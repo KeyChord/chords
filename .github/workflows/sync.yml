@@ -43,5 +43,5 @@ jobs:
       - name: Sync
         run: .github/sync-to-mirrors.sh
         env:
-          BUILD_BASE: ${{ github.workspace }}/plugins
-          API_TOKEN_GITHUB: ${{ secrets.ORG_TAURI_BOT_PAT }}
+          BUILD_BASE: ${{ github.workspace }}/packages
+          API_TOKEN_GITHUB: ${{ secrets.ORG_KEYCHORD_BOT_PAT }}
