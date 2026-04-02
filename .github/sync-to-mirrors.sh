@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copied from https://github.com/tauri-apps/plugins-workspace/blob/v2/.github/sync-to-mirrors.sh
+# Adapted from https://github.com/tauri-apps/plugins-workspace/blob/v2/.github/sync-to-mirrors.sh
 
 ## Environment used by this script:
 #
@@ -23,10 +23,10 @@
 set -eo pipefail
 
 if [[ -n "$CI" ]]; then
-	export GIT_AUTHOR_NAME="tauri-bot"
-	export GIT_AUTHOR_EMAIL="tauri-bot@users.noreply.github.com"
-	export GIT_COMMITTER_NAME="tauri-bot"
-	export GIT_COMMITTER_EMAIL="tauri-bot@users.noreply.github.com"
+	export GIT_AUTHOR_NAME="chord-bot"
+	export GIT_AUTHOR_EMAIL="chord-bot@users.noreply.github.com"
+	export GIT_COMMITTER_NAME="chord-bot"
+	export GIT_COMMITTER_EMAIL="chord-bot@users.noreply.github.com"
 fi
 
 if [[ -z "$BUILD_BASE" ]]; then
@@ -72,7 +72,7 @@ while read -r PACKAGE_NAME; do
 
 	# Initialize the directory as a git repo, and set the remote
 	git init -b "$BRANCH" .
-	git remote add origin "https://github.com/tauri-apps/tauri-plugin-${PACKAGE_NAME}"
+	git remote add origin "https://github.com/KeyChord/${PACKAGE_NAME}"
 	if [[ -n "$API_TOKEN_GITHUB" ]]; then
 		git config --local http.https://github.com/.extraheader "AUTHORIZATION: basic $(printf "x-access-token:%s" "$API_TOKEN_GITHUB" | base64)"
 	fi
