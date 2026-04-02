@@ -1,16 +1,47 @@
-name: Sync Files
+# Copied from https://github.com/tauri-apps/plugins-workspace/blob/v2/.github/workflows/sync.yml
+name: Sync
+
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
-  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  sync:
+  sync-to-mirrors:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
-      - name: Run GitHub File Sync
-        uses: Redocly/repo-file-sync-action@main
+      - uses: actions/checkout@v4
+
+      - name: Fetch git tags
+        run: git fetch origin 'refs/tags/*:refs/tags/*'
+
+      - name: Cache pnpm modules
+        uses: actions/cache@v4
         with:
-          GH_PAT: ${{ secrets.GH_PAT }}
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.x.x
+          run_install: true
+
+      - name: Build packages
+        run: pnpm build
+
+      - name: Sync
+        run: .github/sync-to-mirrors.sh
+        env:
+          BUILD_BASE: ${{ github.workspace }}/plugins
+          API_TOKEN_GITHUB: ${{ secrets.ORG_TAURI_BOT_PAT }}

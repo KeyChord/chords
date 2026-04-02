@@ -6,7 +6,7 @@ var devDependencies = {
 	"@jxa/global-type": "^1.4.0",
 	"@keychord/chords-menu": "github:KeyChord/chords-menu",
 	"@keychord/config": "^0.0.6",
-	"@keychord/tsconfig": "^0.0.6"
+	"@keychord/tsconfig": "catalog:"
 };
 var packageManager = "pnpm@10.33.0";
 var package_default = {

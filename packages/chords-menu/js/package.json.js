@@ -7,7 +7,7 @@ var dependencies = { "jxa-run-compat": "^1.6.0" };
 var devDependencies = {
 	"@jxa/global-type": "^1.4.0",
 	"@keychord/config": "^0.0.1",
-	"@keychord/tsconfig": "latest"
+	"@keychord/tsconfig": "catalog:"
 };
 var packageManager = "pnpm@10.33.0";
 var package_default = {

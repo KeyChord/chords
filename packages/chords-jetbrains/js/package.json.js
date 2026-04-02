@@ -7,7 +7,7 @@ var dependencies = {
 	"outdent": "^0.8.0"
 };
 var devDependencies = {
-	"@keychord/tsconfig": "^0.0.6",
+	"@keychord/tsconfig": "catalog:",
 	"@keychord/config": "^0.0.6"
 };
 var package_default = {

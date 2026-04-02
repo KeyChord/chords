@@ -4,7 +4,7 @@ var type = "module";
 var version = "0.0.0";
 var packageManager = "pnpm@10.33.0";
 var devDependencies = {
-	"@keychord/tsconfig": "^0.0.6",
+	"@keychord/tsconfig": "catalog:",
 	"@keychord/config": "^0.0.6",
 	"typescript": "^6.0.2"
 };

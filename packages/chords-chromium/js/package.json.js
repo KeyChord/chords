@@ -11,7 +11,7 @@ var dependencies = {
 	"nano-spawn-compat": "^2.0.6"
 };
 var devDependencies = {
-	"@keychord/tsconfig": "^0.0.6",
+	"@keychord/tsconfig": "catalog:",
 	"@keychord/config": "^0.0.5",
 	"@types/chrome-remote-interface": "^0.33.0",
 	"bun-types": "^1.3.11",

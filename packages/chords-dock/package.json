@@ -2,13 +2,13 @@
   "name": "@keychord/chords-dock",
   "type": "module",
   "dependencies": {
-    "jxa-run-compat": "^1.6.0"
+    "jxa-run-compat": "catalog:"
   },
   "devDependencies": {
-    "@jxa/global-type": "^1.4.0",
+    "@jxa/global-type": "catalog:",
     "@keychord/chords-menu": "github:KeyChord/chords-menu",
     "@keychord/config": "^0.0.6",
-    "@keychord/tsconfig": "^0.0.6"
+    "@keychord/tsconfig": "catalog:"
   },
   "packageManager": "pnpm@10.33.0"
 }

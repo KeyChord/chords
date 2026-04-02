@@ -6,12 +6,12 @@
     "#/*": "./src/js/*"
   },
   "dependencies": {
-    "jxa-run-compat": "^1.6.0"
+    "jxa-run-compat": "catalog:"
   },
   "devDependencies": {
-    "@jxa/global-type": "^1.4.0",
+    "@jxa/global-type": "catalog:",
     "@keychord/config": "^0.0.1",
-    "@keychord/tsconfig": "latest"
+    "@keychord/tsconfig": "catalog:"
   },
   "packageManager": "pnpm@10.33.0"
 }

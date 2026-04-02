@@ -14,7 +14,7 @@ var dependencies = {
 var devDependencies = {
 	"@jxa/global-type": "^1.4.0",
 	"@keychord/config": "^0.0.6",
-	"@keychord/tsconfig": "^0.0.5",
+	"@keychord/tsconfig": "catalog:",
 	"typescript": "^6.0.2"
 };
 var packageManager = "pnpm@10.33.0";

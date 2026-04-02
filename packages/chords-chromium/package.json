@@ -4,18 +4,18 @@
   "type": "module",
   "packageManager": "pnpm@10.33.0",
   "dependencies": {
-    "chrome-remote-interface": "^0.34.0",
-    "desm": "^1.3.1",
-    "get-port": "^7.2.0",
-    "jquery-as-string": "^0.4.0",
-    "nano-spawn-compat": "^2.0.6"
+    "chrome-remote-interface": "catalog:",
+    "desm": "catalog:",
+    "get-port": "catalog:",
+    "jquery-as-string": "catalog:",
+    "nano-spawn-compat": "catalog:"
   },
   "devDependencies": {
-    "@keychord/tsconfig": "^0.0.6",
-    "@keychord/config": "^0.0.5",
-    "@types/chrome-remote-interface": "^0.33.0",
-    "bun-types": "^1.3.11",
-    "dax": "^0.45.0",
-    "typescript": "^6.0.2"
+    "@keychord/tsconfig": "catalog:",
+    "@keychord/config": "catalog:",
+    "@types/chrome-remote-interface": "catalog:",
+    "bun-types": "catalog:",
+    "dax": "catalog:",
+    "typescript": "catalog:"
   }
 }

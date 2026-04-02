@@ -4,18 +4,18 @@
   "version": "0.0.0",
   "dependencies": {
     "@keychord/chords-menu": "github:KeyChord/chords-menu",
-    "desm": "^1.3.1",
-    "get-port": "^7.2.0",
-    "jquery-as-string": "^0.4.0",
-    "jxa-run-compat": "^1.6.0",
-    "nano-spawn-compat": "^2.0.6",
-    "outdent": "^0.8.0"
+    "desm": "catalog:",
+    "get-port": "catalog:",
+    "jquery-as-string": "catalog:",
+    "jxa-run-compat": "catalog:",
+    "nano-spawn-compat": "catalog:",
+    "outdent": "catalog:"
   },
   "devDependencies": {
-    "@jxa/global-type": "^1.4.0",
+    "@jxa/global-type": "catalog:",
     "@keychord/config": "^0.0.6",
-    "@keychord/tsconfig": "^0.0.5",
-    "typescript": "^6.0.2"
+    "@keychord/tsconfig": "catalog:",
+    "typescript": "catalog:"
   },
   "packageManager": "pnpm@10.33.0"
 }

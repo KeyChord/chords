@@ -1,0 +1,6 @@
+{
+  "scripts": {
+    "build": "vp exec --filter='./packages/chords-*' vp pack"
+  },
+  "packageManager": "pnpm@10.33.0"
+}
