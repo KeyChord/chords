@@ -65,27 +65,27 @@ fi
 readarray -t COMMIT_TAGS < <(git tag --points-at HEAD)
 
 EXIT=0
-while read -r PLUGIN_NAME; do
-	printf "\n\n\e[7m Mirror: %s \e[0m\n" "$PLUGIN_NAME"
-	CLONE_DIR="${BUILD_BASE}/${PLUGIN_NAME}"
+while read -r PACKAGE_NAME; do
+	printf "\n\n\e[7m Mirror: %s \e[0m\n" "$PACKAGE_NAME"
+	CLONE_DIR="${BUILD_BASE}/${PACKAGE_NAME}"
 	cd "${CLONE_DIR}"
 
 	# Initialize the directory as a git repo, and set the remote
 	git init -b "$BRANCH" .
-	git remote add origin "https://github.com/tauri-apps/tauri-plugin-${PLUGIN_NAME}"
+	git remote add origin "https://github.com/tauri-apps/tauri-plugin-${PACKAGE_NAME}"
 	if [[ -n "$API_TOKEN_GITHUB" ]]; then
 		git config --local http.https://github.com/.extraheader "AUTHORIZATION: basic $(printf "x-access-token:%s" "$API_TOKEN_GITHUB" | base64)"
 	fi
 
 	# Check if a remote exists for that mirror.
 	if ! git ls-remote -h origin >/dev/null 2>&1; then
-		echo "::error::Mirror repo for ${PLUGIN_NAME} does not exist."
+		echo "::error::Mirror repo for ${PACKAGE_NAME} does not exist."
 		echo "Skipping."
 		EXIT=1
 		continue
 	fi
 
-	echo "::group::Fetching ${PLUGIN_NAME}"
+	echo "::group::Fetching ${PACKAGE_NAME}"
 	FORCE_COMMIT=
 	if git -c protocol.version=2 fetch --no-tags --prune --progress --no-recurse-submodules --depth=1 origin "$BRANCH"; then
 		git reset --soft FETCH_HEAD
@@ -102,32 +102,32 @@ while read -r PLUGIN_NAME; do
 	echo "::endgroup::"
 
 	if [[ -n "$FORCE_COMMIT" || -n "$(git status --porcelain)" ]]; then
-		echo "Committing to $PLUGIN_NAME"
+		echo "Committing to $PACKAGE_NAME"
 		GIT_CLI_COMMIT_MESSAGE=$( printf "%s \n\nCo-authored-by: %s" "$COMMIT_MESSAGE" "$COMMIT_ACTOR" )
 		if git commit $FORCE_COMMIT --author="${COMMIT_AUTHOR}" -m "${GIT_CLI_COMMIT_MESSAGE}" &&
 			{ [[ -z "$CI" ]] || git push origin "$BRANCH"; } # Only do the actual push from the GitHub Action
 		then
 			# echo "$BUILD_BASE/changes.diff"
-			# git show --pretty= --src-prefix="a/$PLUGIN_NAME/" --dst-prefix="b/$PLUGIN_NAME/" >> "$BUILD_BASE/changes.diff"
-			echo "https://github.com/KeyChord/$PLUGIN_NAME/commit/$(git rev-parse HEAD)"
+			# git show --pretty= --src-prefix="a/$PACKAGE_NAME/" --dst-prefix="b/$PACKAGE_NAME/" >> "$BUILD_BASE/changes.diff"
+			echo "https://github.com/KeyChord/$PACKAGE_NAME/commit/$(git rev-parse HEAD)"
 
 			# Add new tags
 			for FULL_TAG in "${COMMIT_TAGS[@]}"; do
-				if [[ "$FULL_TAG" =~ ^"$PLUGIN_NAME-js-v" ]]; then
-					TAG_NAME="${FULL_TAG#"$PLUGIN_NAME-js-"}"
+				if [[ "$FULL_TAG" =~ ^"$PACKAGE_NAME-js-v" ]]; then
+					TAG_NAME="${FULL_TAG#"$PACKAGE_NAME-js-"}"
 					echo "Creating tag $TAG_NAME"
 					git tag "${TAG_NAME}" -m "${GIT_CLI_COMMIT_MESSAGE}"
 					git push origin "${TAG_NAME}"
 				fi
 			done
 
-			echo "Completed $PLUGIN_NAME"
+			echo "Completed $PACKAGE_NAME"
 		else
-			echo "::error::Commit of ${PLUGIN_NAME} failed"
+			echo "::error::Commit of ${PACKAGE_NAME} failed"
 			EXIT=1
 		fi
 	else
-		echo "No changes, skipping $PLUGIN_NAME"
+		echo "No changes, skipping $PACKAGE_NAME"
 	fi
 done < "$BUILD_BASE/mirrors.txt"
 

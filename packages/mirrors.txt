@@ -1,0 +1,12 @@
+chordpack-chord
+chords-aerospace
+chords-chord
+chords-chromium
+chords-com.apple
+chords-commands
+chords-dock
+chords-jetbrains
+chords-menu
+chords-terminal
+chords-tray
+chords-vscode
