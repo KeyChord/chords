@@ -1,0 +1,70 @@
+name = "macOS Tray / System"
+
+[on.tray]
+file = "tray.js"
+
+[chords]
+'?=' = { name = "Tray / System" }
+
+# Tray Items
+# '=0' = { name = "Tray: Notch", 'emit:notch' = [] }
+'=1' = { name = "Tray: 1st Item", 'emit:tray' = [0] }
+'=2' = { name = "Tray: 2nd Item", 'emit:tray' = [1] }
+'=3' = { name = "Tray: 3rd Item", 'emit:tray' = [2] }
+'=4' = { name = "Tray: 4th Item", 'emit:tray' = [3] }
+'=5' = { name = "Tray: 5th Item", 'emit:tray' = [4] }
+'=6' = { name = "Tray: 6th Item", 'emit:tray' = [5] }
+'=7' = { name = "Tray: 7th Item", 'emit:tray' = [6] }
+'=8' = { name = "Tray: 8th Item", 'emit:tray' = [7] }
+'=9' = { name = "Tray: 9th Item", 'emit:tray' = [8] }
+
+'?=-' = { name = "Tray: From End" }
+'=-1' = { name = "Tray: 1st End Item", 'emit:tray' = [-1] }
+'=-2' = { name = "Tray: 2nd End Item", 'emit:tray' = [-2] }
+'=-3' = { name = "Tray: 3rd End Item", 'emit:tray' = [-3] }
+'=-4' = { name = "Tray: 4th End Item", 'emit:tray' = [-4] }
+'=-5' = { name = "Tray: 5th End Item", 'emit:tray' = [-5] }
+'=-6' = { name = "Tray: 6th End Item", 'emit:tray' = [-6] }
+'=-7' = { name = "Tray: 7th End Item", 'emit:tray' = [-7] }
+'=-8' = { name = "Tray: 8th End Item", 'emit:tray' = [-8] }
+'=-9' = { name = "Tray: 9th End Item", 'emit:tray' = [-9] }
+'=1/' = { name = "Tray: 1st Item Right Click", 'emit:tray' = [0, 'right'] }
+'=2/' = { name = "Tray: 2nd Item Right Click", 'emit:tray' = [1, 'right'] }
+'=3/' = { name = "Tray: 3rd Item Right Click", 'emit:tray' = [2, 'right'] }
+'=4/' = { name = "Tray: 4th Item Right Click", 'emit:tray' = [3, 'right'] }
+'=5/' = { name = "Tray: 5th Item Right Click", 'emit:tray' = [4, 'right'] }
+'=6/' = { name = "Tray: 6th Item Right Click", 'emit:tray' = [5, 'right'] }
+'=7/' = { name = "Tray: 7th Item Right Click", 'emit:tray' = [6, 'right'] }
+'=8/' = { name = "Tray: 8th Item Right Click", 'emit:tray' = [7, 'right'] }
+'=9/' = { name = "Tray: 9th Item Right Click", 'emit:tray' = [8, 'right'] }
+'=-1/' = { name = "Tray: 1st End Item Right Click", 'emit:tray' = [-1, 'right'] }
+'=-2/' = { name = "Tray: 2nd End Item Right Click", 'emit:tray' = [-2, 'right'] }
+'=-3/' = { name = "Tray: 3rd End Item Right Click", 'emit:tray' = [-3, 'right'] }
+'=-4/' = { name = "Tray: 4th End Item Right Click", 'emit:tray' = [-4, 'right'] }
+'=-5/' = { name = "Tray: 5th End Item Right Click", 'emit:tray' = [-5, 'right'] }
+'=-6/' = { name = "Tray: 6th End Item Right Click", 'emit:tray' = [-6, 'right'] }
+'=-7/' = { name = "Tray: 7th End Item Right Click", 'emit:tray' = [-7, 'right'] }
+'=-8/' = { name = "Tray: 8th End Item Right Click", 'emit:tray' = [-8, 'right'] }
+'=-9/' = { name = "Tray: 9th End Item Right Click", 'emit:tray' = [-9, 'right'] }
+
+'=p' = { name = "Tray: Power / Battery" }
+'=c' = { name = "Tray: Control Center" }
+'=t' = { name = "Tray: Time & Date" }
+
+'?=w' = { name = "Tray Wi-Fi" }
+'=w' = { name = "Tray: Wi-Fi" }
+'=wv' = { name = "Tray Wi-Fi: Vary On/Off" }
+
+'=q' = { name = "Force Quit", shortcut = "opt+cmd+esc" }
+'=ls' = { name = "Lock Screen", shortcut = "opt+cmd+esc" }
+'=lo' = { name = "Log Out", shortcut = "ctrl+cmd+q" }
+'=lq' = { name = "Log Quit", shortcut = "opt+shift+cmd+q" }
+
+'?=b' = { name = "Brightness"}
+'=bu' = { name = "Brightness Up", shortcut = "BrightnessUp" }
+'=bd' = { name = "Brightness Down", shortcut = "BrightnessDown" }
+
+'?=v' = { name = "Volume"}
+'=vu' = { name = "Volume Up", shortcut = "AudioVolumeUp" }
+'=vd' = { name = "Volume Down", shortcut = "AudioVolumeDown" }
+'=vm' = { name = "Volume Mute", shortcut = "AudioVolumeMute" }

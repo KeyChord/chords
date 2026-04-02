@@ -1,0 +1,13 @@
+{
+  "name": "@keychord/chords-jetbrains",
+  "type": "module",
+  "packageManager": "pnpm@10.33.0",
+  "dependencies": {
+    "nano-spawn-compat": "^2.0.6",
+    "outdent": "^0.8.0"
+  },
+  "devDependencies": {
+    "@keychord/tsconfig": "^0.0.6",
+    "@keychord/config": "^0.0.6"
+  }
+}

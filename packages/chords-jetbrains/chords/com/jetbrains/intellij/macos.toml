@@ -1,0 +1,6 @@
+name = "IntelliJ IDEA"
+
+[[import]]
+file = "base.toml"
+[import.overrides.meta]
+'$execPath' = "/Applications/IntelliJ IDEA.app/Contents/MacOS/idea"

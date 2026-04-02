@@ -1,0 +1,16 @@
+name = "Terminal"
+
+[chords]
+# Meant to be overriden if you use a different terminal.
+'/t' = { name = "Terminal" }
+
+'?t' = { name = "Terminal" }
+t1 = { name = "Tab 1", shortcut = "cmd+1" }
+t2 = { name = "Tab 2", shortcut = "cmd+2" }
+t3 = { name = "Tab 3", shortcut = "cmd+3" }
+t4 = { name = "Tab 4", shortcut = "cmd+4" }
+t5 = { name = "Tab 5", shortcut = "cmd+5" }
+t6 = { name = "Tab 6", shortcut = "cmd+6" }
+t7 = { name = "Tab 7", shortcut = "cmd+7" }
+t8 = { name = "Tab 8", shortcut = "cmd+8" }
+t9 = { name = "Tab 9", shortcut = "cmd+9" }

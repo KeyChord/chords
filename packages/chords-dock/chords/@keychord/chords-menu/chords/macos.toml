@@ -1,0 +1,10 @@
+name = "macOS Menu Bar"
+
+[js]
+menu = ['']
+
+[chords]
+'?-' = { name = "Menu Bar" }
+'-0' = { name = "Menu Bar: Item 0 (Apple Logo)", 'js:menu' = [] }
+'-([1-9])' = { name = "Menu Bar: Item $1", 'js:menu' = ["by-index", "$1"] }
+'-([a-z]+[0-9]?)' = { name = "Menu Bar: By Letter $1", 'js:menu' = ["by-letters", "$1"] }

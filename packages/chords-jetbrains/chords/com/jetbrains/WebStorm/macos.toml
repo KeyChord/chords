@@ -1,0 +1,6 @@
+name = "WebStorm"
+
+[[import]]
+file = "base.toml"
+[import.overrides.meta]
+'$execPath' = "/Applications/WebStorm.app/Contents/MacOS/webstorm"

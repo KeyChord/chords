@@ -1,0 +1,17 @@
+name = "google.com"
+
+[on.js]
+file = "chrome.js"
+args = []
+
+[chords]
+'?r' = { name = "Results" }
+r1 = { name = "Result 1", 'emit:js' = ['$(`div[lang="en"]:has(cite[role="text"])`).eq(0)'] }
+r2 = { name = "Result 1", 'emit:js' = ['$(`div[lang="en"]:has(cite[role="text"])`).eq(1)'] }
+r3 = { name = "Result 1", 'emit:js' = ['$(`div[lang="en"]:has(cite[role="text"])`).eq(2)'] }
+r4 = { name = "Result 1", 'emit:js' = ['$(`div[lang="en"]:has(cite[role="text"])`).eq(3)'] }
+r5 = { name = "Result 1", 'emit:js' = ['$(`div[lang="en"]:has(cite[role="text"])`).eq(4)'] }
+r6 = { name = "Result 1", 'emit:js' = ['$(`div[lang="en"]:has(cite[role="text"])`).eq(5)'] }
+r7 = { name = "Result 1", 'emit:js' = ['$(`div[lang="en"]:has(cite[role="text"])`).eq(6)'] }
+r8 = { name = "Result 1", 'emit:js' = ['$(`div[lang="en"]:has(cite[role="text"])`).eq(7)'] }
+r9 = { name = "Result 1", 'emit:js' = ['$(`div[lang="en"]:has(cite[role="text"])`).eq(8)'] }

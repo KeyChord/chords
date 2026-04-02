@@ -1,0 +1,6 @@
+name = "GoLand"
+
+[[import]]
+file = "base.toml"
+[import.overrides.meta]
+'$execPath' = "/Applications/GoLand.app/Contents/MacOS/goland"

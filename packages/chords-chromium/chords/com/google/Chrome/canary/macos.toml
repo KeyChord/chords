@@ -1,0 +1,8 @@
+name = "Google Chrome Canary"
+
+[on.js]
+file = "chrome.js"
+args = ["/Applications/Google Chrome Canary.app"]
+
+[[import]]
+file = "com/google/Chrome/macos.toml"

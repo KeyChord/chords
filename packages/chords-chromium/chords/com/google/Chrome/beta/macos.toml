@@ -1,0 +1,8 @@
+name = "Google Chrome Beta"
+
+[on.js]
+file = "chrome.js"
+args = ["/Applications/Google Chrome Beta.app"]
+
+[[import]]
+file = "com/google/Chrome/macos.toml"

@@ -1,0 +1,15 @@
+name = "Accessibility Inspector"
+
+[chords]
+'?i' = { name = "Inspect" }
+'ir' = { name = "Inspect: Refresh", shortcut = "cmd+r" }
+'ip' = { name = "Inspect: Point", shortcut = "cmd+ctrl+alt+shift+p" }
+'iu' = { name = "Inspect: Up Hierarchy - Parent", shortcut = "cmd+ctrl+up" }
+'id' = { name = "Inspect: Down Hierarchy - Child", shortcut = "cmd+ctrl+down" }
+'i[' = { name = "Inspect: Previous", shortcut = "cmd+ctrl+left" }
+'i]' = { name = "Inspect: Next", shortcut = "cmd+ctrl+right" }
+
+'?v' = { name = "Vary" }
+'va' = { name = "Vary Auto-Interact" }
+'vc' = { name = "Vary Class" }
+'vi' = { name = "Vary Ignored" }

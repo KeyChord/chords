@@ -1,0 +1,6 @@
+name = "CLion"
+
+[[import]]
+file = "base.toml"
+[import.overrides.meta]
+'$execPath' = "/Applications/CLion.app/Contents/MacOS/clion"

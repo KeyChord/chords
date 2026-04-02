@@ -1,0 +1,340 @@
+name = "JetBrains Base Chords"
+
+[meta]
+'$execPath' = ""
+
+[on.command]
+file = "jetbrains.js"
+args = ['$execPath']
+
+[chords]
+'?e' = { name = "Editor" }
+ea = { name = "Editor: Actions", 'emit:command' = ['QuickActions'] }
+es = { name = "Editor: Solutions", 'emit:command' = ['QuickFixes'] }
+ef = { name = "Editor: Focus", shortcut = "esc" }
+ep = { name = "Editor: Pin", 'emit:command' = ['PinActiveEditorTab'] }
+eu = { name = "Editor: Unpin", 'emit:command' = ['PinActiveTabToggle'] }
+eq = { name = "Editor: Quit", 'emit:command' = ['CloseEditor'] }
+eqa = { name = "Editor: Quit All", 'emit:command' = ['CloseAllEditors'] }
+eqo = { name = "Editor: Quit Others", 'emit:command' = ['CloseAllEditorsButActive'] }
+eql = { name = "Editor: Quit to the Left", 'emit:command' = ['CloseEditorsToTheLeft'] }
+eqr = { name = "Editor: Quit to the Right", 'emit:command' = ['CloseEditorsToTheRight'] }
+equ = { name = "Editor: Quit Unmodified", 'emit:command' = ['CloseUnmodifiedEditors'] }
+eqp = { name = "Editor: Quit Pinless", 'emit:command' = ['CloseUnpinnedEditors'] }
+
+'?t' = { name = "Tab" }
+ta = { name = "Tab: All", command = "action('TabList')" }
+tv = { name = "Tab: Previous", command = "action('PreviousTab')" }
+tx = { name = "Tab: Next", command = "action('NextTab')" }
+tb = { name = "Tab: Back", command = "action('GoToLastTab')" }
+to = { name = "Tab: Open Recently Closed", command = "action('ReopenClosedTab')" }
+t1 = { name = "Tab 1", 'emit:command' = ['GoToTab1'] }
+t2 = { name = "Tab 2", 'emit:command' = ['GoToTab2'] }
+t3 = { name = "Tab 3", 'emit:command' = ['GoToTab3'] }
+t4 = { name = "Tab 4", 'emit:command' = ['GoToTab4'] }
+t5 = { name = "Tab 5", 'emit:command' = ['GoToTab5'] }
+t6 = { name = "Tab 6", 'emit:command' = ['GoToTab6'] }
+t7 = { name = "Tab 7", 'emit:command' = ['GoToTab7'] }
+t8 = { name = "Tab 8", 'emit:command' = ['GoToTab8'] }
+t9 = { name = "Tab 9", 'emit:command' = ['GoToTab9'] }
+td = { name = "Tab: Move Down", 'emit:command' = ['MoveTabDown'] }
+tr = { name = "Tab: Move Right", 'emit:command' = ['MoveTabRight'] }
+
+'?f' = { name = "Find/File" }
+
+# Find
+fr = { name = "Find and Replace", command = "Replace...", shortcut = "cmd+r" }
+'f]' = { name = "Find: Next", command = "Find Next / Move to Next Occurrence", shortcut = "cmd+g" }
+'f[' = { name = "Find: Previous", command = "Find Previous / Move to Previous Occurrence", shortcut = "cmd+shift+g" }
+fg = { name = "Find Globally", command = "Find in Files...", shortcut = "cmd+shift+f" }
+frg = { name = "Find and Replace Globally", command = "Replace in Files...", shortcut = "cmd+shift+r" }
+fa = { name = "Find Action", command = "Find Action...", shortcut = "cmd+shift+a" }
+
+# File Actions
+fp = { name = "File: Path", shortcut = "cmd+shift+c" }
+fb = { name = "File: Back", command = "Recent Files", shortcut = "cmd+e" }
+fn = { name = "File: New", command = "New in This Directory", shortcut = "ctrl+option+n" }
+fnn = { name = "File: New Name", 'emit:command' = ['RenameFile'] }
+fns = { name = "File: New Scratch", shortcut = "cmd+shift+n" }
+fh = { name = "File: Here", 'emit:command' = ['NewFile'] }
+fd = { name = "File: Directory", 'emit:command' = ['NewDir'] }
+ft = { name = "File: Trash", shortcut = "cmd+delete" }
+fvs = { name = "File: View Structure", command = "File Structure", shortcut = "cmd+f12" }
+fs = { name = "File: Show", 'emit:command' = ['SelectInProjectView'] }
+
+'?b' = { name = "Build" }
+bp = { name = "Build Project", command = "Build Project", shortcut = "cmd+f9" }
+br = { name = "Build: Rebuild", command = "Rebuild", shortcut = "cmd+shift+f9" }
+
+'?s' = { name = "Split/Search" }
+# Split
+sr = { name = "Split: Right", 'emit:command' = ['SplitHorizontally'] }
+sd = { name = "Split: Down", 'emit:command' = ['SplitVertically'] }
+so = { name = "Split: Orientation", 'emit:command' = ['ChangeSplitOrientation'] }
+sx = { name = "Split: Next", shortcut = "opt+right" }
+sv = { name = "Split: Previous", shortcut = "opt+shift+right" }
+sq = { name = "Split: Quit", 'emit:command' = ['Unsplit'] }
+sqa = { name = "Split: Quit All", 'emit:command' = ['UnsplitAll'] }
+
+# Search
+sg = { name = "Search: Globally", command = "Search Everywhere", shortcut = "shift shift" }
+st = { name = "Search: Types", shortcut = "cmd+o" }
+sf = { name = "Search: Files", shortcut = "cmd+shift+o" }
+sy = { name = "Search: Symbols", shortcut = "cmd+option+o" }
+sa = { name = "Search: All", shortcut = "cmd+shift+a" }
+sc = { name = "Search: Content Text", shortcut = "cmd+shift+option+e" }
+
+
+# Basic editing
+# pap = { name = "Paste as Plain Text", command = "Paste as Plain Text", shortcut = "cmd+option+shift+v" }
+ph = { name = "Paste from History...", command = "Paste from History...", shortcut = "cmd+shift+v" }
+cpp = { name = "Copy Paths", command = "Copy Paths", shortcut = "cmd+shift+c" }
+cpr = { name = "Copy Reference", command = "Copy Reference", shortcut = "cmd+option+shift+c" }
+sva = { name = "Save All", command = "Save All", shortcut = "cmd+s" }
+ud = { name = "Undo", command = "Undo", shortcut = "cmd+z" }
+rd = { name = "Redo", command = "Redo", shortcut = "cmd+shift+z" }
+is = { name = "Indent Selection", command = "Indent Selection", shortcut = "tab" }
+uis = { name = "Unindent Selection", command = "Unindent Line or Selection", shortcut = "shift+tab" }
+ail = { name = "Auto-Indent Lines", command = "Auto-Indent Lines", shortcut = "ctrl+option+i" }
+ln = { name = "Line: New", command = "Start New Line", shortcut = "shift+enter" }
+lb = { name = "Line: Before New", command = "Start New Line Before Current", shortcut = "cmd+option+enter" }
+ld = { name = "Line: Delete", command = "Delete Line", shortcut = "cmd+backspace" }
+lj = { name = "Line: Join", command = "Join Lines", shortcut = "ctrl+shift+j" }
+lc = { name = "Line: Clone", command = "Duplicate Line or Selection", shortcut = "cmd+d" }
+tgc = { name = "Toggle Case", command = "Toggle Case", shortcut = "cmd+shift+u" }
+os = { name = "Open Source", command = "Open Source in New Window", shortcut = "shift+f4" }
+fsi = { name = "Font Size: Increase", command = "Increase Font Size in All Editors", shortcut = "ctrl+shift+." }
+fsd = { name = "Font Size: Decrease", command = "Decrease Font Size in All Editors", shortcut = "ctrl+shift+," }
+
+# Folding
+'?ff' = { name = "Folding" }
+ff = { name = "Folding: Fold", command = "Collapse", shortcut = "cmd+NumpadSubtract" }
+ffs = { name = "Folding: Fold Selection", command = "Fold Selection", shortcut = "cmd+." }
+ffa = { name = "Folding: Fold All", command = "Expand All", shortcut = "cmd+shift+NumpadAdd" }
+ffc = { name = "Folding: Fold Comments", 'emit:command' = ['CollapseDocComments'] }
+ffr = { name = "Folding: Fold Recursively", command = "Collapse Recursively", shortcut = "cmd+option+NumpadSubtract" }
+'?fu' = { name = "Folding Unfold" }
+fu = { name = "Folding: Unfold", command = "Expand", shortcut = "cmd+NumpadAdd" }
+fua = { name = "Folding: Unfold All", command = "Collapse All", shortcut = "cmd+shift+NumpadSubtract" }
+fuc = { name = "Folding: Unfold Comments", 'emit:command' = ['ExpandDocComments'] }
+fur = { name = "Folding: Unfold Recursively", command = "Expand Recursively", shortcut = "cmd+option+NumpadAdd" }
+'?f([1-5l])' = { name = "Folding Level" }
+fl = { name = "Folding: Level", 'emit:command' = ['ExpandToLevel'] }
+f1 = { name = "Folding: Level 1", 'emit:command' = ['ExpandToLevel1'] }
+f2 = { name = "Folding: Level 2", 'emit:command' = ['ExpandToLevel2'] }
+f3 = { name = "Folding: Level 3", 'emit:command' = ['ExpandToLevel3'] }
+f4 = { name = "Folding: Level 4", 'emit:command' = ['ExpandToLevel4'] }
+f5 = { name = "Folding: Level 5", 'emit:command' = ['ExpandToLevel5'] }
+'?fa([1-5l])' = { name = "Folding All Level" }
+fal = { name = "Folding: All Level", 'emit:command' = ['ExpandAllToLevel'] }
+fa1 = { name = "Folding: All Level 1", 'emit:command' = ['ExpandAllToLevel1'] }
+fa2 = { name = "Folding: All Level 2", 'emit:command' = ['ExpandAllToLevel2'] }
+fa3 = { name = "Folding: All Level 3", 'emit:command' = ['ExpandAllToLevel3'] }
+fa4 = { name = "Folding: All Level 4", 'emit:command' = ['ExpandAllToLevel4'] }
+fa5 = { name = "Folding: All Level 5", 'emit:command' = ['ExpandAllToLevel5'] }
+
+# Multiple carets and selection ranges
+# = { name = "Add/Remove Caret", command = "Add/Remove Caret", shortcut = "option+shift+click" }
+# tcs = { name = "Toggle Column Selection Mode", command = "Toggle Column Selection Mode", shortcut = "cmd+shift+8" }
+# cca = { name = "Clone Caret Above", command = "Clone Caret Above", shortcut = "option+up option+up" }
+# ccb = { name = "Clone Caret Below", command = "Clone Caret Below", shortcut = "option+down option+down" }
+# acs = { name = "Add Caret to Each Line in Selection", command = "Add Caret to Each Line in Selection", shortcut = "option+shift+g" }
+# asn = { name = "Add Selection for Next Occurrence", command = "Add Selection for Next Occurrence", shortcut = "ctrl+g" }
+# sao = { name = "Select All Occurrences", command = "Select All Occurrences", shortcut = "cmd+ctrl+g" }
+# dlo = { name = "Deselect Last Occurrence", command = "Deselect Last Occurrence", shortcut = "ctrl+shift+g" }
+# = { name = "Create Rectangular Selection", command = "Create Rectangular Selection", shortcut = "option+shift+middleclick" }
+# = { name = "Drag to Create Rectangular Selection", command = "Drag to Create Rectangular Selection", shortcut = "option+click" }
+# = { name = "Drag to Create Multiple Rectangular Selections", command = "Drag to Create Multiple Rectangular Selections", shortcut = "cmd+option+shift+click" }
+
+'?c' = { name = "Completion / Code / Context"}
+cb = { name = "Completion: Basic", shortcut = "ctrl+space" }
+ct = { name = "Completion: Type-Matching", shortcut = "ctrl+shift+space" }
+cs = { name = "Completion: Second Basic", shortcut = "ctrl+option+space" }
+ca = { name = "Completion: AI", shortcut = "option+backslash" }
+cag = { name = "Completion: AI Generate", shortcut = "cmd+backslash" }
+ccs = { name = "Completion: Current Statement", shortcut = "cmd+shift+enter" }
+cf = { name = "Code: Format", shortcut = "cmd+option+l" }
+cd = { name = "Code: Documentation", command = "Quick Documentation", shortcut = "f1" }
+cp = { name = "Code: Parameter Info", command = "Parameter Info", shortcut = "cmd+p" }
+cc = { name = "Code: Comment", command = "Comment with Line Comment", shortcut = "cmd+/" }
+ccb = { name = "Code: Comment Block", command = "Comment with Block Comment", shortcut = "cmd+option+/" }
+cg = { name = "Code: Generate", shortcut = "cmd+n" }
+csw = { name = "Code: Surround With", shortcut = "cmd+option+t" }
+csu = { name = "Code: Statement Up", shortcut = "cmd+shift+up" }
+csd = { name = "Code: Statement Down", shortcut = "cmd+shift+down" }
+cel = { name = "Code: Element Left", shortcut = "cmd+option+shift+left" }
+cer = { name = "Code: Element Right", shortcut = "cmd+option+shift+right" }
+clu = { name = "Code: Line Up", shortcut = "option+shift+up" }
+cld = { name = "Code: Line Down", shortcut = "option+shift+down" }
+ci = { name = "Code: Intention Actions", command = "Show Intention Actions", shortcut = "option+enter" }
+ce = { name = "Code: Error Description", command = "Error Description", shortcut = "cmd+f1" }
+'c]' = { name = "Context: Next", command = "Forward", shortcut = "cmd+]" }
+'c[' = { name = "Context: Previous", command = "Back", shortcut = "cmd+[" }
+
+# Context navigation
+# 'm]' = { name = "Method: Next", command = "Next Method", shortcut = "ctrl+shift+down" }
+# 'm[' = { name = "Method: Previous", command = "Previous Method", shortcut = "ctrl+shift+up" }
+# swt = { name = "Switcher", command = "Switcher", shortcut = "ctrl+tab" }
+# rc = { name = "Recent Changes", command = "Recent Changes", shortcut = "option+shift+c" }
+# le = { name = "Last Edit Location", command = "Last Edit Location", shortcut = "cmd+shift+backspace" }
+# snt = { name = "Select Next Tab", command = "Select Next Tab", shortcut = "cmd+shift+]" }
+# spt = { name = "Select Previous Tab", command = "Select Previous Tab", shortcut = "cmd+shift+[" }
+# tab = { name = "Toggle Anonymous Bookmark", command = "Toggle Anonymous Bookmark", shortcut = "f3" }
+# tbd = { name = "Toggle Bookmark with Digit", command = "Toggle Bookmark with Digit", shortcut = "ctrl+shift" }
+# tbm = { name = "Toggle Bookmark with Mnemonic", command = "Toggle Bookmark with Mnemonic", shortcut = "option+f3" }
+# sab = { name = "Show All Bookmarks", command = "Show All Bookmarks", shortcut = "cmd+f3" }
+# mb = { name = "Show Mnemonic Bookmarks", command = "Show Mnemonic Bookmarks", shortcut = "cmd+option+f3" }
+# no = { name = "Next Occurrence", command = "Next Occurrence", shortcut = "cmd+option+down" }
+# po = { name = "Previous Occurrence", command = "Previous Occurrence", shortcut = "cmd+option+up" }
+
+# Goto
+'?g' = { name = 'Goto / Git' }
+gl = { name = "Go to Line/Column...", command = "Go to Line/Column...", shortcut = "cmd+l" }
+gk = { name = "Goto Class", 'emit:command' = ['GotoClass'] }
+gpx = { name = "Goto Problem: Next", command = "Next Highlighted Error", shortcut = "f2" }
+gpv = { name = "Goto Problem: Previous", command = "Previous Highlighted Error", shortcut = "shift+f2" }
+gd = { name = "Goto Declaration or Usages", command = "Go to Declaration or Usages", shortcut = "cmd+b" }
+gy = { name = "Goto Type Declaration", command = "Go to Type Declaration", shortcut = "cmd+shift+b" }
+gsm = { name = "Goto Super Method", command = "Go to Super Method", shortcut = "cmd+u" }
+gm = { name = "Goto Menu", 'emit:command' = ['GoToMenu'] }
+gi = { name = "Goto Implementation(s)", command = "Go to Implementation(s)", shortcut = "cmd+option+b" }
+gs = { name = "Goto Symbol", command = "Go to Symbol...", shortcut = "cmd+option+o" }
+gt = { name = "Goto Test", command = "Go to Test", shortcut = "cmd+shift+t" }
+gcv = { name = "Goto Change: Previous", command = "Previous Change", shortcut = "ctrl+option+shift+up" }
+gcx = { name = "Goto Change: Next", command = "Next Change", shortcut = "ctrl+option+shift+down" }
+'gb`' = { name = "Go to Bookmark with Digit", command = "Go to Bookmark with Digit", shortcut = "ctrl" }
+
+'?gb' = { name = 'Goto Bookmark' }
+gb0 = { name = "Goto Bookmark: 0", action = "action('GotoBookmark0')" }
+gb1 = { name = "Goto Bookmark: 1", action = "action('GotoBookmark1')" }
+gb2 = { name = "Goto Bookmark: 2", action = "action('GotoBookmark2')" }
+gb3 = { name = "Goto Bookmark: 3", action = "action('GotoBookmark3')" }
+gb4 = { name = "Goto Bookmark: 4", action = "action('GotoBookmark4')" }
+gb5 = { name = "Goto Bookmark: 5", action = "action('GotoBookmark5')" }
+gb6 = { name = "Goto Bookmark: 6", action = "action('GotoBookmark6')" }
+gb7 = { name = "Goto Bookmark: 7", action = "action('GotoBookmark7')" }
+gb8 = { name = "Goto Bookmark: 8", action = "action('GotoBookmark8')" }
+gb9 = { name = "Goto Bookmark: 9", action = "action('GotoBookmark9')" }
+gba = { name = "Goto Bookmark: A", action = "action('GotoBookmarkA')" }
+gbb = { name = "Goto Bookmark: B", action = "action('GotoBookmarkB')" }
+gbc = { name = "Goto Bookmark: C", action = "action('GotoBookmarkC')" }
+gbd = { name = "Goto Bookmark: D", action = "action('GotoBookmarkD')" }
+gbe = { name = "Goto Bookmark: E", action = "action('GotoBookmarkE')" }
+gbf = { name = "Goto Bookmark: F", action = "action('GotoBookmarkF')" }
+gbg = { name = "Goto Bookmark: G", action = "action('GotoBookmarkG')" }
+gbh = { name = "Goto Bookmark: H", action = "action('GotoBookmarkH')" }
+gbi = { name = "Goto Bookmark: I", action = "action('GotoBookmarkI')" }
+gbj = { name = "Goto Bookmark: J", action = "action('GotoBookmarkJ')" }
+gbk = { name = "Goto Bookmark: K", action = "action('GotoBookmarkK')" }
+gbl = { name = "Goto Bookmark: L", action = "action('GotoBookmarkL')" }
+gbm = { name = "Goto Bookmark: M", action = "action('GotoBookmarkM')" }
+gbn = { name = "Goto Bookmark: N", action = "action('GotoBookmarkN')" }
+gbo = { name = "Goto Bookmark: O", action = "action('GotoBookmarkO')" }
+gbp = { name = "Goto Bookmark: P", action = "action('GotoBookmarkP')" }
+gbq = { name = "Goto Bookmark: Q", action = "action('GotoBookmarkQ')" }
+gbr = { name = "Goto Bookmark: R", action = "action('GotoBookmarkR')" }
+gbs = { name = "Goto Bookmark: S", action = "action('GotoBookmarkS')" }
+gbt = { name = "Goto Bookmark: T", action = "action('GotoBookmarkT')" }
+gbu = { name = "Goto Bookmark: U", action = "action('GotoBookmarkU')" }
+gbv = { name = "Goto Bookmark: V", action = "action('GotoBookmarkV')" }
+gbw = { name = "Goto Bookmark: W", action = "action('GotoBookmarkW')" }
+gbx = { name = "Goto Bookmark: X", action = "action('GotoBookmarkX')" }
+gby = { name = "Goto Bookmark: Y", action = "action('GotoBookmarkY')" }
+gbz = { name = "Goto Bookmark: Z", action = "action('GotoBookmarkZ')" }
+
+# Git (VCS)
+go = { name = "Git: Operations", command = "VCS Operations Popup...", shortcut = "ctrl+v" }
+gc = { name = "Git: Commit...", command = "Commit...", shortcut = "cmd+k" }
+gu = { name = "Git: Update Project", command = "Update Project", shortcut = "cmd+t" }
+gr = { name = "Git: Rollback", command = "Rollback", shortcut = "cmd+option+z" }
+gp = { name = "Git: Push...", command = "Push...", shortcut = "cmd+shift+k" }
+
+'?u' = { name = 'Usages' }
+uh = { name = "Usages: Highlight in File", command = "Highlight Usages in File", shortcut = "cmd+shift+f7" }
+uf = { name = "Usages: Find", command = "Find Usages", shortcut = "option+f7" }
+us = { name = "Usages: Show", command = "Show Usages", shortcut = "cmd+option+f7" }
+
+# Code analysis
+
+# Run and debug
+'?r' = { name = "Run" }
+ru = { name = "Run...", command = "Run...", shortcut = "ctrl+option+r" }
+ra = { name = "Run Anything", command = "Run Anything", shortcut = "ctrl+ctrl" }
+rcc = { name = "Run context configuration", command = "Run context configuration", shortcut = "ctrl+r" }
+rs = { name = "Run: Stop", command = "Stop", shortcut = "cmd+f2" }
+rr = { name = "Run: Resume Program", command = "Resume Program", shortcut = "cmd+option+r" }
+ri = { name = "Run Inspection by Name...", command = "Run Inspection by Name...", shortcut = "cmd+option+shift+i" }
+
+# dcc = { name = "Debug context configuration", command = "Debug context configuration", shortcut = "ctrl+d" }
+# db = { name = "Debug...", command = "Debug...", shortcut = "ctrl+option+d" }
+# ap = { name = "Attach to Process...", command = "Attach to Process...", shortcut = "option+shift+f5" }
+# sbp = { name = "Stop Background Processes...", command = "Stop Background Processes...", shortcut = "cmd+shift+f2" }
+# sov = { name = "Step Over", command = "Step Over", shortcut = "f8" }
+# fso = { name = "Force Step Over", command = "Force Step Over", shortcut = "option+shift+f8" }
+# sit = { name = "Step Into", command = "Step Into", shortcut = "f7" }
+# sis = { name = "Step Into: Smart", command = "Smart Step Into", shortcut = "shift+f7" }
+# sif = { name = "Step Into: Force", command = "Force Step Into", shortcut = "option+shift+f7" }
+# sot = { name = "Step Out", command = "Step Out", shortcut = "shift+f8" }
+# rtc = { name = "Run To Cursor", command = "Run To Cursor", shortcut = "option+f9" }
+# frtc = { name = "Force Run To Cursor", command = "Force Run To Cursor", shortcut = "cmd+option+f9" }
+# sep = { name = "Show Execution Point", command = "Show Execution Point", shortcut = "option+f10" }
+# ee = { name = "Evaluate Expression...", command = "Evaluate Expression...", shortcut = "option+f8" }
+# qee = { name = "Quick Evaluate Expression", command = "Quick Evaluate Expression", shortcut = "cmd+option+f8" }
+# tlb = { name = "Toggle Line Breakpoint", command = "Toggle Line Breakpoint", shortcut = "cmd+f8" }
+# ttlb = { name = "Toggle Temporary Line Breakpoint", command = "Toggle Temporary Line Breakpoint", shortcut = "cmd+option+shift+f8" }
+# vb = { name = "View Breakpoints...", command = "View Breakpoints...", shortcut = "cmd+shift+f8" }
+# eb = { name = "Edit Breakpoint", command = "Edit Breakpoint", shortcut = "cmd+shift+f8" }
+
+# Refactorings
+# rt = { name = "Refactor This...", command = "Refactor This...", shortcut = "ctrl+t" }
+# rn = { name = "Rename...", command = "Rename...", shortcut = "shift+f6" }
+# cs = { name = "Change Signature...", command = "Change Signature...", shortcut = "cmd+f6" }
+# inl = { name = "Inline...", command = "Inline...", shortcut = "cmd+option+n" }
+# mo = { name = "Move...", command = "Move...", shortcut = "f6" }
+# em = { name = "Extract Method...", command = "Extract Method...", shortcut = "cmd+option+m" }
+# if = { name = "Introduce Field...", command = "Introduce Field...", shortcut = "cmd+option+f" }
+# ip = { name = "Introduce Parameter...", command = "Introduce Parameter...", shortcut = "cmd+option+p" }
+# iv = { name = "Introduce Variable...", command = "Introduce Variable...", shortcut = "cmd+option+v" }
+# sfd = { name = "Safe Delete...", command = "Safe Delete...", shortcut = "cmd+delete" }
+
+'?d' = { name = "Diff" }
+dc = { name = "Diff: Compare Files", command = "Compare Files", shortcut = "cmd+d" }
+ds = { name = "Diff: Show", command = "Show Diff", shortcut = "cmd+d" }
+dx = { name = "Diff: Next", command = "Next Difference", shortcut = "f7" }
+dv = { name = "Diff: Previous", command = "Previous Difference", shortcut = "shift+f7" }
+do = { name = "Diff: Opposite Pane", command = "Select Opposite Diff Pane", shortcut = "ctrl+shift+tab" }
+dl = { name = "Diff: Left Accept", command = "Accept Left Side", shortcut = "cmd+ctrl+right" }
+dr = { name = "Diff: Right Accept", command = "Accept Right Side", shortcut = "cmd+ctrl+left" }
+dss = { name = "Diff: Show Settings", command = "Show Diff Settings Popup...", shortcut = "cmd+shift+d" }
+
+'?p' = { name = "Panel" }
+
+'?ph' = { name = "Panel: Hide" }
+phc = { name = "Panel: Hide Current", command = "Hide Active Tool Window", shortcut = "shift+esc" }
+pha = { name = "Panel: Hide All", command = "Hide All Tool Windows", shortcut = "cmd+shift+f12" }
+
+'?pr' = { name = "Panel: Run / Resize" }
+pr = { name = "Panel: Run", command = "Show Run window", shortcut = "cmd+4" }
+prl = { name = "Panel: Stretch Left", 'emit:command' = "ResizeToolWindowLeft", shortcut = "ctrl+option+left" }
+prr = { name = "Panel: Resize Right", command = "ResizeToolWindowRight", shortcut = "ctrl+option+right" }
+pru = { name = "Panel: Resize Top", command = "ResizeToolWindowUp", shortcut = "ctrl+option+up" }
+prd = { name = "Panel: Resize Down", command = "ResizeToolWindowDown", shortcut = "ctrl+option+down" }
+
+'p[' = { name = "Panel: Back", command = "Jump to Last Tool Window", shortcut = "f12" }
+pb = { name = "Panel: Build", 'emit:command' = 'ActivateBuildToolWindow' }
+ptc = { name = "Panel: Test Coverage", 'emit:command' = 'ActivateCoverageToolWindow' }
+pp = { name = "Panel: Project", command = "Show Project window", shortcut = "cmd+1" }
+pm = { name = "Panel: Marks", command = "Show Bookmarks window", shortcut = "cmd+2" }
+pf = { name = "Panel: Find", command = "Show Find window", shortcut = "cmd+3" }
+pd = { name = "Panel: Debug", command = "Show Debug window", shortcut = "cmd+5" }
+pi = { name = "Panel: Issues", command = "Show Problems window", shortcut = "cmd+6" }
+ps = { name = "Panel: Structure", command = "Show Structure window", shortcut = "cmd+7" }
+pv = { name = "Panel: Services", command = "Show Services window", shortcut = "cmd+9" }
+pg = { name = "Panel: Git", command = "Show Version Control window", shortcut = "cmd+9" }
+pc = { name = "Panel: Commit", command = "Show Commit window", shortcut = "cmd+0" }
+pt = { name = "Panel: Terminal", command = "Show Terminal window", shortcut = "opt+f12" }
+
+'?z' = { name = "Zoom / Zen" }
+zo = { name = "Zoom Out", 'emit:command' = ['ZoomOutIdeAction'] }
+zi = { name = "Zoom In", 'emit:command' = ['ZoomInIdeAction'] }
+zm = { name = "Zen Mode", 'emit:command' = ['ToggleZenMode'] }

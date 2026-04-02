@@ -1,0 +1,6 @@
+name = "PyCharm"
+
+[[import]]
+file = "base.toml"
+[import.overrides.meta]
+'$execPath' = "/Applications/PyCharm.app/Contents/MacOS/pycharm"

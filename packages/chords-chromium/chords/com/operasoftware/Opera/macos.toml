@@ -1,0 +1,8 @@
+name = "Opera"
+
+[on.js]
+file = 'chrome.js'
+args = ['/Applications/Opera.app']
+
+[[import]]
+file = "base.toml"

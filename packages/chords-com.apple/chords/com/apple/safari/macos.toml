@@ -1,0 +1,39 @@
+name = "Safari"
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+args = ["Safari"]
+
+[chords]
+# `b` for Browser. Meant to be overriden.
+'/b' = { name = "Browser (Safari)", shell = "open -a Finder" }
+
+'?w' = { name = "Window" }
+wn = { name = "Window: New",  shortcut = "cmd+n" }
+wp = { name = "Window: Private",  shortcut = "cmd+shift+n" }
+wqa = { name = "Window: Quit All",  shortcut = "cmd+alt+w" }
+
+'?t' = { name = "Tab" }
+tn = { name = "Tab: New", shortcut = "cmd+t" }
+tq = { name = "Tab: Quit", command = "Close the current tab, or pop-up", shortcut = "cmd+w" }
+tp = { name = "Tab: Pin", 'emit:menu' = ['Window', 'Pin Tab'] }
+td = { name = "Tab: Duplicate", 'emit:menu' = ['Window', 'Duplicate Tab'] }
+tw = { name = "Tab: Windowize", 'emit:menu' = ['Window', 'Move Tab to New Window'] }
+'t]' = { name = "Tab: Next", command = "Jump to the next open tab", shortcut = "ctrl+right" }
+'t[' = { name = "Tab: Previous", command = "Jump to the previous open tab", shortcut = "ctrl+shift+right" }
+t1 = { name = "Tab 1", command = "Jump to a specific tab", shortcut = "cmd+1" }
+t2 = { name = "Tab 2", command = "Jump to a specific tab", shortcut = "cmd+2" }
+t3 = { name = "Tab 3", command = "Jump to a specific tab", shortcut = "cmd+3" }
+t4 = { name = "Tab 4", command = "Jump to a specific tab", shortcut = "cmd+4" }
+t5 = { name = "Tab 5", command = "Jump to a specific tab", shortcut = "cmd+5" }
+t6 = { name = "Tab 6", command = "Jump to a specific tab", shortcut = "cmd+6" }
+t7 = { name = "Tab 7", command = "Jump to a specific tab", shortcut = "cmd+7" }
+t8 = { name = "Tab 8", command = "Jump to a specific tab", shortcut = "cmd+8" }
+tl = { name = "Tab: Left Move", command = "Move tabs right or left", shortcut = "ctrl" }
+tr = { name = "Tab: Right Move", command = "Move tabs right or left", shortcut = "cmd+shift+pgdown" }
+
+'?tg' = { name = "Tab Group" }
+'tgn' = { name = "Tab Group: New", shortcut = "cmd+ctrl+n" }
+'tgq' = { name = "Tab Group: Quit", shortcut = "cmd+ctrl+w" }
+'tg]' = { name = "Tab Group: Next", shortcut = "cmd+shift+up" }
+'tg[' = { name = "Tab Group: Previous", shortcut = "cmd+shift+down" }

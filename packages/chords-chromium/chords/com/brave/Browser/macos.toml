@@ -1,0 +1,8 @@
+name = "Brave"
+
+[on.js]
+file = "chrome.js"
+args = ['/Applications/Brave.app']
+
+[[import]]
+file = "base.toml"

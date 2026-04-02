@@ -1,0 +1,235 @@
+name = "AeroSpace"
+
+[meta]
+# TODO: make these properties work
+'$wrap' = false
+
+[chords]
+# https://nikitabobko.github.io/AeroSpace/commands#close
+'.q' = { name = "Quit Window", shell = "aerospace close" }
+
+# https://nikitabobko.github.io/AeroSpace/commands#close-all-windows-but-current
+'.qa' = { name = "Quit All But Current", shell = "aerospace close-all-windows-but-current" }
+
+# https://nikitabobko.github.io/AeroSpace/commands#enable
+'.v' = { name = "Vary On/Off", shell = "aerospace enable toggle" }
+
+# https://nikitabobko.github.io/AeroSpace/commands#flatten-workspace-tree
+'.wf' = { name = "Workspace: Flatten", shell = "aerospace enable toggle" }
+
+# https://nikitabobko.github.io/AeroSpace/commands#focus
+'.w' = { name = "Focus: West", shell = "aerospace focus left" }
+'.e' = { name = "Focus: East", shell = "aerospace focus right" }
+'.n' = { name = "Focus: North", shell = "aerospace focus up" }
+'.s' = { name = "Focus: South", shell = "aerospace focus down" }
+'.wi' = { name = "Focus: West, Ignore floating", shell = "aerospace focus left" }
+'.ei' = { name = "Focus: East, Ignore floating", shell = "aerospace focus right" }
+'.ni' = { name = "Focus: North, Ignore floating", shell = "aerospace focus up" }
+'.si' = { name = "Focus: South, Ignore floating", shell = "aerospace focus down" }
+
+# https://nikitabobko.github.io/AeroSpace/commands#move
+'.l' = { name = "Move: Left", shell = "aerospace move left" }
+'.d' = { name = "Move: Down", shell = "aerospace move down" }
+'.u' = { name = "Move: Up", shell = "aerospace move up" }
+'.r' = { name = "Move: Right", shell = "aerospace move right" }
+
+# https://nikitabobko.github.io/AeroSpace/commands#move-mouse
+'?.c' = { name = "Cursor" }
+'.cd' = { name = "Cursor: Display", aerospace = "aerospace move-mouse monitor-force-center" }
+'.cw' = { name = "Cursor: Window", aerospace = "aerospace move-mouse window-force-center" }
+
+# https://nikitabobko.github.io/AeroSpace/commands#focus-back-and-forth
+'.[' = { name = "Focus Previous", shell = "aerospace focus-back-and-forth || aerospace workspace-back-and-forth" }
+
+# https://nikitabobko.github.io/AeroSpace/commands#focus-monitor
+'?.d' = { name = "Display" }
+'.dw' = { name = "Display: West", shell = "aerospace focus-monitor --wrap-around left" }
+'.de' = { name = "Display: East", shell = "aerospace focus-monitor --wrap-around right" }
+'.dn' = { name = "Display: North", shell = "aerospace focus-monitor --wrap-around up" }
+'.ds' = { name = "Display: South", shell = "aerospace focus-monitor --wrap-around down" }
+'.d[' = { name = "Display: Prev", shell = "aerospace focus-monitor --wrap-around prev" }
+'.d]' = { name = "Display: Next", shell = "aerospace focus-monitor --wrap-around next" }
+
+# https://nikitabobko.github.io/AeroSpace/commands#fullscreen
+'.zf' = { name = "Zoom: Fullscreen", shell = "aerospace fullscreen" }
+'.zfn' = { name = "Zoom: Fullscreen Native", shell = "aerospace macos-native-fullscreen" }
+'.zm' = { name = "Zoom: Minimize", shell = "aerospace macos-native-minimize" }
+
+# https://nikitabobko.github.io/AeroSpace/commands#join-with
+'.jl' = { name = "Join: Left", shell = "aerospace join-with left" }
+'.jr' = { name = "Join: Right", shell = "aerospace join-with right" }
+'.ju' = { name = "Join: Up", shell = "aerospace join-with up" }
+'.jd' = { name = "Join: Down", shell = "aerospace join-with down" }
+
+# https://nikitabobko.github.io/AeroSpace/commands#layout
+'.lf' = { name = "Layout: Floating", shell = "aerospace layout accordion" }
+'.lm' = { name = "Layout: Managed", shell = "aerospace layout tiling" }
+'.lt' = { name = "Layout: Tiling", shell = "aerospace layout tiling" }
+'.la' = { name = "Layout: According", shell = "aerospace layout tiling" }
+'.lh' = { name = "Layout: Horizontal", shell = "aerospace layout tiling" }
+'.lht' = { name = "Layout: Horizontal Tiles", shell = "aerospace layout tiling" }
+'.lha' = { name = "Layout: Horizontal Accordion", shell = "aerospace layout tiling" }
+'.lvt' = { name = "Layout: Vertical Tiles", shell = "aerospace layout tiling" }
+'.lva' = { name = "Layout: Vertical Accordion", shell = "aerospace layout tiling" }
+
+# https://nikitabobko.github.io/AeroSpace/commands#move-node-to-monitor
+'.dl' = { name = "Display move: Left", shell = "aerospace move-node-to-monitor --wrap-around left" }
+'.dr' = { name = "Display move: Right", shell = "aerospace move-node-to-monitor --wrap-around right" }
+'.du' = { name = "Display move: Up", shell = "aerospace move-node-to-monitor --wrap-around up" }
+'.dd' = { name = "Display move: Down", shell = "aerospace move-node-to-monitor --wrap-around down" }
+'.dk' = { name = "Display move: Back", shell = "aerospace move-node-to-monitor --wrap-around prev" }
+'.df' = { name = "Display move: Forward", shell = "aerospace move-node-to-monitor --wrap-around next" }
+
+# https://nikitabobko.github.io/AeroSpace/commands#move-node-to-workspace
+'?.m' = { name = "Move to workspace" }
+'.m[' = { name = "Move: Workspace Previous", shell = "aerospace move-node-to-workspace prev"}
+'.m]' = { name = "Move: Workspace Next", shell = "aerospace move-node-to-workspace next" }
+'.m0' = { name = "Move: Workspace 0", shell = "aerospace move-node-to-workspace 0" }
+'.m1' = { name = "Move: Workspace 1", shell = "aerospace move-node-to-workspace 1" }
+'.m2' = { name = "Move: Workspace 2", shell = "aerospace move-node-to-workspace 2" }
+'.m3' = { name = "Move: Workspace 3", shell = "aerospace move-node-to-workspace 3" }
+'.m4' = { name = "Move: Workspace 4", shell = "aerospace move-node-to-workspace 4" }
+'.m5' = { name = "Move: Workspace 5", shell = "aerospace move-node-to-workspace 5" }
+'.m6' = { name = "Move: Workspace 6", shell = "aerospace move-node-to-workspace 6" }
+'.m7' = { name = "Move: Workspace 7", shell = "aerospace move-node-to-workspace 7" }
+'.m8' = { name = "Move: Workspace 8", shell = "aerospace move-node-to-workspace 8" }
+'.m9' = { name = "Move: Workspace 9", shell = "aerospace move-node-to-workspace 9" }
+'.ma' = { name = "Move: Workspace A", shell = "aerospace move-node-to-workspace a" }
+'.mb' = { name = "Move: Workspace B", shell = "aerospace move-node-to-workspace b" }
+'.mc' = { name = "Move: Workspace C", shell = "aerospace move-node-to-workspace c" }
+'.md' = { name = "Move: Workspace D", shell = "aerospace move-node-to-workspace d" }
+'.me' = { name = "Move: Workspace E", shell = "aerospace move-node-to-workspace e" }
+'.mf' = { name = "Move: Workspace F", shell = "aerospace move-node-to-workspace f" }
+'.mg' = { name = "Move: Workspace G", shell = "aerospace move-node-to-workspace g" }
+'.mh' = { name = "Move: Workspace H", shell = "aerospace move-node-to-workspace h" }
+'.mi' = { name = "Move: Workspace I", shell = "aerospace move-node-to-workspace i" }
+'.mj' = { name = "Move: Workspace J", shell = "aerospace move-node-to-workspace j" }
+'.mk' = { name = "Move: Workspace K", shell = "aerospace move-node-to-workspace k" }
+'.ml' = { name = "Move: Workspace L", shell = "aerospace move-node-to-workspace l" }
+'.mm' = { name = "Move: Workspace M", shell = "aerospace move-node-to-workspace m" }
+'.mn' = { name = "Move: Workspace N", shell = "aerospace move-node-to-workspace n" }
+'.mo' = { name = "Move: Workspace O", shell = "aerospace move-node-to-workspace o" }
+'.mp' = { name = "Move: Workspace P", shell = "aerospace move-node-to-workspace p" }
+'.mq' = { name = "Move: Workspace Q", shell = "aerospace move-node-to-workspace q" }
+'.mr' = { name = "Move: Workspace R", shell = "aerospace move-node-to-workspace r" }
+'.ms' = { name = "Move: Workspace S", shell = "aerospace move-node-to-workspace s" }
+'.mt' = { name = "Move: Workspace T", shell = "aerospace move-node-to-workspace t" }
+'.mu' = { name = "Move: Workspace U", shell = "aerospace move-node-to-workspace u" }
+'.mv' = { name = "Move: Workspace V", shell = "aerospace move-node-to-workspace v" }
+'.mw' = { name = "Move: Workspace W", shell = "aerospace move-node-to-workspace w" }
+'.mx' = { name = "Move: Workspace X", shell = "aerospace move-node-to-workspace x" }
+'.my' = { name = "Move: Workspace Y", shell = "aerospace move-node-to-workspace y" }
+'.mz' = { name = "Move: Workspace Z", shell = "aerospace move-node-to-workspace z" }
+
+# https://nikitabobko.github.io/AeroSpace/commands#workspace
+'?.f' = { name = "Focus Workspace" }
+'.f[' = { name = "Focus Workspace: Previous", shell = "aerospace workspace prev" }
+'.f]' = { name = "Focus Workspace: Next", shell = "aerospace workspace next" }
+'.f0' = { name = "Focus Workspace: 0", shell = "aerospace workspace 0" }
+'.f1' = { name = "Focus Workspace: 1", shell = "aerospace workspace 1" }
+'.f2' = { name = "Focus Workspace: 2", shell = "aerospace workspace 2" }
+'.f3' = { name = "Focus Workspace: 3", shell = "aerospace workspace 3" }
+'.f4' = { name = "Focus Workspace: 4", shell = "aerospace workspace 4" }
+'.f5' = { name = "Focus Workspace: 5", shell = "aerospace workspace 5" }
+'.f6' = { name = "Focus Workspace: 6", shell = "aerospace workspace 6" }
+'.f7' = { name = "Focus Workspace: 7", shell = "aerospace workspace 7" }
+'.f8' = { name = "Focus Workspace: 8", shell = "aerospace workspace 8" }
+'.f9' = { name = "Focus Workspace: 9", shell = "aerospace workspace 9" }
+'.fa' = { name = "Focus Workspace: A", shell = "aerospace workspace A" }
+'.fb' = { name = "Focus Workspace: B", shell = "aerospace workspace B" }
+'.fc' = { name = "Focus Workspace: C", shell = "aerospace workspace C" }
+'.fd' = { name = "Focus Workspace: D", shell = "aerospace workspace D" }
+'.fe' = { name = "Focus Workspace: E", shell = "aerospace workspace E" }
+'.ff' = { name = "Focus Workspace: F", shell = "aerospace workspace F" }
+'.fg' = { name = "Focus Workspace: G", shell = "aerospace workspace G" }
+'.fh' = { name = "Focus Workspace: H", shell = "aerospace workspace H" }
+'.fi' = { name = "Focus Workspace: I", shell = "aerospace workspace I" }
+'.fj' = { name = "Focus Workspace: J", shell = "aerospace workspace J" }
+'.fk' = { name = "Focus Workspace: K", shell = "aerospace workspace K" }
+'.fl' = { name = "Focus Workspace: L", shell = "aerospace workspace L" }
+'.fm' = { name = "Focus Workspace: M", shell = "aerospace workspace M" }
+'.fn' = { name = "Focus Workspace: N", shell = "aerospace workspace N" }
+'.fo' = { name = "Focus Workspace: O", shell = "aerospace workspace O" }
+'.fp' = { name = "Focus Workspace: P", shell = "aerospace workspace P" }
+'.fq' = { name = "Focus Workspace: Q", shell = "aerospace workspace Q" }
+'.fr' = { name = "Focus Workspace: R", shell = "aerospace workspace R" }
+'.fs' = { name = "Focus Workspace: S", shell = "aerospace workspace S" }
+'.ft' = { name = "Focus Workspace: T", shell = "aerospace workspace T" }
+'.fu' = { name = "Focus Workspace: U", shell = "aerospace workspace U" }
+'.fv' = { name = "Focus Workspace: V", shell = "aerospace workspace V" }
+'.fw' = { name = "Focus Workspace: W", shell = "aerospace workspace W" }
+'.fx' = { name = "Focus Workspace: X", shell = "aerospace workspace X" }
+'.fy' = { name = "Focus Workspace: Y", shell = "aerospace workspace Y" }
+'.fz' = { name = "Focus Workspace: Z", shell = "aerospace workspace Z" }
+
+# https://nikitabobko.github.io/AeroSpace/commands#move-workspace-to-monitor
+'.t' = { name = "Teleport (move workspace to monitor)" }
+'.tl' = { name = "Teleport: Left", shell = "aerospace move-workspace-to-monitor left" }
+'.tr' = { name = "Teleport: Right", shell = "aerospace move-workspace-to-monitor right"}
+'.tu' = { name = "Teleport: Up", shell = "aerospace move-workspace-to-monitor up" }
+'.td' = { name = "Teleport: Down", shell = "aerospace move-workspace-to-monitor down" }
+'.t[' = { name = "Teleport: Previous", shell = "aerospace move-workspace-to-monitor prev" }
+'.t]' = { name = "Teleport: Next", shell = "aerospace move-workspace-to-monitor next" }
+
+# https://nikitabobko.github.io/AeroSpace/commands#reload-config
+'?.,' = { name = "Config" }
+'.,r' = { name = "Config: Reload" }
+
+# https://nikitabobko.github.io/AeroSpace/commands#resize
+'?.r' = { name = "Resize" }
+'.rl' = { name = "Resize: Left" }
+'.rr' = { name = "Resize: Right" }
+'.ru' = { name = "Resize: Up" }
+'.rd' = { name = "Resize: Down" }
+'.r-' = { name = "Resize: Decrease", shell = "aerospace resize smart -10" }
+'.r=' = { name = "Resize: Increase", shell = "aerospace resize smart +10" }
+'.rs' = { name = "Resize: Shrink", shell = "aerospace resize smart-opposite -10" }
+'.re' = { name = "Resize: Expand", shell = "aerospace resize smart-opposite +10" }
+
+# https://nikitabobko.github.io/AeroSpace/commands#swap
+'?.s' = { name = "Swap" }
+'.sl' = { name = "Swap: Left", shell = "aerospace swap left" }
+'.sr' = { name = "Swap: Right", shell = "aerospace swap right" }
+'.su' = { name = "Swap: Up", shell = "aerospace swap up" }
+'.sd' = { name = "Swap: Down", shell = "aerospace swap down" }
+'.s]' = { name = "Swap: Next", shell = "aerospace swap dfs-next" }
+'.s[' = { name = "Swap: Previous", shell = "aerospace swap dfs-prev" }
+
+# https://nikitabobko.github.io/AeroSpace/commands#summon-workspace
+'?.p' = { name = "Present (summon) workspace" }
+'.p0' = { name = "Present workspace: 0", aerospace = "aerospace summon-workspace 0" }
+'.p1' = { name = "Present workspace: 1", aerospace = "aerospace summon-workspace 1" }
+'.p2' = { name = "Present workspace: 2", aerospace = "aerospace summon-workspace 2" }
+'.p3' = { name = "Present workspace: 3", aerospace = "aerospace summon-workspace 3" }
+'.p4' = { name = "Present workspace: 4", aerospace = "aerospace summon-workspace 4" }
+'.p5' = { name = "Present workspace: 5", aerospace = "aerospace summon-workspace 5" }
+'.p6' = { name = "Present workspace: 6", aerospace = "aerospace summon-workspace 6" }
+'.p7' = { name = "Present workspace: 7", aerospace = "aerospace summon-workspace 7" }
+'.p8' = { name = "Present workspace: 8", aerospace = "aerospace summon-workspace 8" }
+'.p9' = { name = "Present workspace: 9", aerospace = "aerospace summon-workspace 9" }
+'.pa' = { name = "Present workspace: A", aerospace = "aerospace summon-workspace a" }
+'.pb' = { name = "Present workspace: B", aerospace = "aerospace summon-workspace b" }
+'.pc' = { name = "Present workspace: C", aerospace = "aerospace summon-workspace c" }
+'.pd' = { name = "Present workspace: D", aerospace = "aerospace summon-workspace d" }
+'.pe' = { name = "Present workspace: E", aerospace = "aerospace summon-workspace e" }
+'.pf' = { name = "Present workspace: F", aerospace = "aerospace summon-workspace f" }
+'.pg' = { name = "Present workspace: G", aerospace = "aerospace summon-workspace g" }
+'.ph' = { name = "Present workspace: H", aerospace = "aerospace summon-workspace h" }
+'.pi' = { name = "Present workspace: I", aerospace = "aerospace summon-workspace i" }
+'.pj' = { name = "Present workspace: J", aerospace = "aerospace summon-workspace j" }
+'.pk' = { name = "Present workspace: K", aerospace = "aerospace summon-workspace k" }
+'.pl' = { name = "Present workspace: L", aerospace = "aerospace summon-workspace l" }
+'.pm' = { name = "Present workspace: M", aerospace = "aerospace summon-workspace m" }
+'.pn' = { name = "Present workspace: N", aerospace = "aerospace summon-workspace n" }
+'.po' = { name = "Present workspace: O", aerospace = "aerospace summon-workspace o" }
+'.pp' = { name = "Present workspace: P", aerospace = "aerospace summon-workspace p" }
+'.pq' = { name = "Present workspace: Q", aerospace = "aerospace summon-workspace q" }
+'.pr' = { name = "Present workspace: R", aerospace = "aerospace summon-workspace r" }
+'.ps' = { name = "Present workspace: S", aerospace = "aerospace summon-workspace s" }
+'.pt' = { name = "Present workspace: T", aerospace = "aerospace summon-workspace t" }
+'.pu' = { name = "Present workspace: U", aerospace = "aerospace summon-workspace u" }
+'.pv' = { name = "Present workspace: V", aerospace = "aerospace summon-workspace v" }
+'.pw' = { name = "Present workspace: W", aerospace = "aerospace summon-workspace w" }
+'.px' = { name = "Present workspace: X", aerospace = "aerospace summon-workspace x" }
+'.py' = { name = "Present workspace: Y", aerospace = "aerospace summon-workspace y" }
+'.pz' = { name = "Present workspace: Z", aerospace = "aerospace summon-workspace z" }

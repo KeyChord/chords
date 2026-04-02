@@ -1,0 +1,48 @@
+name = "macOS Dock + Window Management"
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[on.dock]
+file = 'dock.js'
+
+[chords]
+# Built-in macOS window management shortcuts
+# Can be overriden if using a dedicated window manager such as yabai, Aerospace, etc.
+'?.' = { name = "Dock / Window Management" }
+
+# Move and Resize
+'.l' = { name = "Left", shortcut = "ctrl+fn+left" }
+'.r' = { name = "Right", shortcut = "ctrl+fn+right" }
+'.t' = { name = "Top", shortcut = "ctrl+fn+up" }
+'.b' = { name = "Bottom", shortcut = "ctrl+fn+down" }
+'.tl' = { name = "Top Left", 'emit:menu' = ["Window", "Move & Resize", "Top Left"] }
+'.tr' = { name = "Top Right", 'emit:menu' = ["Window", "Move & Resize", "Top Right"] }
+'.bl' = { name = "Bottom Left", 'emit:menu' = ["Window", "Move & Resize", "Bottom Left"] }
+'.br' = { name = "Bottom Right", 'emit:menu' = ["Window", "Move & Resize", "Bottom Right"] }
+'.lr' = { name = "Left Right", shortcut = "ctrl+fn+shift+left" }
+'.rl' = { name = "Right Left", shortcut = "ctrl+fn+shift+right" }
+'.tb' = { name = "Top Bottom", shortcut = "ctrl+fn+shift+up" }
+'.bt' = { name = "Bottom Top", shortcut = "ctrl+fn+shift+down" }
+'.q' = { name = "Quarters", 'emit:menu' = ["Window", "Move & Resize", "Quarters"] }
+'.s[' = { name = "Size: Previous", shortcut = "ctrl+fn+r" }
+
+'.m' = { name = "Minimize", shortcut = "cmd+m" }
+'.z' = { name = "Zoom", 'emit:menu' = ["Window", 'Zoom'] }
+'.f' = { name = "Fill", shortcut = "ctrl+fn+f" }
+'.c' = { name = "Center", shortcut = "ctrl+fn+c" }
+'.fl' = { name = "Fullscreen Left", 'emit:menu' = ["Window", "Full Screen Tile", "Left of Screen"] }
+'.fr' = { name = "Fullscreen Right", 'emit:menu' = [
+  "Window",
+  "Full Screen Tile",
+  "Right of Screen",
+] }
+'.a' = { name = "All to Front", 'emit:menu' = ["Window", "Bring All to Front"] }
+'.[' = { name = "Previous Window" }
+'.]' = { name = "Next Window" }
+
+# Dock
+'.v' = { name = "Dock: Vary On/Off", shortcut = "ctrl+f3" }
+'.(\d+)' = { name = "Dock Item $1: Focus", 'emit:dock' = ['$1'] }
+'.(\d+),' = { name = "Dock Item $1: Left Click", 'emit:dock' = ['$1'] }
+'.(\d+)/' = { name = "Dock Item $1: Right Click", 'emit:dock' = ['$1', 'right'] }

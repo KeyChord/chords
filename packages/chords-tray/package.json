@@ -1,0 +1,14 @@
+{
+  "name": "@keychord/chords-tray",
+  "version": "0.0.0",
+  "type": "module",
+  "dependencies": {
+    "jxa-run-compat": "^1.6.0"
+  },
+  "devDependencies": {
+    "@jxa/global-type": "^1.4.0",
+    "@keychord/config": "^0.0.6",
+    "@keychord/tsconfig": "^0.0.6"
+  },
+  "packageManager": "pnpm@10.33.0"
+}
