@@ -109,7 +109,7 @@ while read -r PLUGIN_NAME; do
 		then
 			# echo "$BUILD_BASE/changes.diff"
 			# git show --pretty= --src-prefix="a/$PLUGIN_NAME/" --dst-prefix="b/$PLUGIN_NAME/" >> "$BUILD_BASE/changes.diff"
-			echo "https://github.com/tauri-apps/tauri-plugin-$PLUGIN_NAME/commit/$(git rev-parse HEAD)"
+			echo "https://github.com/KeyChord/$PLUGIN_NAME/commit/$(git rev-parse HEAD)"
 
 			# Add new tags
 			for FULL_TAG in "${COMMIT_TAGS[@]}"; do

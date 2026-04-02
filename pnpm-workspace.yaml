@@ -1,11 +1,9 @@
 packages:
   - packages/*
-
-catalogMode: strict
 catalog:
   "@jxa/global-type": ^1.4.0
-  "@keychord/tsconfig": ^0.0.6
   "@keychord/config": ^0.0.6
+  "@keychord/tsconfig": ^0.0.6
   "@octokit/rest": ^22.0.1
   "@types/chrome-remote-interface": ^0.33.0
   "@types/js-yaml": ^4.0.9
@@ -25,3 +23,6 @@ catalog:
   smol-toml: ^1.6.1
   toml-patch: ^0.2.3
   typescript: ^6.0.2
+  vite-plus: ^0.1.15
+
+catalogMode: strict
