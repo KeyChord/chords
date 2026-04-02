@@ -1,5 +1,6 @@
 {
   "name": "@keychord/chords-commands",
+  "type": "module",
   "devDependencies": {
     "@keychord/config": "catalog:"
   }
