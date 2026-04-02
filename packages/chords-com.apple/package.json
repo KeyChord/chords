@@ -13,7 +13,7 @@
   },
   "devDependencies": {
     "@jxa/global-type": "catalog:",
-    "@keychord/config": "^0.0.6",
+    "@keychord/config": "catalog:",
     "@keychord/tsconfig": "catalog:",
     "typescript": "catalog:"
   },

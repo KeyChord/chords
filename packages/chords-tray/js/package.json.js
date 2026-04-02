@@ -2,10 +2,10 @@
 var name = "@keychord/chords-tray";
 var version = "0.0.0";
 var type = "module";
-var dependencies = { "jxa-run-compat": "^1.6.0" };
+var dependencies = { "jxa-run-compat": "catalog:" };
 var devDependencies = {
-	"@jxa/global-type": "^1.4.0",
-	"@keychord/config": "^0.0.6",
+	"@jxa/global-type": "catalog:",
+	"@keychord/config": "catalog:",
 	"@keychord/tsconfig": "catalog:"
 };
 var packageManager = "pnpm@10.33.0";

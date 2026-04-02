@@ -4,19 +4,19 @@ var version = "0.0.0";
 var type = "module";
 var packageManager = "pnpm@10.33.0";
 var dependencies = {
-	"chrome-remote-interface": "^0.34.0",
-	"desm": "^1.3.1",
-	"get-port": "^7.2.0",
-	"jquery-as-string": "^0.4.0",
-	"nano-spawn-compat": "^2.0.6"
+	"chrome-remote-interface": "catalog:",
+	"desm": "catalog:",
+	"get-port": "catalog:",
+	"jquery-as-string": "catalog:",
+	"nano-spawn-compat": "catalog:"
 };
 var devDependencies = {
 	"@keychord/tsconfig": "catalog:",
-	"@keychord/config": "^0.0.5",
-	"@types/chrome-remote-interface": "^0.33.0",
-	"bun-types": "^1.3.11",
-	"dax": "^0.45.0",
-	"typescript": "^6.0.2"
+	"@keychord/config": "catalog:",
+	"@types/chrome-remote-interface": "catalog:",
+	"bun-types": "catalog:",
+	"dax": "catalog:",
+	"typescript": "catalog:"
 };
 var package_default = {
 	name,

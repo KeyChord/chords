@@ -1,11 +1,11 @@
 //#region package.json
 var name = "@keychord/chords-dock";
 var type = "module";
-var dependencies = { "jxa-run-compat": "^1.6.0" };
+var dependencies = { "jxa-run-compat": "catalog:" };
 var devDependencies = {
-	"@jxa/global-type": "^1.4.0",
+	"@jxa/global-type": "catalog:",
 	"@keychord/chords-menu": "github:KeyChord/chords-menu",
-	"@keychord/config": "^0.0.6",
+	"@keychord/config": "catalog:",
 	"@keychord/tsconfig": "catalog:"
 };
 var packageManager = "pnpm@10.33.0";

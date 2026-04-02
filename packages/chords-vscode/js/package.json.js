@@ -5,10 +5,10 @@ var version = "0.0.0";
 var packageManager = "pnpm@10.33.0";
 var devDependencies = {
 	"@keychord/tsconfig": "catalog:",
-	"@keychord/config": "^0.0.6",
-	"typescript": "^6.0.2"
+	"@keychord/config": "catalog:",
+	"typescript": "catalog:"
 };
-var dependencies = { "nano-spawn-compat": "^2.0.6" };
+var dependencies = { "nano-spawn-compat": "catalog:" };
 var package_default = {
 	name,
 	type,

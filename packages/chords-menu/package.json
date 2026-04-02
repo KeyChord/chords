@@ -10,7 +10,7 @@
   },
   "devDependencies": {
     "@jxa/global-type": "catalog:",
-    "@keychord/config": "^0.0.1",
+    "@keychord/config": "catalog:",
     "@keychord/tsconfig": "catalog:"
   },
   "packageManager": "pnpm@10.33.0"

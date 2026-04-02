@@ -13,7 +13,7 @@ var dependencies = {
 };
 var devDependencies = {
 	"@jxa/global-type": "^1.4.0",
-	"@keychord/config": "^0.0.6",
+	"@keychord/config": "catalog:",
 	"@keychord/tsconfig": "catalog:",
 	"typescript": "^6.0.2"
 };

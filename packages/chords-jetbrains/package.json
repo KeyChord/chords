@@ -8,6 +8,6 @@
   },
   "devDependencies": {
     "@keychord/tsconfig": "catalog:",
-    "@keychord/config": "^0.0.6"
+    "@keychord/config": "catalog:"
   }
 }

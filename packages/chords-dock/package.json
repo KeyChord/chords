@@ -7,7 +7,7 @@
   "devDependencies": {
     "@jxa/global-type": "catalog:",
     "@keychord/chords-menu": "github:KeyChord/chords-menu",
-    "@keychord/config": "^0.0.6",
+    "@keychord/config": "catalog:",
     "@keychord/tsconfig": "catalog:"
   },
   "packageManager": "pnpm@10.33.0"
