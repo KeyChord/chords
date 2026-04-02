@@ -82,7 +82,7 @@ name = "AeroSpace"
 
 # https://nikitabobko.github.io/AeroSpace/commands#move-node-to-workspace
 '?.m' = { name = "Move to workspace" }
-'.m[' = { name = "Move: Workspace Previous", shell = "aerospace move-node-to-workspace prev"}
+'.m[' = { name = "Move: Workspace Previous", shell = "aerospace move-node-to-workspace prev" }
 '.m]' = { name = "Move: Workspace Next", shell = "aerospace move-node-to-workspace next" }
 '.m0' = { name = "Move: Workspace 0", shell = "aerospace move-node-to-workspace 0" }
 '.m1' = { name = "Move: Workspace 1", shell = "aerospace move-node-to-workspace 1" }
@@ -165,7 +165,7 @@ name = "AeroSpace"
 # https://nikitabobko.github.io/AeroSpace/commands#move-workspace-to-monitor
 '.t' = { name = "Teleport (move workspace to monitor)" }
 '.tl' = { name = "Teleport: Left", shell = "aerospace move-workspace-to-monitor left" }
-'.tr' = { name = "Teleport: Right", shell = "aerospace move-workspace-to-monitor right"}
+'.tr' = { name = "Teleport: Right", shell = "aerospace move-workspace-to-monitor right" }
 '.tu' = { name = "Teleport: Up", shell = "aerospace move-workspace-to-monitor up" }
 '.td' = { name = "Teleport: Down", shell = "aerospace move-workspace-to-monitor down" }
 '.t[' = { name = "Teleport: Previous", shell = "aerospace move-workspace-to-monitor prev" }

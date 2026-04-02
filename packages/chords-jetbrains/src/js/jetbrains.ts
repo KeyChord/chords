@@ -5,7 +5,7 @@ import spawn from "nano-spawn-compat";
 
 export default function buildAction(ideBinPath: string) {
   if (!ideBinPath) {
-    throw new Error("IDE binpath must be provided")
+    throw new Error("IDE binpath must be provided");
   }
 
   const tmp = process.env.TMPDIR ?? "/tmp";
@@ -51,5 +51,5 @@ export default function buildAction(ideBinPath: string) {
     fs.rmSync(resultPath);
 
     return result == "1";
-  }
-};
+  };
+}

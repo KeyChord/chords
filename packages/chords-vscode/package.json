@@ -1,14 +1,14 @@
 {
   "name": "@keychord/chords-vscode",
-  "type": "module",
   "version": "0.0.0",
-  "packageManager": "pnpm@10.33.0",
-  "devDependencies": {
-    "@keychord/tsconfig": "catalog:",
-    "@keychord/config": "catalog:",
-    "typescript": "catalog:"
-  },
+  "type": "module",
   "dependencies": {
     "nano-spawn-compat": "catalog:"
-  }
+  },
+  "devDependencies": {
+    "@keychord/config": "catalog:",
+    "@keychord/tsconfig": "catalog:",
+    "typescript": "catalog:"
+  },
+  "packageManager": "pnpm@10.33.0"
 }

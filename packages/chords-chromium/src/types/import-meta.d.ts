@@ -1,7 +1,7 @@
 declare global {
   interface ImportMeta {
-    enableDebuggingPort?: boolean
+    enableDebuggingPort?: boolean;
   }
 }
 
-export {}
+export {};

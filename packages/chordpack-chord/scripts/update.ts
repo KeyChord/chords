@@ -3,7 +3,7 @@ import { Octokit } from "@octokit/rest";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { parse, stringify } from "smol-toml";
-import { join } from 'desm'
+import { join } from "desm";
 
 interface PackageConfig {
   name: string;
@@ -74,16 +74,13 @@ async function updatePackageRevisions(): Promise<void> {
         console.log(`Updated ${pkgConfig.name} to ${rev}`);
       }
     } catch (error) {
-      console.error(
-        `Failed to update ${pkgConfig.name}:`,
-        (error as any).message || error
-      );
+      console.error(`Failed to update ${pkgConfig.name}:`, (error as any).message || error);
     }
   }
 
   const output = stringify(chordpack);
   fs.writeFileSync(chordpackPath, output);
-  let maybe = join(import.meta.url, '../../Chord/data/chordpack.toml')
+  let maybe = join(import.meta.url, "../../Chord/data/chordpack.toml");
   if (fs.existsSync(maybe)) {
     fs.writeFileSync(maybe, output);
   }

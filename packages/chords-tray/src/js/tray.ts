@@ -258,7 +258,7 @@ export default function buildHandler() {
             console.log("AXPress:", pressErr);
 
             // if (pressErr === 0) {
-              return;
+            return;
             // }
 
             // console.log("AXPress failed, falling back to cursor click");

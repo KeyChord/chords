@@ -9,7 +9,6 @@ Chord package for pre-installed macOS apps.
 - [Terminal](./chords/com/apple/Terminal/macos.toml) (`com.apple.Terminal`)
 - [Activity Monitor](./chords/com/apple/ActivityMonitor/macos.toml) (`com.apple.ActivityMonitor`)
 
-
 ## Menu
 
 The built-in menu navigation chord handler uses the prefix `-` and is dynamic based on what you type afterwards:

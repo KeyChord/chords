@@ -9,9 +9,9 @@ args = ["Safari"]
 '/b' = { name = "Browser (Safari)", shell = "open -a Finder" }
 
 '?w' = { name = "Window" }
-wn = { name = "Window: New",  shortcut = "cmd+n" }
-wp = { name = "Window: Private",  shortcut = "cmd+shift+n" }
-wqa = { name = "Window: Quit All",  shortcut = "cmd+alt+w" }
+wn = { name = "Window: New", shortcut = "cmd+n" }
+wp = { name = "Window: Private", shortcut = "cmd+shift+n" }
+wqa = { name = "Window: Quit All", shortcut = "cmd+alt+w" }
 
 '?t' = { name = "Tab" }
 tn = { name = "Tab: New", shortcut = "cmd+t" }

@@ -146,7 +146,7 @@ fa5 = { name = "Folding: All Level 5", 'emit:command' = ['ExpandAllToLevel5'] }
 # = { name = "Drag to Create Rectangular Selection", command = "Drag to Create Rectangular Selection", shortcut = "option+click" }
 # = { name = "Drag to Create Multiple Rectangular Selections", command = "Drag to Create Multiple Rectangular Selections", shortcut = "cmd+option+shift+click" }
 
-'?c' = { name = "Completion / Code / Context"}
+'?c' = { name = "Completion / Code / Context" }
 cb = { name = "Completion: Basic", shortcut = "ctrl+space" }
 ct = { name = "Completion: Type-Matching", shortcut = "ctrl+shift+space" }
 cs = { name = "Completion: Second Basic", shortcut = "ctrl+option+space" }

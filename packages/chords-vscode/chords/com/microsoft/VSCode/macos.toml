@@ -27,14 +27,18 @@ args = ["/Applications/Visual Studio Code.app"]
 fr = { name = "Find and Replace", 'emit:command' = [
   'editor.action.startFindReplaceAction',
 ], shortcut = "alt+cmd+f" }
-fg = { name = "Find Globally", 'emit:command' = ['workbench.action.findInFiles'], shortcut = "shift+cmd+f" }
+fg = { name = "Find Globally", 'emit:command' = [
+  'workbench.action.findInFiles',
+], shortcut = "shift+cmd+f" }
 frg = { name = "Find Replace Globally", 'emit:command' = [
   'workbench.action.replaceInFiles',
 ], shortcut = "shift+cmd+h" }
 
 # File
 fpa = { name = "File Path: Absolute (copy to clipboard)", 'emit:command' = ['copyFilePath'] }
-fpr = { name = "File: Path: Relative (copy to clipboard)", 'emit:command' = ['workbench.action.files.copyPathOfActiveFile'] }
+fpr = { name = "File: Path: Relative (copy to clipboard)", 'emit:command' = [
+  'workbench.action.files.copyPathOfActiveFile',
+] }
 frp = { name = "File: Relative Path", 'emit:command' = [
   'copyRelativeFilePath',
 ], shortcut = "shift+alt+cmd+c" }
@@ -49,13 +53,19 @@ fnu = { name = "File: New Untitled File", 'emit:command' = [
   'workbench.action.files.newUntitledFile',
 ], shortcut = "cmd+n" }
 ft = { name = "File: Trash", 'emit:command' = ['deleteFile'], shortcut = "alt+cmd+backspace" }
-fm = { name = "File: Format", 'emit:command' = ['editor.action.formatDocument'], shortcut = "shift+alt+f" }
+fm = { name = "File: Format", 'emit:command' = [
+  'editor.action.formatDocument',
+], shortcut = "shift+alt+f" }
 fs = { name = "File: Show", 'emit:command' = ['revealInExplorer'] }
 fra = { name = "search.action.replaceAllInFile", 'emit:command' = [
   'search.action.replaceAllInFile',
 ], shortcut = "shift+cmd+enter" }
-fo = { name = "File: Open", 'emit:command' = ['workbench.action.files.openFile'], shortcut = "cmd+o" }
-for = { name = "File: Open Recent", 'emit:command' = ['workbench.action.openRecent'], shortcut = "ctrl+r" }
+fo = { name = "File: Open", 'emit:command' = [
+  'workbench.action.files.openFile',
+], shortcut = "cmd+o" }
+for = { name = "File: Open Recent", 'emit:command' = [
+  'workbench.action.openRecent',
+], shortcut = "ctrl+r" }
 
 ## Fold
 '?ff' = { name = "Folding: Fold" }
@@ -77,7 +87,9 @@ ffm = { name = "Folding: Fold All Marker Regions", 'emit:command' = [
 ## Unfold
 '?fu' = { name = "Folding: Unfold" }
 fu = { name = "Folding: Unfold", 'emit:command' = ['editor.unfold'], shortcut = "alt+cmd+]" }
-fua = { name = "Folding: Unfold All", 'emit:command' = ['editor.unfoldAll'], shortcut = "cmd+k cmd+j" }
+fua = { name = "Folding: Unfold All", 'emit:command' = [
+  'editor.unfoldAll',
+], shortcut = "cmd+k cmd+j" }
 fuc = { name = "Folding: Unfold Comments", 'emit:command' = ['editor.unfoldAllBlockComments'] }
 fur = { name = "Folding: Unfold Recursively", 'emit:command' = [
   'editor.unfoldRecursively',
@@ -100,16 +112,32 @@ ftr = { name = "Folding: Toggle Recursively", 'emit:command' = [
 ], shortcut = "cmd+k shift+cmd+l" }
 
 '?f{1..7}' = { name = "Folding: Level" }
-f1 = { name = "editor.foldLevel1", 'emit:command' = ['editor.foldLevel1'], shortcut = "cmd+k cmd+1" }
-f2 = { name = "editor.foldLevel2", 'emit:command' = ['editor.foldLevel2'], shortcut = "cmd+k cmd+2" }
-f3 = { name = "editor.foldLevel3", 'emit:command' = ['editor.foldLevel3'], shortcut = "cmd+k cmd+3" }
-f4 = { name = "editor.foldLevel4", 'emit:command' = ['editor.foldLevel4'], shortcut = "cmd+k cmd+4" }
-f5 = { name = "editor.foldLevel5", 'emit:command' = ['editor.foldLevel5'], shortcut = "cmd+k cmd+5" }
-f6 = { name = "editor.foldLevel6", 'emit:command' = ['editor.foldLevel6'], shortcut = "cmd+k cmd+6" }
-f7 = { name = "editor.foldLevel7", 'emit:command' = ['editor.foldLevel7'], shortcut = "cmd+k cmd+7" }
+f1 = { name = "editor.foldLevel1", 'emit:command' = [
+  'editor.foldLevel1',
+], shortcut = "cmd+k cmd+1" }
+f2 = { name = "editor.foldLevel2", 'emit:command' = [
+  'editor.foldLevel2',
+], shortcut = "cmd+k cmd+2" }
+f3 = { name = "editor.foldLevel3", 'emit:command' = [
+  'editor.foldLevel3',
+], shortcut = "cmd+k cmd+3" }
+f4 = { name = "editor.foldLevel4", 'emit:command' = [
+  'editor.foldLevel4',
+], shortcut = "cmd+k cmd+4" }
+f5 = { name = "editor.foldLevel5", 'emit:command' = [
+  'editor.foldLevel5',
+], shortcut = "cmd+k cmd+5" }
+f6 = { name = "editor.foldLevel6", 'emit:command' = [
+  'editor.foldLevel6',
+], shortcut = "cmd+k cmd+6" }
+f7 = { name = "editor.foldLevel7", 'emit:command' = [
+  'editor.foldLevel7',
+], shortcut = "cmd+k cmd+7" }
 
 # History
-hb = { name = "History: Back", 'emit:command' = ['workbench.action.navigateBack'], shortcut = "BrowserBack" }
+hb = { name = "History: Back", 'emit:command' = [
+  'workbench.action.navigateBack',
+], shortcut = "BrowserBack" }
 hf = { name = "History: Forward", 'emit:command' = [
   'workbench.action.navigateForward',
 ], shortcut = "BrowserForward" }
@@ -118,20 +146,32 @@ hf = { name = "History: Forward", 'emit:command' = [
 '?p' = { name = "Panel" }
 pa = { name = "Panel: AI", 'emit:command' = ['workbench.panel.chat'], shortcut = "ctrl+cmd+i" }
 pd = { name = "Panel: Debug", 'emit:command' = ['workbench.view.debug'], shortcut = "shift+cmd+d" }
-pe = { name = "Panel: Explorer", 'emit:command' = ['workbench.view.explorer'], shortcut = "shift+cmd+e" }
+pe = { name = "Panel: Explorer", 'emit:command' = [
+  'workbench.view.explorer',
+], shortcut = "shift+cmd+e" }
 pg = { name = "Panel: Git", 'emit:command' = ['workbench.view.scm'], shortcut = "ctrl+shift+g" }
-pmd = { name = "Panel: Move Down", 'emit:command' = ['views.moveViewDown'], shortcut = "cmd+k down" }
-pml = { name = "Panel: Move Left", 'emit:command' = ['views.moveViewLeft'], shortcut = "cmd+k left" }
-pmr = { name = "Panel: Move Right", 'emit:command' = ['views.moveViewRight'], shortcut = "cmd+k right" }
+pmd = { name = "Panel: Move Down", 'emit:command' = [
+  'views.moveViewDown',
+], shortcut = "cmd+k down" }
+pml = { name = "Panel: Move Left", 'emit:command' = [
+  'views.moveViewLeft',
+], shortcut = "cmd+k left" }
+pmr = { name = "Panel: Move Right", 'emit:command' = [
+  'views.moveViewRight',
+], shortcut = "cmd+k right" }
 pmu = { name = "Panel: Move Up", 'emit:command' = ['views.moveViewUp'], shortcut = "cmd+k up" }
 pp = { name = "Panel: Problems", 'emit:command' = [
   'workbench.actions.view.problems',
 ], shortcut = "shift+cmd+m" }
-ps = { name = "Panel: Search", 'emit:command' = ['workbench.view.search'], shortcut = "shift+cmd+f" }
+ps = { name = "Panel: Search", 'emit:command' = [
+  'workbench.view.search',
+], shortcut = "shift+cmd+f" }
 psb = { name = "Panel: Side Bar", 'emit:command' = [
   'workbench.action.toggleSidebarVisibility',
 ], shortcut = "cmd+b" }
-pm = { name = "Panel: Marketplace", 'emit:command' = ['workbench.view.extensions'], shortcut = "shift+cmd+x" }
+pm = { name = "Panel: Marketplace", 'emit:command' = [
+  'workbench.view.extensions',
+], shortcut = "shift+cmd+x" }
 po = { name = "Panel: Open", 'emit:command' = [
   'workbench.action.quickOpenView',
 ], shortcut = "cmd+shift+p v i e w space" }
@@ -149,13 +189,17 @@ pv = { name = "Panel: Forward", 'emit:command' = [
 pgk = { name = "Page: Keybindings", 'emit:command' = [
   'workbench.action.openGlobalKeybindings',
 ], shortcut = "cmd+k cmd+s" }
-pgs = { name = "Page: Settings", 'emit:command' = ['workbench.action.openSettings'], shortcut = "cmd+," }
+pgs = { name = "Page: Settings", 'emit:command' = [
+  'workbench.action.openSettings',
+], shortcut = "cmd+," }
 
 '?e' = { name = "Editor" }
 ea = { name = "Editor: Actions", 'emit:command' = ['editor.action.quickFix'], shortcut = "cmd+." }
 ek = { name = "Editor: Kwik Fix", 'emit:command' = ['editor.action.quickFix'], shortcut = "cmd+." }
 es = { name = "Editor: Focus", 'emit:command' = ['workbench.action.focusActiveEditorGroup'] }
-ep = { name = "Editor: Pin", 'emit:command' = ['workbench.action.pinEditor'], shortcut = "cmd+k shift+enter" }
+ep = { name = "Editor: Pin", 'emit:command' = [
+  'workbench.action.pinEditor',
+], shortcut = "cmd+k shift+enter" }
 eu = { name = "Editor: Unpin", 'emit:command' = [
   'workbench.action.unpinEditor',
 ], shortcut = "cmd+k shift+enter" }
@@ -168,7 +212,9 @@ eo = { name = "Editor: Open Recently Closed", 'emit:command' = [
 'e[' = { name = "Editor: Previous", 'emit:command' = [
   'workbench.action.previousEditorInGroup',
 ], shortcut = "cmd+k alt+cmd+left" }
-'e]' = { name = "Editor: Next", 'emit:command' = ['workbench.action.nextEditor'], shortcut = "shift+cmd+]" }
+'e]' = { name = "Editor: Next", 'emit:command' = [
+  'workbench.action.nextEditor',
+], shortcut = "shift+cmd+]" }
 'e]g' = { name = "Editor: Next in Group", 'emit:command' = [
   'workbench.action.nextEditorInGroup',
 ], shortcut = "cmd+k alt+cmd+right" }
@@ -179,7 +225,9 @@ eb = { name = "Editor: Back", 'emit:command' = [
   'workbench.action.quickOpenPreviousRecentlyUsedEditorInGroup',
 ], shortcut = "ctrl+tab" }
 '?eq' = { name = "Editor: Quit" }
-eq = { name = "Editor: Quit", 'emit:command' = ['workbench.action.closeActiveEditor'], shortcut = "cmd+w" }
+eq = { name = "Editor: Quit", 'emit:command' = [
+  'workbench.action.closeActiveEditor',
+], shortcut = "cmd+w" }
 eqa = { name = "Editor: Quit All", 'emit:command' = [
   'workbench.action.closeAllEditors',
 ], shortcut = "cmd+k cmd+w" }
@@ -206,22 +254,42 @@ egu = { name = "workbench.action.moveActiveEditorGroupUp", 'emit:command' = [
 
 
 '?t' = { name = "Tab / Terminal" }
-t1 = { name = "Tab 1", 'emit:command' = ['workbench.action.openEditorAtIndex1'], shortcut = "ctrl+1" }
-t2 = { name = "Tab 2", 'emit:command' = ['workbench.action.openEditorAtIndex2'], shortcut = "ctrl+2" }
-t3 = { name = "Tab 3", 'emit:command' = ['workbench.action.openEditorAtIndex3'], shortcut = "ctrl+3" }
-t4 = { name = "Tab 4", 'emit:command' = ['workbench.action.openEditorAtIndex4'], shortcut = "ctrl+4" }
-t5 = { name = "Tab 5", 'emit:command' = ['workbench.action.openEditorAtIndex5'], shortcut = "ctrl+5" }
-t6 = { name = "Tab 6", 'emit:command' = ['workbench.action.openEditorAtIndex6'], shortcut = "ctrl+6" }
-t7 = { name = "Tab 7", 'emit:command' = ['workbench.action.openEditorAtIndex7'], shortcut = "ctrl+7" }
-t8 = { name = "Tab 8", 'emit:command' = ['workbench.action.openEditorAtIndex8'], shortcut = "ctrl+8" }
-t9 = { name = "Tab 9", 'emit:command' = ['workbench.action.openEditorAtIndex9'], shortcut = "ctrl+9" }
+t1 = { name = "Tab 1", 'emit:command' = [
+  'workbench.action.openEditorAtIndex1',
+], shortcut = "ctrl+1" }
+t2 = { name = "Tab 2", 'emit:command' = [
+  'workbench.action.openEditorAtIndex2',
+], shortcut = "ctrl+2" }
+t3 = { name = "Tab 3", 'emit:command' = [
+  'workbench.action.openEditorAtIndex3',
+], shortcut = "ctrl+3" }
+t4 = { name = "Tab 4", 'emit:command' = [
+  'workbench.action.openEditorAtIndex4',
+], shortcut = "ctrl+4" }
+t5 = { name = "Tab 5", 'emit:command' = [
+  'workbench.action.openEditorAtIndex5',
+], shortcut = "ctrl+5" }
+t6 = { name = "Tab 6", 'emit:command' = [
+  'workbench.action.openEditorAtIndex6',
+], shortcut = "ctrl+6" }
+t7 = { name = "Tab 7", 'emit:command' = [
+  'workbench.action.openEditorAtIndex7',
+], shortcut = "ctrl+7" }
+t8 = { name = "Tab 8", 'emit:command' = [
+  'workbench.action.openEditorAtIndex8',
+], shortcut = "ctrl+8" }
+t9 = { name = "Tab 9", 'emit:command' = [
+  'workbench.action.openEditorAtIndex9',
+], shortcut = "ctrl+9" }
 ta = { name = "Terminal: Actions", 'emit:command' = [
   'workbench.action.terminal.showQuickFixes',
 ], shortcut = "cmd+." }
 tc = { name = "Terminal: Clear", 'emit:command' = [
   'workbench.action.terminal.clear',
 ], shortcut = "cmd+k" }
-ti = { name = "Terminal: Input Chat", 'emit:command' = ['workbench.action.terminal.chat.start'], shortcut = "cmd+i" }
+ti = { name = "Terminal: Input Chat", 'emit:command' = [
+  'workbench.action.terminal.chat.start',
+], shortcut = "cmd+i" }
 tn = { name = "workbench.action.terminal.new", 'emit:command' = [
   'workbench.action.terminal.new", shortcut = "ctrl+shift+`',
 ] }
@@ -239,9 +307,13 @@ ton = { name = "Terminal: Open Native", 'emit:command' = [
 ], shortcut = "shift+cmd+c" }
 
 '?s' = { name = "Search / Split" }
-sg = { name = "Search Globally", 'emit:command' = ['workbench.action.quickOpen'], shortcut = "cmd+p" }
+sg = { name = "Search Globally", 'emit:command' = [
+  'workbench.action.quickOpen',
+], shortcut = "cmd+p" }
 sf = { name = "Search Files", 'emit:command' = ['workbench.action.quickOpen'], shortcut = "cmd+p" }
-sa = { name = "Split: Auto", 'emit:command' = ['workbench.action.splitEditor'], shortcut = "cmd+backslash" }
+sa = { name = "Split: Auto", 'emit:command' = [
+  'workbench.action.splitEditor',
+], shortcut = "cmd+backslash" }
 sl = { name = "Split: Left", 'emit:command' = [
   'workbench.action.splitEditorLeft',
 ], shortcut = "cmd+k cmd+backslash" }
@@ -272,16 +344,30 @@ sw = { name = "Split: West", 'emit:command' = [
 se = { name = "Split: East", 'emit:command' = [
   'workbench.action.focusRightGroup',
 ], shortcut = "cmd+k cmd+right" }
-s1 = { name = "Split: 1st", 'emit:command' = ['workbench.action.focusFirstEditorGroup'], shortcut = "cmd+1" }
-s2 = { name = "Split: 2nd", 'emit:command' = ['workbench.action.focusSecondEditorGroup'], shortcut = "cmd+2" }
-s3 = { name = "Split: 3rd", 'emit:command' = ['workbench.action.focusThirdEditorGroup'], shortcut = "cmd+3" }
-s4 = { name = "Split: 4th", 'emit:command' = ['workbench.action.focusFourthEditorGroup'], shortcut = "cmd+4" }
-s5 = { name = "Split: 5th", 'emit:command' = ['workbench.action.focusFifthEditorGroup'], shortcut = "cmd+5" }
-s6 = { name = "Split: 6th", 'emit:command' = ['workbench.action.focusSixthEditorGroup'], shortcut = "cmd+6" }
+s1 = { name = "Split: 1st", 'emit:command' = [
+  'workbench.action.focusFirstEditorGroup',
+], shortcut = "cmd+1" }
+s2 = { name = "Split: 2nd", 'emit:command' = [
+  'workbench.action.focusSecondEditorGroup',
+], shortcut = "cmd+2" }
+s3 = { name = "Split: 3rd", 'emit:command' = [
+  'workbench.action.focusThirdEditorGroup',
+], shortcut = "cmd+3" }
+s4 = { name = "Split: 4th", 'emit:command' = [
+  'workbench.action.focusFourthEditorGroup',
+], shortcut = "cmd+4" }
+s5 = { name = "Split: 5th", 'emit:command' = [
+  'workbench.action.focusFifthEditorGroup',
+], shortcut = "cmd+5" }
+s6 = { name = "Split: 6th", 'emit:command' = [
+  'workbench.action.focusSixthEditorGroup',
+], shortcut = "cmd+6" }
 s7 = { name = "Split: 7th", 'emit:command' = [
   'workbench.action.focusSeventhEditorGroup',
 ], shortcut = "cmd+7" }
-s8 = { name = "Split: 8th", 'emit:command' = ['workbench.action.focusEighthEditorGroup'], shortcut = "cmd+8" }
+s8 = { name = "Split: 8th", 'emit:command' = [
+  'workbench.action.focusEighthEditorGroup',
+], shortcut = "cmd+8" }
 sq = { name = "Split: Quit", 'emit:command' = ['workbench.action.closeGroup'], shortcut = "cmd+w" }
 sqe = { name = "Split: Quit Editors", 'emit:command' = [
   'workbench.action.closeEditorsInGroup',
@@ -307,22 +393,34 @@ gip = { name = "Goto Implementation Peek", 'emit:command' = [
   'editor.action.peekImplementation',
 ], shortcut = "shift+cmd+f12" }
 gl = { name = "Goto Line", 'emit:command' = ['workbench.action.gotoLine'], shortcut = "ctrl+g" }
-gr = { name = "Goto References", 'emit:command' = ['editor.action.goToReferences'], shortcut = "shift+f12" }
+gr = { name = "Goto References", 'emit:command' = [
+  'editor.action.goToReferences',
+], shortcut = "shift+f12" }
 grv = { name = "Goto Reference: Previous", 'emit:command' = [
   'goToPreviousReference',
 ], shortcut = "shift+f12" }
 grx = { name = "Goto Reference: Next", 'emit:command' = ['goToNextReference'], shortcut = "f12" }
-gs = { name = "Goto Symbol", 'emit:command' = ['workbench.action.gotoSymbol'], shortcut = "shift+cmd+o" }
+gs = { name = "Goto Symbol", 'emit:command' = [
+  'workbench.action.gotoSymbol',
+], shortcut = "shift+cmd+o" }
 
 '?w' = { name = "Window" }
 woe = { name = "Window: Open Editor", 'emit:command' = [
   'workbench.action.copyEditorToNewWindow',
 ], shortcut = "cmd+k o" }
-wq = { name = "Window: Quit", 'emit:command' = ['workbench.action.closeWindow'], shortcut = "shift+cmd+w" }
+wq = { name = "Window: Quit", 'emit:command' = [
+  'workbench.action.closeWindow',
+], shortcut = "shift+cmd+w" }
 wqo = { name = "Window: Quit Others", 'emit:command' = ['workbench.action.closeOtherWindows'] }
-wn = { name = "Window: New", 'emit:command' = ['workbench.action.newWindow'], shortcut = "shift+cmd+n" }
-wr = { name = "Window: Reload", 'emit:command' = ['workbench.action.reloadWindow'], shortcut = "cmd+r" }
-ws = { name = "Window: Switch", 'emit:command' = ['workbench.action.switchWindow'], shortcut = "ctrl+w" }
+wn = { name = "Window: New", 'emit:command' = [
+  'workbench.action.newWindow',
+], shortcut = "shift+cmd+n" }
+wr = { name = "Window: Reload", 'emit:command' = [
+  'workbench.action.reloadWindow',
+], shortcut = "cmd+r" }
+ws = { name = "Window: Switch", 'emit:command' = [
+  'workbench.action.switchWindow',
+], shortcut = "ctrl+w" }
 wt = { name = "Window: Terminal", 'emit:command' = [
   'workbench.action.terminal.newInNewWindow`", shortcut = "ctrl+shift+alt+',
 ] }
@@ -332,9 +430,15 @@ zf = { name = "Zoom: Full Screen", 'emit:command' = [
   'workbench.action.toggleFullScreen',
 ], shortcut = "ctrl+cmd+f" }
 zi = { name = "Zoom In", 'emit:command' = ['workbench.action.zoomIn'], shortcut = "cmd+NumpadAdd" }
-zo = { name = "Zoom Out", 'emit:command' = ['workbench.action.zoomOut'], shortcut = "cmd+NumpadSubtract" }
-zr = { name = "Zoom Reset", 'emit:command' = ['workbench.action.zoomReset'], shortcut = "cmd+Numpad0" }
-zm = { name = "Zen Mode", 'emit:command' = ['workbench.action.toggleZenMode'], shortcut = "cmd+k z" }
+zo = { name = "Zoom Out", 'emit:command' = [
+  'workbench.action.zoomOut',
+], shortcut = "cmd+NumpadSubtract" }
+zr = { name = "Zoom Reset", 'emit:command' = [
+  'workbench.action.zoomReset',
+], shortcut = "cmd+Numpad0" }
+zm = { name = "Zen Mode", 'emit:command' = [
+  'workbench.action.toggleZenMode',
+], shortcut = "cmd+k z" }
 zq = { name = "Zen: Quit", 'emit:command' = [
   'workbench.action.exitZenMode',
 ], shortcut = "escape escape" }
@@ -356,7 +460,9 @@ ds = { name = "Debug: Start", 'emit:command' = ['workbench.action.debug.start'],
 db = { name = "Debug: Breakpoint", 'emit:command' = [
   'editor.debug.action.toggleBreakpoint',
 ], shortcut = "f9" }
-do = { name = "Debug: Stop", 'emit:command' = ['workbench.action.debug.stop'], shortcut = "shift+f5" }
+do = { name = "Debug: Stop", 'emit:command' = [
+  'workbench.action.debug.stop',
+], shortcut = "shift+f5" }
 du = { name = "Debug: Pause", 'emit:command' = ['workbench.action.debug.pause'], shortcut = "f6" }
 dr = { name = "Debug: Run", 'emit:command' = ['workbench.action.debug.run'], shortcut = "ctrl+f5" }
 dv = { name = "Debug: View", 'emit:command' = ['debug.openView'], shortcut = "cmd+f5" }
@@ -374,9 +480,15 @@ dit = { name = "Debug: Into Target", 'emit:command' = [
 ], shortcut = "cmd+f11" }
 
 '?ds' = { name = "Debug: Step" }
-dsi = { name = "Debug: Step Into", 'emit:command' = ['workbench.action.debug.stepInto'], shortcut = "f11" }
-dso = { name = "Debug: Step Out", 'emit:command' = ['workbench.action.debug.stepOut'], shortcut = "shift+f11" }
-dsv = { name = "Debug: Step Over", 'emit:command' = ['workbench.action.debug.stepOver'], shortcut = "f10" }
+dsi = { name = "Debug: Step Into", 'emit:command' = [
+  'workbench.action.debug.stepInto',
+], shortcut = "f11" }
+dso = { name = "Debug: Step Out", 'emit:command' = [
+  'workbench.action.debug.stepOut',
+], shortcut = "shift+f11" }
+dsv = { name = "Debug: Step Over", 'emit:command' = [
+  'workbench.action.debug.stepOver',
+], shortcut = "f10" }
 
 '?dc' = { name = "Debug Console" }
 'dc]' = { name = "workbench.action.debug.nextConsole", 'emit:command' = [
@@ -391,16 +503,24 @@ dsv = { name = "Debug: Step Over", 'emit:command' = ['workbench.action.debug.ste
 ci = { name = "Code: Imports", 'emit:command' = [
   'editor.action.organizeImports',
 ], shortcut = "shift+alt+o" }
-cd = { name = "Code: Definition", 'emit:command' = ['editor.action.revealDefinition'], shortcut = "f12" }
+cd = { name = "Code: Definition", 'emit:command' = [
+  'editor.action.revealDefinition',
+], shortcut = "f12" }
 'c[' = { name = "Code: Previous", 'emit:command' = [
   'editor.action.inlineSuggest.showPrevious',
 ], shortcut = "alt+[" }
-'c]' = { name = "Code: Next", 'emit:command' = ['editor.action.inlineSuggest.showNext'], shortcut = "alt+]" }
+'c]' = { name = "Code: Next", 'emit:command' = [
+  'editor.action.inlineSuggest.showNext',
+], shortcut = "alt+]" }
 cdp = { name = "Code: Definition Peek", 'emit:command' = [
   'editor.action.peekDefinition',
 ], shortcut = "alt+f12" }
-ch = { name = "Code: Hover", 'emit:command' = ['workbench.action.showHover'], shortcut = "cmd+k cmd+i" }
-cr = { name = "Code: Refactor", 'emit:command' = ['editor.action.refactor'], shortcut = "ctrl+shift+r" }
+ch = { name = "Code: Hover", 'emit:command' = [
+  'workbench.action.showHover',
+], shortcut = "cmd+k cmd+i" }
+cr = { name = "Code: Refactor", 'emit:command' = [
+  'editor.action.refactor',
+], shortcut = "ctrl+shift+r" }
 crn = { name = "Code: Re Name", 'emit:command' = ['editor.action.rename'], shortcut = "f2" }
 cs = { name = "Code: Suggest", 'emit:command' = [
   'workbench.action.terminal.triggerSuggest',
@@ -419,7 +539,9 @@ ccl = { name = "Code: Comment Line", 'emit:command' = [
 ccr = { name = "Code Comment: Remove", 'emit:command' = [
   'editor.action.removeCommentLine',
 ], shortcut = "cmd+k cmd+u" }
-cch = { name = "Code Comment: Hide", 'emit:command' = ['workbench.action.hideComment'], shortcut = "shift+escape" }
+cch = { name = "Code Comment: Hide", 'emit:command' = [
+  'workbench.action.hideComment',
+], shortcut = "shift+escape" }
 
 '?n' = { name = "Notebook" }
 
@@ -464,7 +586,9 @@ ncei = { name = "Notebook Cell: Expand Input", 'emit:command' = [
 nceo = { name = "Notebook Cell: Expand Output", 'emit:command' = [
   'notebook.cell.expandCellOutput',
 ], shortcut = "cmd+k t" }
-ncf = { name = "Notebook Cell: Format", 'emit:command' = ['notebook.formatCell'], shortcut = "shift+alt+f" }
+ncf = { name = "Notebook Cell: Format", 'emit:command' = [
+  'notebook.formatCell',
+], shortcut = "shift+alt+f" }
 ncfa = { name = "Notebook Cell: Failure Actions", 'emit:command' = [
   'notebook.cell.openFailureActions',
 ], shortcut = "cmd+." }
@@ -500,10 +624,18 @@ nct = { name = "Notebook Cell: Toggle Output Scrolling", 'emit:command' = [
 ], shortcut = "shift+f8" }
 
 '?i' = { name = "Input (Chat)" }
-ia = { name = "Input: Accept All", 'emit:command' = ['chatEditor.action.acceptAllEdits'], shortcut = "alt+cmd+y" }
-iy = { name = "Input: Yes", 'emit:command' = ['chatEditor.action.accept'], shortcut = "shift+cmd+y" }
-ir = { name = "Input: Reject", 'emit:command' = ['chatEditor.action.reject'], shortcut = "shift+cmd+n" }
-in = { name = "Input: New", 'emit:command' = ['workbench.action.chat.newChat'], shortcut = "ctrl+l" }
+ia = { name = "Input: Accept All", 'emit:command' = [
+  'chatEditor.action.acceptAllEdits',
+], shortcut = "alt+cmd+y" }
+iy = { name = "Input: Yes", 'emit:command' = [
+  'chatEditor.action.accept',
+], shortcut = "shift+cmd+y" }
+ir = { name = "Input: Reject", 'emit:command' = [
+  'chatEditor.action.reject',
+], shortcut = "shift+cmd+n" }
+in = { name = "Input: New", 'emit:command' = [
+  'workbench.action.chat.newChat',
+], shortcut = "ctrl+l" }
 iad = { name = "Input: Accessible Diff", 'emit:command' = [
   'chatEditor.action.showAccessibleDiffView',
 ], shortcut = "f7" }
@@ -512,7 +644,9 @@ id = { name = "Input: Diff", 'emit:command' = [
 ], shortcut = "shift+alt+f7" }
 ii = { name = "Input: Inline", 'emit:command' = ['inlineChat.askInChat'], shortcut = "cmd+i" }
 is = { name = "Input: Start", 'emit:command' = ['inlineChat.start'], shortcut = "cmd+i" }
-io = { name = "Input: Open", 'emit:command' = ['workbench.action.chat.open'], shortcut = "ctrl+cmd+i" }
+io = { name = "Input: Open", 'emit:command' = [
+  'workbench.action.chat.open',
+], shortcut = "ctrl+cmd+i" }
 ic = { name = "Input: Context", 'emit:command' = [
   'workbench.action.chat.attachContext',
 ], shortcut = "cmd+/" }
@@ -530,9 +664,7 @@ iq = { name = "Input: Quick", 'emit:command' = [
 ha = { name = "Hunk: Accept", 'emit:command' = [
   'chatEditor.action.acceptHunk',
 ], shortcut = "cmd+y" }
-hu = { name = "Hunk: Undo", 'emit:command' = [
-  'chatEditor.action.undoHunk',
-], shortcut = "cmd+n" }
+hu = { name = "Hunk: Undo", 'emit:command' = ['chatEditor.action.undoHunk'], shortcut = "cmd+n" }
 
 '?ac' = { name = "Accessibility" }
 ach = { name = "Accessibility: Help", 'emit:command' = [
@@ -568,7 +700,9 @@ avd = { name = "Accessibility View: Disable Hint", 'emit:command' = [
 ], shortcut = "alt+[" }
 
 '?b' = { name = "Breadcrumbs" }
-bf = { name = "Breadcrumbs: Focus", 'emit:command' = ['breadcrumbs.focus'], shortcut = "shift+cmd+;" }
+bf = { name = "Breadcrumbs: Focus", 'emit:command' = [
+  'breadcrumbs.focus',
+], shortcut = "shift+cmd+;" }
 bs = { name = "Breadcrumbs: Select", 'emit:command' = [
   'breadcrumbs.focusAndSelect',
 ], shortcut = "shift+cmd+." }
@@ -580,7 +714,9 @@ bo = { name = "Breadcrumbs: On", 'emit:command' = [
 qh = { name = "QA: History", 'emit:command' = [
   'testing.toggleTestingPeekHistory',
 ], shortcut = "alt+h" }
-qs = { name = "QA: Show Recent Output", 'emit:command' = ['testing.reRunLastRun'], shortcut = "cmd+; l" }
+qs = { name = "QA: Show Recent Output", 'emit:command' = [
+  'testing.reRunLastRun',
+], shortcut = "cmd+; l" }
 '?qc' = { name = "QA Coverage" }
 qci = { name = "QA Coverage: Inline", 'emit:command' = [
   'testing.toggleInlineCoverage',
@@ -606,7 +742,9 @@ qcl = { name = "QA Coverage: Last Run", 'emit:command' = [
 '?qr' = { name = "QA Run / Refresh" }
 qr = { name = "QA Refresh", 'emit:command' = ['testing.refreshTests'], shortcut = "cmd+; cmd+r" }
 qra = { name = "QA Run: All", 'emit:command' = ['testing.runAll'], shortcut = "cmd+; a" }
-qri = { name = "QA Run: Input Cursor", 'emit:command' = ['testing.runAtCursor'], shortcut = "cmd+; c" }
+qri = { name = "QA Run: Input Cursor", 'emit:command' = [
+  'testing.runAtCursor',
+], shortcut = "cmd+; c" }
 qrc = { name = "QA Run: Cancel", 'emit:command' = ['testing.cancelRun'], shortcut = "cmd+; cmd+x" }
 qrf = { name = "QA Run File", 'emit:command' = ['testing.runCurrentFile'], shortcut = "cmd+; f" }
 qrr = { name = "QA: Re-Run", 'emit:command' = ['testing.reRunFailTests'], shortcut = "cmd+; e" }
@@ -732,8 +870,6 @@ qoi = { name = "QA: Output Inline", 'emit:command' = [
 # fws = { name = "Find With Selection", 'emit:command' = ['actions.findWithSelection'], shortcut = "cmd+e" }
 
 
-
-
 # gns = { name = "editor.gotoNextSymbolFromResult", 'emit:command' = [
 #   'editor.gotoNextSymbolFromResult',
 # ], shortcut = "f12" }
@@ -855,7 +991,6 @@ qoi = { name = "QA: Output Inline", 'emit:command' = [
 # ncta = { name = "editor.action.nextCommentThreadAction", 'emit:command' = [
 #   'editor.action.nextCommentThreadAction',
 # ], shortcut = "alt+f9" }
-
 
 
 # nmfa = { name = "editor.action.nextMatchFindAction", 'emit:command' = [
@@ -1123,7 +1258,6 @@ qoi = { name = "QA: Output Inline", 'emit:command' = [
 #     'toggleQuickDiffWidgetFocus',
 #   ] },
 # ]
-
 
 
 # tsg = { name = "editor.action.triggerSuggest", 'emit:command' = [

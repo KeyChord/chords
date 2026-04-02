@@ -1,7 +1,7 @@
 //#region package.json
 var name = "@keychord/chords-com.apple";
-var type = "module";
 var version = "0.0.0";
+var type = "module";
 var dependencies = {
 	"@keychord/chords-menu": "github:KeyChord/chords-menu",
 	"desm": "catalog:",
@@ -20,8 +20,8 @@ var devDependencies = {
 var packageManager = "pnpm@10.33.0";
 var package_default = {
 	name,
-	type,
 	version,
+	type,
 	dependencies,
 	devDependencies,
 	packageManager

@@ -29,4 +29,4 @@ export default function vscode(cmd: string) {
   tap("cmd+shift+f17");
 
   return true;
-};
+}

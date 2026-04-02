@@ -1,7 +1,7 @@
 {
   "name": "@keychord/chords-com.apple",
-  "type": "module",
   "version": "0.0.0",
+  "type": "module",
   "dependencies": {
     "@keychord/chords-menu": "github:KeyChord/chords-menu",
     "desm": "catalog:",

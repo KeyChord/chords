@@ -1,21 +1,21 @@
 //#region package.json
 var name = "@keychord/chords-vscode";
-var type = "module";
 var version = "0.0.0";
-var packageManager = "pnpm@10.33.0";
+var type = "module";
+var dependencies = { "nano-spawn-compat": "catalog:" };
 var devDependencies = {
-	"@keychord/tsconfig": "catalog:",
 	"@keychord/config": "catalog:",
+	"@keychord/tsconfig": "catalog:",
 	"typescript": "catalog:"
 };
-var dependencies = { "nano-spawn-compat": "catalog:" };
+var packageManager = "pnpm@10.33.0";
 var package_default = {
 	name,
-	type,
 	version,
-	packageManager,
+	type,
+	dependencies,
 	devDependencies,
-	dependencies
+	packageManager
 };
 //#endregion
 export { package_default as default, dependencies, devDependencies, name, packageManager, type, version };

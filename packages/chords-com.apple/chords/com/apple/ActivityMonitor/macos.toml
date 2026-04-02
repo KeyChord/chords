@@ -8,7 +8,10 @@ file = "@keychord/chords-menu/js/menu.js"
 
 '?v' = { name = "View" }
 va = { name = "View: All Processes", 'emit:menu' = ["View", "All Processes"] }
-vh = { name = "View: Hierarchially, All Processes", 'emit:menu' = ["View", "All Processes, Hierarchically"] }
+vh = { name = "View: Hierarchially, All Processes", 'emit:menu' = [
+  "View",
+  "All Processes, Hierarchically",
+] }
 vm = { name = "View: My Processes", 'emit:menu' = ["View", "My Processes"] }
 vs = { name = "View: Selected Processes", 'emit:menu' = ["View", "Selected Processes"] }
 vy = { name = "View: System Processes", 'emit:menu' = ["View", "System Processes"] }
@@ -17,14 +20,17 @@ vc = { name = "View: Current (Active) Processes", 'emit:menu' = ["View", "Active
 vi = { name = "View: Inactive Processes", 'emit:menu' = ["View", "Inactive Processes"] }
 vg = { name = "View: GPU Processes", 'emit:menu' = ["View", "GPU Processes"] }
 vw = { name = "View: Windowed Processes", 'emit:menu' = ["View", "Windowed Processes"] }
-vl = { name = "View: Last 12 Hour Applications", 'emit:menu' = ["View", "Applications in last 12 hours"] }
+vl = { name = "View: Last 12 Hour Applications", 'emit:menu' = [
+  "View",
+  "Applications in last 12 hours",
+] }
 vp = { name = "View: Processes, by GPU", 'emit:menu' = ["View", "Processes, by GPU"] }
 
 '?p' = { name = "Process" }
-pf  = { name = "Process: Filter", 'emit:menu' = ["View", "Filter Processes"] }
-pi  = { name = "Process: Inspect", 'emit:menu' = ["View", "Inspect Process"] }
-ps  = { name = "Process: Sample", 'emit:menu' = ["View", "Sample Process"] }
-pq  = { name = "Process: Quit", 'emit:menu' = ["View", "Quit Process"] }
+pf = { name = "Process: Filter", 'emit:menu' = ["View", "Filter Processes"] }
+pi = { name = "Process: Inspect", 'emit:menu' = ["View", "Inspect Process"] }
+ps = { name = "Process: Sample", 'emit:menu' = ["View", "Sample Process"] }
+pq = { name = "Process: Quit", 'emit:menu' = ["View", "Quit Process"] }
 pss = { name = "Process: Send Signal", 'emit:menu' = ["View", "Send Signal to Process..."] }
 psd = { name = "Process: Show Deltas", 'emit:menu' = ["View", "Show Deltas for Process"] }
 
@@ -33,31 +39,47 @@ rs = { name = "Run: Spindump", 'emit:menu' = ["View", "Run Spindump"] }
 rd = { name = "Run: Diagonstics for System", 'emit:menu' = ["View", "Run System Diagnostics..."] }
 
 '?c' = { name = "Columns" }
-cpi  = { name = "Columns: Process ID", 'emit:menu' = ["View", "Columns", "Process ID"] }
-cu   = { name = "Columns: User", 'emit:menu' = ["View", "Columns", "User"] }
-cpc  = { name = "Columns: % CPU", 'emit:menu' = ["View", "Columns", "% CPU"] }
-cct  = { name = "Columns: CPU Time", 'emit:menu' = ["View", "Columns", "CPU Time"] }
-cpg  = { name = "Columns: % GPU", 'emit:menu' = ["View", "Columns", "% GPU"] }
-cgt  = { name = "Columns: GPU Time", 'emit:menu' = ["View", "Columns", "GPU Time"] }
-cnt  = { name = "Columns: # Threads", 'emit:menu' = ["View", "Columns", "# Threads"] }
-cnp  = { name = "Columns: # Ports", 'emit:menu' = ["View", "Columns", "# Ports"] }
-crm  = { name = "Columns: Real Memory", 'emit:menu' = ["View", "Columns", "Real Memory"] }
-crpm = { name = "Columns: Real Private Memory", 'emit:menu' = ["View", "Columns", "Real Private Memory"] }
-crsm = { name = "Columns: Real Shared Memory", 'emit:menu' = ["View", "Columns", "Real Shared Memory"] }
-ck   = { name = "Columns: Kind", 'emit:menu' = ["View", "Columns", "Kind"] }
-cst  = { name = "Columns: Sudden Termination", 'emit:menu' = ["View", "Columns", "Sudden Termination"] }
-cs   = { name = "Columns: Sandbox", 'emit:menu' = ["View", "Columns", "Sandbox"] }
-cr   = { name = "Columns: Restricted", 'emit:menu' = ["View", "Columns", "Restricted"] }
+cpi = { name = "Columns: Process ID", 'emit:menu' = ["View", "Columns", "Process ID"] }
+cu = { name = "Columns: User", 'emit:menu' = ["View", "Columns", "User"] }
+cpc = { name = "Columns: % CPU", 'emit:menu' = ["View", "Columns", "% CPU"] }
+cct = { name = "Columns: CPU Time", 'emit:menu' = ["View", "Columns", "CPU Time"] }
+cpg = { name = "Columns: % GPU", 'emit:menu' = ["View", "Columns", "% GPU"] }
+cgt = { name = "Columns: GPU Time", 'emit:menu' = ["View", "Columns", "GPU Time"] }
+cnt = { name = "Columns: # Threads", 'emit:menu' = ["View", "Columns", "# Threads"] }
+cnp = { name = "Columns: # Ports", 'emit:menu' = ["View", "Columns", "# Ports"] }
+crm = { name = "Columns: Real Memory", 'emit:menu' = ["View", "Columns", "Real Memory"] }
+crpm = { name = "Columns: Real Private Memory", 'emit:menu' = [
+  "View",
+  "Columns",
+  "Real Private Memory",
+] }
+crsm = { name = "Columns: Real Shared Memory", 'emit:menu' = [
+  "View",
+  "Columns",
+  "Real Shared Memory",
+] }
+ck = { name = "Columns: Kind", 'emit:menu' = ["View", "Columns", "Kind"] }
+cst = { name = "Columns: Sudden Termination", 'emit:menu' = [
+  "View",
+  "Columns",
+  "Sudden Termination",
+] }
+cs = { name = "Columns: Sandbox", 'emit:menu' = ["View", "Columns", "Sandbox"] }
+cr = { name = "Columns: Restricted", 'emit:menu' = ["View", "Columns", "Restricted"] }
 ciwu = { name = "Columns: Idle Wake Ups", 'emit:menu' = ["View", "Columns", "Idle Wake Ups"] }
-cei  = { name = "Columns: Energy Impact", 'emit:menu' = ["View", "Columns", "Energy Impact"] }
-can  = { name = "Columns: App Nap", 'emit:menu' = ["View", "Columns", "App Nap"] }
-csb  = { name = "Columns: Sent Bytes", 'emit:menu' = ["View", "Columns", "Sent Bytes"] }
-csp  = { name = "Columns: Sent Packets", 'emit:menu' = ["View", "Columns", "Sent Packets"] }
-crb  = { name = "Columns: Received Bytes", 'emit:menu' = ["View", "Columns", "Received Bytes"] }
-crp  = { name = "Columns: Received Packets", 'emit:menu' = ["View", "Columns", "Received Packets"] }
-cpm  = { name = "Columns: Purgeable Memory", 'emit:menu' = ["View", "Columns", "Purgeable Memory"] }
-cm   = { name = "Columns: Memory", 'emit:menu' = ["View", "Columns", "Memory"] }
-ccm  = { name = "Columns: Compressed Memory", 'emit:menu' = ["View", "Columns", "Compressed Memory"] }
-cbw  = { name = "Columns: Bytes Written", 'emit:menu' = ["View", "Columns", "Bytes Written"] }
-cbr  = { name = "Columns: Bytes Read", 'emit:menu' = ["View", "Columns", "Bytes Read"] }
-cps  = { name = "Columns: Preventing Sleep", 'emit:menu' = ["View", "Columns", "Preventing Sleep"] }
+cei = { name = "Columns: Energy Impact", 'emit:menu' = ["View", "Columns", "Energy Impact"] }
+can = { name = "Columns: App Nap", 'emit:menu' = ["View", "Columns", "App Nap"] }
+csb = { name = "Columns: Sent Bytes", 'emit:menu' = ["View", "Columns", "Sent Bytes"] }
+csp = { name = "Columns: Sent Packets", 'emit:menu' = ["View", "Columns", "Sent Packets"] }
+crb = { name = "Columns: Received Bytes", 'emit:menu' = ["View", "Columns", "Received Bytes"] }
+crp = { name = "Columns: Received Packets", 'emit:menu' = ["View", "Columns", "Received Packets"] }
+cpm = { name = "Columns: Purgeable Memory", 'emit:menu' = ["View", "Columns", "Purgeable Memory"] }
+cm = { name = "Columns: Memory", 'emit:menu' = ["View", "Columns", "Memory"] }
+ccm = { name = "Columns: Compressed Memory", 'emit:menu' = [
+  "View",
+  "Columns",
+  "Compressed Memory",
+] }
+cbw = { name = "Columns: Bytes Written", 'emit:menu' = ["View", "Columns", "Bytes Written"] }
+cbr = { name = "Columns: Bytes Read", 'emit:menu' = ["View", "Columns", "Bytes Read"] }
+cps = { name = "Columns: Preventing Sleep", 'emit:menu' = ["View", "Columns", "Preventing Sleep"] }

@@ -2,7 +2,6 @@
   "name": "@keychord/chords-chromium",
   "version": "0.0.0",
   "type": "module",
-  "packageManager": "pnpm@10.33.0",
   "dependencies": {
     "chrome-remote-interface": "catalog:",
     "desm": "catalog:",
@@ -11,11 +10,12 @@
     "nano-spawn-compat": "catalog:"
   },
   "devDependencies": {
-    "@keychord/tsconfig": "catalog:",
     "@keychord/config": "catalog:",
+    "@keychord/tsconfig": "catalog:",
     "@types/chrome-remote-interface": "catalog:",
     "bun-types": "catalog:",
     "dax": "catalog:",
     "typescript": "catalog:"
-  }
+  },
+  "packageManager": "pnpm@10.33.0"
 }

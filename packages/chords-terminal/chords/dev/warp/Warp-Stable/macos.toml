@@ -23,14 +23,22 @@ args = []
 'f[' = { name = "Find: Next Match", 'emit:command' = ['editor:next_find_match'] }
 
 '?b' = { name = "Block" }
-ba = { name = "Block: All Select", 'emit:command' = ['terminal:select_all_blocks'], shortcut = "cmd+a" }
-bs = { name = "Block: Share", 'emit:command' = ['terminal:open_share_modal'], shortcut = "shift+cmd+s" }
+ba = { name = "Block: All Select", 'emit:command' = [
+  'terminal:select_all_blocks',
+], shortcut = "cmd+a" }
+bs = { name = "Block: Share", 'emit:command' = [
+  'terminal:open_share_modal',
+], shortcut = "shift+cmd+s" }
 bc = { name = "Block: Clear All", 'emit:command' = ['terminal:clear_blocks'], shortcut = "cmd+k" }
 bm = { name = "Block: Menu", 'emit:command' = [
   'terminal:open_block_list_context_menu_via_keybinding',
 ], shortcut = "cmd+m" }
-'b[' = { name = "Block: Previous", 'emit:command' = ['terminal:select_previous_block'], shortcut = "cmd+up" }
-'b]' = { name = "Block: Next", 'emit:command' = ['terminal:select_next_block'], shortcut = "cmd+down" }
+'b[' = { name = "Block: Previous", 'emit:command' = [
+  'terminal:select_previous_block',
+], shortcut = "cmd+up" }
+'b]' = { name = "Block: Next", 'emit:command' = [
+  'terminal:select_next_block',
+], shortcut = "cmd+down" }
 bu = { name = "Block: Up Expand Selected Blocks Above", 'emit:command' = [
   'terminal:expand_block_selection_above',
 ], shortcut = "shift+cmd+up" }
@@ -45,17 +53,27 @@ co = { name = "Command: Output Copy", 'emit:command' = [
 cr = { name = "Command: Reinput", 'emit:command' = [
   'terminal:reinput_commands',
 ], shortcut = "cmd+i" }
-cc = { name = "Command: Copy", 'emit:command' = ['terminal:copy_commands'], shortcut = "shift+cmd+c" }
+cc = { name = "Command: Copy", 'emit:command' = [
+  'terminal:copy_commands',
+], shortcut = "shift+cmd+c" }
 crr = { name = "Command: Reinput as Root", 'emit:command' = [
   'terminal:reinput_commands_with_sudo',
 ], shortcut = "shift+cmd+i" }
-cp = { name = "Command: Palette", 'emit:command' = ['terminal:open_command_palette'], shortcut = "cmd+p" }
-cs = { name = "Command: Search", 'emit:command' = ['workspace:show_command_search'], shortcut = "ctrl+r" }
+cp = { name = "Command: Palette", 'emit:command' = [
+  'terminal:open_command_palette',
+], shortcut = "cmd+p" }
+cs = { name = "Command: Search", 'emit:command' = [
+  'workspace:show_command_search',
+], shortcut = "ctrl+r" }
 
 '?m' = { name = "Mark" }
-mb = { name = "Mark: Block", 'emit:command' = ['terminal:bookmark_selected_block'], shortcut = "cmd+b" }
+mb = { name = "Mark: Block", 'emit:command' = [
+  'terminal:bookmark_selected_block',
+], shortcut = "cmd+b" }
 mu = { name = "Mark: Up", 'emit:command' = ['terminal:select_bookmark_up'], shortcut = "alt+up" }
-md = { name = "Mark: Down", 'emit:command' = ['terminal:select_bookmark_down'], shortcut = "alt+down" }
+md = { name = "Mark: Down", 'emit:command' = [
+  'terminal:select_bookmark_down',
+], shortcut = "alt+down" }
 
 '?t' = { name = "Tab" }
 td = { name = "Tab: Duplicate", 'emit:command' = [
@@ -63,11 +81,15 @@ td = { name = "Tab: Duplicate", 'emit:command' = [
 ], shortcut = "shift+cmd+d" }
 tn = { name = "Tab: New", 'emit:command' = ['workspace:new_tab'], shortcut = "cmd+t" }
 tq = { name = "Tab: Quit", 'emit:command' = ['workspace:close_current_tab'], shortcut = "cmd+w" }
-to = { name = "Tab: Open Closed", 'emit:command' = ['workspace:reopen_closed_tab'], shortcut = "shift+cmd+t" }
+to = { name = "Tab: Open Closed", 'emit:command' = [
+  'workspace:reopen_closed_tab',
+], shortcut = "shift+cmd+t" }
 tqr = { name = "Tab: Quit to Right", 'emit:command' = [
   'workspace:close_tabs_right_active_tab',
 ], shortcut = "shift+cmd+t" }
-tqo = { name = "Tab: Quit Others", 'emit:command' = ['workspace:close_other_tabs'], shortcut = "shift+cmd+t" }
+tqo = { name = "Tab: Quit Others", 'emit:command' = [
+  'workspace:close_other_tabs',
+], shortcut = "shift+cmd+t" }
 t1 = { name = "Switch to tab 1", 'emit:command' = ['workspace:switch_tab:0'], shortcut = "cmd+1" }
 t2 = { name = "Switch to tab 2", 'emit:command' = ['workspace:switch_tab:1'], shortcut = "cmd+2" }
 t3 = { name = "Switch to tab 3", 'emit:command' = ['workspace:switch_tab:2'], shortcut = "cmd+3" }
@@ -79,7 +101,9 @@ t8 = { name = "Switch to tab 8", 'emit:command' = ['workspace:switch_tab:7'], sh
 't[' = { name = "Switch to previous tab", 'emit:command' = [
   'workspace:previous_tab',
 ], shortcut = "ctrl+shift+tab" }
-'t]' = { name = "Switch to next tab", 'emit:command' = ['workspace:next_tab'], shortcut = "ctrl+tab" }
+'t]' = { name = "Switch to next tab", 'emit:command' = [
+  'workspace:next_tab',
+], shortcut = "ctrl+tab" }
 tl = { name = "Move current tab left", 'emit:command' = [
   'workspace:move_tab_left',
 ], shortcut = "shift+cmd+[" }
@@ -89,42 +113,74 @@ tr = { name = "Move current tab right", 'emit:command' = [
 
 '?s' = { name = "Split / Scroll" }
 sn = { name = "Split: North", 'emit:command' = ['pane_group:focus_up'], shortcut = "cmd+alt+up" }
-se = { name = "Split: East", 'emit:command' = ['pane_group:focus_right'], shortcut = "cmd+alt+right" }
-ss = { name = "Split: South", 'emit:command' = ['pane_group:focus_down'], shortcut = "cmd+alt+down" }
+se = { name = "Split: East", 'emit:command' = [
+  'pane_group:focus_right',
+], shortcut = "cmd+alt+right" }
+ss = { name = "Split: South", 'emit:command' = [
+  'pane_group:focus_down',
+], shortcut = "cmd+alt+down" }
 sw = { name = "Split: West", 'emit:command' = ['pane_group:focus_left'], shortcut = "cmd+alt+left" }
 su = { name = "Split: Up", 'emit:command' = ['pane_group:add_up'] }
 sd = { name = "Split: Down", 'emit:command' = ['pane_group:add_down'], shortcut = "cmd+shift+d" }
 sr = { name = "Split: Right", 'emit:command' = ['pane_group:add_right'], shortcut = "cmd+d" }
 sl = { name = "Split: Left", 'emit:command' = ['pane_group:add_left'] }
 slu = { name = "Scroll Terminal Output Up One Line", 'emit:command' = ['terminal:scroll_line_up'] }
-sld = { name = "Scroll Terminal Output Down One Line", 'emit:command' = ['terminal:scroll_line_down'] }
+sld = { name = "Scroll Terminal Output Down One Line", 'emit:command' = [
+  'terminal:scroll_line_down',
+] }
 spu = { name = "Scroll Up One Page", 'emit:command' = ['terminal:page_up'], shortcut = "pageup" }
-spd = { name = "Scroll Down One Page", 'emit:command' = ['terminal:page_down'], shortcut = "pagedown" }
-st = { name = "Scroll to Top", 'emit:command' = ['terminal:scroll_home'], shortcut = "shift+cmd+up" }
-sb = { name = "Scroll to Bottom", 'emit:command' = ['terminal:scroll_end'], shortcut = "shift+cmd+down" }
+spd = { name = "Scroll Down One Page", 'emit:command' = [
+  'terminal:page_down',
+], shortcut = "pagedown" }
+st = { name = "Scroll to Top", 'emit:command' = [
+  'terminal:scroll_home',
+], shortcut = "shift+cmd+up" }
+sb = { name = "Scroll to Bottom", 'emit:command' = [
+  'terminal:scroll_end',
+], shortcut = "shift+cmd+down" }
 
 '?r' = { name = "Resize" }
 ru = { name = "Resize: Up", 'emit:command' = ['pane_group:resize_up'], shortcut = "ctrl+cmd+up" }
-rd = { name = "Resize: Down", 'emit:command' = ['pane_group:resize_down'], shortcut = "ctrl+cmd+down" }
+rd = { name = "Resize: Down", 'emit:command' = [
+  'pane_group:resize_down',
+], shortcut = "ctrl+cmd+down" }
 rr = { name = "Resize: Right", 'emit:command' = [
   'pane_group:resize_right',
 ], shortcut = "ctrl+cmd+right" }
-rl = { name = "Resize: Left", 'emit:command' = ['pane_group:resize_left'], shortcut = "ctrl+cmd+left" }
+rl = { name = "Resize: Left", 'emit:command' = [
+  'pane_group:resize_left',
+], shortcut = "ctrl+cmd+left" }
 
 '?z' = { name = "Zoom" }
-zi = { name = "Increase font size", 'emit:command' = ['window:increase_font_size'], shortcut = "cmd+=" }
-zo = { name = "Decrease font size", 'emit:command' = ['window:decrease_font_size'], shortcut = "cmd+-" }
+zi = { name = "Increase font size", 'emit:command' = [
+  'window:increase_font_size',
+], shortcut = "cmd+=" }
+zo = { name = "Decrease font size", 'emit:command' = [
+  'window:decrease_font_size',
+], shortcut = "cmd+-" }
 zr = { name = "Reset font size", 'emit:command' = ['window:reset_font_size'] }
 zf = { name = "Zoom: Full Screen", 'emit:command' = ['root_view:toggle_fullscreen'] }
 
 '?p' = { name = "Panel" }
 pa = { name = "Panel: AI", 'emit:command' = ['workspace:toggle_ai_panel'], shortcut = "ctrl+]" }
-pt = { name = "Panel: Theme", 'emit:command' = ['workspace:show_theme_chooser'], shortcut = "ctrl+cmd+t" }
-pd = { name = "Panel: Drive", 'emit:command' = ['terminal:toggle_warp_drive'], shortcut = "cmd+backslash" }
+pt = { name = "Panel: Theme", 'emit:command' = [
+  'workspace:show_theme_chooser',
+], shortcut = "ctrl+cmd+t" }
+pd = { name = "Panel: Drive", 'emit:command' = [
+  'terminal:toggle_warp_drive',
+], shortcut = "cmd+backslash" }
 
 '?i' = { name = "Input" }
 im = { name = "Input: Mouse Reporting", 'emit:command' = ['workspace:toggle_mouse_reporting'] }
-in = { name = "Input: Natural Language", 'emit:command' = [ 'input:toggle_natural_language_command_search' ], shortcut = "ctrl+shift+g" }
-if = { name = "Input: Focus Terminal", 'emit:command' = ['terminal:focus_input'], shortcut = "cmd+l" }
-iw = { name = "Input: Workflows", 'emit:command' = ['input:toggle_workflows'], shortcut = "ctrl+shift+r" }
-is = { name = "Input: Subshell", 'emit:command' = ['terminal:trigger_subshell_bootstrap'], shortcut = "ctrl+i" }
+in = { name = "Input: Natural Language", 'emit:command' = [
+  'input:toggle_natural_language_command_search',
+], shortcut = "ctrl+shift+g" }
+if = { name = "Input: Focus Terminal", 'emit:command' = [
+  'terminal:focus_input',
+], shortcut = "cmd+l" }
+iw = { name = "Input: Workflows", 'emit:command' = [
+  'input:toggle_workflows',
+], shortcut = "ctrl+shift+r" }
+is = { name = "Input: Subshell", 'emit:command' = [
+  'terminal:trigger_subshell_bootstrap',
+], shortcut = "ctrl+i" }

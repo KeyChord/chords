@@ -45,11 +45,13 @@ export default async function createChromiumHandler(this: ImportMeta, appPath: s
       return false;
     }
 
-    await spawn(chromeRemoteInterfaceBinPath, [remoteDebuggingPort.toString()], { stdin: { string: code } });
+    await spawn(chromeRemoteInterfaceBinPath, [remoteDebuggingPort.toString()], {
+      stdin: { string: code },
+    });
   }
 
-  return async function handler(action: 'js', code: string) {
-    if (action === 'js') {
+  return async function handler(action: "js", code: string) {
+    if (action === "js") {
       return handlerJs(code);
     }
 

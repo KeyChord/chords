@@ -60,11 +60,11 @@ file = "tray.js"
 '=lo' = { name = "Log Out", shortcut = "ctrl+cmd+q" }
 '=lq' = { name = "Log Quit", shortcut = "opt+shift+cmd+q" }
 
-'?=b' = { name = "Brightness"}
+'?=b' = { name = "Brightness" }
 '=bu' = { name = "Brightness Up", shortcut = "BrightnessUp" }
 '=bd' = { name = "Brightness Down", shortcut = "BrightnessDown" }
 
-'?=v' = { name = "Volume"}
+'?=v' = { name = "Volume" }
 '=vu' = { name = "Volume Up", shortcut = "AudioVolumeUp" }
 '=vd' = { name = "Volume Down", shortcut = "AudioVolumeDown" }
 '=vm' = { name = "Volume Mute", shortcut = "AudioVolumeMute" }
