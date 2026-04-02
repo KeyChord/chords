@@ -103,9 +103,17 @@ importers:
         specifier: 'catalog:'
         version: 1.3.11
 
-  packages/chords-aerospace: {}
+  packages/chords-aerospace:
+    devDependencies:
+      '@keychord/config':
+        specifier: 'catalog:'
+        version: 0.0.6
 
-  packages/chords-chord: {}
+  packages/chords-chord:
+    devDependencies:
+      '@keychord/config':
+        specifier: 'catalog:'
+        version: 0.0.6
 
   packages/chords-chromium:
     dependencies:
@@ -181,7 +189,11 @@ importers:
         specifier: 'catalog:'
         version: 6.0.2
 
-  packages/chords-commands: {}
+  packages/chords-commands:
+    devDependencies:
+      '@keychord/config':
+        specifier: 'catalog:'
+        version: 0.0.6
 
   packages/chords-dock:
     dependencies:

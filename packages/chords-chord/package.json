@@ -1,3 +1,6 @@
 {
-  "name": "@keychord/chords-chord"
+  "name": "@keychord/chords-chord",
+  "devDependencies": {
+    "@keychord/config": "catalog:"
+  }
 }

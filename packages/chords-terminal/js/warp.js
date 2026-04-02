@@ -2,12 +2,12 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 import { tap } from "chord";
-//#region node_modules/.pnpm/array-uniq@3.0.0/node_modules/array-uniq/index.js
+//#region ../../node_modules/.pnpm/array-uniq@3.0.0/node_modules/array-uniq/index.js
 function arrayUniq(array) {
 	return [...new Set(array)];
 }
 //#endregion
-//#region node_modules/.pnpm/just-zip-it@3.2.0/node_modules/just-zip-it/index.mjs
+//#region ../../node_modules/.pnpm/just-zip-it@3.2.0/node_modules/just-zip-it/index.mjs
 var arrayZip = zip;
 function zip() {
 	var args = Array.prototype.slice.call(arguments);
@@ -43,7 +43,7 @@ function generateSyntheticKeybinds(commands, keybinds) {
 	return Object.fromEntries(arrayZip(sortedCommands, sortedKeybinds));
 }
 //#endregion
-//#region node_modules/.pnpm/balanced-match@4.0.4/node_modules/balanced-match/dist/esm/index.js
+//#region ../../node_modules/.pnpm/balanced-match@4.0.4/node_modules/balanced-match/dist/esm/index.js
 const balanced = (a, b, str) => {
 	const ma = a instanceof RegExp ? maybeMatch(a, str) : a;
 	const mb = b instanceof RegExp ? maybeMatch(b, str) : b;
@@ -91,7 +91,7 @@ const range = (a, b, str) => {
 	return result;
 };
 //#endregion
-//#region node_modules/.pnpm/brace-expansion@5.0.5/node_modules/brace-expansion/dist/esm/index.js
+//#region ../../node_modules/.pnpm/brace-expansion@5.0.5/node_modules/brace-expansion/dist/esm/index.js
 const escSlash = "\0SLASH" + Math.random() + "\0";
 const escOpen = "\0OPEN" + Math.random() + "\0";
 const escClose = "\0CLOSE" + Math.random() + "\0";
@@ -242,7 +242,7 @@ function exists(path) {
 	}
 }
 //#endregion
-//#region node_modules/.pnpm/js-yaml@4.1.1/node_modules/js-yaml/dist/js-yaml.mjs
+//#region ../../node_modules/.pnpm/js-yaml@4.1.1/node_modules/js-yaml/dist/js-yaml.mjs
 /*! js-yaml 4.1.1 https://github.com/nodeca/js-yaml @license MIT */
 function isNothing(subject) {
 	return typeof subject === "undefined" || subject === null;

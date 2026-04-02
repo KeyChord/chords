@@ -1,23 +1,28 @@
 //#region package.json
-var name = "@keychord/chords-menu";
+var name = "@keychord/chords-terminal";
+var version = "0.0.0";
 var type = "module";
-var version = "0.0.1";
 var imports = { "#/*": "./src/js/*" };
-var dependencies = { "jxa-run-compat": "catalog:" };
 var devDependencies = {
-	"@jxa/global-type": "catalog:",
 	"@keychord/config": "catalog:",
-	"@keychord/tsconfig": "catalog:"
+	"@keychord/tsconfig": "catalog:",
+	"@types/js-yaml": "catalog:"
 };
 var packageManager = "pnpm@10.33.0";
+var dependencies = {
+	"array-uniq": "catalog:",
+	"brace-expansion": "catalog:",
+	"js-yaml": "catalog:",
+	"just-zip-it": "catalog:"
+};
 var package_default = {
 	name,
-	type,
 	version,
+	type,
 	imports,
-	dependencies,
 	devDependencies,
-	packageManager
+	packageManager,
+	dependencies
 };
 //#endregion
 export { package_default as default, dependencies, devDependencies, imports, name, packageManager, type, version };
