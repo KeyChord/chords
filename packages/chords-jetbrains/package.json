@@ -2,8 +2,8 @@
   "name": "@keychord/chords-jetbrains",
   "type": "module",
   "dependencies": {
-    "nano-spawn-compat": "catalog:",
-    "outdent": "catalog:"
+    "nano-spawn-compat": "latest",
+    "outdent": "latest"
   },
   "devDependencies": {
     "@keychord/config": "catalog:",

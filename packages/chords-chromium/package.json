@@ -3,19 +3,18 @@
   "version": "0.0.0",
   "type": "module",
   "dependencies": {
-    "chrome-remote-interface": "catalog:",
-    "desm": "catalog:",
-    "get-port": "catalog:",
-    "jquery-as-string": "catalog:",
-    "nano-spawn-compat": "catalog:"
+    "chrome-remote-interface": "latest",
+    "desm": "latest",
+    "get-port": "latest",
+    "jquery-as-string": "latest",
+    "nano-spawn-compat": "latest"
   },
   "devDependencies": {
     "@keychord/config": "catalog:",
     "@keychord/tsconfig": "catalog:",
-    "@types/chrome-remote-interface": "catalog:",
-    "bun-types": "catalog:",
-    "dax": "catalog:",
-    "typescript": "catalog:"
+    "@types/chrome-remote-interface": "latest",
+    "bun-types": "latest",
+    "dax": "latest"
   },
   "packageManager": "pnpm@10.33.0"
 }

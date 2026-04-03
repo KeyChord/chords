@@ -3,12 +3,11 @@
   "version": "0.0.0",
   "type": "module",
   "dependencies": {
-    "nano-spawn-compat": "catalog:"
+    "nano-spawn-compat": "latest"
   },
   "devDependencies": {
     "@keychord/config": "catalog:",
-    "@keychord/tsconfig": "catalog:",
-    "typescript": "catalog:"
+    "@keychord/tsconfig": "catalog:"
   },
   "packageManager": "pnpm@10.33.0"
 }

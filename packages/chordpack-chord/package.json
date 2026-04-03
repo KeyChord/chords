@@ -1,13 +1,13 @@
 {
   "type": "module",
   "dependencies": {
-    "desm": "catalog:",
-    "smol-toml": "catalog:",
-    "toml-patch": "catalog:"
+    "desm": "latest",
+    "smol-toml": "latest",
+    "toml-patch": "latest"
   },
   "devDependencies": {
-    "@octokit/rest": "catalog:",
-    "bun-types": "catalog:"
+    "@octokit/rest": "latest",
+    "bun-types": "latest"
   },
   "packageManager": "pnpm@10.33.0"
 }

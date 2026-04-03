@@ -6,15 +6,15 @@
     "#/*": "./src/js/*"
   },
   "dependencies": {
-    "array-uniq": "catalog:",
-    "brace-expansion": "catalog:",
-    "js-yaml": "catalog:",
-    "just-zip-it": "catalog:"
+    "array-uniq": "latest",
+    "brace-expansion": "latest",
+    "js-yaml": "latest",
+    "just-zip-it": "latest"
   },
   "devDependencies": {
     "@keychord/config": "catalog:",
     "@keychord/tsconfig": "catalog:",
-    "@types/js-yaml": "catalog:"
+    "@types/js-yaml": "latest"
   },
   "packageManager": "pnpm@10.33.0"
 }

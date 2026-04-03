@@ -3,10 +3,10 @@
   "version": "0.0.0",
   "type": "module",
   "dependencies": {
-    "jxa-run-compat": "catalog:"
+    "jxa-run-compat": "latest"
   },
   "devDependencies": {
-    "@jxa/global-type": "catalog:",
+    "@jxa/global-type": "latest",
     "@keychord/config": "catalog:",
     "@keychord/tsconfig": "catalog:"
   },

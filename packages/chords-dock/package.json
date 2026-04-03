@@ -2,10 +2,10 @@
   "name": "@keychord/chords-dock",
   "type": "module",
   "dependencies": {
-    "jxa-run-compat": "catalog:"
+    "jxa-run-compat": "latest"
   },
   "devDependencies": {
-    "@jxa/global-type": "catalog:",
+    "@jxa/global-type": "latest",
     "@keychord/chords-menu": "github:KeyChord/chords-menu",
     "@keychord/config": "catalog:",
     "@keychord/tsconfig": "catalog:"
