@@ -4,6 +4,9 @@ name = "Safari"
 file = '@keychord/chords-menu/js/menu.js'
 args = ["Safari"]
 
+[on.js]
+file = 'safari.js'
+
 [chords]
 # `b` for Browser. Meant to be overriden.
 '/b' = { name = "Browser (Safari)", shell = "open -a Finder" }
@@ -37,3 +40,5 @@ tr = { name = "Tab: Right Move", command = "Move tabs right or left", shortcut =
 'tgq' = { name = "Tab Group: Quit", shortcut = "cmd+ctrl+w" }
 'tg]' = { name = "Tab Group: Next", shortcut = "cmd+shift+up" }
 'tg[' = { name = "Tab Group: Previous", shortcut = "cmd+shift+down" }
+
+js = { name = "JavaScript", 'emit:js' = [] }
