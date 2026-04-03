@@ -5,7 +5,7 @@
   "dependencies": {
     "@keychord/chords-menu": "github:KeyChord/chords-menu",
     "desm": "catalog:",
-    "get-port": "catalog:",
+    "get-port": "catalog:*",
     "jquery-as-string": "catalog:",
     "jxa-run-compat": "catalog:",
     "nano-spawn-compat": "catalog:",
