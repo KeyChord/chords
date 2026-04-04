@@ -4,15 +4,15 @@ var version = "0.0.0";
 var type = "module";
 var imports = { "#/*": "./src/js/*" };
 var dependencies = {
-	"array-uniq": "catalog:",
-	"brace-expansion": "catalog:",
-	"js-yaml": "catalog:",
-	"just-zip-it": "catalog:"
+	"array-uniq": "latest",
+	"brace-expansion": "latest",
+	"js-yaml": "latest",
+	"just-zip-it": "latest"
 };
 var devDependencies = {
 	"@keychord/config": "catalog:",
 	"@keychord/tsconfig": "catalog:",
-	"@types/js-yaml": "catalog:"
+	"@types/js-yaml": "latest"
 };
 var packageManager = "pnpm@10.33.0";
 var package_default = {

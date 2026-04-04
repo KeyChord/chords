@@ -2,11 +2,10 @@
 var name = "@keychord/chords-vscode";
 var version = "0.0.0";
 var type = "module";
-var dependencies = { "nano-spawn-compat": "catalog:" };
+var dependencies = { "nano-spawn-compat": "latest" };
 var devDependencies = {
 	"@keychord/config": "catalog:",
-	"@keychord/tsconfig": "catalog:",
-	"typescript": "catalog:"
+	"@keychord/tsconfig": "catalog:"
 };
 var packageManager = "pnpm@10.33.0";
 var package_default = {

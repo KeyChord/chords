@@ -2,8 +2,8 @@
 var name = "@keychord/chords-jetbrains";
 var type = "module";
 var dependencies = {
-	"nano-spawn-compat": "catalog:",
-	"outdent": "catalog:"
+	"nano-spawn-compat": "latest",
+	"outdent": "latest"
 };
 var devDependencies = {
 	"@keychord/config": "catalog:",

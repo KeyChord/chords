@@ -8,6 +8,7 @@
     "get-port": "latest",
     "jquery-as-string": "latest",
     "jxa-run-compat": "latest",
+    "ky": "^1.14.3",
     "nano-spawn-compat": "latest",
     "outdent": "latest"
   },

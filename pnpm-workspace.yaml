@@ -5,3 +5,6 @@ catalog:
   "@keychord/tsconfig": ^0.0.6
   typescript: ^6.0.2
   vite-plus: ^0.1.15
+
+# We don't use strict because we want users to be able to directly pull dependencies from GitHub
+catalogMode: manual

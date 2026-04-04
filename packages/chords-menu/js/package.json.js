@@ -3,9 +3,9 @@ var name = "@keychord/chords-menu";
 var version = "0.0.1";
 var type = "module";
 var imports = { "#/*": "./src/js/*" };
-var dependencies = { "jxa-run-compat": "catalog:" };
+var dependencies = { "jxa-run-compat": "latest" };
 var devDependencies = {
-	"@jxa/global-type": "catalog:",
+	"@jxa/global-type": "latest",
 	"@keychord/config": "catalog:",
 	"@keychord/tsconfig": "catalog:"
 };

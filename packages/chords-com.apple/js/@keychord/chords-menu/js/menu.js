@@ -1,5 +1,5 @@
 import { spawn } from "child_process";
-//#region node_modules/.pnpm/jxa-run-compat@1.6.0/node_modules/jxa-run-compat/lib/run.js
+//#region ../../node_modules/.pnpm/jxa-run-compat@1.6.0/node_modules/jxa-run-compat/lib/run.js
 function run(jxaCodeFunction, ...args) {
 	return executeInOsa(`
 ObjC.import('stdlib');
