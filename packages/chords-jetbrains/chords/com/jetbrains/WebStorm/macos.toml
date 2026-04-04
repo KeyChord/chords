@@ -2,5 +2,5 @@ name = "WebStorm"
 
 [[import]]
 file = "base.toml"
-[import.overrides.meta]
+[import.override.meta]
 '$execPath' = "/Applications/WebStorm.app/Contents/MacOS/webstorm"
