@@ -1,104 +1,85 @@
-import { runSudoCommand } from "chord";
-import net from "node:net";
-import os from "node:os";
+import { spawn } from "child_process";
+import "chord";
 import process from "node:process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { spawn } from "node:child_process";
+import { spawn as spawn$1 } from "node:child_process";
 import fs from "node:fs/promises";
 import { pipeline } from "node:stream/promises";
-//#region ../../node_modules/.pnpm/get-port@7.2.0/node_modules/get-port/index.js
-var Locked = class extends Error {
-	constructor(port) {
-		super(`${port} is locked`);
-	}
-};
-const lockedPorts = {
-	old: /* @__PURE__ */ new Set(),
-	young: /* @__PURE__ */ new Set()
-};
-const releaseOldLockedPortsIntervalMs = 1e3 * 15;
-const reservedPorts = /* @__PURE__ */ new Set();
-let timeout;
-const getLocalHosts = () => {
-	const interfaces = os.networkInterfaces();
-	const results = new Set([void 0, "0.0.0.0"]);
-	for (const _interface of Object.values(interfaces)) for (const config of _interface) results.add(config.address);
-	return results;
-};
-const checkAvailablePort = (options) => new Promise((resolve, reject) => {
-	const server = net.createServer();
-	server.unref();
-	server.on("error", reject);
-	server.listen(options, () => {
-		const { port } = server.address();
-		server.close(() => {
-			resolve(port);
+//#region ../../node_modules/.pnpm/jxa-run-compat@1.6.0/node_modules/jxa-run-compat/lib/run.js
+function run(jxaCodeFunction, ...args) {
+	return executeInOsa(`
+ObjC.import('stdlib');
+var args = JSON.parse($.getenv('OSA_ARGS'));
+var fn   = (${jxaCodeFunction.toString()});
+var out  = fn.apply(null, args);
+JSON.stringify({ result: out });
+`, args);
+}
+const DEFAULT_MAX_BUFFER = 1e3 * 1e3 * 100;
+/**
+* execute the `code` in `osascript`
+*/
+function executeInOsa(code, args) {
+	return new Promise((resolve, reject) => {
+		const child = spawn("/usr/bin/osascript", ["-l", "JavaScript"], {
+			env: { OSA_ARGS: JSON.stringify(args) },
+			stdio: [
+				"pipe",
+				"pipe",
+				"pipe"
+			]
 		});
-	});
-});
-const getAvailablePort = async (options, hosts) => {
-	if (options.host || options.port === 0) return checkAvailablePort(options);
-	for (const host of hosts) try {
-		await checkAvailablePort({
-			port: options.port,
-			host
-		});
-	} catch (error) {
-		if (!["EADDRNOTAVAIL", "EINVAL"].includes(error.code)) throw error;
-	}
-	return options.port;
-};
-const isLockedPort = (port) => lockedPorts.old.has(port) || lockedPorts.young.has(port) || reservedPorts.has(port);
-const portCheckSequence = function* (ports) {
-	if (ports) yield* ports;
-	yield 0;
-};
-async function getPorts(options) {
-	let ports;
-	let exclude = /* @__PURE__ */ new Set();
-	if (options) {
-		if (options.port) ports = typeof options.port === "number" ? [options.port] : options.port;
-		if (options.exclude) {
-			const excludeIterable = options.exclude;
-			if (typeof excludeIterable[Symbol.iterator] !== "function") throw new TypeError("The `exclude` option must be an iterable.");
-			for (const element of excludeIterable) {
-				if (typeof element !== "number") throw new TypeError("Each item in the `exclude` option must be a number corresponding to the port you want excluded.");
-				if (!Number.isSafeInteger(element)) throw new TypeError(`Number ${element} in the exclude option is not a safe integer and can't be used`);
+		let stdoutBuffers = [];
+		let stderrBuffers = [];
+		let stdoutLength = 0;
+		let stderrLength = 0;
+		let done = false;
+		function finishError(err) {
+			if (done) return;
+			done = true;
+			reject(err);
+		}
+		function onData(chunk, buffers, currentLength, streamName) {
+			const nextLength = currentLength + chunk.length;
+			if (nextLength > DEFAULT_MAX_BUFFER) {
+				child.kill();
+				finishError(/* @__PURE__ */ new Error(`${streamName} maxBuffer length exceeded`));
+				return currentLength;
 			}
-			exclude = new Set(excludeIterable);
+			buffers.push(chunk);
+			return nextLength;
 		}
-	}
-	const { reserve, ...netOptions } = options ?? {};
-	if (timeout === void 0) {
-		timeout = setTimeout(() => {
-			timeout = void 0;
-			lockedPorts.old = lockedPorts.young;
-			lockedPorts.young = /* @__PURE__ */ new Set();
-		}, releaseOldLockedPortsIntervalMs);
-		if (timeout.unref) timeout.unref();
-	}
-	const hosts = getLocalHosts();
-	for (const port of portCheckSequence(ports)) try {
-		if (exclude.has(port)) continue;
-		let availablePort = await getAvailablePort({
-			...netOptions,
-			port
-		}, hosts);
-		while (isLockedPort(availablePort)) {
-			if (port !== 0) throw new Locked(port);
-			availablePort = await getAvailablePort({
-				...netOptions,
-				port
-			}, hosts);
-		}
-		if (reserve) reservedPorts.add(availablePort);
-		else lockedPorts.young.add(availablePort);
-		return availablePort;
-	} catch (error) {
-		if (!["EADDRINUSE", "EACCES"].includes(error.code) && !(error instanceof Locked)) throw error;
-	}
-	throw new Error("No available ports found");
+		child.stdout.on("data", (chunk) => {
+			stdoutLength = onData(chunk, stdoutBuffers, stdoutLength, "stdout");
+		});
+		child.stderr.on("data", (chunk) => {
+			stderrLength = onData(chunk, stderrBuffers, stderrLength, "stderr");
+		});
+		child.on("error", (err) => {
+			finishError(err);
+		});
+		child.on("close", () => {
+			if (done) return;
+			const stdout = Buffer.concat(stdoutBuffers);
+			const stderr = Buffer.concat(stderrBuffers);
+			if (stderr.length) console.error(stderr.toString());
+			if (!stdout.length) {
+				done = true;
+				resolve(void 0);
+			}
+			try {
+				const result = JSON.parse(stdout.toString().trim()).result;
+				done = true;
+				resolve(result);
+			} catch (errorOutput) {
+				done = true;
+				resolve(stdout.toString().trim());
+			}
+		});
+		child.stdin.write(code);
+		child.stdin.end();
+	});
 }
 //#endregion
 //#region ../../node_modules/.pnpm/ansi-regex@6.2.2/node_modules/ansi-regex/index.js
@@ -268,7 +249,7 @@ const spawnSubprocess = async (file, commandArguments, options, context) => {
 	try {
 		[file, commandArguments, options] = await applyForceShell(file, commandArguments, options);
 		[file, commandArguments, options] = concatenateShell(file, commandArguments, options);
-		const instance = spawn(file, commandArguments, options);
+		const instance = spawn$1(file, commandArguments, options);
 		bufferOutput(instance.stdout, context, "stdout");
 		bufferOutput(instance.stderr, context, "stderr");
 		instance.once("error", () => {});
@@ -384,7 +365,7 @@ const getNext = async (iterator, index, { nonIterable }) => {
 const shouldIgnoreError = (nonIterable, index) => nonIterable.every(Boolean) ? index !== nonIterable.length - 1 : nonIterable[index];
 //#endregion
 //#region ../../node_modules/.pnpm/nano-spawn-compat@2.0.6/node_modules/nano-spawn-compat/source/index.js
-function spawn$1(file, second, third, previous) {
+function spawn$2(file, second, third, previous) {
 	const [commandArguments = [], options = {}] = Array.isArray(second) ? [second, third] : [[], second];
 	const context = getContext([file, ...commandArguments]);
 	const spawnOptions = getOptions(options);
@@ -399,31 +380,92 @@ function spawn$1(file, second, third, previous) {
 		stdout,
 		stderr,
 		[Symbol.asyncIterator]: () => combineAsyncIterators(context, stdout, stderr),
-		pipe: (file, second, third) => spawn$1(file, second, third, subprocess)
+		pipe: (file, second, third) => spawn$2(file, second, third, subprocess)
 	});
 }
 //#endregion
 //#region src/js/safari.ts
 async function buildSafariHandler() {
-	const safariDriverPort = await getPorts();
-	spawn$1("safaridriver", ["-p", safariDriverPort.toString()], { stdio: "inherit" });
-	console.log(safariDriverPort);
-	console.log(await fetch("http://google.com"));
-	const fetchSession = async () => {
-		return await fetch(`http://127.0.0.1:${safariDriverPort}/session`, {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ capabilities: { alwaysMatch: { browserName: "safari" } } })
-		});
+	const { stdout } = await spawn$2("defaults", [
+		"read",
+		"com.apple.Safari",
+		"IncludeDevelopMenu"
+	]);
+	const isDevelopMenuEnabled = stdout === "1";
+	let isAllowJavaScriptFromAppleEventsEnabled;
+	try {
+		const { stdout } = await spawn$2("defaults", [
+			"read",
+			"com.apple.Safari",
+			"AllowJavaScriptFromAppleEvents"
+		]);
+		isAllowJavaScriptFromAppleEventsEnabled = stdout === "1";
+	} catch {
+		isAllowJavaScriptFromAppleEventsEnabled = false;
+	}
+	const enableDevelopMenu = async () => {
+		await spawn$2("defaults", [
+			"write",
+			"com.apple.Safari",
+			"IncludeDevelopMenu",
+			"-bool",
+			"true"
+		]);
+		await spawn$2("defaults", [
+			"write",
+			"com.apple.Safari.SandboxBroker",
+			"ShowDevelopMenu",
+			"-bool",
+			"true"
+		]);
+		await spawn$2("defaults", [
+			"write",
+			"com.apple.Safari",
+			"WebKitDeveloperExtrasEnabledPreferenceKey",
+			"-bool",
+			"true"
+		]);
+		await spawn$2("defaults", [
+			"write",
+			"com.apple.Safari",
+			"com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled",
+			"-bool",
+			"true"
+		]);
 	};
 	return async function safari() {
-		let response = await fetchSession();
-		if ((await response.json())?.value?.message === "Could not create a session: You must enable 'Allow remote automation' in the Developer section of Safari Settings to control Safari via WebDriver.") {
-			await runSudoCommand("safaridriver", ["--enable"]);
-			response = await fetchSession();
+		if (!isAllowJavaScriptFromAppleEventsEnabled) {
+			if (isDevelopMenuEnabled) await openDeveloperSettingsPane();
+			else {
+				await enableDevelopMenu();
+				await spawn$2("killall", ["-w", "Safari"]);
+				await spawn$2("open", ["-a", "Safari"]);
+				await openDeveloperSettingsPane();
+			}
+			return;
 		}
-		console.log(response);
+		await run(() => {
+			var safariApp = Application("Safari");
+			var result = safariApp.doJavaScript("document.title;", { in: safariApp.windows[0].currentTab() });
+			console.log("The title of the page is: " + result);
+		});
 	};
+}
+async function openDeveloperSettingsPane() {
+	await run(() => {
+		Application("Safari").activate();
+		var systemEvents = Application("System Events");
+		var safariProcess = systemEvents.processes["Safari"];
+		while (!safariProcess.frontmost()) delay(.1);
+		systemEvents.keystroke(",", { using: "command down" });
+		while (true) {
+			try {
+				if (safariProcess.windows[0].toolbars.length > 0) break;
+			} catch (e) {}
+			delay(.1);
+		}
+		safariProcess.windows[0].toolbars[0].buttons["Developer"].click();
+	});
 }
 //#endregion
 export { buildSafariHandler as default };

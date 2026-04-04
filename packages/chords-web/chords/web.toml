@@ -24,7 +24,7 @@ file = 'web.js'
 ';b([^,.;]*,)' = { name = "Button: Click", 'emit:js' = ['button', '$1'] }
 ';b([^,.;]*.)' = { name = "Button: Right Click", 'emit:js' = ['button', '$1'] }
 
-';n' = { name = "North", 'emit:js' = ['north'] }
-';s' = { name = "South", 'emit:js' = ['south'] }
-';e' = { name = "East", 'emit:js' = ['east'] }
-';w' = { name = "West", 'emit:js' = ['west'] }
+';n' = { name = "North", 'emit:js' = ['scroll', 'north'] }
+';s' = { name = "South", 'emit:js' = ['scroll', 'south'] }
+';e' = { name = "East", 'emit:js' = ['scroll', 'east'] }
+';w' = { name = "West", 'emit:js' = ['scroll', 'west'] }

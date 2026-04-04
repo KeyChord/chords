@@ -237,6 +237,28 @@ importers:
         specifier: 'catalog:'
         version: 0.0.6
 
+  packages/chords-web:
+    dependencies:
+      jquery-as-string:
+        specifier: ^0.4.0
+        version: 0.4.0
+      jxa-run-compat:
+        specifier: ^1.6.0
+        version: 1.6.0
+      outdent:
+        specifier: ^0.8.0
+        version: 0.8.0
+    devDependencies:
+      '@jxa/global-type':
+        specifier: ^1.4.0
+        version: 1.4.0
+      '@keychord/config':
+        specifier: 'catalog:'
+        version: 0.0.6
+      '@keychord/tsconfig':
+        specifier: 'catalog:'
+        version: 0.0.6
+
 packages:
 
   '@deno/shim-deno-test@0.5.0':
