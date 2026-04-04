@@ -10,3 +10,4 @@ chords-menu
 chords-terminal
 chords-tray
 chords-vscode
+chords-web
