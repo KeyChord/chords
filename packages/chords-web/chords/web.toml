@@ -1,0 +1,30 @@
+name = "Web chords"
+
+[on.js]
+file = 'web.js'
+
+[chords]
+'?;i' = { name = "Input" }
+
+';i([^,.;]*)' = { name = "Input: Match", 'emit:js' = ['placeholder', '$1'] }
+';i([^,.;]*,)' = { name = "Input: Click (focus)", 'emit:js' = ['placeholder', '$1'] }
+';i([^,.;]*.)' = { name = "Input: Right Click", 'emit:js' = ['placeholder', '$1'] }
+
+';a([^,.;]*)' = { name = "Start Selection: Match", 'emit:js' = ['selection-start', '$1'] }
+';a([^,.;]*,)' = { name = "Start Selection: Select", 'emit:js' = ['selection-start', '$1'] }
+';z([^,.;]*)' = { name = "End Selection: Match", 'emit:js' = ['selection-end', '$1'] }
+';z([^,.;]*,)' = { name = "End Selection: Select", 'emit:js' = ['selection-end', '$1'] }
+';z([^,.;]*.)' = { name = "End Selection: Right Click", 'emit:js' = ['selection-end', '$1'] }
+
+';l([^,.;]*)' = { name = "Link: Match", 'emit:js' = ['link', '$1'] }
+';l([^,.;]*,)' = { name = "Link: Click", 'emit:js' = ['link', '$1'] }
+';l([^,.;]*.)' = { name = "Link: Right Click", 'emit:js' = ['link', '$1'] }
+
+';b([^,.;]*)' = { name = "Button: Match", 'emit:js' = ['button', '$1'] }
+';b([^,.;]*,)' = { name = "Button: Click", 'emit:js' = ['button', '$1'] }
+';b([^,.;]*.)' = { name = "Button: Right Click", 'emit:js' = ['button', '$1'] }
+
+';n' = { name = "North", 'emit:js' = ['north'] }
+';s' = { name = "South", 'emit:js' = ['south'] }
+';e' = { name = "East", 'emit:js' = ['east'] }
+';w' = { name = "West", 'emit:js' = ['west'] }

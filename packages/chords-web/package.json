@@ -1,0 +1,11 @@
+{
+  "name": "@keychord/chords-web",
+  "type": "module",
+  "devDependencies": {
+    "@jxa/global-type": "^1.4.0"
+  },
+  "dependencies": {
+    "jquery-as-string": "^0.4.0",
+    "jxa-run-compat": "^1.6.0"
+  }
+}
