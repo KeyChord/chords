@@ -8,3 +8,6 @@ catalog:
 
 # We don't use strict because we want users to be able to directly pull dependencies from GitHub
 catalogMode: manual
+
+overrides:
+  "@keychord/config": "link:../config"

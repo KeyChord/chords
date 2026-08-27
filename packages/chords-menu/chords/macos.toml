@@ -1,7 +1,8 @@
 name = "macOS Menu Bar"
 
 [on.menu]
-file = "menu.js"
+kind = "native"
+file = "menu"
 args = []
 
 [chords]

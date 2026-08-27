@@ -6,15 +6,15 @@ settings:
 
 catalogs:
   default:
-    '@keychord/config':
-      specifier: ^0.0.6
-      version: 0.0.6
     '@keychord/tsconfig':
       specifier: ^0.0.6
       version: 0.0.6
     vite-plus:
       specifier: ^0.1.15
       version: 0.1.15
+
+overrides:
+  '@keychord/config': link:../config
 
 importers:
 
@@ -46,14 +46,14 @@ importers:
   packages/chords-aerospace:
     devDependencies:
       '@keychord/config':
-        specifier: 'catalog:'
-        version: 0.0.6
+        specifier: link:../../../config
+        version: link:../../../config
 
   packages/chords-chord:
     devDependencies:
       '@keychord/config':
-        specifier: 'catalog:'
-        version: 0.0.6
+        specifier: link:../../../config
+        version: link:../../../config
 
   packages/chords-chromium:
     dependencies:
@@ -74,8 +74,8 @@ importers:
         version: 2.0.6
     devDependencies:
       '@keychord/config':
-        specifier: 'catalog:'
-        version: 0.0.6
+        specifier: link:../../../config
+        version: link:../../../config
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -120,8 +120,8 @@ importers:
         specifier: latest
         version: 1.4.0
       '@keychord/config':
-        specifier: 'catalog:'
-        version: 0.0.6
+        specifier: link:../../../config
+        version: link:../../../config
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -129,8 +129,8 @@ importers:
   packages/chords-commands:
     devDependencies:
       '@keychord/config':
-        specifier: 'catalog:'
-        version: 0.0.6
+        specifier: link:../../../config
+        version: link:../../../config
 
   packages/chords-dock:
     dependencies:
@@ -145,8 +145,8 @@ importers:
         specifier: github:KeyChord/chords-menu
         version: https://codeload.github.com/KeyChord/chords-menu/tar.gz/02408f01fb0c74b96c550e3f24f34531888a6844
       '@keychord/config':
-        specifier: 'catalog:'
-        version: 0.0.6
+        specifier: link:../../../config
+        version: link:../../../config
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -161,8 +161,8 @@ importers:
         version: 0.8.0
     devDependencies:
       '@keychord/config':
-        specifier: 'catalog:'
-        version: 0.0.6
+        specifier: link:../../../config
+        version: link:../../../config
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -177,8 +177,8 @@ importers:
         specifier: latest
         version: 1.4.0
       '@keychord/config':
-        specifier: 'catalog:'
-        version: 0.0.6
+        specifier: link:../../../config
+        version: link:../../../config
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -199,8 +199,8 @@ importers:
         version: 3.2.0
     devDependencies:
       '@keychord/config':
-        specifier: 'catalog:'
-        version: 0.0.6
+        specifier: link:../../../config
+        version: link:../../../config
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -218,8 +218,8 @@ importers:
         specifier: latest
         version: 1.4.0
       '@keychord/config':
-        specifier: 'catalog:'
-        version: 0.0.6
+        specifier: link:../../../config
+        version: link:../../../config
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -231,8 +231,8 @@ importers:
         version: 2.0.6
     devDependencies:
       '@keychord/config':
-        specifier: 'catalog:'
-        version: 0.0.6
+        specifier: link:../../../config
+        version: link:../../../config
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -253,8 +253,8 @@ importers:
         specifier: ^1.4.0
         version: 1.4.0
       '@keychord/config':
-        specifier: 'catalog:'
-        version: 0.0.6
+        specifier: link:../../../config
+        version: link:../../../config
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -432,9 +432,6 @@ packages:
   '@keychord/chords-menu@https://codeload.github.com/KeyChord/chords-menu/tar.gz/02408f01fb0c74b96c550e3f24f34531888a6844':
     resolution: {tarball: https://codeload.github.com/KeyChord/chords-menu/tar.gz/02408f01fb0c74b96c550e3f24f34531888a6844}
     version: 0.0.1
-
-  '@keychord/config@0.0.6':
-    resolution: {integrity: sha512-JfD4hVGtSBaCONL1ntBrHIq0aqIvp7GoMtwZLuHTTLa4e/DQIs+jDo9nuNUZkkBPlGV77DWPfsy6Ommcd0r83Q==}
 
   '@keychord/tsconfig@0.0.6':
     resolution: {integrity: sha512-TwU3agMUhTzTbfoHKtzJQKwzpzQpjje3Z+6i7FrSuZLBygTZq/W9j0SI+6IlmuTnf0whgbLBOukJJ4K51V4wAw==}
@@ -1565,8 +1562,6 @@ snapshots:
   '@keychord/chords-menu@https://codeload.github.com/KeyChord/chords-menu/tar.gz/02408f01fb0c74b96c550e3f24f34531888a6844':
     dependencies:
       jxa-run-compat: 1.6.0
-
-  '@keychord/config@0.0.6': {}
 
   '@keychord/tsconfig@0.0.6': {}
 

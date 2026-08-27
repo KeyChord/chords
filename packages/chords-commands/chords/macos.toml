@@ -1,24 +1,25 @@
 name = "macOS Commands"
 
+[on.keys]
+file = "keys.js"
+
 [chords]
-'?,' = { name = "Universal Commands" }
-',a' = { name = "Select All", shortcut = "cmd+a" }
-',s' = { name = "Save", shortcut = "cmd+s" }
-',f' = { name = "Find", shortcut = "cmd+f" }
-',h' = { name = "Hide", shortcut = "cmd+h" }
-',r' = { name = "Refresh", shortcut = "cmd+r" }
-',z' = { name = "Undo", shortcut = "cmd+z" }
-',y' = { name = "Redo", shortcut = "cmd+y" }
-',x' = { name = "Cut", shortcut = "cmd+x" }
-',c' = { name = "Copy", shortcut = "cmd+c" }
-',v' = { name = "Paste", shortcut = "cmd+v" }
-',o' = { name = "Open", shortcut = "cmd+o" }
-',n' = { name = "New", shortcut = "cmd+n" }
-',m' = { name = "Minimize", shortcut = "cmd+m" }
-',[' = { name = "Back", shortcut = "cmd+[" }
-',]' = { name = "Forward", shortcut = "cmd+]" }
-',q' = { name = "Quit", shortcut = "cmd+q" }
-',w' = { name = "Close", shortcut = "cmd+w" }
-',,' = { name = "Settings", shortcut = "cmd+," }
-',=' = { name = "Zoom In", shortcut = "cmd+=" }
-',-' = { name = "Zoom Out", shortcut = "cmd+-" }
+'?,' = { name = "Commands / Modifier Keys" }
+
+'?,a' = { name = "Alt" }
+',(a[cfms]*-.*)' = { name = "Alt Combo", 'emit:keys' = ['$1'] }
+
+'?,c' = { name = "Ctrl" }
+',(c[fms]*-.*)' = { name = "Ctrl Combo", 'emit:keys' = ['$1'] }
+
+'?,f' = { name = "Fn" }
+',(f[ms]*-.*)' = { name = "Fn Combo", 'emit:keys' = ['$1'] }
+
+'?,m' = { name = "Meta (Cmd)" }
+',(m[s]*-.*)' = { name = "Meta (Cmd) Combo", 'emit:keys' = ['$1'] }
+
+'?,s' = { name = "Shift" }
+',(s-.*)' = { name = "Shift Combo", 'emit:keys' = ['$1'] }
+
+'?,-' = { name = "Unmodified Key" }
+',(-.*)' = { name = "Unmodified key", 'emit:keys' = ['$1'] }
