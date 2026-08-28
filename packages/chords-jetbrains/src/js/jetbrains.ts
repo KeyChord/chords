@@ -1,20 +1,17 @@
-import fs from "fs";
 import { outdent } from "outdent";
-import path from "path";
-import spawn from "nano-spawn-compat";
 
 export default function buildAction(ideBinPath: string) {
   if (!ideBinPath) {
     throw new Error("IDE binpath must be provided");
   }
 
-  const tmp = process.env.TMPDIR ?? "/tmp";
+  const tmp = Bun.env.TMPDIR ?? "/tmp";
 
   // This function makes it possible to programmatically execute IntelliJ commands
   return async function action(commandId: string) {
     const id = Math.random();
-    const scriptPath = path.join(tmp, `jetbrains_action_${id}.groovy`);
-    const resultPath = path.join(tmp, `jetbrains_action_${id}.txt`);
+    const scriptPath = `${tmp}/jetbrains_action_${id}.groovy`;
+    const resultPath = `${tmp}/jetbrains_action_${id}.txt`;
 
     const script = outdent`
       import com.intellij.openapi.actionSystem.ActionManager
@@ -38,17 +35,16 @@ export default function buildAction(ideBinPath: string) {
       }
     `;
 
-    fs.writeFileSync(scriptPath, script);
-    const process = spawn(ideBinPath, ["ideScript", scriptPath]);
-    // const nodeChildProcess = await process.nodeChildProcess
+    await Bun.write(scriptPath, script);
+    const subprocess = Bun.spawn([ideBinPath, "ideScript", scriptPath]);
     // this.controller.signal.addEventListener("abort", () => {
-    //   nodeChildProcess.kill()
+    //   subprocess.kill();
     // });
-    await process;
+    await subprocess.exited;
 
-    const result = fs.readFileSync(resultPath, "utf8");
-    fs.rmSync(scriptPath);
-    fs.rmSync(resultPath);
+    const result = await Bun.file(resultPath).text();
+    await Bun.file(scriptPath).delete();
+    await Bun.file(resultPath).delete();
 
     return result == "1";
   };

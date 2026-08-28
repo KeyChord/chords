@@ -103,28 +103,22 @@ importers:
       jquery-as-string:
         specifier: latest
         version: 0.4.0
-      jxa-run-compat:
-        specifier: latest
-        version: 1.6.0
       ky:
         specifier: ^1.14.3
         version: 1.14.3
-      nano-spawn-compat:
-        specifier: latest
-        version: 2.0.6
       outdent:
         specifier: latest
         version: 0.8.0
     devDependencies:
-      '@jxa/global-type':
-        specifier: latest
-        version: 1.4.0
       '@keychord/config':
         specifier: link:../../../config
         version: link:../../../config
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
+      '@types/bun':
+        specifier: latest
+        version: 1.4.0
 
   packages/chords-commands:
     devDependencies:
@@ -205,20 +199,16 @@ importers:
         version: 4.0.9
 
   packages/chords-tray:
-    dependencies:
-      jxa-run-compat:
-        specifier: latest
-        version: 1.6.0
     devDependencies:
-      '@jxa/global-type':
-        specifier: latest
-        version: 1.4.0
       '@keychord/config':
         specifier: link:../../../config
         version: link:../../../config
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
+      '@types/bun':
+        specifier: latest
+        version: 1.4.0
 
   packages/chords-vscode:
     dependencies:

@@ -3,14 +3,14 @@
 // Behaviour mirrors the query language documented in `readme.md`, talking to the Accessibility
 // API directly so a keystroke costs a few AX calls rather than an `osascript` round trip.
 //
-// This file is compiled into `target/<triple>/native/menu/menu.dylib` (see `@keychord/config`),
+// This file is compiled into `target/<triple>/menu/menu.dylib` (see `@keychord/config`),
 // which `src/js/menu.ts` opens with `bun:ffi`. The C ABI it exports:
 //
-//   const char *chords_menu_run(const char *process_name /* nullable */, const char *action,
+//   const char *chordsMenuRun(const char *process_name /* nullable */, const char *action,
 //                               const char *value);
 //     Runs one menu action. Returns NULL on success, otherwise a heap-allocated error message
-//     that the caller releases with `chords_menu_free`.
-//   void chords_menu_free(char *message);
+//     that the caller releases with `chordsMenuFree`.
+//   void chordsMenuFree(char *message);
 //
 // Chord calls handlers from its JS worker thread. The Accessibility client API and NSWorkspace
 // are usable from any thread, so the work stays on the calling thread — hopping to the main
@@ -64,8 +64,8 @@ public enum MenuError: Error, CustomStringConvertible {
 // MARK: - C ABI (what `src/js/menu.ts` calls through `bun:ffi`)
 
 /// Runs one menu action. Returns `nil` on success or a `strdup`ed error message the caller frees
-/// with `chords_menu_free`. Safe to call from any thread.
-@_cdecl("chords_menu_run")
+/// with `chordsMenuFree`. Safe to call from any thread.
+@c
 public func chordsMenuRun(
     _ processName: UnsafePointer<CChar>?,
     _ action: UnsafePointer<CChar>?,
@@ -85,7 +85,7 @@ public func chordsMenuRun(
     }
 }
 
-@_cdecl("chords_menu_free")
+@c
 public func chordsMenuFree(_ message: UnsafeMutablePointer<CChar>?) {
     free(message)
 }
@@ -340,7 +340,7 @@ private extension NSWorkspace {
     }
 }
 
-/// Public entry point so other packages can `import KeychordChordsMenuNativeMenu` and drive the
+/// Public entry point so other packages can `import KeychordChordsMenuFfiMenu` and drive the
 /// menu bar with the same query language (`by-index` / `by-letters`). Callable from any thread.
 public func runMenuAction(processName: String?, action: String, value: String) throws {
     let target: NSRunningApplication

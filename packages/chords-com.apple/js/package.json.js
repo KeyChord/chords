@@ -7,15 +7,13 @@ var dependencies = {
 	"desm": "latest",
 	"get-port": "latest",
 	"jquery-as-string": "latest",
-	"jxa-run-compat": "latest",
 	"ky": "^1.14.3",
-	"nano-spawn-compat": "latest",
 	"outdent": "latest"
 };
 var devDependencies = {
-	"@jxa/global-type": "latest",
 	"@keychord/config": "catalog:",
-	"@keychord/tsconfig": "catalog:"
+	"@keychord/tsconfig": "catalog:",
+	"@types/bun": "latest"
 };
 var packageManager = "pnpm@10.33.0";
 var package_default = {

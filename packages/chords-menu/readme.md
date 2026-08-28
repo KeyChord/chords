@@ -21,13 +21,13 @@ Query semantics:
 
 ## How it works
 
-`src/swift/menu.swift` drives the menu bar through the Accessibility API and exports a tiny C
-ABI (`chords_menu_run` / `chords_menu_free`). `@keychord/config` compiles it to
-`target/<triple>/native/menu/menu.dylib` (committed, like `js/`), and `src/js/menu.ts` opens
+`src/ffi/menu/menu.swift` drives the menu bar through the Accessibility API and exports a tiny C
+ABI (`chordsMenuRun` / `chordsMenuFree`). `@keychord/config` compiles it to
+`target/<triple>/menu/menu.dylib` (committed, like `js/`), and `src/js/menu.ts` opens
 that library with Bun's `bun:ffi` — Chord runs handlers on its embedded Bun, so the call is
 in-process. The library path comes from Chord's `chord` module
-(`resolveNativeLibrary(import.meta, "menu")`), which knows the package layout, so the JS never
-hardcodes paths. The Swift module (`KeychordChordsMenuNativeMenu`) is also emitted so other
+(`resolveFfiPath(import.meta, "menu")`), which knows the package layout, so the JS never
+hardcodes paths. The Swift module (`KeychordChordsMenuFfiMenu`) is also emitted so other
 packages can `import` it from their own Swift code.
 
 Build with `pnpm exec vp pack` (needs a Swift toolchain). Test outside the app with a Chord

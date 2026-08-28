@@ -2,13 +2,10 @@
   "name": "@keychord/chords-tray",
   "version": "0.0.0",
   "type": "module",
-  "dependencies": {
-    "jxa-run-compat": "latest"
-  },
   "devDependencies": {
-    "@jxa/global-type": "latest",
     "@keychord/config": "catalog:",
-    "@keychord/tsconfig": "catalog:"
+    "@keychord/tsconfig": "catalog:",
+    "@types/bun": "latest"
   },
   "packageManager": "pnpm@10.33.0"
 }

@@ -1,10 +1,6 @@
 import { generateSyntheticKeybinds } from "#/utils/keybinds.ts";
-import fs from "fs";
 import { expand } from "brace-expansion";
-import { exists } from "#/utils/file.ts";
 import yaml from "js-yaml";
-import os from "os";
-import path from "path";
 import { tap, type BuilderThis } from "chord";
 
 function extractCommands(chords: Record<string, any>): string[] {
@@ -20,7 +16,7 @@ function extractCommands(chords: Record<string, any>): string[] {
 }
 
 // TODO: call `setAppNeedsRelaunch` if we updated the keybindings
-export default function buildWarpHandler(this: BuilderThis) {
+export default async function buildWarpHandler(this: BuilderThis) {
   const commands = extractCommands(this.chordsFile.chords);
 
   const syntheticKeybinds = generateSyntheticKeybinds(
@@ -33,10 +29,10 @@ export default function buildWarpHandler(this: BuilderThis) {
   // write warp keybindings
   const sortedCommands = Object.keys(syntheticKeybinds).sort();
 
-  const keybindingsPath = path.join(os.homedir(), ".warp", "keybindings.yaml");
+  const keybindingsPath = `${Bun.env.HOME}/.warp/keybindings.yaml`;
   let keybindings: Record<string, string> = {};
-  if (exists(keybindingsPath)) {
-    const yml = yaml.load(fs.readFileSync(keybindingsPath, "utf8"));
+  if (await Bun.file(keybindingsPath).exists()) {
+    const yml = yaml.load(await Bun.file(keybindingsPath).text());
     if (typeof yml === "object" && yml !== null) {
       keybindings = yml as Record<string, string>;
     }
@@ -47,7 +43,7 @@ export default function buildWarpHandler(this: BuilderThis) {
     const keybind = syntheticKeybinds[cmd]!.replaceAll("+", "-");
     keybindings[cmd] = keybind;
   }
-  fs.writeFileSync(keybindingsPath, "---\n" + yaml.dump(keybindings));
+  await Bun.write(keybindingsPath, "---\n" + yaml.dump(keybindings));
 
   return function command(cmd: string): boolean {
     const keybind = keybindings[cmd];

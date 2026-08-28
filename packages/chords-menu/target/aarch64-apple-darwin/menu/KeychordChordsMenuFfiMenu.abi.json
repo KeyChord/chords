@@ -1,15 +1,15 @@
 {
   "ABIRoot": {
     "kind": "Root",
-    "name": "KeychordChordsMenuNativeMenu",
-    "printedName": "KeychordChordsMenuNativeMenu",
+    "name": "KeychordChordsMenuFfiMenu",
+    "printedName": "KeychordChordsMenuFfiMenu",
     "children": [
       {
         "kind": "Import",
         "name": "AppKit",
         "printedName": "AppKit",
         "declKind": "Import",
-        "moduleName": "KeychordChordsMenuNativeMenu",
+        "moduleName": "KeychordChordsMenuFfiMenu",
         "declAttributes": [
           "RawDocComment"
         ]
@@ -19,14 +19,14 @@
         "name": "ApplicationServices",
         "printedName": "ApplicationServices",
         "declKind": "Import",
-        "moduleName": "KeychordChordsMenuNativeMenu"
+        "moduleName": "KeychordChordsMenuFfiMenu"
       },
       {
         "kind": "Import",
         "name": "Foundation",
         "printedName": "Foundation",
         "declKind": "Import",
-        "moduleName": "KeychordChordsMenuNativeMenu"
+        "moduleName": "KeychordChordsMenuFfiMenu"
       },
       {
         "kind": "TypeDecl",
@@ -41,18 +41,18 @@
               {
                 "kind": "TypeFunc",
                 "name": "Function",
-                "printedName": "(KeychordChordsMenuNativeMenu.MenuError.Type) -> (Swift.String) -> KeychordChordsMenuNativeMenu.MenuError",
+                "printedName": "(KeychordChordsMenuFfiMenu.MenuError.Type) -> (Swift.String) -> KeychordChordsMenuFfiMenu.MenuError",
                 "children": [
                   {
                     "kind": "TypeFunc",
                     "name": "Function",
-                    "printedName": "(Swift.String) -> KeychordChordsMenuNativeMenu.MenuError",
+                    "printedName": "(Swift.String) -> KeychordChordsMenuFfiMenu.MenuError",
                     "children": [
                       {
                         "kind": "TypeNominal",
                         "name": "MenuError",
-                        "printedName": "KeychordChordsMenuNativeMenu.MenuError",
-                        "usr": "s:024KeychordChordsMenuNativeC00C5ErrorO"
+                        "printedName": "KeychordChordsMenuFfiMenu.MenuError",
+                        "usr": "s:021KeychordChordsMenuFfiC00C5ErrorO"
                       },
                       {
                         "kind": "TypeNominal",
@@ -65,13 +65,13 @@
                   {
                     "kind": "TypeNominal",
                     "name": "Metatype",
-                    "printedName": "KeychordChordsMenuNativeMenu.MenuError.Type",
+                    "printedName": "KeychordChordsMenuFfiMenu.MenuError.Type",
                     "children": [
                       {
                         "kind": "TypeNominal",
                         "name": "MenuError",
-                        "printedName": "KeychordChordsMenuNativeMenu.MenuError",
-                        "usr": "s:024KeychordChordsMenuNativeC00C5ErrorO"
+                        "printedName": "KeychordChordsMenuFfiMenu.MenuError",
+                        "usr": "s:021KeychordChordsMenuFfiC00C5ErrorO"
                       }
                     ]
                   }
@@ -79,9 +79,9 @@
               }
             ],
             "declKind": "EnumElement",
-            "usr": "s:024KeychordChordsMenuNativeC00C5ErrorO13invalidActionyACSScACmF",
-            "mangledName": "$s024KeychordChordsMenuNativeC00C5ErrorO13invalidActionyACSScACmF",
-            "moduleName": "KeychordChordsMenuNativeMenu"
+            "usr": "s:021KeychordChordsMenuFfiC00C5ErrorO13invalidActionyACSScACmF",
+            "mangledName": "$s021KeychordChordsMenuFfiC00C5ErrorO13invalidActionyACSScACmF",
+            "moduleName": "KeychordChordsMenuFfiMenu"
           },
           {
             "kind": "Var",
@@ -91,18 +91,18 @@
               {
                 "kind": "TypeFunc",
                 "name": "Function",
-                "printedName": "(KeychordChordsMenuNativeMenu.MenuError.Type) -> (Swift.String) -> KeychordChordsMenuNativeMenu.MenuError",
+                "printedName": "(KeychordChordsMenuFfiMenu.MenuError.Type) -> (Swift.String) -> KeychordChordsMenuFfiMenu.MenuError",
                 "children": [
                   {
                     "kind": "TypeFunc",
                     "name": "Function",
-                    "printedName": "(Swift.String) -> KeychordChordsMenuNativeMenu.MenuError",
+                    "printedName": "(Swift.String) -> KeychordChordsMenuFfiMenu.MenuError",
                     "children": [
                       {
                         "kind": "TypeNominal",
                         "name": "MenuError",
-                        "printedName": "KeychordChordsMenuNativeMenu.MenuError",
-                        "usr": "s:024KeychordChordsMenuNativeC00C5ErrorO"
+                        "printedName": "KeychordChordsMenuFfiMenu.MenuError",
+                        "usr": "s:021KeychordChordsMenuFfiC00C5ErrorO"
                       },
                       {
                         "kind": "TypeNominal",
@@ -115,13 +115,13 @@
                   {
                     "kind": "TypeNominal",
                     "name": "Metatype",
-                    "printedName": "KeychordChordsMenuNativeMenu.MenuError.Type",
+                    "printedName": "KeychordChordsMenuFfiMenu.MenuError.Type",
                     "children": [
                       {
                         "kind": "TypeNominal",
                         "name": "MenuError",
-                        "printedName": "KeychordChordsMenuNativeMenu.MenuError",
-                        "usr": "s:024KeychordChordsMenuNativeC00C5ErrorO"
+                        "printedName": "KeychordChordsMenuFfiMenu.MenuError",
+                        "usr": "s:021KeychordChordsMenuFfiC00C5ErrorO"
                       }
                     ]
                   }
@@ -129,9 +129,9 @@
               }
             ],
             "declKind": "EnumElement",
-            "usr": "s:024KeychordChordsMenuNativeC00C5ErrorO19applicationNotFoundyACSScACmF",
-            "mangledName": "$s024KeychordChordsMenuNativeC00C5ErrorO19applicationNotFoundyACSScACmF",
-            "moduleName": "KeychordChordsMenuNativeMenu"
+            "usr": "s:021KeychordChordsMenuFfiC00C5ErrorO19applicationNotFoundyACSScACmF",
+            "mangledName": "$s021KeychordChordsMenuFfiC00C5ErrorO19applicationNotFoundyACSScACmF",
+            "moduleName": "KeychordChordsMenuFfiMenu"
           },
           {
             "kind": "Var",
@@ -141,24 +141,24 @@
               {
                 "kind": "TypeFunc",
                 "name": "Function",
-                "printedName": "(KeychordChordsMenuNativeMenu.MenuError.Type) -> KeychordChordsMenuNativeMenu.MenuError",
+                "printedName": "(KeychordChordsMenuFfiMenu.MenuError.Type) -> KeychordChordsMenuFfiMenu.MenuError",
                 "children": [
                   {
                     "kind": "TypeNominal",
                     "name": "MenuError",
-                    "printedName": "KeychordChordsMenuNativeMenu.MenuError",
-                    "usr": "s:024KeychordChordsMenuNativeC00C5ErrorO"
+                    "printedName": "KeychordChordsMenuFfiMenu.MenuError",
+                    "usr": "s:021KeychordChordsMenuFfiC00C5ErrorO"
                   },
                   {
                     "kind": "TypeNominal",
                     "name": "Metatype",
-                    "printedName": "KeychordChordsMenuNativeMenu.MenuError.Type",
+                    "printedName": "KeychordChordsMenuFfiMenu.MenuError.Type",
                     "children": [
                       {
                         "kind": "TypeNominal",
                         "name": "MenuError",
-                        "printedName": "KeychordChordsMenuNativeMenu.MenuError",
-                        "usr": "s:024KeychordChordsMenuNativeC00C5ErrorO"
+                        "printedName": "KeychordChordsMenuFfiMenu.MenuError",
+                        "usr": "s:021KeychordChordsMenuFfiC00C5ErrorO"
                       }
                     ]
                   }
@@ -166,9 +166,9 @@
               }
             ],
             "declKind": "EnumElement",
-            "usr": "s:024KeychordChordsMenuNativeC00C5ErrorO22noFrontmostApplicationyA2CmF",
-            "mangledName": "$s024KeychordChordsMenuNativeC00C5ErrorO22noFrontmostApplicationyA2CmF",
-            "moduleName": "KeychordChordsMenuNativeMenu"
+            "usr": "s:021KeychordChordsMenuFfiC00C5ErrorO22noFrontmostApplicationyA2CmF",
+            "mangledName": "$s021KeychordChordsMenuFfiC00C5ErrorO22noFrontmostApplicationyA2CmF",
+            "moduleName": "KeychordChordsMenuFfiMenu"
           },
           {
             "kind": "Var",
@@ -178,18 +178,18 @@
               {
                 "kind": "TypeFunc",
                 "name": "Function",
-                "printedName": "(KeychordChordsMenuNativeMenu.MenuError.Type) -> (Swift.String) -> KeychordChordsMenuNativeMenu.MenuError",
+                "printedName": "(KeychordChordsMenuFfiMenu.MenuError.Type) -> (Swift.String) -> KeychordChordsMenuFfiMenu.MenuError",
                 "children": [
                   {
                     "kind": "TypeFunc",
                     "name": "Function",
-                    "printedName": "(Swift.String) -> KeychordChordsMenuNativeMenu.MenuError",
+                    "printedName": "(Swift.String) -> KeychordChordsMenuFfiMenu.MenuError",
                     "children": [
                       {
                         "kind": "TypeNominal",
                         "name": "MenuError",
-                        "printedName": "KeychordChordsMenuNativeMenu.MenuError",
-                        "usr": "s:024KeychordChordsMenuNativeC00C5ErrorO"
+                        "printedName": "KeychordChordsMenuFfiMenu.MenuError",
+                        "usr": "s:021KeychordChordsMenuFfiC00C5ErrorO"
                       },
                       {
                         "kind": "TypeNominal",
@@ -202,13 +202,13 @@
                   {
                     "kind": "TypeNominal",
                     "name": "Metatype",
-                    "printedName": "KeychordChordsMenuNativeMenu.MenuError.Type",
+                    "printedName": "KeychordChordsMenuFfiMenu.MenuError.Type",
                     "children": [
                       {
                         "kind": "TypeNominal",
                         "name": "MenuError",
-                        "printedName": "KeychordChordsMenuNativeMenu.MenuError",
-                        "usr": "s:024KeychordChordsMenuNativeC00C5ErrorO"
+                        "printedName": "KeychordChordsMenuFfiMenu.MenuError",
+                        "usr": "s:021KeychordChordsMenuFfiC00C5ErrorO"
                       }
                     ]
                   }
@@ -216,9 +216,9 @@
               }
             ],
             "declKind": "EnumElement",
-            "usr": "s:024KeychordChordsMenuNativeC00C5ErrorO13accessibilityyACSScACmF",
-            "mangledName": "$s024KeychordChordsMenuNativeC00C5ErrorO13accessibilityyACSScACmF",
-            "moduleName": "KeychordChordsMenuNativeMenu"
+            "usr": "s:021KeychordChordsMenuFfiC00C5ErrorO13accessibilityyACSScACmF",
+            "mangledName": "$s021KeychordChordsMenuFfiC00C5ErrorO13accessibilityyACSScACmF",
+            "moduleName": "KeychordChordsMenuFfiMenu"
           },
           {
             "kind": "Var",
@@ -228,18 +228,18 @@
               {
                 "kind": "TypeFunc",
                 "name": "Function",
-                "printedName": "(KeychordChordsMenuNativeMenu.MenuError.Type) -> (Swift.Int, Swift.Int) -> KeychordChordsMenuNativeMenu.MenuError",
+                "printedName": "(KeychordChordsMenuFfiMenu.MenuError.Type) -> (Swift.Int, Swift.Int) -> KeychordChordsMenuFfiMenu.MenuError",
                 "children": [
                   {
                     "kind": "TypeFunc",
                     "name": "Function",
-                    "printedName": "(Swift.Int, Swift.Int) -> KeychordChordsMenuNativeMenu.MenuError",
+                    "printedName": "(Swift.Int, Swift.Int) -> KeychordChordsMenuFfiMenu.MenuError",
                     "children": [
                       {
                         "kind": "TypeNominal",
                         "name": "MenuError",
-                        "printedName": "KeychordChordsMenuNativeMenu.MenuError",
-                        "usr": "s:024KeychordChordsMenuNativeC00C5ErrorO"
+                        "printedName": "KeychordChordsMenuFfiMenu.MenuError",
+                        "usr": "s:021KeychordChordsMenuFfiC00C5ErrorO"
                       },
                       {
                         "kind": "TypeNominal",
@@ -265,13 +265,13 @@
                   {
                     "kind": "TypeNominal",
                     "name": "Metatype",
-                    "printedName": "KeychordChordsMenuNativeMenu.MenuError.Type",
+                    "printedName": "KeychordChordsMenuFfiMenu.MenuError.Type",
                     "children": [
                       {
                         "kind": "TypeNominal",
                         "name": "MenuError",
-                        "printedName": "KeychordChordsMenuNativeMenu.MenuError",
-                        "usr": "s:024KeychordChordsMenuNativeC00C5ErrorO"
+                        "printedName": "KeychordChordsMenuFfiMenu.MenuError",
+                        "usr": "s:021KeychordChordsMenuFfiC00C5ErrorO"
                       }
                     ]
                   }
@@ -279,9 +279,9 @@
               }
             ],
             "declKind": "EnumElement",
-            "usr": "s:024KeychordChordsMenuNativeC00C5ErrorO15indexOutOfRangeyACSi_SitcACmF",
-            "mangledName": "$s024KeychordChordsMenuNativeC00C5ErrorO15indexOutOfRangeyACSi_SitcACmF",
-            "moduleName": "KeychordChordsMenuNativeMenu"
+            "usr": "s:021KeychordChordsMenuFfiC00C5ErrorO15indexOutOfRangeyACSi_SitcACmF",
+            "mangledName": "$s021KeychordChordsMenuFfiC00C5ErrorO15indexOutOfRangeyACSi_SitcACmF",
+            "moduleName": "KeychordChordsMenuFfiMenu"
           },
           {
             "kind": "Var",
@@ -291,18 +291,18 @@
               {
                 "kind": "TypeFunc",
                 "name": "Function",
-                "printedName": "(KeychordChordsMenuNativeMenu.MenuError.Type) -> (Swift.String) -> KeychordChordsMenuNativeMenu.MenuError",
+                "printedName": "(KeychordChordsMenuFfiMenu.MenuError.Type) -> (Swift.String) -> KeychordChordsMenuFfiMenu.MenuError",
                 "children": [
                   {
                     "kind": "TypeFunc",
                     "name": "Function",
-                    "printedName": "(Swift.String) -> KeychordChordsMenuNativeMenu.MenuError",
+                    "printedName": "(Swift.String) -> KeychordChordsMenuFfiMenu.MenuError",
                     "children": [
                       {
                         "kind": "TypeNominal",
                         "name": "MenuError",
-                        "printedName": "KeychordChordsMenuNativeMenu.MenuError",
-                        "usr": "s:024KeychordChordsMenuNativeC00C5ErrorO"
+                        "printedName": "KeychordChordsMenuFfiMenu.MenuError",
+                        "usr": "s:021KeychordChordsMenuFfiC00C5ErrorO"
                       },
                       {
                         "kind": "TypeNominal",
@@ -315,13 +315,13 @@
                   {
                     "kind": "TypeNominal",
                     "name": "Metatype",
-                    "printedName": "KeychordChordsMenuNativeMenu.MenuError.Type",
+                    "printedName": "KeychordChordsMenuFfiMenu.MenuError.Type",
                     "children": [
                       {
                         "kind": "TypeNominal",
                         "name": "MenuError",
-                        "printedName": "KeychordChordsMenuNativeMenu.MenuError",
-                        "usr": "s:024KeychordChordsMenuNativeC00C5ErrorO"
+                        "printedName": "KeychordChordsMenuFfiMenu.MenuError",
+                        "usr": "s:021KeychordChordsMenuFfiC00C5ErrorO"
                       }
                     ]
                   }
@@ -329,9 +329,9 @@
               }
             ],
             "declKind": "EnumElement",
-            "usr": "s:024KeychordChordsMenuNativeC00C5ErrorO12invalidIndexyACSScACmF",
-            "mangledName": "$s024KeychordChordsMenuNativeC00C5ErrorO12invalidIndexyACSScACmF",
-            "moduleName": "KeychordChordsMenuNativeMenu"
+            "usr": "s:021KeychordChordsMenuFfiC00C5ErrorO12invalidIndexyACSScACmF",
+            "mangledName": "$s021KeychordChordsMenuFfiC00C5ErrorO12invalidIndexyACSScACmF",
+            "moduleName": "KeychordChordsMenuFfiMenu"
           },
           {
             "kind": "Var",
@@ -341,24 +341,24 @@
               {
                 "kind": "TypeFunc",
                 "name": "Function",
-                "printedName": "(KeychordChordsMenuNativeMenu.MenuError.Type) -> KeychordChordsMenuNativeMenu.MenuError",
+                "printedName": "(KeychordChordsMenuFfiMenu.MenuError.Type) -> KeychordChordsMenuFfiMenu.MenuError",
                 "children": [
                   {
                     "kind": "TypeNominal",
                     "name": "MenuError",
-                    "printedName": "KeychordChordsMenuNativeMenu.MenuError",
-                    "usr": "s:024KeychordChordsMenuNativeC00C5ErrorO"
+                    "printedName": "KeychordChordsMenuFfiMenu.MenuError",
+                    "usr": "s:021KeychordChordsMenuFfiC00C5ErrorO"
                   },
                   {
                     "kind": "TypeNominal",
                     "name": "Metatype",
-                    "printedName": "KeychordChordsMenuNativeMenu.MenuError.Type",
+                    "printedName": "KeychordChordsMenuFfiMenu.MenuError.Type",
                     "children": [
                       {
                         "kind": "TypeNominal",
                         "name": "MenuError",
-                        "printedName": "KeychordChordsMenuNativeMenu.MenuError",
-                        "usr": "s:024KeychordChordsMenuNativeC00C5ErrorO"
+                        "printedName": "KeychordChordsMenuFfiMenu.MenuError",
+                        "usr": "s:021KeychordChordsMenuFfiC00C5ErrorO"
                       }
                     ]
                   }
@@ -366,9 +366,9 @@
               }
             ],
             "declKind": "EnumElement",
-            "usr": "s:024KeychordChordsMenuNativeC00C5ErrorO10emptyQueryyA2CmF",
-            "mangledName": "$s024KeychordChordsMenuNativeC00C5ErrorO10emptyQueryyA2CmF",
-            "moduleName": "KeychordChordsMenuNativeMenu"
+            "usr": "s:021KeychordChordsMenuFfiC00C5ErrorO10emptyQueryyA2CmF",
+            "mangledName": "$s021KeychordChordsMenuFfiC00C5ErrorO10emptyQueryyA2CmF",
+            "moduleName": "KeychordChordsMenuFfiMenu"
           },
           {
             "kind": "Var",
@@ -378,18 +378,18 @@
               {
                 "kind": "TypeFunc",
                 "name": "Function",
-                "printedName": "(KeychordChordsMenuNativeMenu.MenuError.Type) -> (Swift.String) -> KeychordChordsMenuNativeMenu.MenuError",
+                "printedName": "(KeychordChordsMenuFfiMenu.MenuError.Type) -> (Swift.String) -> KeychordChordsMenuFfiMenu.MenuError",
                 "children": [
                   {
                     "kind": "TypeFunc",
                     "name": "Function",
-                    "printedName": "(Swift.String) -> KeychordChordsMenuNativeMenu.MenuError",
+                    "printedName": "(Swift.String) -> KeychordChordsMenuFfiMenu.MenuError",
                     "children": [
                       {
                         "kind": "TypeNominal",
                         "name": "MenuError",
-                        "printedName": "KeychordChordsMenuNativeMenu.MenuError",
-                        "usr": "s:024KeychordChordsMenuNativeC00C5ErrorO"
+                        "printedName": "KeychordChordsMenuFfiMenu.MenuError",
+                        "usr": "s:021KeychordChordsMenuFfiC00C5ErrorO"
                       },
                       {
                         "kind": "TypeNominal",
@@ -402,13 +402,13 @@
                   {
                     "kind": "TypeNominal",
                     "name": "Metatype",
-                    "printedName": "KeychordChordsMenuNativeMenu.MenuError.Type",
+                    "printedName": "KeychordChordsMenuFfiMenu.MenuError.Type",
                     "children": [
                       {
                         "kind": "TypeNominal",
                         "name": "MenuError",
-                        "printedName": "KeychordChordsMenuNativeMenu.MenuError",
-                        "usr": "s:024KeychordChordsMenuNativeC00C5ErrorO"
+                        "printedName": "KeychordChordsMenuFfiMenu.MenuError",
+                        "usr": "s:021KeychordChordsMenuFfiC00C5ErrorO"
                       }
                     ]
                   }
@@ -416,9 +416,9 @@
               }
             ],
             "declKind": "EnumElement",
-            "usr": "s:024KeychordChordsMenuNativeC00C5ErrorO12invalidQueryyACSScACmF",
-            "mangledName": "$s024KeychordChordsMenuNativeC00C5ErrorO12invalidQueryyACSScACmF",
-            "moduleName": "KeychordChordsMenuNativeMenu"
+            "usr": "s:021KeychordChordsMenuFfiC00C5ErrorO12invalidQueryyACSScACmF",
+            "mangledName": "$s021KeychordChordsMenuFfiC00C5ErrorO12invalidQueryyACSScACmF",
+            "moduleName": "KeychordChordsMenuFfiMenu"
           },
           {
             "kind": "Var",
@@ -428,18 +428,18 @@
               {
                 "kind": "TypeFunc",
                 "name": "Function",
-                "printedName": "(KeychordChordsMenuNativeMenu.MenuError.Type) -> (Swift.String, Swift.Int, Swift.Int) -> KeychordChordsMenuNativeMenu.MenuError",
+                "printedName": "(KeychordChordsMenuFfiMenu.MenuError.Type) -> (Swift.String, Swift.Int, Swift.Int) -> KeychordChordsMenuFfiMenu.MenuError",
                 "children": [
                   {
                     "kind": "TypeFunc",
                     "name": "Function",
-                    "printedName": "(Swift.String, Swift.Int, Swift.Int) -> KeychordChordsMenuNativeMenu.MenuError",
+                    "printedName": "(Swift.String, Swift.Int, Swift.Int) -> KeychordChordsMenuFfiMenu.MenuError",
                     "children": [
                       {
                         "kind": "TypeNominal",
                         "name": "MenuError",
-                        "printedName": "KeychordChordsMenuNativeMenu.MenuError",
-                        "usr": "s:024KeychordChordsMenuNativeC00C5ErrorO"
+                        "printedName": "KeychordChordsMenuFfiMenu.MenuError",
+                        "usr": "s:021KeychordChordsMenuFfiC00C5ErrorO"
                       },
                       {
                         "kind": "TypeNominal",
@@ -471,13 +471,13 @@
                   {
                     "kind": "TypeNominal",
                     "name": "Metatype",
-                    "printedName": "KeychordChordsMenuNativeMenu.MenuError.Type",
+                    "printedName": "KeychordChordsMenuFfiMenu.MenuError.Type",
                     "children": [
                       {
                         "kind": "TypeNominal",
                         "name": "MenuError",
-                        "printedName": "KeychordChordsMenuNativeMenu.MenuError",
-                        "usr": "s:024KeychordChordsMenuNativeC00C5ErrorO"
+                        "printedName": "KeychordChordsMenuFfiMenu.MenuError",
+                        "usr": "s:021KeychordChordsMenuFfiC00C5ErrorO"
                       }
                     ]
                   }
@@ -485,9 +485,9 @@
               }
             ],
             "declKind": "EnumElement",
-            "usr": "s:024KeychordChordsMenuNativeC00C5ErrorO15noTopLevelMatchyACSS_S2itcACmF",
-            "mangledName": "$s024KeychordChordsMenuNativeC00C5ErrorO15noTopLevelMatchyACSS_S2itcACmF",
-            "moduleName": "KeychordChordsMenuNativeMenu"
+            "usr": "s:021KeychordChordsMenuFfiC00C5ErrorO15noTopLevelMatchyACSS_S2itcACmF",
+            "mangledName": "$s021KeychordChordsMenuFfiC00C5ErrorO15noTopLevelMatchyACSS_S2itcACmF",
+            "moduleName": "KeychordChordsMenuFfiMenu"
           },
           {
             "kind": "Var",
@@ -497,18 +497,18 @@
               {
                 "kind": "TypeFunc",
                 "name": "Function",
-                "printedName": "(KeychordChordsMenuNativeMenu.MenuError.Type) -> (Swift.String) -> KeychordChordsMenuNativeMenu.MenuError",
+                "printedName": "(KeychordChordsMenuFfiMenu.MenuError.Type) -> (Swift.String) -> KeychordChordsMenuFfiMenu.MenuError",
                 "children": [
                   {
                     "kind": "TypeFunc",
                     "name": "Function",
-                    "printedName": "(Swift.String) -> KeychordChordsMenuNativeMenu.MenuError",
+                    "printedName": "(Swift.String) -> KeychordChordsMenuFfiMenu.MenuError",
                     "children": [
                       {
                         "kind": "TypeNominal",
                         "name": "MenuError",
-                        "printedName": "KeychordChordsMenuNativeMenu.MenuError",
-                        "usr": "s:024KeychordChordsMenuNativeC00C5ErrorO"
+                        "printedName": "KeychordChordsMenuFfiMenu.MenuError",
+                        "usr": "s:021KeychordChordsMenuFfiC00C5ErrorO"
                       },
                       {
                         "kind": "TypeNominal",
@@ -528,13 +528,13 @@
                   {
                     "kind": "TypeNominal",
                     "name": "Metatype",
-                    "printedName": "KeychordChordsMenuNativeMenu.MenuError.Type",
+                    "printedName": "KeychordChordsMenuFfiMenu.MenuError.Type",
                     "children": [
                       {
                         "kind": "TypeNominal",
                         "name": "MenuError",
-                        "printedName": "KeychordChordsMenuNativeMenu.MenuError",
-                        "usr": "s:024KeychordChordsMenuNativeC00C5ErrorO"
+                        "printedName": "KeychordChordsMenuFfiMenu.MenuError",
+                        "usr": "s:021KeychordChordsMenuFfiC00C5ErrorO"
                       }
                     ]
                   }
@@ -542,9 +542,9 @@
               }
             ],
             "declKind": "EnumElement",
-            "usr": "s:024KeychordChordsMenuNativeC00C5ErrorO010noExpandedC0yACSS_tcACmF",
-            "mangledName": "$s024KeychordChordsMenuNativeC00C5ErrorO010noExpandedC0yACSS_tcACmF",
-            "moduleName": "KeychordChordsMenuNativeMenu"
+            "usr": "s:021KeychordChordsMenuFfiC00C5ErrorO010noExpandedC0yACSS_tcACmF",
+            "mangledName": "$s021KeychordChordsMenuFfiC00C5ErrorO010noExpandedC0yACSS_tcACmF",
+            "moduleName": "KeychordChordsMenuFfiMenu"
           },
           {
             "kind": "Var",
@@ -554,18 +554,18 @@
               {
                 "kind": "TypeFunc",
                 "name": "Function",
-                "printedName": "(KeychordChordsMenuNativeMenu.MenuError.Type) -> (Swift.String, Swift.Int, Swift.Int) -> KeychordChordsMenuNativeMenu.MenuError",
+                "printedName": "(KeychordChordsMenuFfiMenu.MenuError.Type) -> (Swift.String, Swift.Int, Swift.Int) -> KeychordChordsMenuFfiMenu.MenuError",
                 "children": [
                   {
                     "kind": "TypeFunc",
                     "name": "Function",
-                    "printedName": "(Swift.String, Swift.Int, Swift.Int) -> KeychordChordsMenuNativeMenu.MenuError",
+                    "printedName": "(Swift.String, Swift.Int, Swift.Int) -> KeychordChordsMenuFfiMenu.MenuError",
                     "children": [
                       {
                         "kind": "TypeNominal",
                         "name": "MenuError",
-                        "printedName": "KeychordChordsMenuNativeMenu.MenuError",
-                        "usr": "s:024KeychordChordsMenuNativeC00C5ErrorO"
+                        "printedName": "KeychordChordsMenuFfiMenu.MenuError",
+                        "usr": "s:021KeychordChordsMenuFfiC00C5ErrorO"
                       },
                       {
                         "kind": "TypeNominal",
@@ -597,13 +597,13 @@
                   {
                     "kind": "TypeNominal",
                     "name": "Metatype",
-                    "printedName": "KeychordChordsMenuNativeMenu.MenuError.Type",
+                    "printedName": "KeychordChordsMenuFfiMenu.MenuError.Type",
                     "children": [
                       {
                         "kind": "TypeNominal",
                         "name": "MenuError",
-                        "printedName": "KeychordChordsMenuNativeMenu.MenuError",
-                        "usr": "s:024KeychordChordsMenuNativeC00C5ErrorO"
+                        "printedName": "KeychordChordsMenuFfiMenu.MenuError",
+                        "usr": "s:021KeychordChordsMenuFfiC00C5ErrorO"
                       }
                     ]
                   }
@@ -611,9 +611,9 @@
               }
             ],
             "declKind": "EnumElement",
-            "usr": "s:024KeychordChordsMenuNativeC00C5ErrorO15noExpandedMatchyACSS_S2itcACmF",
-            "mangledName": "$s024KeychordChordsMenuNativeC00C5ErrorO15noExpandedMatchyACSS_S2itcACmF",
-            "moduleName": "KeychordChordsMenuNativeMenu"
+            "usr": "s:021KeychordChordsMenuFfiC00C5ErrorO15noExpandedMatchyACSS_S2itcACmF",
+            "mangledName": "$s021KeychordChordsMenuFfiC00C5ErrorO15noExpandedMatchyACSS_S2itcACmF",
+            "moduleName": "KeychordChordsMenuFfiMenu"
           },
           {
             "kind": "Var",
@@ -628,9 +628,9 @@
               }
             ],
             "declKind": "Var",
-            "usr": "s:024KeychordChordsMenuNativeC00C5ErrorO11descriptionSSvp",
-            "mangledName": "$s024KeychordChordsMenuNativeC00C5ErrorO11descriptionSSvp",
-            "moduleName": "KeychordChordsMenuNativeMenu",
+            "usr": "s:021KeychordChordsMenuFfiC00C5ErrorO11descriptionSSvp",
+            "mangledName": "$s021KeychordChordsMenuFfiC00C5ErrorO11descriptionSSvp",
+            "moduleName": "KeychordChordsMenuFfiMenu",
             "declAttributes": [
               "AccessControl"
             ],
@@ -648,18 +648,18 @@
                   }
                 ],
                 "declKind": "Accessor",
-                "usr": "s:024KeychordChordsMenuNativeC00C5ErrorO11descriptionSSvg",
-                "mangledName": "$s024KeychordChordsMenuNativeC00C5ErrorO11descriptionSSvg",
-                "moduleName": "KeychordChordsMenuNativeMenu",
+                "usr": "s:021KeychordChordsMenuFfiC00C5ErrorO11descriptionSSvg",
+                "mangledName": "$s021KeychordChordsMenuFfiC00C5ErrorO11descriptionSSvg",
+                "moduleName": "KeychordChordsMenuFfiMenu",
                 "accessorKind": "get"
               }
             ]
           }
         ],
         "declKind": "Enum",
-        "usr": "s:024KeychordChordsMenuNativeC00C5ErrorO",
-        "mangledName": "$s024KeychordChordsMenuNativeC00C5ErrorO",
-        "moduleName": "KeychordChordsMenuNativeMenu",
+        "usr": "s:021KeychordChordsMenuFfiC00C5ErrorO",
+        "mangledName": "$s021KeychordChordsMenuFfiC00C5ErrorO",
+        "moduleName": "KeychordChordsMenuFfiMenu",
         "declAttributes": [
           "AccessControl"
         ],
@@ -804,8 +804,8 @@
         ],
         "declKind": "Func",
         "usr": "c:(cm)chordsMenuRun:::",
-        "mangledName": "$s024KeychordChordsMenuNativeC006chordsC3RunySpys4Int8VGSgSPyADGSg_A2HtF",
-        "moduleName": "KeychordChordsMenuNativeMenu",
+        "mangledName": "$s021KeychordChordsMenuFfiC006chordsC3RunySpys4Int8VGSgSPyADGSg_A2HtF",
+        "moduleName": "KeychordChordsMenuFfiMenu",
         "declAttributes": [
           "AccessControl",
           "CDecl",
@@ -848,8 +848,8 @@
         ],
         "declKind": "Func",
         "usr": "c:(cm)chordsMenuFree:",
-        "mangledName": "$s024KeychordChordsMenuNativeC006chordsC4FreeyySpys4Int8VGSgF",
-        "moduleName": "KeychordChordsMenuNativeMenu",
+        "mangledName": "$s021KeychordChordsMenuFfiC006chordsC4FreeyySpys4Int8VGSgF",
+        "moduleName": "KeychordChordsMenuFfiMenu",
         "declAttributes": [
           "AccessControl",
           "CDecl"
@@ -894,9 +894,9 @@
           }
         ],
         "declKind": "Func",
-        "usr": "s:024KeychordChordsMenuNativeC003runC6Action11processName6action5valueySSSg_S2StKF",
-        "mangledName": "$s024KeychordChordsMenuNativeC003runC6Action11processName6action5valueySSSg_S2StKF",
-        "moduleName": "KeychordChordsMenuNativeMenu",
+        "usr": "s:021KeychordChordsMenuFfiC003runC6Action11processName6action5valueySSSg_S2StKF",
+        "mangledName": "$s021KeychordChordsMenuFfiC003runC6Action11processName6action5valueySSSg_S2StKF",
+        "moduleName": "KeychordChordsMenuFfiMenu",
         "declAttributes": [
           "AccessControl",
           "RawDocComment"
@@ -909,9 +909,9 @@
   },
   "ConstValues": [
     {
-      "filePath": "\/Users\/leonsilicon\/Developer\/github\/KeyChord\/chords\/packages\/chords-menu\/src\/swift\/menu.swift",
+      "filePath": "\/Users\/leonsilicon\/Developer\/github\/KeyChord\/chords\/packages\/chords-menu\/src\/ffi\/menu\/menu.swift",
       "kind": "Array",
-      "offset": 5880,
+      "offset": 5816,
       "length": 88,
       "value": "[0x200B, 0x200C, 0x200D, 0x200E, 0x200F, 0xFEFF, 0x202A, 0x202B, 0x202C, 0x202D, 0x202E]"
     }

@@ -1,6 +1,6 @@
 // swift-interface-format-version: 1.0
 // swift-compiler-version: Apple Swift version 6.3.2 effective-5.10 (swiftlang-6.3.2.1.108 clang-2100.1.1.101)
-// swift-module-flags: -target arm64-apple-macosx13.0 -enable-objc-interop -enable-library-evolution -swift-version 5 -O -module-name KeychordChordsMenuNativeMenu
+// swift-module-flags: -target arm64-apple-macosx13.0 -enable-objc-interop -enable-library-evolution -swift-version 5 -O -module-name KeychordChordsMenuFfiMenu
 // swift-module-flags-ignorable:  -formal-cxx-interoperability-mode=off -interface-compiler-version 6.3.2
 import AppKit
 import ApplicationServices
@@ -25,8 +25,8 @@ public enum MenuError : Swift.Error, Swift.CustomStringConvertible {
     get
   }
 }
-@_cdecl("chords_menu_run")
+@c
 public func chordsMenuRun(_ processName: Swift.UnsafePointer<Swift.CChar>?, _ action: Swift.UnsafePointer<Swift.CChar>?, _ value: Swift.UnsafePointer<Swift.CChar>?) -> Swift.UnsafeMutablePointer<Swift.CChar>?
-@_cdecl("chords_menu_free")
+@c
 public func chordsMenuFree(_ message: Swift.UnsafeMutablePointer<Swift.CChar>?)
 public func runMenuAction(processName: Swift.String?, action: Swift.String, value: Swift.String) throws

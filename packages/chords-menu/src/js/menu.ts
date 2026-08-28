@@ -1,14 +1,14 @@
 /**
  * macOS menu bar handler: a thin `bun:ffi` binding over the Swift implementation in
- * `src/swift/menu.swift`, which `@keychord/config` compiles to
- * `target/<triple>/native/menu/menu.dylib`. Chord runs handlers on Bun, so the library is
+ * `src/ffi/menu/menu.swift`, which `@keychord/config` compiles to
+ * `target/<triple>/menu/menu.dylib`. Chord runs handlers on Bun, so the library is
  * opened in-process — no helper process, no `osascript` round trip.
  *
- * The library is located through Chord's `chord` module (`resolveNativeLibrary`), which knows the
+ * The library is located through Chord's `chord` module (`resolveFfiPath`), which knows the
  * package layout (including vendored copies), so nothing here depends on where the package is
  * installed.
  */
-import { resolveNativeLibrary } from "chord";
+import { resolveFfiPath } from "chord";
 import { CString, dlopen, FFIType, ptr } from "bun:ffi";
 
 export type MenuAction = "by-index" | "by-letters";
@@ -43,12 +43,12 @@ type MenuLibrary = ReturnType<typeof openMenuLibrary>;
 let library: MenuLibrary | undefined;
 
 function openMenuLibrary() {
-  return dlopen(resolveNativeLibrary(import.meta, "menu"), {
-    chords_menu_run: {
+  return dlopen(resolveFfiPath(import.meta, "menu"), {
+    chordsMenuRun: {
       args: [FFIType.ptr, FFIType.cstring, FFIType.cstring],
       returns: FFIType.ptr,
     },
-    chords_menu_free: {
+    chordsMenuFree: {
       args: [FFIType.ptr],
       returns: FFIType.void,
     },
@@ -65,10 +65,10 @@ export function runMenuAction(processName: string | undefined, action: MenuActio
   // A missing process name is NULL; Bun's `cstring` arguments cannot be null, hence the raw
   // pointer for that parameter.
   const processNamePointer = processName ? ptr(cstr(processName)) : 0;
-  const error = library.symbols.chords_menu_run(processNamePointer, cstr(action), cstr(value));
+  const error = library.symbols.chordsMenuRun(processNamePointer, cstr(action), cstr(value));
   if (error) {
     const message = new CString(error).toString();
-    library.symbols.chords_menu_free(error);
+    library.symbols.chordsMenuFree(error);
     throw new Error(message);
   }
 }

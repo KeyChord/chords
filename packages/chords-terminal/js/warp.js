@@ -1,6 +1,3 @@
-import fs from "fs";
-import os from "os";
-import path from "path";
 import { tap } from "chord";
 //#region ../../node_modules/.pnpm/array-uniq@3.0.0/node_modules/array-uniq/index.js
 function arrayUniq(array) {
@@ -233,13 +230,8 @@ function expand_(str, max, isTop) {
 }
 //#endregion
 //#region src/js/utils/file.ts
-function exists(path) {
-	try {
-		fs.statSync(path);
-		return true;
-	} catch (err) {
-		return false;
-	}
+async function exists(path) {
+	return await Bun.file(path).exists();
 }
 //#endregion
 //#region ../../node_modules/.pnpm/js-yaml@4.1.1/node_modules/js-yaml/dist/js-yaml.mjs
@@ -2278,24 +2270,24 @@ function extractCommands(chords) {
 	for (const chord of Object.values(chords)) if (chord?.args?.[0] && !chord.shortcut) result.push(chord.args[0]);
 	return result;
 }
-function buildWarpHandler() {
+async function buildWarpHandler() {
 	const syntheticKeybinds = generateSyntheticKeybinds(extractCommands(this.chordsFile.chords), [
 		"alt+shift+cmd+{0..9}",
 		"ctrl+cmd+shift+{0..9}",
 		"ctrl+alt+shift+{0..9}"
 	].flatMap((pattern) => expand(pattern)));
 	const sortedCommands = Object.keys(syntheticKeybinds).sort();
-	const keybindingsPath = path.join(os.homedir(), ".warp", "keybindings.yaml");
+	const keybindingsPath = `${Bun.env.HOME}/.warp/keybindings.yaml`;
 	let keybindings = {};
-	if (exists(keybindingsPath)) {
-		const yml = jsYaml.load(fs.readFileSync(keybindingsPath, "utf8"));
+	if (await exists(keybindingsPath)) {
+		const yml = jsYaml.load(await Bun.file(keybindingsPath).text());
 		if (typeof yml === "object" && yml !== null) keybindings = yml;
 	}
 	for (const cmd of sortedCommands) {
 		const keybind = syntheticKeybinds[cmd].replaceAll("+", "-");
 		keybindings[cmd] = keybind;
 	}
-	fs.writeFileSync(keybindingsPath, "---\n" + jsYaml.dump(keybindings));
+	await Bun.write(keybindingsPath, "---\n" + jsYaml.dump(keybindings));
 	return function command(cmd) {
 		const keybind = keybindings[cmd];
 		if (!keybind) return false;
