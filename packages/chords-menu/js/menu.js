@@ -34,7 +34,7 @@ function cstr(value) {
 }
 function runMenuAction(processName, action, value) {
 	library ??= openMenuLibrary();
-	const processNamePointer = processName ? ptr(cstr(processName)) : 0;
+	const processNamePointer = processName ? ptr(cstr(processName)) : null;
 	const error = library.symbols.chordsMenuRun(processNamePointer, cstr(action), cstr(value));
 	if (error) {
 		const message = new CString(error).toString();

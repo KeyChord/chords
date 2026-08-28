@@ -3,7 +3,7 @@ var name = "@keychord/chords-com.apple";
 var version = "0.0.0";
 var type = "module";
 var dependencies = {
-	"@keychord/chords-menu": "github:KeyChord/chords-menu",
+	"@keychord/chords-menu": "workspace:*",
 	"desm": "latest",
 	"get-port": "latest",
 	"jquery-as-string": "latest",
