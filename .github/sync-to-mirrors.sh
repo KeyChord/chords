@@ -65,7 +65,7 @@ fi
 readarray -t COMMIT_TAGS < <(git tag --points-at HEAD)
 
 EXIT=0
-while read -r PACKAGE_NAME; do
+while IFS= read -r PACKAGE_NAME || [[ -n "$PACKAGE_NAME" ]]; do
 	printf "\n\n\e[7m Mirror: %s \e[0m\n" "$PACKAGE_NAME"
 	CLONE_DIR="${BUILD_BASE}/${PACKAGE_NAME}"
 	cd "${CLONE_DIR}"
@@ -74,12 +74,16 @@ while read -r PACKAGE_NAME; do
 	git init -b "$BRANCH" .
 	git remote add origin "https://github.com/KeyChord/${PACKAGE_NAME}"
 	if [[ -n "$API_TOKEN_GITHUB" ]]; then
-		git config --local http.https://github.com/.extraheader "AUTHORIZATION: basic $(printf "x-access-token:%s" "$API_TOKEN_GITHUB" | base64)"
+		# GNU base64 wraps long values by default. Strip line endings so
+		# fine-grained PATs produce a valid, single-line HTTP header.
+		AUTH_HEADER=$(printf "x-access-token:%s" "$API_TOKEN_GITHUB" | base64 | tr -d '\r\n')
+		git config --local http.https://github.com/.extraheader "AUTHORIZATION: basic $AUTH_HEADER"
 	fi
 
-	# Check if a remote exists for that mirror.
-	if ! git ls-remote -h origin >/dev/null 2>&1; then
-		echo "::error::Mirror repo for ${PACKAGE_NAME} does not exist."
+	# Check whether the mirror can be accessed with the configured credentials.
+	if ! LS_REMOTE_ERROR=$(git ls-remote -h origin 2>&1 >/dev/null); then
+		echo "::error::Could not access mirror repo ${PACKAGE_NAME}."
+		printf '%s\n' "$LS_REMOTE_ERROR"
 		echo "Skipping."
 		EXIT=1
 		continue
