@@ -10,9 +10,7 @@
         "printedName": "AppKit",
         "declKind": "Import",
         "moduleName": "KeychordChordsMenuFfiMenu",
-        "declAttributes": [
-          "RawDocComment"
-        ]
+        "declAttributes": ["RawDocComment"]
       },
       {
         "kind": "Import",
@@ -631,9 +629,7 @@
             "usr": "s:021KeychordChordsMenuFfiC00C5ErrorO11descriptionSSvp",
             "mangledName": "$s021KeychordChordsMenuFfiC00C5ErrorO11descriptionSSvp",
             "moduleName": "KeychordChordsMenuFfiMenu",
-            "declAttributes": [
-              "AccessControl"
-            ],
+            "declAttributes": ["AccessControl"],
             "accessors": [
               {
                 "kind": "Accessor",
@@ -660,9 +656,7 @@
         "usr": "s:021KeychordChordsMenuFfiC00C5ErrorO",
         "mangledName": "$s021KeychordChordsMenuFfiC00C5ErrorO",
         "moduleName": "KeychordChordsMenuFfiMenu",
-        "declAttributes": [
-          "AccessControl"
-        ],
+        "declAttributes": ["AccessControl"],
         "conformances": [
           {
             "kind": "Conformance",
@@ -806,11 +800,7 @@
         "usr": "c:(cm)chordsMenuRun:::",
         "mangledName": "$s021KeychordChordsMenuFfiC006chordsC3RunySpys4Int8VGSgSPyADGSg_A2HtF",
         "moduleName": "KeychordChordsMenuFfiMenu",
-        "declAttributes": [
-          "AccessControl",
-          "CDecl",
-          "RawDocComment"
-        ],
+        "declAttributes": ["AccessControl", "CDecl", "RawDocComment"],
         "funcSelfKind": "NonMutating"
       },
       {
@@ -850,10 +840,7 @@
         "usr": "c:(cm)chordsMenuFree:",
         "mangledName": "$s021KeychordChordsMenuFfiC006chordsC4FreeyySpys4Int8VGSgF",
         "moduleName": "KeychordChordsMenuFfiMenu",
-        "declAttributes": [
-          "AccessControl",
-          "CDecl"
-        ],
+        "declAttributes": ["AccessControl", "CDecl"],
         "funcSelfKind": "NonMutating"
       },
       {
@@ -897,10 +884,7 @@
         "usr": "s:021KeychordChordsMenuFfiC003runC6Action11processName6action5valueySSSg_S2StKF",
         "mangledName": "$s021KeychordChordsMenuFfiC003runC6Action11processName6action5valueySSSg_S2StKF",
         "moduleName": "KeychordChordsMenuFfiMenu",
-        "declAttributes": [
-          "AccessControl",
-          "RawDocComment"
-        ],
+        "declAttributes": ["AccessControl", "RawDocComment"],
         "throwing": true,
         "funcSelfKind": "NonMutating"
       }

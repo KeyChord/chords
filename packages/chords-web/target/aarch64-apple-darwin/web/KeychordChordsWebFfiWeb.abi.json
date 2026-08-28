@@ -10,9 +10,7 @@
         "printedName": "AppKit",
         "declKind": "Import",
         "moduleName": "KeychordChordsWebFfiWeb",
-        "declAttributes": [
-          "RawDocComment"
-        ]
+        "declAttributes": ["RawDocComment"]
       },
       {
         "kind": "Import",
@@ -89,11 +87,7 @@
         "usr": "c:(cm)chordsWebRunJavaScript:",
         "mangledName": "$s020KeychordChordsWebFfiC006chordsC13RunJavaScriptySpys4Int8VGSgSPyADGSgF",
         "moduleName": "KeychordChordsWebFfiWeb",
-        "declAttributes": [
-          "AccessControl",
-          "CDecl",
-          "RawDocComment"
-        ],
+        "declAttributes": ["AccessControl", "CDecl", "RawDocComment"],
         "funcSelfKind": "NonMutating"
       },
       {
@@ -133,10 +127,7 @@
         "usr": "c:(cm)chordsWebFree:",
         "mangledName": "$s020KeychordChordsWebFfiC006chordsC4FreeyySpys4Int8VGSgF",
         "moduleName": "KeychordChordsWebFfiWeb",
-        "declAttributes": [
-          "AccessControl",
-          "CDecl"
-        ],
+        "declAttributes": ["AccessControl", "CDecl"],
         "funcSelfKind": "NonMutating"
       }
     ],

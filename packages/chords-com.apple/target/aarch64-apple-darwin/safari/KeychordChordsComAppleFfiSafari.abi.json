@@ -10,9 +10,7 @@
         "printedName": "AppKit",
         "declKind": "Import",
         "moduleName": "KeychordChordsComAppleFfiSafari",
-        "declAttributes": [
-          "RawDocComment"
-        ]
+        "declAttributes": ["RawDocComment"]
       },
       {
         "kind": "Import",
@@ -89,11 +87,7 @@
         "usr": "c:(cm)chordsSafariRunJavaScript:",
         "mangledName": "$s31KeychordChordsComAppleFfiSafari06chordsF13RunJavaScriptySpys4Int8VGSgSPyADGSgF",
         "moduleName": "KeychordChordsComAppleFfiSafari",
-        "declAttributes": [
-          "AccessControl",
-          "CDecl",
-          "RawDocComment"
-        ],
+        "declAttributes": ["AccessControl", "CDecl", "RawDocComment"],
         "funcSelfKind": "NonMutating"
       },
       {
@@ -128,11 +122,7 @@
         "usr": "c:(cm)chordsSafariOpenDeveloperSettings",
         "mangledName": "$s31KeychordChordsComAppleFfiSafari06chordsF21OpenDeveloperSettingsSpys4Int8VGSgyF",
         "moduleName": "KeychordChordsComAppleFfiSafari",
-        "declAttributes": [
-          "AccessControl",
-          "CDecl",
-          "RawDocComment"
-        ],
+        "declAttributes": ["AccessControl", "CDecl", "RawDocComment"],
         "funcSelfKind": "NonMutating"
       },
       {
@@ -172,10 +162,7 @@
         "usr": "c:(cm)chordsSafariFree:",
         "mangledName": "$s31KeychordChordsComAppleFfiSafari06chordsF4FreeyySpys4Int8VGSgF",
         "moduleName": "KeychordChordsComAppleFfiSafari",
-        "declAttributes": [
-          "AccessControl",
-          "CDecl"
-        ],
+        "declAttributes": ["AccessControl", "CDecl"],
         "funcSelfKind": "NonMutating"
       }
     ],

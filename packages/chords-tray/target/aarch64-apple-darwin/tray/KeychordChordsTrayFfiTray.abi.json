@@ -10,9 +10,7 @@
         "printedName": "ApplicationServices",
         "declKind": "Import",
         "moduleName": "KeychordChordsTrayFfiTray",
-        "declAttributes": [
-          "RawDocComment"
-        ]
+        "declAttributes": ["RawDocComment"]
       },
       {
         "kind": "Import",
@@ -88,11 +86,7 @@
         "usr": "c:(cm)chordsTrayRun::",
         "mangledName": "$s021KeychordChordsTrayFfiC006chordsC3RunySpys4Int8VGSgs5Int32V_SPyADGSgtF",
         "moduleName": "KeychordChordsTrayFfiTray",
-        "declAttributes": [
-          "AccessControl",
-          "CDecl",
-          "RawDocComment"
-        ],
+        "declAttributes": ["AccessControl", "CDecl", "RawDocComment"],
         "funcSelfKind": "NonMutating"
       },
       {
@@ -132,10 +126,7 @@
         "usr": "c:(cm)chordsTrayFree:",
         "mangledName": "$s021KeychordChordsTrayFfiC006chordsC4FreeyySpys4Int8VGSgF",
         "moduleName": "KeychordChordsTrayFfiTray",
-        "declAttributes": [
-          "AccessControl",
-          "CDecl"
-        ],
+        "declAttributes": ["AccessControl", "CDecl"],
         "funcSelfKind": "NonMutating"
       }
     ],

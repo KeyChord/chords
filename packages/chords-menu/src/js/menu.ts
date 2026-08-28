@@ -60,7 +60,11 @@ function cstr(value: string): Buffer {
   return Buffer.from(`${value}\0`, "utf8");
 }
 
-export function runMenuAction(processName: string | undefined, action: MenuAction, value: string): void {
+export function runMenuAction(
+  processName: string | undefined,
+  action: MenuAction,
+  value: string,
+): void {
   library ??= openMenuLibrary();
   // A missing process name is NULL; Bun's `cstring` arguments cannot be null, hence the raw
   // pointer for that parameter.
