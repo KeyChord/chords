@@ -3,12 +3,11 @@
   "type": "module",
   "dependencies": {
     "jquery-as-string": "^0.4.0",
-    "jxa-run-compat": "^1.6.0",
     "outdent": "^0.8.0"
   },
   "devDependencies": {
     "@keychord/config": "catalog:",
     "@keychord/tsconfig": "catalog:",
-    "@jxa/global-type": "^1.4.0"
+    "@types/bun": "latest"
   }
 }

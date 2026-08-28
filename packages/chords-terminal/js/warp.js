@@ -229,11 +229,6 @@ function expand_(str, max, isTop) {
 	return expansions;
 }
 //#endregion
-//#region src/js/utils/file.ts
-async function exists(path) {
-	return await Bun.file(path).exists();
-}
-//#endregion
 //#region ../../node_modules/.pnpm/js-yaml@4.1.1/node_modules/js-yaml/dist/js-yaml.mjs
 /*! js-yaml 4.1.1 https://github.com/nodeca/js-yaml @license MIT */
 function isNothing(subject) {
@@ -2279,7 +2274,7 @@ async function buildWarpHandler() {
 	const sortedCommands = Object.keys(syntheticKeybinds).sort();
 	const keybindingsPath = `${Bun.env.HOME}/.warp/keybindings.yaml`;
 	let keybindings = {};
-	if (await exists(keybindingsPath)) {
+	if (await Bun.file(keybindingsPath).exists()) {
 		const yml = jsYaml.load(await Bun.file(keybindingsPath).text());
 		if (typeof yml === "object" && yml !== null) keybindings = yml;
 	}

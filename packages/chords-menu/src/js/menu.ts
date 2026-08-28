@@ -64,7 +64,7 @@ export function runMenuAction(processName: string | undefined, action: MenuActio
   library ??= openMenuLibrary();
   // A missing process name is NULL; Bun's `cstring` arguments cannot be null, hence the raw
   // pointer for that parameter.
-  const processNamePointer = processName ? ptr(cstr(processName)) : 0;
+  const processNamePointer = processName ? ptr(cstr(processName)) : null;
   const error = library.symbols.chordsMenuRun(processNamePointer, cstr(action), cstr(value));
   if (error) {
     const message = new CString(error).toString();

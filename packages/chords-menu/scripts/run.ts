@@ -3,5 +3,12 @@
 import buildMenuHandler from "../src/js/menu.ts";
 
 const [action = "by-index", value = "1"] = process.argv.slice(2);
-buildMenuHandler()(action as "by-index" | "by-letters", value);
+const menu = buildMenuHandler();
+if (action === "by-index") {
+  menu(action, value);
+} else if (action === "by-letters") {
+  menu(action, value);
+} else {
+  throw new Error(`unknown menu action "${action}"`);
+}
 console.log("ok");

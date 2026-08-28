@@ -1,0 +1,189 @@
+{
+  "ABIRoot": {
+    "kind": "Root",
+    "name": "KeychordChordsWebFfiWeb",
+    "printedName": "KeychordChordsWebFfiWeb",
+    "children": [
+      {
+        "kind": "Import",
+        "name": "AppKit",
+        "printedName": "AppKit",
+        "declKind": "Import",
+        "moduleName": "KeychordChordsWebFfiWeb",
+        "declAttributes": [
+          "RawDocComment"
+        ]
+      },
+      {
+        "kind": "Import",
+        "name": "Carbon",
+        "printedName": "Carbon",
+        "declKind": "Import",
+        "moduleName": "KeychordChordsWebFfiWeb"
+      },
+      {
+        "kind": "Import",
+        "name": "CoreFoundation",
+        "printedName": "CoreFoundation",
+        "declKind": "Import",
+        "moduleName": "KeychordChordsWebFfiWeb"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "KeychordChordsWebFfiWeb"
+      },
+      {
+        "kind": "Function",
+        "name": "chordsWebRunJavaScript",
+        "printedName": "chordsWebRunJavaScript(_:)",
+        "children": [
+          {
+            "kind": "TypeNominal",
+            "name": "Optional",
+            "printedName": "Swift.UnsafeMutablePointer<Swift.Int8>?",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "UnsafeMutablePointer",
+                "printedName": "Swift.UnsafeMutablePointer<Swift.Int8>",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Int8",
+                    "printedName": "Swift.Int8",
+                    "usr": "s:s4Int8V"
+                  }
+                ],
+                "usr": "s:Sp"
+              }
+            ],
+            "usr": "s:Sq"
+          },
+          {
+            "kind": "TypeNominal",
+            "name": "Optional",
+            "printedName": "Swift.UnsafePointer<Swift.Int8>?",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "UnsafePointer",
+                "printedName": "Swift.UnsafePointer<Swift.Int8>",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Int8",
+                    "printedName": "Swift.Int8",
+                    "usr": "s:s4Int8V"
+                  }
+                ],
+                "usr": "s:SP"
+              }
+            ],
+            "usr": "s:Sq"
+          }
+        ],
+        "declKind": "Func",
+        "usr": "c:(cm)chordsWebRunJavaScript:",
+        "mangledName": "$s020KeychordChordsWebFfiC006chordsC13RunJavaScriptySpys4Int8VGSgSPyADGSgF",
+        "moduleName": "KeychordChordsWebFfiWeb",
+        "declAttributes": [
+          "AccessControl",
+          "CDecl",
+          "RawDocComment"
+        ],
+        "funcSelfKind": "NonMutating"
+      },
+      {
+        "kind": "Function",
+        "name": "chordsWebFree",
+        "printedName": "chordsWebFree(_:)",
+        "children": [
+          {
+            "kind": "TypeNominal",
+            "name": "Void",
+            "printedName": "()"
+          },
+          {
+            "kind": "TypeNominal",
+            "name": "Optional",
+            "printedName": "Swift.UnsafeMutablePointer<Swift.Int8>?",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "UnsafeMutablePointer",
+                "printedName": "Swift.UnsafeMutablePointer<Swift.Int8>",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Int8",
+                    "printedName": "Swift.Int8",
+                    "usr": "s:s4Int8V"
+                  }
+                ],
+                "usr": "s:Sp"
+              }
+            ],
+            "usr": "s:Sq"
+          }
+        ],
+        "declKind": "Func",
+        "usr": "c:(cm)chordsWebFree:",
+        "mangledName": "$s020KeychordChordsWebFfiC006chordsC4FreeyySpys4Int8VGSgF",
+        "moduleName": "KeychordChordsWebFfiWeb",
+        "declAttributes": [
+          "AccessControl",
+          "CDecl"
+        ],
+        "funcSelfKind": "NonMutating"
+      }
+    ],
+    "json_format_version": 8
+  },
+  "ConstValues": [
+    {
+      "filePath": "\/Users\/leonsilicon\/Developer\/github\/KeyChord\/chords\/packages\/chords-web\/src\/ffi\/web\/web.swift",
+      "kind": "Array",
+      "offset": 377,
+      "length": 78,
+      "value": "[\"Google Chrome\", \"Brave Browser\", \"Microsoft Edge\", \"Arc\"]"
+    },
+    {
+      "filePath": "\/Users\/leonsilicon\/Developer\/github\/KeyChord\/chords\/packages\/chords-web\/src\/ffi\/web\/web.swift",
+      "kind": "IntegerLiteral",
+      "offset": 2071,
+      "length": 11,
+      "value": "0x43725375"
+    },
+    {
+      "filePath": "\/Users\/leonsilicon\/Developer\/github\/KeyChord\/chords\/packages\/chords-web\/src\/ffi\/web\/web.swift",
+      "kind": "IntegerLiteral",
+      "offset": 2141,
+      "length": 11,
+      "value": "0x45784A61"
+    },
+    {
+      "filePath": "\/Users\/leonsilicon\/Developer\/github\/KeyChord\/chords\/packages\/chords-web\/src\/ffi\/web\/web.swift",
+      "kind": "IntegerLiteral",
+      "offset": 2208,
+      "length": 11,
+      "value": "0x4A765363"
+    },
+    {
+      "filePath": "\/Users\/leonsilicon\/Developer\/github\/KeyChord\/chords\/packages\/chords-web\/src\/ffi\/web\/web.swift",
+      "kind": "IntegerLiteral",
+      "offset": 2266,
+      "length": 11,
+      "value": "0x6377696E"
+    },
+    {
+      "filePath": "\/Users\/leonsilicon\/Developer\/github\/KeyChord\/chords\/packages\/chords-web\/src\/ffi\/web\/web.swift",
+      "kind": "IntegerLiteral",
+      "offset": 2330,
+      "length": 11,
+      "value": "0x61635461"
+    }
+  ]
+}

@@ -1,77 +1,93 @@
-import '@jxa/global-type';
-import { run } from 'jxa-run-compat'
-import jquery from 'jquery-as-string'
-import outdent from 'outdent'
+/**
+ * Web chord handler for Chromium-family browsers. The generated JavaScript is sent to the
+ * frontmost browser by `src/ffi/web/web.swift`; this file only builds commands and binds its C ABI
+ * through Bun FFI.
+ */
+import { CString, dlopen, FFIType } from "bun:ffi";
+import { resolveFfiPath } from "chord";
+import jquery from "jquery-as-string";
+import outdent from "outdent";
 
-type Args = [type: 'placeholder', input: string] | [type: 'selection-start', input: string] | [type: 'selection-end', input: string] | [type: 'link', input: string] | [type: 'button', input: string] | [type: 'scroll', direction: 'north' | 'south' | 'east' | 'west']
+type Args =
+  | [type: "placeholder", input: string]
+  | [type: "selection-start", input: string]
+  | [type: "selection-end", input: string]
+  | [type: "link", input: string]
+  | [type: "button", input: string]
+  | [type: "scroll", direction: "north" | "south" | "east" | "west"];
 
-export default function buildHandler() {
-  return async function handler(...args: Args) {
-    const javascript = jquery + ';\n' + getJavascript(...args);
-    await run((javascript: string) => {
-      // 1. Get System Events to find the currently active process
-      const sysEvents = Application("System Events");
-      const activeProcess = sysEvents.processes.whose({ frontmost: true })[0];
-      const appName = activeProcess.name();
+type WebLibrary = ReturnType<typeof openWebLibrary>;
 
-      // We need the current application to show macOS dialog boxes
-      const currentApp = Application.currentApplication();
-      currentApp.includeStandardAdditions = true;
+let library: WebLibrary | undefined;
 
-      // 2. Define our supported browsers
-      const supportedBrowsers = ["Google Chrome", "Brave Browser", "Microsoft Edge", "Arc"];
+function openWebLibrary() {
+  return dlopen(resolveFfiPath(import.meta, "web"), {
+    chordsWebRunJavaScript: {
+      args: [FFIType.cstring],
+      returns: FFIType.ptr,
+    },
+    chordsWebFree: {
+      args: [FFIType.ptr],
+      returns: FFIType.void,
+    },
+  });
+}
 
-      // 3. Check if the active app is in our list
-      if (supportedBrowsers.includes(appName)) {
-          // Bind to the active browser dynamically
-          const browser = Application(appName);
+/** NUL-terminated UTF-8 for a `cstring` argument. */
+function cstr(value: string): Buffer {
+  return Buffer.from(`${value}\0`, "utf8");
+}
 
-          // Execute the code in the frontmost tab of the frontmost window
-          const result = browser.windows[0].activeTab.execute({
-              javascript: `
-                ${jquery};
-                ${javascript}
-              `,
-          });
-
-          console.log(result);
-      } else {
-          currentApp.displayDialog(`The frontmost app (${appName}) is not a supported browser.`);
-      }
-    }, javascript);
+export function runWebJavaScript(source: string): void {
+  library ??= openWebLibrary();
+  const error = library.symbols.chordsWebRunJavaScript(cstr(source));
+  if (error) {
+    const message = new CString(error).toString();
+    library.symbols.chordsWebFree(error);
+    throw new Error(message);
   }
 }
 
-function getJavascript(...args: Args) {
+export default function buildHandler() {
+  return async function handler(...args: Args) {
+    const javascript = `${jquery};\n${getJavascript(...args)}`;
+
+    // Preserve the previous handler's page environment: it injected jQuery once around the
+    // generated payload and once inside it.
+    runWebJavaScript(`${jquery};\n${javascript}`);
+  };
+}
+
+function getJavascript(...args: Args): string {
   const type = args[0];
   switch (type) {
-    case 'scroll': {
+    case "scroll": {
       const direction = args[1];
       return outdent`
         window.scrollBy({
-          top: ${direction === 'north' ? -100 : direction === 'south' ? 100 : 0},
-          left: ${direction === 'east' ? 100 : direction === 'west' ? -100 : 0},
+          top: ${direction === "north" ? -100 : direction === "south" ? 100 : 0},
+          left: ${direction === "east" ? 100 : direction === "west" ? -100 : 0},
           behavior: 'smooth'
         });
-      `
+      `;
     }
 
-    case 'placeholder': {
+    case "placeholder": {
       const input = args[1];
-      if (input.endsWith('.')) {
+      if (input.endsWith(".")) {
         return outdent`
           $('input[placeholder="${input}" i]').focus();
         `;
       }
 
-      if (input.endsWith(',')) {
-        // TODO: need to use AppleScript for true right click
-        return ``
+      if (input.endsWith(",")) {
+        // TODO: need a native event for a true right click.
+        return "";
       }
     }
 
     default: {
-      return `console.log('unhandled type ${type}')`
+      return `console.log('unhandled type ${type}')`;
     }
   }
 }
