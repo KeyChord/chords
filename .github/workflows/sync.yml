@@ -17,6 +17,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: actions/checkout@v4
+        with:
+          repository: KeyChord/config
+          path: ../config
+
       - name: Fetch git tags
         run: git fetch origin 'refs/tags/*:refs/tags/*'
 
