@@ -10,7 +10,7 @@ import _Concurrency
 import _StringProcessing
 import _SwiftConcurrencyShims
 public enum MenuError : Swift.Error, Swift.CustomStringConvertible {
-  case invalidArguments([Swift.String])
+  case invalidAction(Swift.String)
   case applicationNotFound(Swift.String)
   case noFrontmostApplication
   case accessibility(Swift.String)
@@ -25,6 +25,8 @@ public enum MenuError : Swift.Error, Swift.CustomStringConvertible {
     get
   }
 }
+@_cdecl("chords_menu_run")
+public func chordsMenuRun(_ processName: Swift.UnsafePointer<Swift.CChar>?, _ action: Swift.UnsafePointer<Swift.CChar>?, _ value: Swift.UnsafePointer<Swift.CChar>?) -> Swift.UnsafeMutablePointer<Swift.CChar>?
+@_cdecl("chords_menu_free")
+public func chordsMenuFree(_ message: Swift.UnsafeMutablePointer<Swift.CChar>?)
 public func runMenuAction(processName: Swift.String?, action: Swift.String, value: Swift.String) throws
-@_cdecl("chord_native_run_v1")
-public func chordNativeRunV1(_ handlerArgumentCount: Swift.Int32, _ handlerArgumentValues: Swift.UnsafePointer<Swift.UnsafePointer<Swift.CChar>?>?, _ eventArgumentCount: Swift.Int32, _ eventArgumentValues: Swift.UnsafePointer<Swift.UnsafePointer<Swift.CChar>?>?, _ errorBuffer: Swift.UnsafeMutablePointer<Swift.UInt8>?, _ errorBufferCapacity: Swift.Int) -> Swift.Int32

@@ -1,17 +1,14 @@
 {
   "name": "@keychord/chords-menu",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "type": "module",
   "imports": {
     "#/*": "./src/js/*"
   },
-  "dependencies": {
-    "jxa-run-compat": "latest"
-  },
   "devDependencies": {
-    "@jxa/global-type": "latest",
     "@keychord/config": "catalog:",
-    "@keychord/tsconfig": "catalog:"
+    "@keychord/tsconfig": "catalog:",
+    "@types/bun": "latest"
   },
   "packageManager": "pnpm@10.33.0"
 }

@@ -35,18 +35,18 @@
         "children": [
           {
             "kind": "Var",
-            "name": "invalidArguments",
-            "printedName": "invalidArguments",
+            "name": "invalidAction",
+            "printedName": "invalidAction",
             "children": [
               {
                 "kind": "TypeFunc",
                 "name": "Function",
-                "printedName": "(KeychordChordsMenuNativeMenu.MenuError.Type) -> ([Swift.String]) -> KeychordChordsMenuNativeMenu.MenuError",
+                "printedName": "(KeychordChordsMenuNativeMenu.MenuError.Type) -> (Swift.String) -> KeychordChordsMenuNativeMenu.MenuError",
                 "children": [
                   {
                     "kind": "TypeFunc",
                     "name": "Function",
-                    "printedName": "([Swift.String]) -> KeychordChordsMenuNativeMenu.MenuError",
+                    "printedName": "(Swift.String) -> KeychordChordsMenuNativeMenu.MenuError",
                     "children": [
                       {
                         "kind": "TypeNominal",
@@ -56,17 +56,9 @@
                       },
                       {
                         "kind": "TypeNominal",
-                        "name": "Array",
-                        "printedName": "[Swift.String]",
-                        "children": [
-                          {
-                            "kind": "TypeNominal",
-                            "name": "String",
-                            "printedName": "Swift.String",
-                            "usr": "s:SS"
-                          }
-                        ],
-                        "usr": "s:Sa"
+                        "name": "String",
+                        "printedName": "Swift.String",
+                        "usr": "s:SS"
                       }
                     ]
                   },
@@ -87,8 +79,8 @@
               }
             ],
             "declKind": "EnumElement",
-            "usr": "s:024KeychordChordsMenuNativeC00C5ErrorO16invalidArgumentsyACSaySSGcACmF",
-            "mangledName": "$s024KeychordChordsMenuNativeC00C5ErrorO16invalidArgumentsyACSaySSGcACmF",
+            "usr": "s:024KeychordChordsMenuNativeC00C5ErrorO13invalidActionyACSScACmF",
+            "mangledName": "$s024KeychordChordsMenuNativeC00C5ErrorO13invalidActionyACSScACmF",
             "moduleName": "KeychordChordsMenuNativeMenu"
           },
           {
@@ -718,6 +710,154 @@
       },
       {
         "kind": "Function",
+        "name": "chordsMenuRun",
+        "printedName": "chordsMenuRun(_:_:_:)",
+        "children": [
+          {
+            "kind": "TypeNominal",
+            "name": "Optional",
+            "printedName": "Swift.UnsafeMutablePointer<Swift.Int8>?",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "UnsafeMutablePointer",
+                "printedName": "Swift.UnsafeMutablePointer<Swift.Int8>",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Int8",
+                    "printedName": "Swift.Int8",
+                    "usr": "s:s4Int8V"
+                  }
+                ],
+                "usr": "s:Sp"
+              }
+            ],
+            "usr": "s:Sq"
+          },
+          {
+            "kind": "TypeNominal",
+            "name": "Optional",
+            "printedName": "Swift.UnsafePointer<Swift.Int8>?",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "UnsafePointer",
+                "printedName": "Swift.UnsafePointer<Swift.Int8>",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Int8",
+                    "printedName": "Swift.Int8",
+                    "usr": "s:s4Int8V"
+                  }
+                ],
+                "usr": "s:SP"
+              }
+            ],
+            "usr": "s:Sq"
+          },
+          {
+            "kind": "TypeNominal",
+            "name": "Optional",
+            "printedName": "Swift.UnsafePointer<Swift.Int8>?",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "UnsafePointer",
+                "printedName": "Swift.UnsafePointer<Swift.Int8>",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Int8",
+                    "printedName": "Swift.Int8",
+                    "usr": "s:s4Int8V"
+                  }
+                ],
+                "usr": "s:SP"
+              }
+            ],
+            "usr": "s:Sq"
+          },
+          {
+            "kind": "TypeNominal",
+            "name": "Optional",
+            "printedName": "Swift.UnsafePointer<Swift.Int8>?",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "UnsafePointer",
+                "printedName": "Swift.UnsafePointer<Swift.Int8>",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Int8",
+                    "printedName": "Swift.Int8",
+                    "usr": "s:s4Int8V"
+                  }
+                ],
+                "usr": "s:SP"
+              }
+            ],
+            "usr": "s:Sq"
+          }
+        ],
+        "declKind": "Func",
+        "usr": "c:(cm)chordsMenuRun:::",
+        "mangledName": "$s024KeychordChordsMenuNativeC006chordsC3RunySpys4Int8VGSgSPyADGSg_A2HtF",
+        "moduleName": "KeychordChordsMenuNativeMenu",
+        "declAttributes": [
+          "AccessControl",
+          "CDecl",
+          "RawDocComment"
+        ],
+        "funcSelfKind": "NonMutating"
+      },
+      {
+        "kind": "Function",
+        "name": "chordsMenuFree",
+        "printedName": "chordsMenuFree(_:)",
+        "children": [
+          {
+            "kind": "TypeNominal",
+            "name": "Void",
+            "printedName": "()"
+          },
+          {
+            "kind": "TypeNominal",
+            "name": "Optional",
+            "printedName": "Swift.UnsafeMutablePointer<Swift.Int8>?",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "UnsafeMutablePointer",
+                "printedName": "Swift.UnsafeMutablePointer<Swift.Int8>",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Int8",
+                    "printedName": "Swift.Int8",
+                    "usr": "s:s4Int8V"
+                  }
+                ],
+                "usr": "s:Sp"
+              }
+            ],
+            "usr": "s:Sq"
+          }
+        ],
+        "declKind": "Func",
+        "usr": "c:(cm)chordsMenuFree:",
+        "mangledName": "$s024KeychordChordsMenuNativeC006chordsC4FreeyySpys4Int8VGSgF",
+        "moduleName": "KeychordChordsMenuNativeMenu",
+        "declAttributes": [
+          "AccessControl",
+          "CDecl"
+        ],
+        "funcSelfKind": "NonMutating"
+      },
+      {
+        "kind": "Function",
         "name": "runMenuAction",
         "printedName": "runMenuAction(processName:action:value:)",
         "children": [
@@ -763,154 +903,6 @@
         ],
         "throwing": true,
         "funcSelfKind": "NonMutating"
-      },
-      {
-        "kind": "Import",
-        "name": "Foundation",
-        "printedName": "Foundation",
-        "declKind": "Import",
-        "moduleName": "KeychordChordsMenuNativeMenu",
-        "declAttributes": [
-          "RawDocComment"
-        ]
-      },
-      {
-        "kind": "Function",
-        "name": "chordNativeRunV1",
-        "printedName": "chordNativeRunV1(_:_:_:_:_:_:)",
-        "children": [
-          {
-            "kind": "TypeNominal",
-            "name": "Int32",
-            "printedName": "Swift.Int32",
-            "usr": "s:s5Int32V"
-          },
-          {
-            "kind": "TypeNominal",
-            "name": "Int32",
-            "printedName": "Swift.Int32",
-            "usr": "s:s5Int32V"
-          },
-          {
-            "kind": "TypeNominal",
-            "name": "Optional",
-            "printedName": "Swift.UnsafePointer<Swift.UnsafePointer<Swift.Int8>?>?",
-            "children": [
-              {
-                "kind": "TypeNominal",
-                "name": "UnsafePointer",
-                "printedName": "Swift.UnsafePointer<Swift.UnsafePointer<Swift.Int8>?>",
-                "children": [
-                  {
-                    "kind": "TypeNominal",
-                    "name": "Optional",
-                    "printedName": "Swift.UnsafePointer<Swift.Int8>?",
-                    "children": [
-                      {
-                        "kind": "TypeNominal",
-                        "name": "UnsafePointer",
-                        "printedName": "Swift.UnsafePointer<Swift.Int8>",
-                        "children": [
-                          {
-                            "kind": "TypeNominal",
-                            "name": "Int8",
-                            "printedName": "Swift.Int8",
-                            "usr": "s:s4Int8V"
-                          }
-                        ],
-                        "usr": "s:SP"
-                      }
-                    ],
-                    "usr": "s:Sq"
-                  }
-                ],
-                "usr": "s:SP"
-              }
-            ],
-            "usr": "s:Sq"
-          },
-          {
-            "kind": "TypeNominal",
-            "name": "Int32",
-            "printedName": "Swift.Int32",
-            "usr": "s:s5Int32V"
-          },
-          {
-            "kind": "TypeNominal",
-            "name": "Optional",
-            "printedName": "Swift.UnsafePointer<Swift.UnsafePointer<Swift.Int8>?>?",
-            "children": [
-              {
-                "kind": "TypeNominal",
-                "name": "UnsafePointer",
-                "printedName": "Swift.UnsafePointer<Swift.UnsafePointer<Swift.Int8>?>",
-                "children": [
-                  {
-                    "kind": "TypeNominal",
-                    "name": "Optional",
-                    "printedName": "Swift.UnsafePointer<Swift.Int8>?",
-                    "children": [
-                      {
-                        "kind": "TypeNominal",
-                        "name": "UnsafePointer",
-                        "printedName": "Swift.UnsafePointer<Swift.Int8>",
-                        "children": [
-                          {
-                            "kind": "TypeNominal",
-                            "name": "Int8",
-                            "printedName": "Swift.Int8",
-                            "usr": "s:s4Int8V"
-                          }
-                        ],
-                        "usr": "s:SP"
-                      }
-                    ],
-                    "usr": "s:Sq"
-                  }
-                ],
-                "usr": "s:SP"
-              }
-            ],
-            "usr": "s:Sq"
-          },
-          {
-            "kind": "TypeNominal",
-            "name": "Optional",
-            "printedName": "Swift.UnsafeMutablePointer<Swift.UInt8>?",
-            "children": [
-              {
-                "kind": "TypeNominal",
-                "name": "UnsafeMutablePointer",
-                "printedName": "Swift.UnsafeMutablePointer<Swift.UInt8>",
-                "children": [
-                  {
-                    "kind": "TypeNominal",
-                    "name": "UInt8",
-                    "printedName": "Swift.UInt8",
-                    "usr": "s:s5UInt8V"
-                  }
-                ],
-                "usr": "s:Sp"
-              }
-            ],
-            "usr": "s:Sq"
-          },
-          {
-            "kind": "TypeNominal",
-            "name": "Int",
-            "printedName": "Swift.Int",
-            "usr": "s:Si"
-          }
-        ],
-        "declKind": "Func",
-        "usr": "c:(cm)chordNativeRunV1::::::",
-        "mangledName": "$s024KeychordChordsMenuNativeC005chordD5RunV1ys5Int32VAD_SPySPys4Int8VGSgGSgAdJSpys5UInt8VGSgSitF",
-        "moduleName": "KeychordChordsMenuNativeMenu",
-        "declAttributes": [
-          "AccessControl",
-          "CDecl"
-        ],
-        "funcSelfKind": "NonMutating"
       }
     ],
     "json_format_version": 8
@@ -919,7 +911,7 @@
     {
       "filePath": "\/Users\/leonsilicon\/Developer\/github\/KeyChord\/chords\/packages\/chords-menu\/src\/swift\/menu.swift",
       "kind": "Array",
-      "offset": 4604,
+      "offset": 5880,
       "length": 88,
       "value": "[0x200B, 0x200C, 0x200D, 0x200E, 0x200F, 0xFEFF, 0x202A, 0x202B, 0x202C, 0x202D, 0x202E]"
     }

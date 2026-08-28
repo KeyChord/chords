@@ -1,4 +1,7 @@
 {
   "extends": "@keychord/tsconfig",
-  "include": ["src"]
+  "compilerOptions": {
+    "types": ["bun", "@keychord/types"]
+  },
+  "include": ["src", "scripts"]
 }

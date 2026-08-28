@@ -1,19 +1,27 @@
 // Native (Swift) implementation of the macOS menu bar handler.
 //
-// Behaviour mirrors `src/js/menu.ts` one-to-one, but talks to the Accessibility API directly
-// instead of going through JXA/System Events, so a keystroke costs a few AX calls rather than an
-// `osascript` round trip.
+// Behaviour mirrors the query language documented in `readme.md`, talking to the Accessibility
+// API directly so a keystroke costs a few AX calls rather than an `osascript` round trip.
 //
-// Chord calls `run(handlerArguments, eventArguments)`:
-//   handlerArguments[0]  optional process name to activate first (e.g. "Safari")
-//   eventArguments       ["by-index", "<n>"] | ["by-letters", "<query>"] | [] (Apple menu)
+// This file is compiled into `target/<triple>/native/menu/menu.dylib` (see `@keychord/config`),
+// which `src/js/menu.ts` opens with `bun:ffi`. The C ABI it exports:
+//
+//   const char *chords_menu_run(const char *process_name /* nullable */, const char *action,
+//                               const char *value);
+//     Runs one menu action. Returns NULL on success, otherwise a heap-allocated error message
+//     that the caller releases with `chords_menu_free`.
+//   void chords_menu_free(char *message);
+//
+// Chord calls handlers from its JS worker thread. The Accessibility client API and NSWorkspace
+// are usable from any thread, so the work stays on the calling thread — hopping to the main
+// thread would deadlock a caller whose main thread is not running a run loop (the `chord` CLI).
 
 import AppKit
 import ApplicationServices
 import Foundation
 
 public enum MenuError: Error, CustomStringConvertible {
-    case invalidArguments([String])
+    case invalidAction(String)
     case applicationNotFound(String)
     case noFrontmostApplication
     case accessibility(String)
@@ -27,8 +35,8 @@ public enum MenuError: Error, CustomStringConvertible {
 
     public var description: String {
         switch self {
-        case .invalidArguments(let args):
-            return "expected event arguments [action, value], got \(args)"
+        case .invalidAction(let action):
+            return "unknown menu action \"\(action)\" (expected \"by-index\" or \"by-letters\")"
         case .applicationNotFound(let name):
             return "application \"\(name)\" is not running and could not be launched"
         case .noFrontmostApplication:
@@ -53,18 +61,43 @@ public enum MenuError: Error, CustomStringConvertible {
     }
 }
 
-func run(_ handlerArguments: [String], _ eventArguments: [String]) throws {
-    let processName = handlerArguments.first.flatMap { $0.isEmpty ? nil : $0 }
+// MARK: - C ABI (what `src/js/menu.ts` calls through `bun:ffi`)
 
-    switch eventArguments.count {
-    case 0:
-        // `'-0' = { 'emit:menu' = [] }`: the Apple menu.
-        try runMenuAction(processName: processName, action: "by-index", value: "0")
-    case 2:
-        try runMenuAction(processName: processName, action: eventArguments[0], value: eventArguments[1])
-    default:
-        throw MenuError.invalidArguments(eventArguments)
+/// Runs one menu action. Returns `nil` on success or a `strdup`ed error message the caller frees
+/// with `chords_menu_free`. Safe to call from any thread.
+@_cdecl("chords_menu_run")
+public func chordsMenuRun(
+    _ processName: UnsafePointer<CChar>?,
+    _ action: UnsafePointer<CChar>?,
+    _ value: UnsafePointer<CChar>?
+) -> UnsafeMutablePointer<CChar>? {
+    let processName = processName.map { String(cString: $0) }.flatMap { $0.isEmpty ? nil : $0 }
+    let action = action.map { String(cString: $0) } ?? "by-index"
+    let value = value.map { String(cString: $0) } ?? "0"
+
+    return autoreleasepool {
+        do {
+            try runMenuAction(processName: processName, action: action, value: value)
+            return nil
+        } catch {
+            return strdup(describe(error))
+        }
     }
+}
+
+@_cdecl("chords_menu_free")
+public func chordsMenuFree(_ message: UnsafeMutablePointer<CChar>?) {
+    free(message)
+}
+
+private func describe(_ error: Error) -> String {
+    if let error = error as? MenuError {
+        return error.description
+    }
+    if let localized = error as? LocalizedError, let text = localized.errorDescription {
+        return text
+    }
+    return String(describing: error)
 }
 
 // MARK: - Accessibility helpers
@@ -106,7 +139,7 @@ private func axPress(_ element: AXUIElement, label: String) throws {
     }
 }
 
-// MARK: - Query semantics (identical to menu.ts)
+// MARK: - Query semantics
 
 private let invisibleCharacters: CharacterSet = {
     var set = CharacterSet()
@@ -248,8 +281,18 @@ private func clickExpandedMenuItem(_ items: [AXUIElement], query: String) throws
     try axPress(item, label: "menu item \"\(pattern)\" #\(occurrence)")
 }
 
+/// Sleeps `interval`, pumping the main run loop instead when called on the main thread (so
+/// NSWorkspace state keeps updating in a process without an AppKit event loop).
+private func waitBriefly(_ interval: TimeInterval) {
+    if Thread.isMainThread {
+        RunLoop.main.run(until: Date(timeIntervalSinceNow: interval))
+    } else {
+        Thread.sleep(forTimeInterval: interval)
+    }
+}
+
 /// Activates `processName` (launching it when needed) and waits briefly for it to become
-/// frontmost, pumping the run loop so NSWorkspace state updates.
+/// frontmost.
 private func activate(processName: String) throws -> NSRunningApplication {
     let workspace = NSWorkspace.shared
     var app = workspace.runningApplications.first { $0.localizedName == processName }
@@ -263,7 +306,7 @@ private func activate(processName: String) throws -> NSRunningApplication {
         workspace.openApplication(at: url, configuration: NSWorkspace.OpenConfiguration())
         let deadline = Date(timeIntervalSinceNow: 5)
         while app == nil && Date() < deadline {
-            RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.05))
+            waitBriefly(0.05)
             app = workspace.runningApplications.first { $0.localizedName == processName }
         }
     }
@@ -275,7 +318,7 @@ private func activate(processName: String) throws -> NSRunningApplication {
     app.activate()
     let deadline = Date(timeIntervalSinceNow: 1)
     while !app.isActive && Date() < deadline {
-        RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.02))
+        waitBriefly(0.02)
     }
     return app
 }
@@ -297,8 +340,8 @@ private extension NSWorkspace {
     }
 }
 
-/// Public entry point so other packages can `import KeychordChordsMenuSwiftMenu` and drive the
-/// menu bar with the same query language (`by-index` / `by-letters`).
+/// Public entry point so other packages can `import KeychordChordsMenuNativeMenu` and drive the
+/// menu bar with the same query language (`by-index` / `by-letters`). Callable from any thread.
 public func runMenuAction(processName: String?, action: String, value: String) throws {
     let target: NSRunningApplication
     if let processName {
@@ -320,29 +363,26 @@ public func runMenuAction(processName: String?, action: String, value: String) t
     let menuBar = menuBarValue as! AXUIElement
     let items = axChildren(menuBar)
 
-    if action == "by-index" {
+    switch action {
+    case "by-index":
         guard let index = Int(value) else {
             throw MenuError.invalidIndex(value)
         }
         try clickTopLevelMenu(items, index: index)
-        log("Done")
-        return
+    case "by-letters":
+        let query = normalize(value)
+        if query.isEmpty {
+            throw MenuError.emptyQuery
+        }
+        if query.allSatisfy({ $0.isASCII && $0.isNumber }) {
+            try clickTopLevelMenu(items, index: Int(query) ?? 0)
+        } else if isRepeatedLettersQuery(query) {
+            try clickTopLevelMenu(items, repeatedLetters: query)
+        } else {
+            try clickExpandedMenuItem(items, query: query)
+        }
+    default:
+        throw MenuError.invalidAction(action)
     }
-
-    let query = normalize(value)
-    if query.isEmpty {
-        throw MenuError.emptyQuery
-    }
-    if query.allSatisfy({ $0.isASCII && $0.isNumber }) {
-        try clickTopLevelMenu(items, index: Int(query) ?? 0)
-        log("Done")
-        return
-    }
-    if isRepeatedLettersQuery(query) {
-        try clickTopLevelMenu(items, repeatedLetters: query)
-        log("Done")
-        return
-    }
-    try clickExpandedMenuItem(items, query: query)
     log("Done")
 }
