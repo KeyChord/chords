@@ -20,6 +20,22 @@ jobs:
       - name: Fetch git tags
         run: git fetch origin 'refs/tags/*:refs/tags/*'
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "lts/*"
+
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: true
+
+      # Native addons are committed (they can only be built on macOS), so CI
+      # rebuilds the JS only. See scripts/check-native-artifacts.sh for the
+      # pre-commit check that keeps the committed .node files in sync.
+      - name: Build packages
+        run: pnpm build
+        env:
+          CHORD_SKIP_NATIVE: "1"
+
       - name: Sync
         run: .github/sync-to-mirrors.sh
         env:

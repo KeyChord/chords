@@ -1,0 +1,16 @@
+$schema: "https://moonrepo.dev/schemas/project.json"
+
+layer: library
+language: typescript
+
+tasks:
+  # Vendors @keychord/chords-menu's prebuilt addon into this package's target/.
+  build-native:
+    deps:
+      - "chords-menu:build-native"
+    command: "vp pack"
+    inputs:
+      - "package.json"
+      - "vite.config.ts"
+    outputs:
+      - "target"

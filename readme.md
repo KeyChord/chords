@@ -64,3 +64,26 @@ In the default chord package, these are the categories assigned to the global ch
 `.` Right Click\
 `;` Middle Click (Rare)\
 `/` Search
+
+## Native addons
+
+Some packages (`chords-menu`, `chords-web`, `chords-tray`, `chords-com.apple`)
+ship NodeSwift addons built from `src/swift/`. They can only be compiled on
+macOS, so the built `.node` files are committed and CI syncs them to the
+mirrors as-is; CI builds the JS only, via `CHORD_SKIP_NATIVE=1`.
+
+A pre-commit hook keeps the committed artifacts honest: staging a `.swift`
+change runs `scripts/check-native-artifacts.sh`, which rebuilds through moon
+and fails if the result differs from what is committed. To enable the hooks in
+a fresh clone:
+
+```sh
+vp config --hooks-dir .vite-hooks
+```
+
+Rebuild the artifacts yourself with `moon run ':build-native'`, then
+`git add packages/*/target`.
+
+> Mach-O output is not byte-reproducible -- the linker mints a fresh `LC_UUID`
+> each run -- so the check compares disassembled machine code rather than file
+> hashes, and every genuine rebuild rewrites the binaries.

@@ -1,0 +1,16 @@
+$schema: "https://moonrepo.dev/schemas/project.json"
+
+layer: library
+language: typescript
+
+tasks:
+  # `buildNative` in @keychord/config always builds; moon decides *whether* to,
+  # by hashing src/swift/** and tracking target/ as the output.
+  build-native:
+    command: "vp pack"
+    inputs:
+      - "src/swift/**/*"
+      - "package.json"
+      - "vite.config.ts"
+    outputs:
+      - "target"

@@ -7,8 +7,8 @@ settings:
 catalogs:
   default:
     '@keychord/config':
-      specifier: ^0.0.8
-      version: 0.0.8
+      specifier: ^0.0.9
+      version: 0.0.9
     '@keychord/tsconfig':
       specifier: ^0.0.6
       version: 0.0.6
@@ -47,13 +47,13 @@ importers:
     devDependencies:
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.8
+        version: 0.0.9
 
   packages/chords-chord:
     devDependencies:
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.8
+        version: 0.0.9
 
   packages/chords-chromium:
     dependencies:
@@ -75,7 +75,7 @@ importers:
     devDependencies:
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.8
+        version: 0.0.9
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -112,7 +112,7 @@ importers:
     devDependencies:
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.8
+        version: 0.0.9
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -124,7 +124,7 @@ importers:
     devDependencies:
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.8
+        version: 0.0.9
 
   packages/chords-dock:
     devDependencies:
@@ -133,7 +133,7 @@ importers:
         version: link:../chords-menu
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.8
+        version: 0.0.9
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -149,7 +149,7 @@ importers:
     devDependencies:
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.8
+        version: 0.0.9
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -158,7 +158,7 @@ importers:
     devDependencies:
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.8
+        version: 0.0.9
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -183,7 +183,7 @@ importers:
     devDependencies:
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.8
+        version: 0.0.9
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -195,7 +195,7 @@ importers:
     devDependencies:
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.8
+        version: 0.0.9
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -211,7 +211,7 @@ importers:
     devDependencies:
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.8
+        version: 0.0.9
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -227,7 +227,7 @@ importers:
     devDependencies:
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.8
+        version: 0.0.9
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -399,8 +399,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@keychord/config@0.0.8':
-    resolution: {integrity: sha512-hEIGLDqxUe7kDijMFDi4LLbygzLc5UWZX5/m9VK4NwFsZXeR03E1IyMPvuPMfH/YJg8VFUbp8mAAIYjTrEXGxw==}
+  '@keychord/config@0.0.9':
+    resolution: {integrity: sha512-zLnUGJcbiFBx1B1sRfY961NjCBf26BF+xUlzr6Mj0NZPrR9H0XsEvYdgpkrSkKVEK6C4lFkfe8mY7bNj8FHNLg==}
     hasBin: true
 
   '@keychord/tsconfig@0.0.6':
@@ -1543,7 +1543,7 @@ snapshots:
   '@esbuild/win32-x64@0.27.7':
     optional: true
 
-  '@keychord/config@0.0.8':
+  '@keychord/config@0.0.9':
     dependencies:
       node-swift: 1.5.1
 
