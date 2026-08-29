@@ -1,10 +1,9 @@
 /**
  * Web chord handler for Chromium-family browsers. The generated JavaScript is sent to the
- * frontmost browser by `src/ffi/web/web.swift`; this file only builds commands and binds its C ABI
- * through Bun FFI.
+ * frontmost browser by `src/swift/web/web.swift`; this file builds commands and calls its
+ * NodeSwift addon through Node-API.
  */
-import { CString, dlopen, FFIType } from "bun:ffi";
-import { resolveFfiPath } from "chord";
+import { resolveNativeModulePath } from "chord";
 import jquery from "jquery-as-string";
 import outdent from "outdent";
 
@@ -16,36 +15,21 @@ type Args =
   | [type: "button", input: string]
   | [type: "scroll", direction: "north" | "south" | "east" | "west"];
 
-type WebLibrary = ReturnType<typeof openWebLibrary>;
+type WebAddon = {
+  runJavaScript(source: string): void;
+};
 
-let library: WebLibrary | undefined;
+let addon: WebAddon | undefined;
 
-function openWebLibrary() {
-  return dlopen(resolveFfiPath(import.meta, "web"), {
-    chordsWebRunJavaScript: {
-      args: [FFIType.cstring],
-      returns: FFIType.ptr,
-    },
-    chordsWebFree: {
-      args: [FFIType.ptr],
-      returns: FFIType.void,
-    },
-  });
-}
-
-/** NUL-terminated UTF-8 for a `cstring` argument. */
-function cstr(value: string): Buffer {
-  return Buffer.from(`${value}\0`, "utf8");
+function openWebAddon(): WebAddon {
+  const module = { exports: {} as WebAddon };
+  process.dlopen(module, resolveNativeModulePath(import.meta, "web"));
+  return module.exports;
 }
 
 export function runWebJavaScript(source: string): void {
-  library ??= openWebLibrary();
-  const error = library.symbols.chordsWebRunJavaScript(cstr(source));
-  if (error) {
-    const message = new CString(error).toString();
-    library.symbols.chordsWebFree(error);
-    throw new Error(message);
-  }
+  addon ??= openWebAddon();
+  addon.runJavaScript(source);
 }
 
 export default function buildHandler() {

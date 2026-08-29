@@ -1,45 +1,29 @@
 /**
- * Thin Bun FFI binding over the native menu-bar-extra scanner in `src/ffi/tray/tray.swift`.
+ * Thin Node-API binding over the native menu-bar-extra scanner in `src/swift/tray/tray.swift`.
  * `@keychord/config` compiles the Swift source to
- * `target/<triple>/tray/tray.dylib`.
+ * `target/<triple>/tray/tray.node`.
  */
-import { resolveFfiPath } from "chord";
-import { CString, dlopen, FFIType } from "bun:ffi";
+import { resolveNativeModulePath } from "chord";
 
 export type TrayClickType = "left" | "right";
 
 export type TrayHandler = (trayIndex: number, clickType?: TrayClickType) => void;
 
-type TrayLibrary = ReturnType<typeof openTrayLibrary>;
+type TrayAddon = {
+  runTrayAction(trayIndex: number, clickType: TrayClickType): void;
+};
 
-let library: TrayLibrary | undefined;
+let addon: TrayAddon | undefined;
 
-function openTrayLibrary() {
-  return dlopen(resolveFfiPath(import.meta, "tray"), {
-    chordsTrayRun: {
-      args: [FFIType.i32, FFIType.cstring],
-      returns: FFIType.ptr,
-    },
-    chordsTrayFree: {
-      args: [FFIType.ptr],
-      returns: FFIType.void,
-    },
-  });
-}
-
-/** NUL-terminated UTF-8 for a `cstring` argument. */
-function cstr(value: string): Buffer {
-  return Buffer.from(`${value}\0`, "utf8");
+function openTrayAddon(): TrayAddon {
+  const module = { exports: {} as TrayAddon };
+  process.dlopen(module, resolveNativeModulePath(import.meta, "tray"));
+  return module.exports;
 }
 
 export function runTrayAction(trayIndex: number, clickType: TrayClickType = "left"): void {
-  library ??= openTrayLibrary();
-  const error = library.symbols.chordsTrayRun(trayIndex, cstr(clickType));
-  if (error) {
-    const message = new CString(error).toString();
-    library.symbols.chordsTrayFree(error);
-    throw new Error(message);
-  }
+  addon ??= openTrayAddon();
+  addon.runTrayAction(trayIndex, clickType);
 }
 
 /**

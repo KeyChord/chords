@@ -21,14 +21,14 @@ Query semantics:
 
 ## How it works
 
-`src/ffi/menu/menu.swift` drives the menu bar through the Accessibility API and exports a tiny C
-ABI (`chordsMenuRun` / `chordsMenuFree`). `@keychord/config` compiles it to
-`target/<triple>/menu/menu.dylib` (committed, like `js/`), and `src/js/menu.ts` opens
-that library with Bun's `bun:ffi` — Chord runs handlers on its embedded Bun, so the call is
-in-process. The library path comes from Chord's `chord` module
-(`resolveFfiPath(import.meta, "menu")`), which knows the package layout, so the JS never
-hardcodes paths. The Swift module (`KeychordChordsMenuFfiMenu`) is also emitted so other
-packages can `import` it from their own Swift code.
+`src/swift/menu/menu.swift` drives the menu bar through the Accessibility API and exposes
+`runMenuAction` as a Node-API function with NodeSwift. `@keychord/config` compiles it to the
+committed `target/<triple>/menu/menu.node` add-on, and `src/js/menu.ts` loads it in-process with
+`process.dlopen`. The path comes from Chord's built-in
+`resolveNativeModulePath(import.meta, "menu")`, so the handler also works when the package is
+vendored inside another chord package. Chord's handler context supplies the bundle identifier of
+the app for which the chord was resolved, so menu actions target that app directly instead of
+re-reading the frontmost application after dispatch.
 
 Build with `pnpm exec vp pack` (needs a Swift toolchain). Test outside the app with a Chord
 build's CLI: `chord run scripts/run.ts by-letters f`.

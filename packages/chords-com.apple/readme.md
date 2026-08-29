@@ -11,10 +11,10 @@ Chord package for pre-installed macOS apps.
 
 ## Safari handler
 
-`src/js/safari.ts` uses Bun's process API for Safari defaults and lifecycle commands, then opens the
-Swift library built from `src/ffi/safari/safari.swift` with `bun:ffi`. The native library sends Safari's
-`do JavaScript` Apple event directly and uses the Accessibility API to select the Developer pane
-when the JavaScript-from-Apple-events setting still needs to be enabled.
+`src/js/safari.ts` uses Bun's process API for Safari defaults and lifecycle commands, then loads the
+NodeSwift add-on built from `src/swift/safari/safari.swift` with `process.dlopen`. The add-on sends
+Safari's `do JavaScript` Apple event directly and uses the Accessibility API to select the Developer
+pane when the JavaScript-from-Apple-events setting still needs to be enabled.
 
 ## Menu
 

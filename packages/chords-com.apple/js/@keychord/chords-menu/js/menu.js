@@ -1,52 +1,35 @@
-import { resolveFfiPath } from "chord";
-import { CString, FFIType, dlopen, ptr } from "bun:ffi";
+import { resolveNativeModulePath } from "chord";
 //#region src/js/menu.ts
 /**
- * macOS menu bar handler: a thin `bun:ffi` binding over the Swift implementation in
- * `src/ffi/menu/menu.swift`, which `@keychord/config` compiles to
- * `target/<triple>/menu/menu.dylib`. Chord runs handlers on Bun, so the library is
- * opened in-process — no helper process, no `osascript` round trip.
- *
- * The library is located through Chord's `chord` module (`resolveFfiPath`), which knows the
- * package layout (including vendored copies), so nothing here depends on where the package is
- * installed.
- */
-let library;
-function openMenuLibrary() {
-  return dlopen(resolveFfiPath(import.meta, "menu"), {
-    chordsMenuRun: {
-      args: [FFIType.ptr, FFIType.cstring, FFIType.cstring],
-      returns: FFIType.ptr,
-    },
-    chordsMenuFree: {
-      args: [FFIType.ptr],
-      returns: FFIType.void,
-    },
-  });
-}
-/** NUL-terminated UTF-8 for a `cstring` argument. */
-function cstr(value) {
-  return Buffer.from(`${value}\0`, "utf8");
+* macOS menu bar handler: a thin Node-API binding over the Swift implementation in
+* `src/swift/menu/menu.swift`, which `@keychord/config` compiles to
+* `target/<triple>/menu/menu.node`. Chord runs handlers on Bun, so the addon is
+* opened in-process — no helper process, no `osascript` round trip.
+*
+* The addon is located through Chord's `chord` module (`resolveNativeModulePath`), which knows the
+* package layout (including vendored copies), so nothing here depends on where the package is
+* installed.
+*/
+let addon;
+function openMenuAddon() {
+	const module = { exports: {} };
+	process.dlopen(module, resolveNativeModulePath(import.meta, "menu"));
+	return module.exports;
 }
 function runMenuAction(processName, action, value) {
-  library ??= openMenuLibrary();
-  const processNamePointer = processName ? ptr(cstr(processName)) : null;
-  const error = library.symbols.chordsMenuRun(processNamePointer, cstr(action), cstr(value));
-  if (error) {
-    const message = new CString(error).toString();
-    library.symbols.chordsMenuFree(error);
-    throw new Error(message);
-  }
+	addon ??= openMenuAddon();
+	addon.runMenuAction(processName, action, value);
 }
 /**
- * Builds the `emit:menu` handler. `processName` optionally names an app to activate first;
- * without it the frontmost app's menu bar is driven. Called by Chord with `this` bound to the
- * chords-file build context and by other packages directly.
- */
+* Builds the `emit:menu` handler. `processName` optionally names an app to activate first.
+* Otherwise Chord's captured focused-app bundle identifier is used, avoiding a race with Chord's
+* panel temporarily becoming frontmost. Direct callers without an invocation context retain the
+* frontmost-app fallback.
+*/
 function buildMenuHandler(processName) {
-  return function menu(action, value = 0) {
-    runMenuAction(processName, action, String(value));
-  };
+	return function menu(action, value = 0) {
+		runMenuAction(processName ?? this?.focusedAppId, action, String(value));
+	};
 }
 //#endregion
 export { buildMenuHandler as default, runMenuAction };

@@ -1,24 +1,28 @@
 /**
- * macOS menu bar handler: a thin `bun:ffi` binding over the Swift implementation in
- * `src/ffi/menu/menu.swift`, which `@keychord/config` compiles to
- * `target/<triple>/menu/menu.dylib`. Chord runs handlers on Bun, so the library is
+ * macOS menu bar handler: a thin Node-API binding over the Swift implementation in
+ * `src/swift/menu/menu.swift`, which `@keychord/config` compiles to
+ * `target/<triple>/menu/menu.node`. Chord runs handlers on Bun, so the addon is
  * opened in-process — no helper process, no `osascript` round trip.
  *
- * The library is located through Chord's `chord` module (`resolveFfiPath`), which knows the
+ * The addon is located through Chord's `chord` module (`resolveNativeModulePath`), which knows the
  * package layout (including vendored copies), so nothing here depends on where the package is
  * installed.
  */
-import { resolveFfiPath } from "chord";
-import { CString, dlopen, FFIType, ptr } from "bun:ffi";
+import { resolveNativeModulePath } from "chord";
 
 export type MenuAction = "by-index" | "by-letters";
+
+export type MenuHandlerContext = {
+  /** Bundle identifier captured by Chord when it resolved the chord. */
+  focusedAppId?: string;
+};
 
 export type MenuHandler = {
   /**
    * 0-based menu bar index: 0 => the Apple menu, 1 => the application menu, 2 => the first
    * regular menu, etc.
    */
-  (action: "by-index", menuIndex: number | string): void;
+  (this: MenuHandlerContext | void, action: "by-index", menuIndex: number | string): void;
 
   /**
    * Lowercase-only query language:
@@ -35,29 +39,19 @@ export type MenuHandler = {
    * - "z-o"   => 1st expanded menu item matching word-prefixes "z" + "o"
    * - "z-o2"  => 2nd expanded menu item matching word-prefixes "z" + "o"
    */
-  (action: "by-letters", query: string): void;
+  (this: MenuHandlerContext | void, action: "by-letters", query: string): void;
 };
 
-type MenuLibrary = ReturnType<typeof openMenuLibrary>;
+type MenuAddon = {
+  runMenuAction(processName: string | undefined, action: MenuAction, value: string): void;
+};
 
-let library: MenuLibrary | undefined;
+let addon: MenuAddon | undefined;
 
-function openMenuLibrary() {
-  return dlopen(resolveFfiPath(import.meta, "menu"), {
-    chordsMenuRun: {
-      args: [FFIType.ptr, FFIType.cstring, FFIType.cstring],
-      returns: FFIType.ptr,
-    },
-    chordsMenuFree: {
-      args: [FFIType.ptr],
-      returns: FFIType.void,
-    },
-  });
-}
-
-/** NUL-terminated UTF-8 for a `cstring` argument. */
-function cstr(value: string): Buffer {
-  return Buffer.from(`${value}\0`, "utf8");
+function openMenuAddon(): MenuAddon {
+  const module = { exports: {} as MenuAddon };
+  process.dlopen(module, resolveNativeModulePath(import.meta, "menu"));
+  return module.exports;
 }
 
 export function runMenuAction(
@@ -65,25 +59,22 @@ export function runMenuAction(
   action: MenuAction,
   value: string,
 ): void {
-  library ??= openMenuLibrary();
-  // A missing process name is NULL; Bun's `cstring` arguments cannot be null, hence the raw
-  // pointer for that parameter.
-  const processNamePointer = processName ? ptr(cstr(processName)) : null;
-  const error = library.symbols.chordsMenuRun(processNamePointer, cstr(action), cstr(value));
-  if (error) {
-    const message = new CString(error).toString();
-    library.symbols.chordsMenuFree(error);
-    throw new Error(message);
-  }
+  addon ??= openMenuAddon();
+  addon.runMenuAction(processName, action, value);
 }
 
 /**
- * Builds the `emit:menu` handler. `processName` optionally names an app to activate first;
- * without it the frontmost app's menu bar is driven. Called by Chord with `this` bound to the
- * chords-file build context and by other packages directly.
+ * Builds the `emit:menu` handler. `processName` optionally names an app to activate first.
+ * Otherwise Chord's captured focused-app bundle identifier is used, avoiding a race with Chord's
+ * panel temporarily becoming frontmost. Direct callers without an invocation context retain the
+ * frontmost-app fallback.
  */
 export default function buildMenuHandler(processName?: string): MenuHandler {
-  return function menu(action: MenuAction, value: number | string = 0) {
-    runMenuAction(processName, action, String(value));
+  return function menu(
+    this: MenuHandlerContext | void,
+    action: MenuAction,
+    value: number | string = 0,
+  ) {
+    runMenuAction(processName ?? this?.focusedAppId, action, String(value));
   } as MenuHandler;
 }

@@ -2,58 +2,34 @@
  * Safari handler for Chord's Bun runtime.
  *
  * Bun handles the small amount of `defaults`/application lifecycle work. Safari and the
- * Accessibility API are driven in-process by `src/ffi/safari/safari.swift`, compiled by
- * `@keychord/config` to `target/<triple>/safari/safari.dylib`.
+ * Accessibility API are driven in-process by `src/swift/safari/safari.swift`, compiled by
+ * `@keychord/config` to `target/<triple>/safari/safari.node`.
  */
-import { CString, dlopen, FFIType } from "bun:ffi";
-import { resolveFfiPath } from "chord";
+import { resolveNativeModulePath } from "chord";
 
 const safariDomain = "com.apple.Safari";
 
-type SafariLibrary = ReturnType<typeof openSafariLibrary>;
+type SafariAddon = {
+  runJavaScript(source: string): void;
+  openDeveloperSettings(): void;
+};
 
-let library: SafariLibrary | undefined;
+let addon: SafariAddon | undefined;
 
-function openSafariLibrary() {
-  return dlopen(resolveFfiPath(import.meta, "safari"), {
-    chordsSafariRunJavaScript: {
-      args: [FFIType.cstring],
-      returns: FFIType.ptr,
-    },
-    chordsSafariOpenDeveloperSettings: {
-      args: [],
-      returns: FFIType.ptr,
-    },
-    chordsSafariFree: {
-      args: [FFIType.ptr],
-      returns: FFIType.void,
-    },
-  });
-}
-
-/** NUL-terminated UTF-8 for a `cstring` argument. */
-function cstr(value: string): Buffer {
-  return Buffer.from(`${value}\0`, "utf8");
-}
-
-function throwNativeError(
-  error: ReturnType<SafariLibrary["symbols"]["chordsSafariRunJavaScript"]>,
-): void {
-  if (!error) return;
-
-  const message = new CString(error).toString();
-  library!.symbols.chordsSafariFree(error);
-  throw new Error(message);
+function openSafariAddon(): SafariAddon {
+  const module = { exports: {} as SafariAddon };
+  process.dlopen(module, resolveNativeModulePath(import.meta, "safari"));
+  return module.exports;
 }
 
 function runJavaScript(source: string): void {
-  library ??= openSafariLibrary();
-  throwNativeError(library.symbols.chordsSafariRunJavaScript(cstr(source)));
+  addon ??= openSafariAddon();
+  addon.runJavaScript(source);
 }
 
 function openDeveloperSettingsPane(): void {
-  library ??= openSafariLibrary();
-  throwNativeError(library.symbols.chordsSafariOpenDeveloperSettings());
+  addon ??= openSafariAddon();
+  addon.openDeveloperSettings();
 }
 
 async function readBooleanDefault(domain: string, key: string): Promise<boolean> {

@@ -7,8 +7,8 @@ settings:
 catalogs:
   default:
     '@keychord/config':
-      specifier: ^0.0.6
-      version: 0.0.6
+      specifier: ^0.0.8
+      version: 0.0.8
     '@keychord/tsconfig':
       specifier: ^0.0.6
       version: 0.0.6
@@ -47,13 +47,13 @@ importers:
     devDependencies:
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.6
+        version: 0.0.8
 
   packages/chords-chord:
     devDependencies:
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.6
+        version: 0.0.8
 
   packages/chords-chromium:
     dependencies:
@@ -75,7 +75,7 @@ importers:
     devDependencies:
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.6
+        version: 0.0.8
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -112,7 +112,7 @@ importers:
     devDependencies:
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.6
+        version: 0.0.8
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -124,7 +124,7 @@ importers:
     devDependencies:
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.6
+        version: 0.0.8
 
   packages/chords-dock:
     devDependencies:
@@ -133,7 +133,7 @@ importers:
         version: link:../chords-menu
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.6
+        version: 0.0.8
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -149,7 +149,7 @@ importers:
     devDependencies:
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.6
+        version: 0.0.8
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -158,7 +158,7 @@ importers:
     devDependencies:
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.6
+        version: 0.0.8
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -183,7 +183,7 @@ importers:
     devDependencies:
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.6
+        version: 0.0.8
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -195,7 +195,7 @@ importers:
     devDependencies:
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.6
+        version: 0.0.8
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -211,7 +211,7 @@ importers:
     devDependencies:
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.6
+        version: 0.0.8
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -227,7 +227,7 @@ importers:
     devDependencies:
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.6
+        version: 0.0.8
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -399,8 +399,9 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@keychord/config@0.0.6':
-    resolution: {integrity: sha512-JfD4hVGtSBaCONL1ntBrHIq0aqIvp7GoMtwZLuHTTLa4e/DQIs+jDo9nuNUZkkBPlGV77DWPfsy6Ommcd0r83Q==}
+  '@keychord/config@0.0.8':
+    resolution: {integrity: sha512-hEIGLDqxUe7kDijMFDi4LLbygzLc5UWZX5/m9VK4NwFsZXeR03E1IyMPvuPMfH/YJg8VFUbp8mAAIYjTrEXGxw==}
+    hasBin: true
 
   '@keychord/tsconfig@0.0.6':
     resolution: {integrity: sha512-TwU3agMUhTzTbfoHKtzJQKwzpzQpjje3Z+6i7FrSuZLBygTZq/W9j0SI+6IlmuTnf0whgbLBOukJJ4K51V4wAw==}
@@ -1129,6 +1130,14 @@ packages:
     resolution: {integrity: sha512-afP4W205ONCuMoPBqcR6PSXnzX35KTcJygfJfcp+QY+uwm3p20p1YczWXhlICIzGMCxYBQcySEcOgsJcrkyobg==}
     engines: {node: '>=16'}
 
+  import-cwd@3.0.0:
+    resolution: {integrity: sha512-4pnzH16plW+hgvRECbDWpQl3cqtvSofHWh44met7ESfZ8UZOWWddm8hEyDTqREJ9RbYHY8gi8DqmaelApoOGMg==}
+    engines: {node: '>=8'}
+
+  import-from@3.0.0:
+    resolution: {integrity: sha512-CiuXOFFSzkU5x/CR0+z7T91Iht4CXgfCxVOFRhh2Zyhg5wOpWvvDLQUsWl+gcN+QscYBjez8hDCt85O7RLDttQ==}
+    engines: {node: '>=8'}
+
   isexe@2.0.0:
     resolution: {integrity: sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==}
 
@@ -1243,6 +1252,11 @@ packages:
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
 
+  node-swift@1.5.1:
+    resolution: {integrity: sha512-bA4+HeSihdKIyyBFx+X5FFS5Nby6QI+O7KsLs14J/EkcrN88RZKjfPY/uXaeSY6k4tEB60Hu2mH4D/ZMgwCXbQ==}
+    engines: {node: ^20.19.0 || ^22.13.0 || >=24}
+    hasBin: true
+
   obug@2.1.1:
     resolution: {integrity: sha512-uTqF9MuPraAQ+IsnPf366RG4cP9RtUi7MLO1N3KEc+wb0a6yKpeL0lmk2IB1jY5KHPAlTc6T/JRdC/YqxHNwkQ==}
 
@@ -1290,6 +1304,10 @@ packages:
   postcss@8.5.8:
     resolution: {integrity: sha512-OW/rX8O/jXnm82Ey1k44pObPtdblfiuWnrd8X7GJ7emImCOstunGbXUpp7HdBrFQX6rJzn3sPT397Wp5aCwCHg==}
     engines: {node: ^10 || ^12 || >=14}
+
+  resolve-from@5.0.0:
+    resolution: {integrity: sha512-qYg9KP24dD5qka9J47d0aVky0N+b4fTU89LN9iDnjB5waksiC49rvMB0PrUJQGoTmH50XPiqOvAjDfaijGxYZw==}
+    engines: {node: '>=8'}
 
   rollup@4.60.1:
     resolution: {integrity: sha512-VmtB2rFU/GroZ4oL8+ZqXgSA38O6GR8KSIvWmEFv63pQ0G6KaBH9s07PO8XTXP4vI+3UJUEypOfjkGfmSBBR0w==}
@@ -1525,7 +1543,9 @@ snapshots:
   '@esbuild/win32-x64@0.27.7':
     optional: true
 
-  '@keychord/config@0.0.6': {}
+  '@keychord/config@0.0.8':
+    dependencies:
+      node-swift: 1.5.1
 
   '@keychord/tsconfig@0.0.6': {}
 
@@ -2000,6 +2020,14 @@ snapshots:
 
   get-port@7.2.0: {}
 
+  import-cwd@3.0.0:
+    dependencies:
+      import-from: 3.0.0
+
+  import-from@3.0.0:
+    dependencies:
+      resolve-from: 5.0.0
+
   isexe@2.0.0: {}
 
   isexe@3.1.5: {}
@@ -2074,6 +2102,10 @@ snapshots:
       strip-ansi: 7.2.0
 
   nanoid@3.3.11: {}
+
+  node-swift@1.5.1:
+    dependencies:
+      import-cwd: 3.0.0
 
   obug@2.1.1: {}
 
@@ -2152,6 +2184,8 @@ snapshots:
       nanoid: 3.3.11
       picocolors: 1.1.1
       source-map-js: 1.2.1
+
+  resolve-from@5.0.0: {}
 
   rollup@4.60.1:
     dependencies:

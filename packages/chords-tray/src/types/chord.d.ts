@@ -1,4 +1,4 @@
 declare module "chord" {
-  /** Resolve a package-relative native handler library for Chord's current target triple. */
-  export function resolveFfiPath(importMeta: ImportMeta, outputRelpath: string): string;
+  /** Resolve a NodeSwift addon for Chord's current target triple. */
+  export function resolveNativeModulePath(importMeta: ImportMeta, outputRelpath: string): string;
 }
