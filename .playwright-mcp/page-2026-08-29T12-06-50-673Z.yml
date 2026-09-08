@@ -1,0 +1,32 @@
+- generic [ref=e1]:
+  - generic [ref=e4]:
+    - generic [ref=e5]:
+      - heading "Welcome to Cursor Sign in The new way to build software" [level=1] [ref=e7]
+      - generic [ref=e8]:
+        - generic [ref=e10]:
+          - generic [ref=e11]:
+            - generic [ref=e12]:
+              - generic [ref=e13]: Email
+              - textbox "Email" [active] [ref=e16]:
+                - /placeholder: Your email address
+            - button "Continue with email" [ref=e17] [cursor=pointer]
+          - generic [ref=e21]:
+            - link [ref=e23] [cursor=pointer]:
+              - /url: /api/login?provider=GoogleOAuth&state=%257B%2522nonce%2522%253A%2522c5ed07d8-108c-48c4-be04-845e812ea41d%2522%257D&redirect_uri=https%3A%2F%2Fcursor.com%2Fapi%2Fauth%2Fcallback&client_id=client_01GS6W3C96KW4WRS6Z93JCE2RJ&source=signin&authorization_session_id=01M16PMMMNKR7NGVVRR4HMWHSN
+            - link [ref=e31] [cursor=pointer]:
+              - /url: /api/login?provider=GitHubOAuth&state=%257B%2522nonce%2522%253A%2522c5ed07d8-108c-48c4-be04-845e812ea41d%2522%257D&redirect_uri=https%3A%2F%2Fcursor.com%2Fapi%2Fauth%2Fcallback&client_id=client_01GS6W3C96KW4WRS6Z93JCE2RJ&source=signin&authorization_session_id=01M16PMMMNKR7NGVVRR4HMWHSN
+            - link [ref=e35] [cursor=pointer]:
+              - /url: /api/login?provider=AppleOAuth&state=%257B%2522nonce%2522%253A%2522c5ed07d8-108c-48c4-be04-845e812ea41d%2522%257D&redirect_uri=https%3A%2F%2Fcursor.com%2Fapi%2Fauth%2Fcallback&client_id=client_01GS6W3C96KW4WRS6Z93JCE2RJ&source=signin&authorization_session_id=01M16PMMMNKR7NGVVRR4HMWHSN
+            - link [ref=e39] [cursor=pointer]:
+              - /url: /api/login?connection_id=conn_01KZAATE3WMBHA35J0W8NEKZ3D&state=%257B%2522nonce%2522%253A%2522c5ed07d8-108c-48c4-be04-845e812ea41d%2522%257D&redirect_uri=https%3A%2F%2Fcursor.com%2Fapi%2Fauth%2Fcallback&client_id=client_01GS6W3C96KW4WRS6Z93JCE2RJ&source=signin&authorization_session_id=01M16PMMMNKR7NGVVRR4HMWHSN
+        - paragraph [ref=e43]:
+          - text: Don't have an account?
+          - link "Sign up" [ref=e44] [cursor=pointer]:
+            - /url: /sign-up?state=%257B%2522nonce%2522%253A%2522c5ed07d8-108c-48c4-be04-845e812ea41d%2522%257D&redirect_uri=https%3A%2F%2Fcursor.com%2Fapi%2Fauth%2Fcallback&authorization_session_id=01M16PMMMNKR7NGVVRR4HMWHSN
+    - generic [ref=e45]:
+      - link "Terms of Service" [ref=e46] [cursor=pointer]:
+        - /url: https://www.cursor.com/terms-of-service
+      - text: and
+      - link "Privacy Policy" [ref=e47] [cursor=pointer]:
+        - /url: https://www.cursor.com/privacy
+  - alert [ref=e48]

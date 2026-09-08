@@ -1,27 +1,24 @@
 // Native (Swift) implementation of the macOS menu bar handler.
 //
 // Behaviour mirrors the query language documented in `readme.md`, talking to the Accessibility
-// API directly so a keystroke costs a few AX calls rather than an `osascript` round trip.
+// API through AXorcist, in-process without an `osascript` round trip.
 //
 // `@keychord/config` compiles this file into a NodeSwift addon at
 // `target/<triple>/menu/menu.node`; `src/js/menu.ts` loads it through Node-API.
 //
-// Chord calls handlers from its JS worker thread. The Accessibility client API and NSWorkspace
-// are usable from any thread, so the work stays on the calling thread — hopping to the main
-// thread would deadlock a caller whose main thread is not running a run loop (the `chord` CLI).
+// NodeSwift returns a Promise to Chord's JS worker. Accessibility work runs on MainActor;
+// both the desktop app and the updated Chord CLI service the main run loop.
 
 import AppKit
+import AXorcist
 import ApplicationServices
 import Foundation
 import NodeAPI
 
 #NodeModule(exports: [
     "runMenuAction": try NodeFunction {
-        (processName: String?, action: String, value: String) throws in
-        try autoreleasepool {
-            try runMenuAction(processName: processName, action: action, value: value)
-        }
-        return try NodeUndefined()
+        (processName: String?, action: String, value: String) async throws in
+        try await runMenuAction(processName: processName, action: action, value: value)
     },
 ])
 
@@ -32,6 +29,9 @@ public enum MenuError: Error, CustomStringConvertible {
     case accessibility(String)
     case indexOutOfRange(index: Int, count: Int)
     case invalidIndex(String)
+    case invalidPath(String)
+    case pathComponentNotFound(component: String, path: [String], available: [String])
+    case pathItemDisabled(component: String, path: [String])
     case emptyQuery
     case invalidQuery(String)
     case noTopLevelMatch(prefix: String, occurrence: Int, found: Int)
@@ -41,7 +41,7 @@ public enum MenuError: Error, CustomStringConvertible {
     public var description: String {
         switch self {
         case .invalidAction(let action):
-            return "unknown menu action \"\(action)\" (expected \"by-index\" or \"by-letters\")"
+            return "unknown menu action \"\(action)\" (expected \"by-index\", \"by-letters\", or \"by-path\")"
         case .applicationNotFound(let name):
             return "application \"\(name)\" is not running and could not be launched"
         case .noFrontmostApplication:
@@ -52,6 +52,13 @@ public enum MenuError: Error, CustomStringConvertible {
             return "menuIndex \(index) out of range; found \(count) menu bar items"
         case .invalidIndex(let value):
             return "invalid menu index \"\(value)\""
+        case .invalidPath(let reason):
+            return "Invalid menu path: \(reason)"
+        case .pathComponentNotFound(let component, let path, let available):
+            let renderedPath = path.joined(separator: " > ")
+            return "Menu path \"\(renderedPath)\" has no component \"\(component)\". Available items: \(available)."
+        case .pathItemDisabled(let component, let path):
+            return "Menu item \"\(component)\" in path \"\(path.joined(separator: " > "))\" is disabled."
         case .emptyQuery:
             return "Expected a non-empty lowercase query"
         case .invalidQuery(let query):
@@ -68,40 +75,25 @@ public enum MenuError: Error, CustomStringConvertible {
 
 // MARK: - Accessibility helpers
 
+@MainActor
 private func log(_ message: String) {
     print("[menu] \(message)")
 }
 
-private func axValue(_ element: AXUIElement, _ attribute: String) -> AnyObject? {
-    var value: CFTypeRef?
-    guard AXUIElementCopyAttributeValue(element, attribute as CFString, &value) == .success else {
-        return nil
-    }
-    return value
+@MainActor
+private func axChildren(_ element: Element) -> [Element] {
+    // Preserve AXChildren order exactly: AXorcist's children() also discovers alternative
+    // relationships. Menu indices and occurrence queries rely on the original AX hierarchy.
+    let children: [AXUIElement] = element.attribute(Attribute<[AXUIElement]>(kAXChildrenAttribute)) ?? []
+    return children.map(Element.init)
 }
 
-private func axChildren(_ element: AXUIElement, _ attribute: String = kAXChildrenAttribute) -> [AXUIElement] {
-    guard let array = axValue(element, attribute) as? [AnyObject] else {
-        return []
-    }
-    return array.compactMap { item in
-        // AXUIElement is a CoreFoundation type; check the type id before force-casting.
-        CFGetTypeID(item) == AXUIElementGetTypeID() ? (item as! AXUIElement) : nil
-    }
-}
-
-private func axString(_ element: AXUIElement, _ attribute: String) -> String {
-    (axValue(element, attribute) as? String) ?? ""
-}
-
-private func axBool(_ element: AXUIElement, _ attribute: String, default defaultValue: Bool) -> Bool {
-    (axValue(element, attribute) as? Bool) ?? defaultValue
-}
-
-private func axPress(_ element: AXUIElement, label: String) throws {
-    let result = AXUIElementPerformAction(element, kAXPressAction as CFString)
-    guard result == .success else {
-        throw MenuError.accessibility("\(label) (AXPress returned \(result.rawValue))")
+@MainActor
+private func axPress(_ element: Element, label: String) throws {
+    do {
+        try element.performAction(.press)
+    } catch let error as AccessibilitySystemError {
+        throw MenuError.accessibility("\(label) (AXPress returned \(error.axError.rawValue))")
     }
 }
 
@@ -115,16 +107,29 @@ private let invisibleCharacters: CharacterSet = {
     return set
 }()
 
-private func normalize(_ value: String) -> String {
+@MainActor
+private func cleanTitle(_ value: String) -> String {
     String(value.unicodeScalars.filter { !invisibleCharacters.contains($0) })
         .trimmingCharacters(in: .whitespacesAndNewlines)
+}
+
+@MainActor
+private func normalize(_ value: String) -> String {
+    cleanTitle(value)
         .lowercased()
 }
 
-private func name(of element: AXUIElement) -> String {
-    normalize(axString(element, kAXTitleAttribute))
+@MainActor
+private func title(of element: Element) -> String {
+    cleanTitle((element.title() ?? ""))
 }
 
+@MainActor
+private func name(of element: Element) -> String {
+    normalize((element.title() ?? ""))
+}
+
+@MainActor
 private func isRepeatedLettersQuery(_ query: String) -> Bool {
     guard let first = query.first, query.allSatisfy({ $0.isASCII && $0.isLowercase && $0.isLetter }) else {
         return false
@@ -132,6 +137,7 @@ private func isRepeatedLettersQuery(_ query: String) -> Bool {
     return query.allSatisfy { $0 == first }
 }
 
+@MainActor
 private func parseExpandedItemQuery(_ query: String) throws -> (pattern: String, occurrence: Int) {
     // ^([a-z-]+?)(\d+)?$
     var pattern = Substring(query)
@@ -150,6 +156,7 @@ private func parseExpandedItemQuery(_ query: String) throws -> (pattern: String,
     return (String(pattern), occurrence)
 }
 
+@MainActor
 private func matchesWordAbbreviation(_ name: String, _ pattern: String) -> Bool {
     let words = name.split(whereSeparator: { $0.isWhitespace }).map(String.init)
     let parts = pattern.split(separator: "-").map(String.init)
@@ -162,20 +169,23 @@ private func matchesWordAbbreviation(_ name: String, _ pattern: String) -> Bool 
     return true
 }
 
+@MainActor
 private func matchesExpandedPattern(_ name: String, _ pattern: String) -> Bool {
     pattern.contains("-") ? matchesWordAbbreviation(name, pattern) : name.hasPrefix(pattern)
 }
 
-private func isSeparatorLike(_ item: AXUIElement) -> Bool {
+@MainActor
+private func isSeparatorLike(_ item: Element) -> Bool {
     if !name(of: item).isEmpty {
         return false
     }
-    return normalize(axString(item, kAXRoleDescriptionAttribute)).contains("separator")
+    return normalize((item.roleDescription() ?? "")).contains("separator")
 }
 
-private func collectMenuItemsDepthFirst(_ menu: AXUIElement) -> [AXUIElement] {
-    var out: [AXUIElement] = []
-    func walk(_ menu: AXUIElement) {
+@MainActor
+private func collectMenuItemsDepthFirst(_ menu: Element) -> [Element] {
+    var out: [Element] = []
+    func walk(_ menu: Element) {
         for item in axChildren(menu) {
             if !isSeparatorLike(item) {
                 out.append(item)
@@ -189,8 +199,9 @@ private func collectMenuItemsDepthFirst(_ menu: AXUIElement) -> [AXUIElement] {
     return out
 }
 
-private func selectedTopLevelMenu(_ menuBarItems: [AXUIElement]) -> (menuBarItem: AXUIElement, menu: AXUIElement)? {
-    for item in menuBarItems where axBool(item, kAXSelectedAttribute, default: false) {
+@MainActor
+private func selectedTopLevelMenu(_ menuBarItems: [Element]) -> (menuBarItem: Element, menu: Element)? {
+    for item in menuBarItems where (item.attribute(Attribute<Bool>(kAXSelectedAttribute)) ?? false) {
         if let menu = axChildren(item).first {
             return (item, menu)
         }
@@ -200,66 +211,102 @@ private func selectedTopLevelMenu(_ menuBarItems: [AXUIElement]) -> (menuBarItem
 
 // MARK: - Actions
 
-private func clickTopLevelMenu(_ items: [AXUIElement], index: Int) throws {
+@MainActor
+private func clickTopLevelMenu(_ items: [Element], index: Int) throws {
     guard index >= 0, index < items.count else {
         throw MenuError.indexOutOfRange(index: index, count: items.count)
     }
     let item = items[index]
-    log("Clicking top-level menu #\(index): \(axString(item, kAXTitleAttribute))")
+    log("Clicking top-level menu #\(index): \((item.title() ?? ""))")
     try axPress(item, label: "menuBarItems[\(index)]")
 }
 
-private func clickTopLevelMenu(_ items: [AXUIElement], repeatedLetters query: String) throws {
+@MainActor
+private func clickTopLevelMenu(_ items: [Element], repeatedLetters query: String) throws {
     let prefix = String(query.first!)
     let occurrence = query.count
     let matches = items.filter { name(of: $0).hasPrefix(prefix) }
     log("Top-level repeated-letter query \"\(query)\" -> prefix \"\(prefix)\", occurrence \(occurrence)")
-    log("Top-level matches: \(matches.map { axString($0, kAXTitleAttribute) })")
+    log("Top-level matches: \(matches.map { ($0.title() ?? "") })")
     guard matches.count >= occurrence else {
         throw MenuError.noTopLevelMatch(prefix: prefix, occurrence: occurrence, found: matches.count)
     }
     let item = matches[occurrence - 1]
-    log("Clicking top-level menu: \(axString(item, kAXTitleAttribute))")
+    log("Clicking top-level menu: \((item.title() ?? ""))")
     try axPress(item, label: "menu bar item \"\(prefix)\" #\(occurrence)")
 }
 
-private func clickExpandedMenuItem(_ items: [AXUIElement], query: String) throws {
+@MainActor
+private func clickExpandedMenuItem(_ items: [Element], query: String) throws {
     guard let selected = selectedTopLevelMenu(items) else {
         throw MenuError.noExpandedMenu(query: query)
     }
     let (pattern, occurrence) = try parseExpandedItemQuery(query)
-    log("Expanded menu context: \"\(axString(selected.menuBarItem, kAXTitleAttribute))\"")
+    log("Expanded menu context: \"\((selected.menuBarItem.title() ?? ""))\"")
     log("Expanded-item query \"\(query)\" -> pattern \"\(pattern)\", occurrence \(occurrence)")
 
     let candidates = collectMenuItemsDepthFirst(selected.menu).filter { item in
-        guard axBool(item, kAXEnabledAttribute, default: true) else {
+        guard (item.isEnabled() ?? true) else {
             return false
         }
         let itemName = name(of: item)
         return !itemName.isEmpty && matchesExpandedPattern(itemName, pattern)
     }
-    log("Expanded matches: \(candidates.map { axString($0, kAXTitleAttribute) })")
+    log("Expanded matches: \(candidates.map { ($0.title() ?? "") })")
     guard candidates.count >= occurrence else {
         throw MenuError.noExpandedMatch(pattern: pattern, occurrence: occurrence, found: candidates.count)
     }
     let item = candidates[occurrence - 1]
-    log("Clicking expanded menu item: \(axString(item, kAXTitleAttribute))")
+    log("Clicking expanded menu item: \((item.title() ?? ""))")
     try axPress(item, label: "menu item \"\(pattern)\" #\(occurrence)")
 }
 
-/// Sleeps `interval`, pumping the main run loop instead when called on the main thread (so
-/// NSWorkspace state keeps updating in a process without an AppKit event loop).
-private func waitBriefly(_ interval: TimeInterval) {
-    if Thread.isMainThread {
-        RunLoop.main.run(until: Date(timeIntervalSinceNow: interval))
-    } else {
-        Thread.sleep(forTimeInterval: interval)
+@MainActor
+private func parseMenuPath(_ value: String) throws -> [String] {
+    let path: [String]
+    do {
+        path = try JSONDecoder().decode([String].self, from: Data(value.utf8))
+    } catch {
+        throw MenuError.invalidPath("expected a JSON array of strings")
     }
+    guard path.count >= 2 else {
+        throw MenuError.invalidPath("expected at least a top-level menu and a menu item")
+    }
+    let cleanedPath = path.map(cleanTitle)
+    guard cleanedPath.allSatisfy({ !$0.isEmpty }) else {
+        throw MenuError.invalidPath("components must be non-empty strings")
+    }
+    return cleanedPath
+}
+
+@MainActor
+private func clickMenuItem(_ menuBarItems: [Element], path: [String]) throws {
+    func find(_ component: String, in items: [Element]) throws -> Element {
+        guard let item = items.first(where: { title(of: $0) == component }) else {
+            let available = items.map(title).filter { !$0.isEmpty }
+            throw MenuError.pathComponentNotFound(component: component, path: path, available: available)
+        }
+        return item
+    }
+
+    var item = try find(path[0], in: menuBarItems)
+    for component in path.dropFirst() {
+        guard let menu = axChildren(item).first else {
+            throw MenuError.pathComponentNotFound(component: component, path: path, available: [])
+        }
+        item = try find(component, in: axChildren(menu))
+    }
+    guard (item.isEnabled() ?? true) else {
+        throw MenuError.pathItemDisabled(component: path.last!, path: path)
+    }
+    log("Clicking menu path: \(path.joined(separator: " > "))")
+    try axPress(item, label: "menu path \"\(path.joined(separator: " > "))\"")
 }
 
 /// Activates `processName` (launching it when needed) and waits briefly for it to become
 /// frontmost.
-private func activate(processName: String) throws -> NSRunningApplication {
+@MainActor
+private func activate(processName: String) async throws -> NSRunningApplication {
     let workspace = NSWorkspace.shared
     func resolveRunningApplication() -> NSRunningApplication? {
         // Chord passes the bundle identifier captured when it resolved the chord. Prefer an active
@@ -279,10 +326,10 @@ private func activate(processName: String) throws -> NSRunningApplication {
         else {
             throw MenuError.applicationNotFound(processName)
         }
-        workspace.openApplication(at: url, configuration: NSWorkspace.OpenConfiguration())
+        workspace.openApplication(at: url, configuration: NSWorkspace.OpenConfiguration(), completionHandler: nil)
         let deadline = Date(timeIntervalSinceNow: 5)
         while app == nil && Date() < deadline {
-            waitBriefly(0.05)
+            try await Task.sleep(for: .milliseconds(50))
             app = resolveRunningApplication()
         }
     }
@@ -294,7 +341,7 @@ private func activate(processName: String) throws -> NSRunningApplication {
     app.activate()
     let deadline = Date(timeIntervalSinceNow: 1)
     while !app.isActive && Date() < deadline {
-        waitBriefly(0.02)
+        try await Task.sleep(for: .milliseconds(20))
     }
     return app
 }
@@ -316,11 +363,12 @@ private extension NSWorkspace {
     }
 }
 
-/// Drives the menu bar with the `by-index` / `by-letters` query language. Callable from any thread.
-public func runMenuAction(processName: String?, action: String, value: String) throws {
+/// Drives the menu bar on MainActor; callers on NodeActor await this operation.
+@MainActor
+public func runMenuAction(processName: String?, action: String, value: String) async throws {
     let target: NSRunningApplication
     if let processName {
-        target = try activate(processName: processName)
+        target = try await activate(processName: processName)
     } else {
         guard let frontmost = NSWorkspace.shared.frontmostApplication else {
             throw MenuError.noFrontmostApplication
@@ -329,13 +377,10 @@ public func runMenuAction(processName: String?, action: String, value: String) t
     }
     log("Frontmost process: \(target.localizedName ?? "<unknown>")")
 
-    let application = AXUIElementCreateApplication(target.processIdentifier)
-    guard let menuBarValue = axValue(application, kAXMenuBarAttribute),
-          CFGetTypeID(menuBarValue) == AXUIElementGetTypeID()
-    else {
+    let application = Element(AXUIElementCreateApplication(target.processIdentifier))
+    guard let menuBar = application.menuBar() else {
         throw MenuError.accessibility("menuBars[0]")
     }
-    let menuBar = menuBarValue as! AXUIElement
     let items = axChildren(menuBar)
 
     switch action {
@@ -356,6 +401,8 @@ public func runMenuAction(processName: String?, action: String, value: String) t
         } else {
             try clickExpandedMenuItem(items, query: query)
         }
+    case "by-path":
+        try clickMenuItem(items, path: try parseMenuPath(value))
     default:
         throw MenuError.invalidAction(action)
     }

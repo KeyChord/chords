@@ -10,19 +10,23 @@
  */
 import { resolveNativeModulePath } from "chord";
 
-export type MenuAction = "by-index" | "by-letters";
+export type MenuAction = "by-index" | "by-letters" | "by-path";
+
+/** An exact menu path, starting at a top-level menu and ending at the item to invoke. */
+export type MenuPath = readonly [menu: string, item: string, ...subitems: string[]];
 
 export type MenuHandlerContext = {
   /** Bundle identifier captured by Chord when it resolved the chord. */
   focusedAppId?: string;
 };
 
+/** Resolves when the native action completes; rejects on validation or accessibility errors. */
 export type MenuHandler = {
   /**
    * 0-based menu bar index: 0 => the Apple menu, 1 => the application menu, 2 => the first
    * regular menu, etc.
    */
-  (this: MenuHandlerContext | void, action: "by-index", menuIndex: number | string): void;
+  (this: MenuHandlerContext | void, action: "by-index", menuIndex: number | string): Promise<void>;
 
   /**
    * Lowercase-only query language:
@@ -39,11 +43,17 @@ export type MenuHandler = {
    * - "z-o"   => 1st expanded menu item matching word-prefixes "z" + "o"
    * - "z-o2"  => 2nd expanded menu item matching word-prefixes "z" + "o"
    */
-  (this: MenuHandlerContext | void, action: "by-letters", query: string): void;
+  (this: MenuHandlerContext | void, action: "by-letters", query: string): Promise<void>;
+
+  /**
+   * Exact menu titles from the menu bar down to the item to invoke. For example:
+   * `["Window", "Move Tab to New Window"]`.
+   */
+  (this: MenuHandlerContext | void, action: "by-path", path: MenuPath): Promise<void>;
 };
 
 type MenuAddon = {
-  runMenuAction(processName: string | undefined, action: MenuAction, value: string): void;
+  runMenuAction(processName: string | undefined, action: MenuAction, value: string): Promise<void>;
 };
 
 let addon: MenuAddon | undefined;
@@ -54,13 +64,23 @@ function openMenuAddon(): MenuAddon {
   return module.exports;
 }
 
-export function runMenuAction(
+export async function runMenuAction(
   processName: string | undefined,
   action: MenuAction,
-  value: string,
-): void {
+  value: number | string | MenuPath,
+): Promise<void> {
   addon ??= openMenuAddon();
-  addon.runMenuAction(processName, action, value);
+  if (action === "by-path") {
+    if (
+      !Array.isArray(value) ||
+      value.length < 2 ||
+      value.some((component) => typeof component !== "string" || component.trim().length === 0)
+    ) {
+      throw new TypeError('"by-path" expects at least two non-empty string components');
+    }
+    return addon.runMenuAction(processName, action, JSON.stringify(value));
+  }
+  return addon.runMenuAction(processName, action, String(value));
 }
 
 /**
@@ -73,8 +93,8 @@ export default function buildMenuHandler(processName?: string): MenuHandler {
   return function menu(
     this: MenuHandlerContext | void,
     action: MenuAction,
-    value: number | string = 0,
+    value: number | string | MenuPath = 0,
   ) {
-    runMenuAction(processName ?? this?.focusedAppId, action, String(value));
+    return runMenuAction(processName ?? this?.focusedAppId, action, value);
   } as MenuHandler;
 }

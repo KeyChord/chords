@@ -1,8 +1,8 @@
 name = "Terminal"
 
 [chords]
-# Meant to be overriden if you use a different terminal.
-'/t' = { name = "Terminal" }
+# `t` for Terminal. Meant to be overriden if you use a different Terminal.
+'/t' = { name = "Terminal", shell = "open -a Terminal" }
 
 '?t' = { name = "Terminal" }
 t1 = { name = "Tab 1", shortcut = "cmd+1" }

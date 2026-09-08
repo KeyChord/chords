@@ -9,19 +9,20 @@ file = 'safari.js'
 
 [chords]
 # `b` for Browser. Meant to be overriden.
-'/b' = { name = "Browser (Safari)", shell = "open -a Finder" }
+'/b' = { name = "Browser (Safari)", shell = "open -a Safari" }
 
 '?w' = { name = "Window" }
 wn = { name = "Window: New", shortcut = "cmd+n" }
 wp = { name = "Window: Private", shortcut = "cmd+shift+n" }
+wq = { name = "Window: Quit", shortcut = "cmd+shift+w" }
 wqa = { name = "Window: Quit All", shortcut = "cmd+alt+w" }
 
 '?t' = { name = "Tab" }
 tn = { name = "Tab: New", shortcut = "cmd+t" }
 tq = { name = "Tab: Quit", command = "Close the current tab, or pop-up", shortcut = "cmd+w" }
 tp = { name = "Tab: Pin", 'emit:menu' = ['Window', 'Pin Tab'] }
-td = { name = "Tab: Duplicate", 'emit:menu' = ['Window', 'Duplicate Tab'] }
-tw = { name = "Tab: Windowize", 'emit:menu' = ['Window', 'Move Tab to New Window'] }
+td = { name = "Tab: Duplicate", 'emit:menu' = ['by-path', ['Window', 'Duplicate Tab']] }
+tw = { name = "Tab: Windowize", 'emit:menu' = ['by-path', ['Window', 'Move Tab to New Window']] }
 't]' = { name = "Tab: Next", command = "Jump to the next open tab", shortcut = "ctrl+right" }
 't[' = { name = "Tab: Previous", command = "Jump to the previous open tab", shortcut = "ctrl+shift+right" }
 t1 = { name = "Tab 1", command = "Jump to a specific tab", shortcut = "cmd+1" }

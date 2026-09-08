@@ -6,7 +6,7 @@ args = []
 
 [chords]
 '?-' = { name = "Menu Bar" }
-'-0' = { name = "Menu Bar: Apple Logo", 'emit:menu' = [] }
+'-0' = { name = "Menu Bar: Apple Logo", 'emit:menu' = ['by-index', 0] }
 
 '?-1' = { name = "1st menu" }
 '?-2' = { name = "2nd menu" }

@@ -1,0 +1,18 @@
+name = "Raycast"
+
+[meta]
+url = "https://manual.raycast.com/keyboard-shortcuts"
+
+[chords]
+'/r' = { name = "Raycast", shell = "open -a Raycast" }
+
+'nn' = { name = "Navigate: North", shortcut = "up" }
+'ne' = { name = "Navigate: East", shortcut = "right" }
+'ns' = { name = "Navigate: South", shortcut = "down" }
+'nw' = { name = "Navigate: West", shortcut = "left" }
+
+'p[' = { name = "Page: Previous", shortcut = "alt+up" }
+'p]' = { name = "Page: Next", shortcut = "alt+down" }
+
+'s[' = { name = "Section: Previous", shortcut = "cmd+up" }
+'s]' = { name = "Section: Next", shortcut = "cmd+down" }

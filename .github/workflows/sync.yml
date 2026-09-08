@@ -30,7 +30,7 @@ jobs:
 
       # Native addons are committed (they can only be built on macOS), so CI
       # rebuilds the JS only. See scripts/check-native-artifacts.sh for the
-      # pre-commit check that keeps the committed .node files in sync.
+      # manual check that keeps the committed .node files in sync.
       - name: Build packages
         run: pnpm build
         env:
