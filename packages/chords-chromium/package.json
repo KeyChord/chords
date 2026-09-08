@@ -1,6 +1,10 @@
 {
   "name": "@keychord/chords-chromium",
   "version": "0.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KeyChord/chords-chromium"
+  },
   "type": "module",
   "dependencies": {
     "chrome-remote-interface": "latest",

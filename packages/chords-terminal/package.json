@@ -1,6 +1,10 @@
 {
   "name": "@keychord/chords-terminal",
   "version": "0.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KeyChord/chords-terminal"
+  },
   "type": "module",
   "imports": {
     "#/*": "./src/js/*"

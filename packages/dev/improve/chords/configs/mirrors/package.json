@@ -1,0 +1,29 @@
+{
+  "name": "@chord/dev.improve.chords.configs.mirrors",
+  "version": "0.0.0",
+  "private": true,
+  "bin": {
+    "_list-mirrors": "./_list-mirrors.ts",
+    "_sync-mirrors": "./_sync-mirrors.ts"
+  },
+  "type": "module",
+  "imports": {
+    "#list-mirrors": "./list-mirrors.ts",
+    "#list-cli": "./_list-mirrors.ts",
+    "#sync-cli": "./_sync-mirrors.ts",
+    "#list-mirrors-command": "./list-mirrors-command.ts",
+    "#sync-mirrors-command": "./sync-mirrors-command.ts",
+    "#sync-mirrors": "./sync-mirrors.ts"
+  },
+  "dependencies": {
+    "@chord/com.npmjs.execa": "workspace:*",
+    "citty": "^0.2.2"
+  },
+  "devDependencies": {
+    "@chord/com.npmjs.types__node": "workspace:*",
+    "@chord/com.npmjs.vite-plus": "workspace:*"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  }
+}

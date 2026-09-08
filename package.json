@@ -1,9 +1,14 @@
 {
   "type": "module",
   "scripts": {
-    "build": "vp exec --filter='./packages/chords-*' vp pack"
+    "build": "vp exec --filter='./packages/chords-*' vp pack",
+    "mirrors:list": "_list-mirrors packages",
+    "mirrors:sync": "_sync-mirrors",
+    "native:check": "_check-native-artifacts"
   },
   "devDependencies": {
+    "@chord/dev.improve.chords.configs.mirrors": "workspace:*",
+    "@chord/dev.improve.chords.configs.native": "workspace:*",
     "vite-plus": "catalog:"
   },
   "packageManager": "pnpm@10.33.0"

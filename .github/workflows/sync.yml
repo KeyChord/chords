@@ -29,7 +29,7 @@ jobs:
           run_install: true
 
       # Native addons are committed (they can only be built on macOS), so CI
-      # rebuilds the JS only. See scripts/check-native-artifacts.sh for the
+      # rebuilds the JS only. See packages/dev/improve/chords/configs/native/check-native-artifacts.ts for the
       # manual check that keeps the committed .node files in sync.
       - name: Build packages
         run: pnpm build
@@ -37,7 +37,7 @@ jobs:
           CHORD_SKIP_NATIVE: "1"
 
       - name: Sync
-        run: .github/sync-to-mirrors.sh
+        run: pnpm run mirrors:sync
         env:
           BUILD_BASE: ${{ github.workspace }}/packages
           API_TOKEN_GITHUB: ${{ secrets.ORG_KEYCHORD_BOT_PAT }}

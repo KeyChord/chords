@@ -2,7 +2,9 @@ import { outdent } from "outdent";
 
 export default function buildAction(ideBinPath: string) {
   if (!ideBinPath) {
-    throw new Error("IDE binpath must be provided");
+    return () => {
+      throw new Error("IDE binpath must be provided");
+    };
   }
 
   const tmp = Bun.env.TMPDIR ?? "/tmp";

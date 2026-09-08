@@ -1,0 +1,12 @@
+{
+  "name": "@chord/com.npmjs.execa",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./+.ts"
+  },
+  "dependencies": {
+    "execa": "^9.6.0"
+  }
+}

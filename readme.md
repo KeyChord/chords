@@ -83,8 +83,38 @@ vp config --hooks-dir .vite-hooks
 Rebuild the artifacts yourself with `moon run ':build-native'`, then
 `git add packages/*/target`.
 
-To check native artifacts manually, run `./scripts/check-native-artifacts.sh`.
+To check native artifacts manually, run `vp run native:check`.
 
 > Mach-O output is not byte-reproducible -- the linker mints a fresh `LC_UUID`
 > each run -- so the check compares disassembled machine code rather than file
 > hashes, and every genuine rebuild rewrites the binaries.
+
+## Repository mirrors
+
+Each `packages/*/package.json` declares its mirror destination using
+`repository.url`:
+
+```json
+{
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KeyChord/chords-menu"
+  }
+}
+```
+
+The Sync workflow discovers these manifests and mirrors each package directory
+to its declared GitHub repository. URLs may end in `.git`. Packages without
+`repository.url` are skipped; invalid URLs fail the sync. Adding a package only
+requires setting its URL, with no separate mirror list to maintain.
+
+Mirror tooling lives in the private workspace package
+`@chord/dev.improve.chords.configs.mirrors` at
+`packages/dev/improve/chords/configs/mirrors`. Run `vp run mirrors:list` from the
+repository root to inspect destinations. The Sync workflow calls the root
+`mirrors:sync` script, which runs the package's `_sync-mirrors` command.
+
+The native artifact checker lives in `packages/dev/improve/chords/configs/native`.
+Both tooling packages run TypeScript directly on Node.js 22.18 or newer.
+Third-party runtime helpers are accessed through wrappers in
+`packages/com/npmjs/`; scoped names use `scope__name` directory names.

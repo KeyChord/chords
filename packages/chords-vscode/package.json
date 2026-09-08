@@ -1,6 +1,10 @@
 {
   "name": "@keychord/chords-vscode",
   "version": "0.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KeyChord/chords-vscode"
+  },
   "type": "module",
   "dependencies": {
     "nano-spawn-compat": "latest"

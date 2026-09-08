@@ -1,5 +1,7 @@
 packages:
   - packages/*
+  - packages/com/npmjs/*
+  - packages/dev/improve/chords/configs/*
 catalog:
   "@keychord/config": ^0.0.9
   "@keychord/tsconfig": ^0.0.6

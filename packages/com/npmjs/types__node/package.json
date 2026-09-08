@@ -1,0 +1,16 @@
+{
+  "name": "@chord/com.npmjs.types__node",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "types": "./+.d.ts",
+  "imports": {
+    "#types": "./types.d.ts"
+  },
+  "exports": {
+    ".": "./+.d.ts"
+  },
+  "dependencies": {
+    "@types/node": "^22.18.0"
+  }
+}

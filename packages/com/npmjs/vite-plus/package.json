@@ -1,0 +1,12 @@
+{
+  "name": "@chord/com.npmjs.vite-plus",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./test": "./+test.ts"
+  },
+  "dependencies": {
+    "vite-plus": "catalog:"
+  }
+}

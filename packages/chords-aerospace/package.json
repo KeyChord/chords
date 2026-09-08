@@ -1,5 +1,9 @@
 {
   "name": "@keychord/chords-aerospace",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KeyChord/chords-aerospace"
+  },
   "type": "module",
   "devDependencies": {
     "@keychord/config": "catalog:"

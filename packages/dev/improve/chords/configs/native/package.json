@@ -1,0 +1,24 @@
+{
+  "name": "@chord/dev.improve.chords.configs.native",
+  "version": "0.0.0",
+  "private": true,
+  "bin": {
+    "_check-native-artifacts": "./_check-native-artifacts.ts"
+  },
+  "type": "module",
+  "imports": {
+    "#check-native-artifacts": "./check-native-artifacts.ts",
+    "#check-native-artifacts-command": "./check-native-artifacts-command.ts"
+  },
+  "dependencies": {
+    "@chord/com.npmjs.execa": "workspace:*",
+    "citty": "^0.2.2"
+  },
+  "devDependencies": {
+    "@chord/com.npmjs.types__node": "workspace:*",
+    "@chord/com.npmjs.vite-plus": "workspace:*"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  }
+}

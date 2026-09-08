@@ -1,6 +1,10 @@
 {
   "name": "@keychord/chords-tray",
   "version": "0.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KeyChord/chords-tray"
+  },
   "type": "module",
   "devDependencies": {
     "@keychord/config": "catalog:",

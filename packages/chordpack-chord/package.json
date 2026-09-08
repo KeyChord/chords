@@ -1,4 +1,8 @@
 {
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KeyChord/chordpack-chord"
+  },
   "type": "module",
   "dependencies": {
     "desm": "latest",

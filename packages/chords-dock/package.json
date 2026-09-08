@@ -1,5 +1,9 @@
 {
   "name": "@keychord/chords-dock",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KeyChord/chords-dock"
+  },
   "type": "module",
   "devDependencies": {
     "@keychord/chords-menu": "workspace:*",

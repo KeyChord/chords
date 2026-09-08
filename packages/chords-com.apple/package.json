@@ -1,6 +1,10 @@
 {
   "name": "@keychord/chords-com.apple",
   "version": "0.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KeyChord/chords-com.apple"
+  },
   "type": "module",
   "dependencies": {
     "@keychord/chords-menu": "workspace:*",
