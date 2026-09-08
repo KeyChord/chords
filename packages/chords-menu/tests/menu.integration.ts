@@ -13,6 +13,16 @@ async function recorded(expected: string) {
   assert.equal(await readFile(output, "utf8"), expected);
 }
 
+// The chord passes a string, like the captured indices for -1 through -9.
+await menu("by-index", "0");
+await assert.rejects(menu("by-letters", "zz9"), /No expanded menu item match/);
+await menu("by-letters", "a");
+await recorded("opened:Arrange");
+await menu("by-letters", "aa");
+await recorded("opened:Apple Tools");
+await assert.rejects(menu("by-letters", "aaa"), /Found 2/);
+await menu("by-index", 0);
+await assert.rejects(menu("by-letters", "zz9"), /No expanded menu item match/);
 await menu("by-index", 2);
 await recorded("opened:File");
 await menu("by-letters", "z-o2");

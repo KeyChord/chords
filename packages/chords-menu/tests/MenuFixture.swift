@@ -20,7 +20,7 @@ final class Fixture: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         let bar = NSMenu()
-        for title in ["MenuFixture", "File", "Format"] {
+        for title in ["MenuFixture", "File", "Format", "Arrange", "Apple Tools"] {
             let top = NSMenuItem(title: title, action: nil, keyEquivalent: "")
             let menu = NSMenu(title: title)
             menu.autoenablesItems = false

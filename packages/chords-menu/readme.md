@@ -21,6 +21,9 @@ Query semantics:
 - `by-letters`, `h` / `hh` / `hhh` — 1st/2nd/3rd top-level menu starting with `h`
 - `by-letters`, `zo` / `z2` / `z-o` / `z-o2` — items of the currently expanded menu (prefix, ordinal, word-prefix)
 
+`-0` always targets the Apple menu. Letter queries exclude the system Apple menu, so `-a`
+selects the first application menu starting with A (or reports no match).
+
 ## How it works
 
 `src/swift/menu/menu.swift` drives the menu bar through AXorcist on Swift’s `@MainActor` and exposes
@@ -42,10 +45,12 @@ checkout for Swift package dependency support; build that checkout with `pnpm ex
 after editing its source. Test outside the app with a Chord
 build's CLI: `chord bun scripts/run.ts by-letters f`.
 
-
 ## Regression check
 
 After building, run `python3 tests/check.py /path/to/chord` from this package. It launches a
 temporary menu fixture app and verifies indices, repeated letters, expanded-item occurrences,
 word abbreviations, nested exact paths, invisible-title cleanup, disabled items, rejection, and
-captured app context. Chord needs Accessibility permission. The fixture closes after the check.
+captured app context. It also checks Apple menu selection by zero and excludes the system Apple
+menu from A-prefixed matches. Chord needs Accessibility permission. The fixture closes after the check.
+
+Run `vp test` for the binding test without launching a fixture app.

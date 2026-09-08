@@ -32,6 +32,7 @@ export type MenuHandler = {
    * Lowercase-only query language:
    *
    * Top-level menus:
+   * The Apple menu is excluded; select it with by-index 0.
    * - "h"   => 1st menu starting with "h"
    * - "hh"  => 2nd menu starting with "h"
    * - "hhh" => 3rd menu starting with "h"

@@ -225,7 +225,9 @@ private func clickTopLevelMenu(_ items: [Element], index: Int) throws {
 private func clickTopLevelMenu(_ items: [Element], repeatedLetters query: String) throws {
     let prefix = String(query.first!)
     let occurrence = query.count
-    let matches = items.filter { name(of: $0).hasPrefix(prefix) }
+    // Index zero is the system Apple menu, regardless of its localized AX title.
+    // Reserve it for numeric selection; it must not consume a letter occurrence.
+    let matches = items.dropFirst().filter { name(of: $0).hasPrefix(prefix) }
     log("Top-level repeated-letter query \"\(query)\" -> prefix \"\(prefix)\", occurrence \(occurrence)")
     log("Top-level matches: \(matches.map { ($0.title() ?? "") })")
     guard matches.count >= occurrence else {
