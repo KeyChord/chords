@@ -1,6 +1,12 @@
 import { outdent } from "outdent";
 
 export default function buildAction(ideBinPath: string) {
+  // Chord calls this builder eagerly while compiling every chords file that declares
+  // `[on.command]` — including `chords/base.toml`, which is compiled in its own right even
+  // though it only exists to be imported. Its `[meta]` placeholder `'$execPath'` is empty, so
+  // this runs with no bin path on every load. Return a throwing stub rather than throwing here:
+  // throwing would abort handler registration and make Chord skip base.toml entirely, taking
+  // every `emit:command` chord in all the importing IDEs down with it.
   if (!ideBinPath) {
     return () => {
       throw new Error("IDE binpath must be provided");
