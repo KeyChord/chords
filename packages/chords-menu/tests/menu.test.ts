@@ -1,8 +1,6 @@
 import { readFileSync } from "node:fs";
 import { afterEach, expect, test, vi } from "vite-plus/test";
 
-vi.mock("chord", () => ({ resolveNativeModulePath: () => "/fixture/menu.node" }));
-
 afterEach(() => {
   vi.restoreAllMocks();
   vi.resetModules();

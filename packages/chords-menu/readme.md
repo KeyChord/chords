@@ -30,7 +30,7 @@ selects the first application menu starting with A (or reports no match).
 `runMenuAction` as an async Node-API function with NodeSwift. `@keychord/config` compiles it to the
 committed `target/<triple>/menu/menu.node` add-on, and `src/js/menu.ts` loads it in-process with
 `process.dlopen`. The path comes from Chord's built-in
-`resolveNativeModulePath(import.meta, "menu")`, so the handler also works when the package is
+`import.meta.chord.resolveNative("menu")`, so the handler also works when the package is
 vendored inside another chord package. Chord's handler context supplies the bundle identifier of
 the app for which the chord was resolved, so menu actions target that app directly instead of
 re-reading the frontmost application after dispatch.

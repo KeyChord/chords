@@ -1,14 +1,8 @@
-import { resolveNativeModulePath } from "chord";
 //#region src/js/tray.ts
-/**
- * Thin Node-API binding over the native menu-bar-extra scanner in `Sources/KeychordChordsTrayNativeTray/tray.swift`.
- * `@keychord/config` compiles the Swift source to
- * `target/<triple>/tray/tray.node`.
- */
 let addon;
 function openTrayAddon() {
   const module = { exports: {} };
-  process.dlopen(module, resolveNativeModulePath(import.meta, "tray"));
+  process.dlopen(module, import.meta.chord.resolveNative("tray"));
   return module.exports;
 }
 function runTrayAction(trayIndex, clickType = "left") {

@@ -1,4 +1,3 @@
-import { resolveNativeModulePath } from "chord";
 //#region src/js/safari.ts
 /**
  * Safari handler for Chord's Bun runtime.
@@ -11,7 +10,7 @@ const safariDomain = "com.apple.Safari";
 let addon;
 function openSafariAddon() {
   const module = { exports: {} };
-  process.dlopen(module, resolveNativeModulePath(import.meta, "safari"));
+  process.dlopen(module, import.meta.chord.resolveNative("safari"));
   return module.exports;
 }
 function runJavaScript(source) {

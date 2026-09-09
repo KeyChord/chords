@@ -1,19 +1,8 @@
-import { resolveNativeModulePath } from "chord";
 //#region src/js/menu.ts
-/**
- * macOS menu bar handler: a thin Node-API binding over the Swift implementation in
- * `Sources/KeychordChordsMenuNativeMenu/menu.swift`, which `@keychord/config` compiles to
- * `target/<triple>/menu/menu.node`. Chord runs handlers on Bun, so the addon is
- * opened in-process — no helper process, no `osascript` round trip.
- *
- * The addon is located through Chord's `chord` module (`resolveNativeModulePath`), which knows the
- * package layout (including vendored copies), so nothing here depends on where the package is
- * installed.
- */
 let addon;
 function openMenuAddon() {
   const module = { exports: {} };
-  process.dlopen(module, resolveNativeModulePath(import.meta, "menu"));
+  process.dlopen(module, import.meta.chord.resolveNative("menu"));
   return module.exports;
 }
 async function runMenuAction(processName, action, value) {

@@ -4,11 +4,10 @@
  * `target/<triple>/menu/menu.node`. Chord runs handlers on Bun, so the addon is
  * opened in-process — no helper process, no `osascript` round trip.
  *
- * The addon is located through Chord's `chord` module (`resolveNativeModulePath`), which knows the
- * package layout (including vendored copies), so nothing here depends on where the package is
- * installed.
+ * The addon is located through `import.meta.chord.resolveNative`, which Chord attaches to every
+ * module it loads and which knows the package layout (including vendored copies), so nothing here
+ * depends on where the package is installed.
  */
-import { resolveNativeModulePath } from "chord";
 
 export type MenuAction = "by-index" | "by-letters" | "by-path";
 
@@ -61,7 +60,7 @@ let addon: MenuAddon | undefined;
 
 function openMenuAddon(): MenuAddon {
   const module = { exports: {} as MenuAddon };
-  process.dlopen(module, resolveNativeModulePath(import.meta, "menu"));
+  process.dlopen(module, import.meta.chord.resolveNative("menu"));
   return module.exports;
 }
 

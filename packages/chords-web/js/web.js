@@ -1,4 +1,3 @@
-import { resolveNativeModulePath } from "chord";
 //#region \0rolldown/runtime.js
 var __create = Object.create;
 var __defProp = Object.defineProperty;
@@ -185,7 +184,7 @@ var import_lib = /* @__PURE__ */ __toESM(
 let addon;
 function openWebAddon() {
   const module = { exports: {} };
-  process.dlopen(module, resolveNativeModulePath(import.meta, "web"));
+  process.dlopen(module, import.meta.chord.resolveNative("web"));
   return module.exports;
 }
 function runWebJavaScript(source) {

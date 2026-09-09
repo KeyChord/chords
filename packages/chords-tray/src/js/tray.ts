@@ -3,7 +3,6 @@
  * `@keychord/config` compiles the Swift source to
  * `target/<triple>/tray/tray.node`.
  */
-import { resolveNativeModulePath } from "chord";
 
 export type TrayClickType = "left" | "right";
 
@@ -17,7 +16,7 @@ let addon: TrayAddon | undefined;
 
 function openTrayAddon(): TrayAddon {
   const module = { exports: {} as TrayAddon };
-  process.dlopen(module, resolveNativeModulePath(import.meta, "tray"));
+  process.dlopen(module, import.meta.chord.resolveNative("tray"));
   return module.exports;
 }
 

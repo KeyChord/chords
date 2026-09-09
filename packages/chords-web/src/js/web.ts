@@ -3,7 +3,6 @@
  * frontmost browser by `Sources/KeychordChordsWebNativeWeb/web.swift`; this file builds commands and calls its
  * NodeSwift addon through Node-API.
  */
-import { resolveNativeModulePath } from "chord";
 import jquery from "jquery-as-string";
 import outdent from "outdent";
 
@@ -23,7 +22,7 @@ let addon: WebAddon | undefined;
 
 function openWebAddon(): WebAddon {
   const module = { exports: {} as WebAddon };
-  process.dlopen(module, resolveNativeModulePath(import.meta, "web"));
+  process.dlopen(module, import.meta.chord.resolveNative("web"));
   return module.exports;
 }
 
