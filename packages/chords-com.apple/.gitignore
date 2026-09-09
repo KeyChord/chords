@@ -3,3 +3,4 @@ pnpm-lock.yaml
 pnpm-workspace.yaml
 .DS_Store
 .chord-native-build
+.build

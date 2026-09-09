@@ -1,6 +1,6 @@
 /**
  * Web chord handler for Chromium-family browsers. The generated JavaScript is sent to the
- * frontmost browser by `src/swift/web/web.swift`; this file builds commands and calls its
+ * frontmost browser by `Sources/KeychordChordsWebNativeWeb/web.swift`; this file builds commands and calls its
  * NodeSwift addon through Node-API.
  */
 import { resolveNativeModulePath } from "chord";

@@ -1,5 +1,5 @@
 /**
- * Thin Node-API binding over the native menu-bar-extra scanner in `src/swift/tray/tray.swift`.
+ * Thin Node-API binding over the native menu-bar-extra scanner in `Sources/KeychordChordsTrayNativeTray/tray.swift`.
  * `@keychord/config` compiles the Swift source to
  * `target/<triple>/tray/tray.node`.
  */
@@ -7,10 +7,10 @@ import { resolveNativeModulePath } from "chord";
 
 export type TrayClickType = "left" | "right";
 
-export type TrayHandler = (trayIndex: number, clickType?: TrayClickType) => void;
+export type TrayHandler = (trayIndex: number, clickType?: TrayClickType) => Promise<void>;
 
 type TrayAddon = {
-  runTrayAction(trayIndex: number, clickType: TrayClickType): void;
+  runTrayAction(trayIndex: number, clickType: TrayClickType): Promise<void>;
 };
 
 let addon: TrayAddon | undefined;
@@ -21,9 +21,9 @@ function openTrayAddon(): TrayAddon {
   return module.exports;
 }
 
-export function runTrayAction(trayIndex: number, clickType: TrayClickType = "left"): void {
+export function runTrayAction(trayIndex: number, clickType: TrayClickType = "left"): Promise<void> {
   addon ??= openTrayAddon();
-  addon.runTrayAction(trayIndex, clickType);
+  return addon.runTrayAction(trayIndex, clickType);
 }
 
 /**

@@ -1,6 +1,6 @@
 /**
  * macOS menu bar handler: a thin Node-API binding over the Swift implementation in
- * `src/swift/menu/menu.swift`, which `@keychord/config` compiles to
+ * `Sources/KeychordChordsMenuNativeMenu/menu.swift`, which `@keychord/config` compiles to
  * `target/<triple>/menu/menu.node`. Chord runs handlers on Bun, so the addon is
  * opened in-process — no helper process, no `osascript` round trip.
  *

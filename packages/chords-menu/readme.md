@@ -26,7 +26,7 @@ selects the first application menu starting with A (or reports no match).
 
 ## How it works
 
-`src/swift/menu/menu.swift` drives the menu bar through AXorcist on Swift’s `@MainActor` and exposes
+`Sources/KeychordChordsMenuNativeMenu/menu.swift` drives the menu bar through AXorcist on Swift’s `@MainActor` and exposes
 `runMenuAction` as an async Node-API function with NodeSwift. `@keychord/config` compiles it to the
 committed `target/<triple>/menu/menu.node` add-on, and `src/js/menu.ts` loads it in-process with
 `process.dlopen`. The path comes from Chord's built-in

@@ -28,7 +28,17 @@ test.each([false, true])(
     const addon = join(root, "addon.node");
     writeFileSync(addon, "local bytes before check");
     const run = vi.fn((command: string, args: string[]) => {
-      if (command === "git" && args[0] === "ls-files") return { stdout: "addon.node\0" };
+      if (command === "git" && args[0] === "ls-files")
+        return {
+          stdout: args.at(-1) === "*/Package.swift" ? "pkg/Package.swift\0" : "addon.node\0",
+        };
+      if (command === "swift") {
+        return {
+          stdout: JSON.stringify({
+            products: [{ name: "ANativeA", type: { library: ["dynamic"] } }],
+          }),
+        };
+      }
       if (command === "git" && args[0] === "show")
         return { stdout: Buffer.from("committed bytes"), failed: false };
       if (command === "moon") {
@@ -48,3 +58,24 @@ test.each([false, true])(
     expect(readFileSync(addon, "utf8")).toBe(stale ? "rebuilt bytes" : "local bytes before check");
   },
 );
+
+test("fails when two packages declare the same native module", () => {
+  vi.stubGlobal("process", { ...process, platform: "darwin" });
+  const dumped = {
+    stdout: JSON.stringify({ products: [{ name: "Clash", type: { library: ["dynamic"] } }] }),
+  };
+  const run = vi.fn((command: string, args: string[]) => {
+    if (command === "git" && args[0] === "ls-files")
+      return { stdout: "one/Package.swift\0two/Package.swift\0" };
+    if (command === "swift") return dumped;
+    throw new Error(`Unexpected command: ${command} ${args.join(" ")}`);
+  });
+  execaSync.mockImplementation((command: unknown) =>
+    typeof command === "string" ? { stdout: "/repo" } : run,
+  );
+  const errors = vi.spyOn(console, "error").mockImplementation(() => {});
+  expect(checkNativeArtifacts()).toBe(1);
+  expect(errors.mock.calls.flat().join("\n")).toContain("Clash");
+  // The duplicate check runs before any rebuild.
+  expect(run).not.toHaveBeenCalledWith("moon", expect.anything(), expect.anything());
+});

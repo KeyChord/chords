@@ -6,7 +6,7 @@ args = []
 
 [chords]
 '?-' = { name = "Menu Bar" }
-'-0' = { name = "Menu Bar: Apple Logo", 'emit:menu' = ['by-index', 0] }
+'-0' = { name = "Menu Bar: Apple Logo", 'emit:menu' = ['by-index', '0'] }
 
 '?-1' = { name = "1st menu" }
 '?-2' = { name = "2nd menu" }
@@ -19,30 +19,5 @@ args = []
 '?-9' = { name = "9th menu" }
 '-([1-9])' = { name = "Menu Bar: nth item", 'emit:menu' = ["by-index", "$1"] }
 
-'?-a' = { name = "menu starting with A" }
-'?-b' = { name = "menu starting with B" }
-'?-c' = { name = "menu starting with C" }
-'?-d' = { name = "menu starting with D" }
-'?-e' = { name = "menu starting with E" }
-'?-f' = { name = "menu starting with F" }
-'?-g' = { name = "menu starting with G" }
-'?-h' = { name = "menu starting with H" }
-'?-i' = { name = "menu starting with I" }
-'?-j' = { name = "menu starting with J" }
-'?-k' = { name = "menu starting with K" }
-'?-l' = { name = "menu starting with L" }
-'?-m' = { name = "menu starting with M" }
-'?-n' = { name = "menu starting with N" }
-'?-o' = { name = "menu starting with O" }
-'?-p' = { name = "menu starting with P" }
-'?-q' = { name = "menu starting with Q" }
-'?-r' = { name = "menu starting with R" }
-'?-s' = { name = "menu starting with S" }
-'?-t' = { name = "menu starting with T" }
-'?-u' = { name = "menu starting with U" }
-'?-v' = { name = "menu starting with V" }
-'?-w' = { name = "menu starting with W" }
-'?-x' = { name = "menu starting with X" }
-'?-y' = { name = "menu starting with Y" }
-'?-z' = { name = "menu starting with Z" }
+'?-(a-z)' = { name = "Menu item by letter" }
 '-([a-z]+[0-9]?)' = { name = "Menu Bar: by letter", 'emit:menu' = ["by-letters", "$1"] }

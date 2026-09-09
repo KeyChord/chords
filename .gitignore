@@ -3,3 +3,4 @@ node_modules
 .chord-native-build
 .moon/cache
 .moon/docker
+.build

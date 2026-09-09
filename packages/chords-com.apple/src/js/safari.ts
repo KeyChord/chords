@@ -2,7 +2,7 @@
  * Safari handler for Chord's Bun runtime.
  *
  * Bun handles the small amount of `defaults`/application lifecycle work. Safari and the
- * Accessibility API are driven in-process by `src/swift/safari/safari.swift`, compiled by
+ * Accessibility API are driven in-process by `Sources/KeychordChordsComAppleNativeSafari/safari.swift`, compiled by
  * `@keychord/config` to `target/<triple>/safari/safari.node`.
  */
 import { resolveNativeModulePath } from "chord";

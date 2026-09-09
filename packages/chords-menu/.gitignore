@@ -3,3 +3,4 @@ node_modules
 pnpm-workspace.yaml
 pnpm-lock.yaml
 .chord-native-build
+.build

@@ -3,7 +3,7 @@
 // Behaviour mirrors the query language documented in `readme.md`, talking to the Accessibility
 // API through AXorcist, in-process without an `osascript` round trip.
 //
-// `@keychord/config` compiles this file into a NodeSwift addon at
+// `@keychord/config` builds this package's Package.swift into a NodeSwift addon at
 // `target/<triple>/menu/menu.node`; `src/js/menu.ts` loads it through Node-API.
 //
 // NodeSwift returns a Promise to Chord's JS worker. Accessibility work runs on MainActor;
