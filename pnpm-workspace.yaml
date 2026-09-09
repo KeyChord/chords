@@ -14,7 +14,3 @@ catalogMode: manual
 # For local development with a sibling config checkout, add:
 # overrides:
 #   "@keychord/config": "link:../config"
-
-# AXorcist dependency support is developed in the sibling build-tool checkout.
-overrides:
-  "@keychord/config": "link:../config"
