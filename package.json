@@ -1,14 +1,22 @@
 {
+  "name": "@keychord/chords",
   "type": "module",
   "scripts": {
-    "build": "vp exec --filter='./packages/chords-*' vp pack",
-    "mirrors:list": "_list-mirrors packages",
+    "build": "vp exec --filter='./@keychord/chords-*' --filter='./@keychord/chordtest' vp pack",
+    "mirrors:list": "_list-mirrors @keychord",
     "mirrors:sync": "_sync-mirrors",
-    "native:check": "_check-native-artifacts"
+    "native:check": "_check-native-artifacts",
+    "test:bun": "bun test @keychord/chordtest/__tests__ @keychord/chords-tray/__tests__",
+    "test:macos:setup": "chordtest setup",
+    "test:macos": "chordtest test",
+    "test:macos:status": "chordtest status",
+    "test:macos:stop": "chordtest stop"
   },
   "devDependencies": {
-    "@chord/dev.improve.chords.configs.mirrors": "workspace:*",
+    "@chord/dev.improve.chords.configs.mirrors.list": "workspace:*",
+    "@chord/dev.improve.chords.configs.mirrors.sync": "workspace:*",
     "@chord/dev.improve.chords.configs.native": "workspace:*",
+    "@keychord/chordtest": "workspace:*",
     "vite-plus": "catalog:"
   },
   "packageManager": "pnpm@10.33.0"

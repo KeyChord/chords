@@ -1,0 +1,16 @@
+executionPrerequisite: The installed Brave Instagram app is selected, signed in with the English desktop interface, viewing your own profile with the Note... bubble visible and no existing note or open dialog. Brave exposes its local debugging port.
+steps:
+  - echo: Open the empty Note editor from your profile avatar.
+  - tap:
+      text: Note...
+  - await:
+      visible:
+        text: New note
+  - await:
+      idle: true
+  - echo: Close the empty Note editor without sharing.
+  - tap:
+      text: Close
+  - await:
+      hidden:
+        text: New note

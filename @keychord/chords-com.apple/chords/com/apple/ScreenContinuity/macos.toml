@@ -1,0 +1,10 @@
+name = "iPhone Mirroring"
+
+[on.click]
+file = 'screen-continuity.js'
+
+[chords]
+# Each click has one vertical (t/b) and one horizontal (l/r) offset, in either order.
+# Numbers starting with a digit are pixels; .5 is half the corresponding dimension.
+# Example: j,b20l.5b.5l0b.3l.3b20r0b.5r.4
+'j,(.+)' = { name = "Click", '@input:click' = ['$1'] }

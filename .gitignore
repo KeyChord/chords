@@ -1,6 +1,8 @@
 node_modules
+.jj/
 .DS_Store
-.chord-native-build
 .moon/cache
 .moon/docker
 .build
+
+.chord-testing

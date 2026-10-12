@@ -1,0 +1,26 @@
+name = "Instagram"
+
+[on.instagram]
+file = 'instagram.js'
+
+[chords]
+'?g' = { name = "Goto" }
+'gh' = { name = "Goto: Home", '@input:instagram' = ['home'] }
+'gr' = { name = "Goto: Reels", '@input:instagram' = ['reels'] }
+'gm' = { name = "Goto: Messages", '@input:instagram' = ['messages'] }
+'gs' = { name = "Goto: Search", '@input:instagram' = ['search'] }
+'gc' = { name = "Goto: Create", '@input:instagram' = ['create'] }
+'gp' = { name = "Goto: Profile", '@input:instagram' = ['profile'] }
+
+'?h' = { name = "Home" }
+'?hs' = { name = "Home: Stories" }
+'?hs,' = { name = "Home: Stories > Click" }
+
+'hs,(\d+)' = { name = "Home: Stories Click by #", '@input:instagram' = ['story', '$1'] }
+
+'?p' = { name = "Profile" }
+'?pa' = { name = "Profile: Avatar" }
+'pa,' = { name = "Profile: Avatar > Click", '@input:instagram' = ['avatar'] }
+'?pan' = { name = "Profile: Avatar > Note" }
+'pan' = { name = "Profile: Avatar > Note", '@input:instagram' = ['note'] }
+'panx' = { name = "Profile: Avatar > Note > Close", '@input:instagram' = ['close-note'] }

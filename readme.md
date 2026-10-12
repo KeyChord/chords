@@ -1,5 +1,46 @@
 A monorepo of all the conventional chord packages.
 
+Chord packages live in `@keychord/`; workspace tooling and third-party wrappers
+live in `packages/`.
+
+## Version control
+
+This repository uses colocated Jujutsu (`jj`) and Git, following Haniverse's
+workflow with `main` as the integration branch. The checked-in `.jj.toml` provides
+repository-specific aliases, overriding any global aliases that target `trunk`.
+
+To enable the same setup in a fresh Git checkout:
+
+```sh
+jj --config-file .jj.toml git init --colocate
+cp .jj.toml "$(jj config path --repo)"
+jj bookmark track main --remote origin
+```
+
+The config allows new files up to 10 MB, matching Haniverse and accommodating the
+native addons and generated bundles committed here. Re-run the `cp` command after
+changing `.jj.toml` to update the active local config.
+
+```sh
+jj --no-pager status
+jj --no-pager diff --git
+jj --no-pager log
+jj gf                              # fetch without rebasing
+jj describe -m "Describe the change"
+jj push                            # advance main and push to origin
+```
+
+`jj push` selects the latest described, non-empty commit in the current working
+copy's ancestry and leaves working files in place. It forwards arguments to
+`jj git push`; `jj push --dry-run` previews the remote update but still advances
+the local `main` bookmark.
+
+`jj pull` fetches `origin`, resets the local `main` bookmark to `main@origin`, and
+rebases current work onto it. Coordinate before running it in a shared checkout.
+Describing and pushing the current working copy includes all edits in that
+revision, so review them first. Jujutsu does not run Git hooks; run `vp check` and
+`vp test` before pushing.
+
 ## Usage
 
 You can re-define these defaults in _Chord_ by simply adding a Chord Package with a new definition for one of these sequences (e.g. if you don't use Safari which is defined as `/b` in these defaults, you can simply a new chord to `/b` and it will be used instead.
@@ -81,7 +122,7 @@ vp config --hooks-dir .vite-hooks
 ```
 
 Rebuild the artifacts yourself with `moon run ':build-native'`, then
-`git add packages/*/target`.
+`git add @keychord/*/target`.
 
 To check native artifacts manually, run `vp run native:check`.
 
@@ -91,7 +132,7 @@ To check native artifacts manually, run `vp run native:check`.
 
 ## Repository mirrors
 
-Each `packages/*/package.json` declares its mirror destination using
+Each `@keychord/*/package.json` declares its mirror destination using
 `repository.url`:
 
 ```json
@@ -108,13 +149,19 @@ to its declared GitHub repository. URLs may end in `.git`. Packages without
 `repository.url` are skipped; invalid URLs fail the sync. Adding a package only
 requires setting its URL, with no separate mirror list to maintain.
 
-Mirror tooling lives in the private workspace package
-`@chord/dev.improve.chords.configs.mirrors` at
-`packages/dev/improve/chords/configs/mirrors`. Run `vp run mirrors:list` from the
-repository root to inspect destinations. The Sync workflow calls the root
-`mirrors:sync` script, which runs the package's `_sync-mirrors` command.
+Mirror tooling lives in two private workspace packages under
+`packages/dev/improve/chords/configs/mirrors`:
+
+- `@chord/dev.improve.chords.configs.mirrors.list` in `list/` discovers destinations
+  and provides the `_list-mirrors` command. Run `vp run mirrors:list` from the
+  repository root to inspect destinations.
+- `@chord/dev.improve.chords.configs.mirrors.sync` in `sync/` depends on the list
+  package and provides the `_sync-mirrors` command. The Sync workflow calls it
+  through the root `mirrors:sync` script.
 
 The native artifact checker lives in `packages/dev/improve/chords/configs/native`.
-Both tooling packages run TypeScript directly on Node.js 22.18 or newer.
+All three tooling packages run TypeScript directly on Node.js 22.18 or newer.
 Third-party runtime helpers are accessed through wrappers in
 `packages/com/npmjs/`; scoped names use `scope__name` directory names.
+
+Tests and their fixtures live in each package's `__tests__/` directory.

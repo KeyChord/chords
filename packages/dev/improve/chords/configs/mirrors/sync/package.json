@@ -1,0 +1,26 @@
+{
+  "name": "@chord/dev.improve.chords.configs.mirrors.sync",
+  "version": "0.0.0",
+  "private": true,
+  "bin": {
+    "_sync-mirrors": "./_sync-mirrors.ts"
+  },
+  "type": "module",
+  "imports": {
+    "#sync-cli": "./_sync-mirrors.ts",
+    "#sync-mirrors-command": "./sync-mirrors-command.ts",
+    "#sync-mirrors": "./sync-mirrors.ts"
+  },
+  "dependencies": {
+    "@chord/com.npmjs.execa": "workspace:*",
+    "@chord/dev.improve.chords.configs.mirrors.list": "workspace:*",
+    "citty": "^0.2.2"
+  },
+  "devDependencies": {
+    "@chord/com.npmjs.types__node": "workspace:*",
+    "@chord/com.npmjs.vite-plus": "workspace:*"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  }
+}

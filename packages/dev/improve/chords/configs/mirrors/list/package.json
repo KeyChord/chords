@@ -1,0 +1,27 @@
+{
+  "name": "@chord/dev.improve.chords.configs.mirrors.list",
+  "version": "0.0.0",
+  "private": true,
+  "bin": {
+    "_list-mirrors": "./_list-mirrors.ts"
+  },
+  "type": "module",
+  "imports": {
+    "#list-mirrors": "./list-mirrors.ts",
+    "#list-cli": "./_list-mirrors.ts",
+    "#list-mirrors-command": "./list-mirrors-command.ts"
+  },
+  "exports": {
+    ".": "./list-mirrors.ts"
+  },
+  "dependencies": {
+    "citty": "^0.2.2"
+  },
+  "devDependencies": {
+    "@chord/com.npmjs.types__node": "workspace:*",
+    "@chord/com.npmjs.vite-plus": "workspace:*"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  }
+}

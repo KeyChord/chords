@@ -3,11 +3,11 @@ $schema: "https://moonrepo.dev/schemas/workspace.json"
 # Only packages with native addons are modelled; the rest are built by
 # `pnpm build` (vite-plus) as before.
 projects:
-  chords-menu: "packages/chords-menu"
-  chords-web: "packages/chords-web"
-  chords-tray: "packages/chords-tray"
-  chords-com.apple: "packages/chords-com.apple"
-  chords-dock: "packages/chords-dock"
+  chords-menu: "@keychord/chords-menu"
+  chords-web: "@keychord/chords-web"
+  chords-tray: "@keychord/chords-tray"
+  chords-com.apple: "@keychord/chords-com.apple"
+  chords-dock: "@keychord/chords-dock"
 
 vcs:
   defaultBranch: main

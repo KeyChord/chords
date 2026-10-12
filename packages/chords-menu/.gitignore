@@ -1,6 +1,0 @@
-node_modules
-.DS_Store
-pnpm-workspace.yaml
-pnpm-lock.yaml
-.chord-native-build
-.build

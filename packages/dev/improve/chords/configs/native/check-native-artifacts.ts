@@ -81,7 +81,9 @@ export function checkNativeArtifacts(): number {
       console.error(
         `Rebuilding produced different machine code for:\n${stale.map((addon) => `  ${addon}`).join("\n")}`,
       );
-      console.error("Stage the rebuilt artifacts and commit again:\n    git add packages/*/target");
+      console.error(
+        "Stage the rebuilt artifacts and commit again:\n    git add @keychord/*/target",
+      );
       return 1;
     }
 

@@ -1,0 +1,22 @@
+name = "YouTube"
+
+[on.youtube]
+file = 'youtube.js'
+
+[chords]
+
+# Video Commands
+'?v' = { name = "Video" }
+'?vs' = { name = "Video: Scrub" }
+'vs(\d+)' = { name = "Video: Scrub (to second)", '@input:youtube' = ['seek', '$1'] }
+'vp' = { name = "Video: Play", '@input:youtube' = ['play'] }
+'vh' = { name = "Video: Halt", '@input:youtube' = ['pause'] }
+'vm' = { name = "Video: Mute", '@input:youtube' = ['mute'] }
+'va' = { name = "Video: Autoplay", '@input:youtube' = ['autoplay'] }
+'vc' = { name = "Video: Closed Captions", '@input:youtube' = ['captions'] }
+'v,' = { name = "Video: Settings", '@input:youtube' = ['settings'] }
+'vt' = { name = "Video: Theater Mode", '@input:youtube' = ['theater'] }
+'vf' = { name = "Video: Fullscreen", '@input:youtube' = ['fullscreen'] }
+
+# Global Commands
+'js' = { name = "Search", '@input:youtube' = ['search'] }

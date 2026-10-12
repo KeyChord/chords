@@ -1,0 +1,125 @@
+name = "macOS Tray / System"
+
+[on.tray]
+file = "tray.js"
+
+[chords]
+'?=' = { name = "Tray / System" }
+
+# Tray Items
+# '=0' = { name = "Tray: Notch", '@input:notch' = [] }
+'=1' = { name = "Tray: 1st Item", '@input:tray' = ['ITEM', 0] }
+'=2' = { name = "Tray: 2nd Item", '@input:tray' = ['ITEM', 1] }
+'=3' = { name = "Tray: 3rd Item", '@input:tray' = ['ITEM', 2] }
+'=4' = { name = "Tray: 4th Item", '@input:tray' = ['ITEM', 3] }
+'=5' = { name = "Tray: 5th Item", '@input:tray' = ['ITEM', 4] }
+'=6' = { name = "Tray: 6th Item", '@input:tray' = ['ITEM', 5] }
+'=7' = { name = "Tray: 7th Item", '@input:tray' = ['ITEM', 6] }
+'=8' = { name = "Tray: 8th Item", '@input:tray' = ['ITEM', 7] }
+'=9' = { name = "Tray: 9th Item", '@input:tray' = ['ITEM', 8] }
+
+'?=-' = { name = "Tray: From End" }
+'=-1' = { name = "Tray: 1st End Item", '@input:tray' = ['ITEM', -1] }
+'=-2' = { name = "Tray: 2nd End Item", '@input:tray' = ['ITEM', -2] }
+'=-3' = { name = "Tray: 3rd End Item", '@input:tray' = ['ITEM', -3] }
+'=-4' = { name = "Tray: 4th End Item", '@input:tray' = ['ITEM', -4] }
+'=-5' = { name = "Tray: 5th End Item", '@input:tray' = ['ITEM', -5] }
+'=-6' = { name = "Tray: 6th End Item", '@input:tray' = ['ITEM', -6] }
+'=-7' = { name = "Tray: 7th End Item", '@input:tray' = ['ITEM', -7] }
+'=-8' = { name = "Tray: 8th End Item", '@input:tray' = ['ITEM', -8] }
+'=-9' = { name = "Tray: 9th End Item", '@input:tray' = ['ITEM', -9] }
+'=1/' = { name = "Tray: 1st Item Right Click", '@input:tray' = ['ITEM', 0, 'right'] }
+'=2/' = { name = "Tray: 2nd Item Right Click", '@input:tray' = ['ITEM', 1, 'right'] }
+'=3/' = { name = "Tray: 3rd Item Right Click", '@input:tray' = ['ITEM', 2, 'right'] }
+'=4/' = { name = "Tray: 4th Item Right Click", '@input:tray' = ['ITEM', 3, 'right'] }
+'=5/' = { name = "Tray: 5th Item Right Click", '@input:tray' = ['ITEM', 4, 'right'] }
+'=6/' = { name = "Tray: 6th Item Right Click", '@input:tray' = ['ITEM', 5, 'right'] }
+'=7/' = { name = "Tray: 7th Item Right Click", '@input:tray' = ['ITEM', 6, 'right'] }
+'=8/' = { name = "Tray: 8th Item Right Click", '@input:tray' = ['ITEM', 7, 'right'] }
+'=9/' = { name = "Tray: 9th Item Right Click", '@input:tray' = ['ITEM', 8, 'right'] }
+'=-1/' = { name = "Tray: 1st End Item Right Click", '@input:tray' = ['ITEM', -1, 'right'] }
+'=-2/' = { name = "Tray: 2nd End Item Right Click", '@input:tray' = ['ITEM', -2, 'right'] }
+'=-3/' = { name = "Tray: 3rd End Item Right Click", '@input:tray' = ['ITEM', -3, 'right'] }
+'=-4/' = { name = "Tray: 4th End Item Right Click", '@input:tray' = ['ITEM', -4, 'right'] }
+'=-5/' = { name = "Tray: 5th End Item Right Click", '@input:tray' = ['ITEM', -5, 'right'] }
+'=-6/' = { name = "Tray: 6th End Item Right Click", '@input:tray' = ['ITEM', -6, 'right'] }
+'=-7/' = { name = "Tray: 7th End Item Right Click", '@input:tray' = ['ITEM', -7, 'right'] }
+'=-8/' = { name = "Tray: 8th End Item Right Click", '@input:tray' = ['ITEM', -8, 'right'] }
+'=-9/' = { name = "Tray: 9th End Item Right Click", '@input:tray' = ['ITEM', -9, 'right'] }
+
+'=p' = { name = "Tray: Power / Battery" }
+
+# Control Center
+'=c' = { name = "Tray: Control Center", '@input:tray' = ['CONTROL_CENTER'] }
+'=cd' = { name = "Tray: Control Center > Display", '@input:tray' = ['CONTROL_CENTER', 'DISPLAY'] }
+'=cd-' = { name = "Tray: Control Center > Display > Decrease", '@input:tray' = [
+  'CONTROL_CENTER',
+  'DISPLAY',
+  'DECREASE',
+] }
+'=cd=' = { name = "Tray: Control Center > Display > Increase", '@input:tray' = [
+  'CONTROL_CENTER',
+  'DISPLAY',
+  'INCREASE',
+] }
+'=cd,' = { name = "Tray: Control Center > Display > Click", '@input:tray' = [
+  'CONTROL_CENTER',
+  'DISPLAY',
+  'CLICK',
+] }
+'=cdd' = { name = "Tray: Control Center > Display > Dark Mode", '@input:tray' = [
+  'CONTROL_CENTER',
+  'DISPLAY',
+  'DARK_MODE',
+] }
+'=cdn' = { name = "Tray: Control Center > Display > Night Shift", '@input:tray' = [
+  'CONTROL_CENTER',
+  'DISPLAY',
+  'NIGHT_SHIFT',
+] }
+'=cdt' = { name = "Tray: Control Center > Display > True Tone", '@input:tray' = [
+  'CONTROL_CENTER',
+  'DISPLAY',
+  'TRUE_TONE',
+] }
+'=cds' = { name = "Tray: Control Center > Display > Settings", '@input:tray' = [
+  'CONTROL_CENTER',
+  'DISPLAY',
+  'SETTINGS',
+] }
+'=cs' = { name = "Tray: Control Center > Sound", '@input:tray' = ['CONTROL_CENTER', 'SOUND'] }
+'=cs-' = { name = "Tray: Control Center > Sound > Decrease", '@input:tray' = [
+  'CONTROL_CENTER',
+  'SOUND',
+  'DECREASE',
+] }
+'=cs=' = { name = "Tray: Control Center > Sound > Increase", '@input:tray' = [
+  'CONTROL_CENTER',
+  'SOUND',
+  'INCREASE',
+] }
+'=cs,' = { name = "Tray: Control Center > Sound > Click", '@input:tray' = [
+  'CONTROL_CENTER',
+  'SOUND',
+  'CLICK',
+] }
+
+'=t' = { name = "Tray: Time & Date" }
+
+'?=w' = { name = "Tray Wi-Fi" }
+'=w' = { name = "Tray: Wi-Fi" }
+'=wv' = { name = "Tray Wi-Fi: Vary On/Off" }
+
+'=q' = { name = "Force Quit", shortcut = "opt+cmd+esc" }
+'=ls' = { name = "Lock Screen", shortcut = "opt+cmd+esc" }
+'=lo' = { name = "Log Out", shortcut = "ctrl+cmd+q" }
+'=lq' = { name = "Log Quit", shortcut = "opt+shift+cmd+q" }
+
+'?=b' = { name = "Brightness" }
+'=bu' = { name = "Brightness Up", shortcut = "BrightnessUp" }
+'=bd' = { name = "Brightness Down", shortcut = "BrightnessDown" }
+
+'?=v' = { name = "Volume" }
+'=vu' = { name = "Volume Up", shortcut = "AudioVolumeUp" }
+'=vd' = { name = "Volume Down", shortcut = "AudioVolumeDown" }
+'=vm' = { name = "Volume Mute", shortcut = "AudioVolumeMute" }

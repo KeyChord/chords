@@ -1,0 +1,5 @@
+{
+  "extends": "@keychord/tsconfig",
+  "compilerOptions": { "types": [], "lib": ["ES2024", "DOM"] },
+  "include": ["src"]
+}

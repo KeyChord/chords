@@ -1,0 +1,97 @@
+name = "Activity Monitor"
+
+[handler.menu]
+file = "@keychord/chords-menu/js/menu.js"
+
+[chords]
+'/am' = { name = "Activity Monitor", shell = "open -a 'Activity Monitor'" }
+
+'?v' = { name = "View" }
+va = { name = "View: All Processes", '@input:menu' = ["View", "All Processes"] }
+vh = { name = "View: Hierarchially, All Processes", '@input:menu' = [
+  "View",
+  "All Processes, Hierarchically",
+] }
+vm = { name = "View: My Processes", '@input:menu' = ["View", "My Processes"] }
+vs = { name = "View: Selected Processes", '@input:menu' = ["View", "Selected Processes"] }
+vy = { name = "View: System Processes", '@input:menu' = ["View", "System Processes"] }
+vo = { name = "View: Other Users' Processes", '@input:menu' = ["View", "Other Users’ Processes"] }
+vc = { name = "View: Current (Active) Processes", '@input:menu' = ["View", "Active Processes"] }
+vi = { name = "View: Inactive Processes", '@input:menu' = ["View", "Inactive Processes"] }
+vg = { name = "View: GPU Processes", '@input:menu' = ["View", "GPU Processes"] }
+vw = { name = "View: Windowed Processes", '@input:menu' = ["View", "Windowed Processes"] }
+vl = { name = "View: Last 12 Hour Applications", '@input:menu' = [
+  "View",
+  "Applications in last 12 hours",
+] }
+vp = { name = "View: Processes, by GPU", '@input:menu' = ["View", "Processes, by GPU"] }
+
+'?p' = { name = "Process" }
+pf = { name = "Process: Filter", '@input:menu' = ["View", "Filter Processes"] }
+pi = { name = "Process: Inspect", '@input:menu' = ["View", "Inspect Process"] }
+ps = { name = "Process: Sample", '@input:menu' = ["View", "Sample Process"] }
+pq = { name = "Process: Quit", '@input:menu' = ["View", "Quit Process"] }
+pss = { name = "Process: Send Signal", '@input:menu' = ["View", "Send Signal to Process..."] }
+psd = { name = "Process: Show Deltas", '@input:menu' = ["View", "Show Deltas for Process"] }
+
+'?r' = { name = "Run" }
+rs = { name = "Run: Spindump", '@input:menu' = ["View", "Run Spindump"] }
+rd = { name = "Run: Diagonstics for System", '@input:menu' = ["View", "Run System Diagnostics..."] }
+
+'?c' = { name = "Columns" }
+cpi = { name = "Columns: Process ID", '@input:menu' = ["View", "Columns", "Process ID"] }
+cu = { name = "Columns: User", '@input:menu' = ["View", "Columns", "User"] }
+cpc = { name = "Columns: % CPU", '@input:menu' = ["View", "Columns", "% CPU"] }
+cct = { name = "Columns: CPU Time", '@input:menu' = ["View", "Columns", "CPU Time"] }
+cpg = { name = "Columns: % GPU", '@input:menu' = ["View", "Columns", "% GPU"] }
+cgt = { name = "Columns: GPU Time", '@input:menu' = ["View", "Columns", "GPU Time"] }
+cnt = { name = "Columns: # Threads", '@input:menu' = ["View", "Columns", "# Threads"] }
+cnp = { name = "Columns: # Ports", '@input:menu' = ["View", "Columns", "# Ports"] }
+crm = { name = "Columns: Real Memory", '@input:menu' = ["View", "Columns", "Real Memory"] }
+crpm = { name = "Columns: Real Private Memory", '@input:menu' = [
+  "View",
+  "Columns",
+  "Real Private Memory",
+] }
+crsm = { name = "Columns: Real Shared Memory", '@input:menu' = [
+  "View",
+  "Columns",
+  "Real Shared Memory",
+] }
+ck = { name = "Columns: Kind", '@input:menu' = ["View", "Columns", "Kind"] }
+cst = { name = "Columns: Sudden Termination", '@input:menu' = [
+  "View",
+  "Columns",
+  "Sudden Termination",
+] }
+cs = { name = "Columns: Sandbox", '@input:menu' = ["View", "Columns", "Sandbox"] }
+cr = { name = "Columns: Restricted", '@input:menu' = ["View", "Columns", "Restricted"] }
+ciwu = { name = "Columns: Idle Wake Ups", '@input:menu' = ["View", "Columns", "Idle Wake Ups"] }
+cei = { name = "Columns: Energy Impact", '@input:menu' = ["View", "Columns", "Energy Impact"] }
+can = { name = "Columns: App Nap", '@input:menu' = ["View", "Columns", "App Nap"] }
+csb = { name = "Columns: Sent Bytes", '@input:menu' = ["View", "Columns", "Sent Bytes"] }
+csp = { name = "Columns: Sent Packets", '@input:menu' = ["View", "Columns", "Sent Packets"] }
+crb = { name = "Columns: Received Bytes", '@input:menu' = ["View", "Columns", "Received Bytes"] }
+crp = { name = "Columns: Received Packets", '@input:menu' = [
+  "View",
+  "Columns",
+  "Received Packets",
+] }
+cpm = { name = "Columns: Purgeable Memory", '@input:menu' = [
+  "View",
+  "Columns",
+  "Purgeable Memory",
+] }
+cm = { name = "Columns: Memory", '@input:menu' = ["View", "Columns", "Memory"] }
+ccm = { name = "Columns: Compressed Memory", '@input:menu' = [
+  "View",
+  "Columns",
+  "Compressed Memory",
+] }
+cbw = { name = "Columns: Bytes Written", '@input:menu' = ["View", "Columns", "Bytes Written"] }
+cbr = { name = "Columns: Bytes Read", '@input:menu' = ["View", "Columns", "Bytes Read"] }
+cps = { name = "Columns: Preventing Sleep", '@input:menu' = [
+  "View",
+  "Columns",
+  "Preventing Sleep",
+] }

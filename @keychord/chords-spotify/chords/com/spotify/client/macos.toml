@@ -1,0 +1,35 @@
+name = "Spotify"
+
+[on.spotify]
+file = 'spotify.js'
+
+[chords]
+
+# Goto
+'?g' = { name = "Goto" }
+'gls' = { name = "Goto: Liked Songs", '@input:spotify' = ['liked-songs'] }
+
+# Playlist
+'?p' = { name = "Playlist" }
+
+'pm(\d+)' = { name = "Playlist: More @ #$1", '@input:spotify' = ['more', '$1'] }
+'pr(\d+)' = { name = "Playlist: Remove @ #$1", '@input:spotify' = ['remove', '$1'] }
+'pa(\d+)' = { name = "Playlist: Add (to queue) @ #$1", '@input:spotify' = ['queue', '$1'] }
+'pe(\d+)' = { name = "Playlist: Exclude (from taste profile) @ #$1", '@input:spotify' = [
+  'exclude',
+  '$1',
+] }
+'?psj' = { name = "Playlist: Start Jam" }
+'psj(\d+)' = { name = "Playlist: Start Jam @ #$1", '@input:spotify' = ['jam', '$1'] }
+'?pg' = { name = "Playlist: Goto" }
+'pgsr(\d+)' = { name = "Playlist: Goto Song Radio @ #$1", '@input:spotify' = ['song-radio', '$1'] }
+'pgar(\d+)' = { name = "Playlist: Goto Artist @ #$1", '@input:spotify' = ['artist', '$1'] }
+'pgal(\d+)' = { name = "Playlist: Goto Album @ #$1", '@input:spotify' = ['album', '$1'] }
+'?pv' = { name = "Playlist: View Credits" }
+'pvc(\d+)' = { name = "Playlist: View Credits @ #$1", '@input:spotify' = ['credits', '$1'] }
+'?ps' = { name = "Playlist: Share" }
+'psc(\d+)' = { name = "Playlist: Share > Copy (link to Song) @ #$1", '@input:spotify' = [
+  'copy-link',
+  '$1',
+] }
+'pse(\d+)' = { name = "Playlist: #$1 > Share > Embed (track)", '@input:spotify' = ['embed', '$1'] }

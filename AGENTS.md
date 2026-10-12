@@ -1,3 +1,25 @@
+# Runtime APIs
+
+Prefer Bun APIs over `node:*` in Chord handlers and Bun scripts. Use `Bun.file` / `Bun.write` for file contents and copies, `Bun.spawn` / `Bun.spawnSync` for subprocesses, and Bun's URL helpers. Keep Node APIs for operations without a Bun equivalent or code that must run under Node, including Vite+ configuration and tests. Preserve failure handling, timeouts, permissions, and locking semantics.
+
+# Version control
+
+This shared checkout uses colocated Jujutsu (`.jj/` alongside `.git/`), following
+Haniverse's workflow with `main` as the integration bookmark. Use `jj` for version
+control changes; read-only Git commands are also supported.
+
+- Repository aliases are defined in `.jj.toml`; see `readme.md` for installation.
+- Use `jj --no-pager status`, `jj --no-pager log`, and `jj --no-pager diff --git`
+  to inspect work. Use `jj gf` to fetch without rebasing the working copy.
+- Preserve all existing work in the shared checkout. Do not restore, reset,
+  stash, clean, abandon, split, squash, or move the working-copy commit to isolate
+  your edits. Coordinate before running `jj pull` or rebasing shared work.
+- `jj describe -m "..."` records a message for the current working copy, including
+  all in-progress edits. `jj push` advances `main` to the latest described,
+  non-empty commit and pushes it to `origin` without moving the working copy.
+  Review the included changes before describing or pushing shared work.
+- Jujutsu does not run Git hooks. Run the required Vite+ checks before pushing.
+
 <!--VITE PLUS START-->
 
 # Using Vite+, the Unified Toolchain for the Web

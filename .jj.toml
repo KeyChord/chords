@@ -1,0 +1,42 @@
+#:schema https://docs.jj-vcs.dev/latest/config-schema.json
+# Haniverse's workflow adapted to this repository's main branch.
+# Install with: cp .jj.toml "$(jj config path --repo)"
+
+[revset-aliases]
+"trunk()" = "main@origin"
+
+[snapshot]
+# Match Haniverse and allow the committed native addons and generated bundles.
+max-new-file-size = 10000000
+
+[aliases]
+gf = ["git", "fetch"]
+
+# Fetch and rebase onto main. Coordinate before moving a shared working copy.
+pull = ["util", "exec", "--", "bash", "-c", """
+set -eu
+jj git fetch --remote origin
+jj bookmark set main -r main@origin --allow-backwards
+jj rebase -d main
+""", "bash"]
+
+# Push the latest described, non-empty work without moving the working copy.
+# Extra arguments, including --dry-run, are passed to jj git push.
+push = [
+  "util",
+  "exec",
+  "--",
+  "bash",
+  "-c",
+  """
+set -eu
+target=$(jj log --no-graph -r 'heads(::@ & mutable() & ~description(exact:"") & ~empty())' -T 'commit_id')
+if [ -z "$target" ]; then
+  echo "error: nothing to push (no described, non-empty commit on this branch)" >&2
+  exit 1
+fi
+jj bookmark move main --to "$target"
+exec jj git push --remote origin -b main "$@"
+""",
+  "bash",
+]

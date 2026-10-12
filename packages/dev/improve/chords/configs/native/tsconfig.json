@@ -8,5 +8,5 @@
     "skipLibCheck": true,
     "types": ["@chord/com.npmjs.types__node"]
   },
-  "include": ["*.ts"]
+  "include": ["**/*.ts"]
 }

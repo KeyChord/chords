@@ -1,0 +1,31 @@
+{
+  "name": "@keychord/chordtest",
+  "version": "0.0.0",
+  "private": true,
+  "bin": {
+    "chordtest": "./src/cli.ts"
+  },
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./native": "./src/native.ts",
+    "./runtime": "./src/runtime.ts",
+    "./vitest": "./src/vitest.ts"
+  },
+  "scripts": {
+    "test": "bun test",
+    "vm:setup": "bun src/cli.ts setup",
+    "vm:test": "bun src/cli.ts test",
+    "vm:status": "bun src/cli.ts status",
+    "vm:stop": "bun src/cli.ts stop"
+  },
+  "dependencies": {
+    "node-swift": "1.5.1"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "catalog:",
+    "vite-plus": "catalog:"
+  },
+  "packageManager": "pnpm@10.33.0"
+}

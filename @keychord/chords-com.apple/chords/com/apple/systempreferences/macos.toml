@@ -1,0 +1,46 @@
+name = "System Preferences"
+
+[chords]
+'/,' = { name = "System Preferences", shell = "open -b com.apple.systempreferences" }
+
+# Goto
+'gaa' = { name = "Goto: Apple Account" }
+'gwi' = { name = "Goto: Wi-fi" }
+'gbl' = { name = "Goto: Bluetooth" }
+'gne' = { name = "Goto: Network" }
+'gvp' = { name = "Goto: VPN" }
+'gba' = { name = "Goto: Battery" }
+
+'gge' = { name = "Goto: General" }
+'gac' = { name = "Goto: Accessibility" }
+'gap' = { name = "Goto: Appearance" }
+'gai' = { name = "Goto: Apple Intelligence" }
+'gdd' = { name = "Goto: Desktop & Dock" }
+'gdi' = { name = "Goto: Displays" }
+'gmb' = { name = "Goto: Menu Bar" }
+'gsp' = { name = "Goto: Spotlight" }
+'gwa' = { name = "Goto: Wallpaper" }
+
+'gno' = { name = "Goto: Notifications" }
+'gso' = { name = "Goto: Sound" }
+'gfo' = { name = "Goto: Focus" }
+'gst' = { name = "Goto: Screen Time" }
+
+'gls' = { name = "Goto: Lock Screen" }
+'gps' = { name = "Goto: Privacy & Security" }
+'gtp' = { name = "Goto: Touch ID & Password" }
+'gup' = { name = "Goto: Users & Groups" }
+
+'gia' = { name = "Goto: Internet Accounts" }
+'ggc' = { name = "Goto: Game Center" }
+'gic' = { name = "Goto: iCloud" }
+'gap' = { name = "Goto: Apple Pay" }
+
+'gke' = { name = "Goto: Keyboard" }
+'gtr' = { name = "Goto: Trackpad" }
+'gpr' = { name = "Goto: Printers" }
+
+# Appearance
+'apa' = { name = "Appearance: Auto" }
+'apd' = { name = "Appearance: Dark" }
+'apl' = { name = "Appearance: Light" }

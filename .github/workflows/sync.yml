@@ -39,5 +39,5 @@ jobs:
       - name: Sync
         run: pnpm run mirrors:sync
         env:
-          BUILD_BASE: ${{ github.workspace }}/packages
+          BUILD_BASE: ${{ github.workspace }}/@keychord
           API_TOKEN_GITHUB: ${{ secrets.ORG_KEYCHORD_BOT_PAT }}
