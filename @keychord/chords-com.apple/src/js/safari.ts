@@ -5,29 +5,15 @@
  * Accessibility API are driven in-process by `Sources/KeychordChordsComAppleNativeSafari/safari.swift`, compiled by
  * `@keychord/config` to `target/<triple>/safari/safari.node`.
  */
+import addon from "./safari.node";
 
 const safariDomain = "com.apple.Safari";
 
-type SafariAddon = {
-  runJavaScript(source: string): void;
-  openDeveloperSettings(): void;
-};
-
-let addon: SafariAddon | undefined;
-
-function openSafariAddon(): SafariAddon {
-  const module = { exports: {} as SafariAddon };
-  process.dlopen(module, import.meta.chord.resolveNative("safari"));
-  return module.exports;
-}
-
-function runJavaScript(source: string): void {
-  addon ??= openSafariAddon();
+export function runSafariJavaScript(source: string): void {
   addon.runJavaScript(source);
 }
 
 function openDeveloperSettingsPane(): void {
-  addon ??= openSafariAddon();
   addon.openDeveloperSettings();
 }
 
@@ -106,6 +92,6 @@ export default async function buildSafariHandler() {
       return;
     }
 
-    runJavaScript("document.title;");
+    runSafariJavaScript("document.title;");
   };
 }

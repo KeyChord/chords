@@ -1,27 +1,27 @@
-import { installChordRuntime } from "@keychord/chordtest/runtime";
-import { afterAll, beforeEach, expect, mock, spyOn, test } from "bun:test";
+import { beforeEach, expect, mock, test } from "bun:test";
 import type { TrayAction } from "../src/js/tray";
 
-installChordRuntime({
-  filter: /\/src\/js\/tray\.ts$/,
-  packageRoot: Bun.fileURLToPath(new URL("..", import.meta.url)),
-  nativeDirectory: "/test-native",
-});
 const nativeAction = mock(async (_type: string, _value: string, _action: string) => {});
-const openAddon = spyOn(process, "dlopen").mockImplementation((module, filename) => {
-  expect(filename).toBe("/test-native/tray.node");
-  (module as { exports: unknown }).exports = { runTrayAction: nativeAction };
+const openAddon = mock(() => ({ default: { runTrayAction: nativeAction } }));
+mock.module("tray-native-mock", openAddon);
+// These tests load source without the bundler's native-addon plugin.
+// Redirect its native import to a mocked JavaScript module.
+Bun.plugin({
+  name: "tray-native-mock",
+  setup(builder) {
+    builder.onLoad({ filter: /\/src\/js\/tray\.ts$/ }, async ({ path }) => ({
+      loader: "ts",
+      contents: (await Bun.file(path).text()).replace('"./tray.node"', '"tray-native-mock"'),
+    }));
+  },
 });
 const { default: buildHandler } = await import("../src/js/tray.ts");
 const handler = buildHandler();
 const { chords: bindings } = Bun.TOML.parse(
   await Bun.file(new URL("../chords/macos.toml", import.meta.url)).text(),
-) as { chords: Record<string, { name: string; "@input:tray"?: TrayAction }> };
+) as { chords: Record<string, { name: string; "@input:tray"?: TrayAction; shortcut?: string }> };
 
 beforeEach(() => nativeAction.mockClear());
-afterAll(() => {
-  openAddon.mockRestore();
-});
 
 test("every indexed binding preserves its index and mouse button with the ITEM type", async () => {
   for (let index = 1; index <= 9; index++) {
@@ -79,6 +79,27 @@ test("all Control Center entries have executable bindings", () => {
   );
   expect(bindings["=cd."].name).toEndWith("Click");
   expect(bindings["=cds"].name).toEndWith("Settings");
+});
+
+for (const [chord, args] of [
+  ["=p", ["BATTERY"]],
+  ["=t", ["DATE_TIME"]],
+  ["=w", ["WIFI"]],
+  ["=wv", ["WIFI", "TOGGLE"]],
+] satisfies [string, TrayAction][]) {
+  test(`${chord} routes its system tray command`, async () => {
+    expect(bindings[chord]["@input:tray"]).toEqual(args);
+    await handler(...bindings[chord]["@input:tray"]!);
+    expect(nativeAction).toHaveBeenCalledWith(args[0], args[1] ?? "", "");
+  });
+}
+
+test("Spotlight has a shortcut and every non-category chord has an action", () => {
+  expect(bindings["=s"].shortcut).toBe("cmd+space");
+  const placeholders = Object.entries(bindings).filter(
+    ([chord, binding]) => !chord.startsWith("?") && !binding["@input:tray"] && !binding.shortcut,
+  );
+  expect(placeholders).toEqual([]);
 });
 
 for (const index of [NaN, Infinity, -Infinity, 0.5, Number.MAX_SAFE_INTEGER + 1]) {

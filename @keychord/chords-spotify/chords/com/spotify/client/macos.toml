@@ -33,3 +33,19 @@ file = 'spotify.js'
   '$1',
 ] }
 'pse(\d+)' = { name = "Playlist: #$1 > Share > Embed (track)", '@input:spotify' = ['embed', '$1'] }
+
+'?b' = { name = "Bar (Now Playing)" }
+'b[' = { name = "Bar: Previous", '@input:spotify' = ['bar-previous'] }
+'b]' = { name = "Bar: Next", '@input:spotify' = ['bar-next'] }
+'bp' = { name = "Bar: Play", '@input:spotify' = ['bar-play'] }
+'bh' = { name = "Bar: Halt", '@input:spotify' = ['bar-halt'] }
+'br' = { name = "Bar: Repeat", '@input:spotify' = ['bar-repeat'] }
+'bl' = { name = "Bar: Lyrics", '@input:spotify' = ['bar-lyrics'] }
+'bq' = { name = "Bar: Queue", '@input:spotify' = ['bar-queue'] }
+'bc' = { name = "Bar: Connect (to device)", '@input:spotify' = ['bar-connect'] }
+'bm' = { name = "Bar: Miniplayer", '@input:spotify' = ['bar-miniplayer'] }
+'bf' = { name = "Bar: Fullscreen", '@input:spotify' = ['bar-fullscreen'] }
+
+'?bs' = { name = "Bar: Shuffle / Scrub" }
+'bs' = { name = "Bar: Shuffle", '@input:spotify' = ['bar-shuffle'] }
+'bs(\d+)' = { name = "Bar: Scrub (to second)", '@input:spotify' = ['bar-scrub', '$1'] }

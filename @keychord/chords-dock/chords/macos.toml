@@ -49,6 +49,7 @@ file = 'dock.js'
 '/ws[' = { name = "Window: Size Previous", shortcut = "ctrl+fn+r" }
 '/wz' = { name = "Window: Zoom", '@input:menu' = ["Window", 'Zoom'] }
 
+'/h' = { name = "Hide", shortcut = "cmd+h" }
 '/m' = { name = "Minimize", shortcut = "cmd+m" }
 '/q' = { name = "Quit", shortcut = "cmd+q" }
 

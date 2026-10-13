@@ -3,14 +3,13 @@ import { afterEach, expect, test, vi } from "vite-plus/test";
 
 afterEach(() => {
   vi.restoreAllMocks();
+  vi.doUnmock("../src/js/menu.node");
   vi.resetModules();
 });
 
 test("the -0 binding sends index zero and preserves the captured application", async () => {
   const nativeAction = vi.fn().mockResolvedValue(undefined);
-  vi.spyOn(process, "dlopen").mockImplementation((module) => {
-    module.exports = { runMenuAction: nativeAction };
-  });
+  vi.doMock("../src/js/menu.node", () => ({ default: { runMenuAction: nativeAction } }));
   const { default: buildMenuHandler } = await import("../src/js/menu.ts");
   const source = readFileSync(new URL("../chords/macos.toml", import.meta.url), "utf8");
   const binding = source.match(/^'-0'.*'@input:menu' = \['by-index', '([0-9]+)'\]/m);

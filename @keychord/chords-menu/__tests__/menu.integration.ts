@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
-import buildMenuHandler, { runMenuAction } from "../src/js/menu.ts";
+import buildMenuHandler, { runMenuAction } from "../js/menu.js";
 
 const output = process.env.MENU_FIXTURE_OUTPUT!;
 const appId = "dev.keychord.menu-fixture";

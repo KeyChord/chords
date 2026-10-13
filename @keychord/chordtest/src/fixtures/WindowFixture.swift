@@ -14,6 +14,10 @@ final class EventView: NSView {
     override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
     override func mouseDown(with event: NSEvent) { record?(event, "down", convert(event.locationInWindow, from: nil)) }
     override func mouseUp(with event: NSEvent) { record?(event, "up", convert(event.locationInWindow, from: nil)) }
+    override func rightMouseDown(with event: NSEvent) { record?(event, "down", convert(event.locationInWindow, from: nil)) }
+    override func rightMouseUp(with event: NSEvent) { record?(event, "up", convert(event.locationInWindow, from: nil)) }
+    override func otherMouseDown(with event: NSEvent) { record?(event, "down", convert(event.locationInWindow, from: nil)) }
+    override func otherMouseUp(with event: NSEvent) { record?(event, "up", convert(event.locationInWindow, from: nil)) }
 }
 
 @MainActor
@@ -47,7 +51,8 @@ final class WindowFixture: NSObject, NSApplicationDelegate {
         view.layer?.backgroundColor = NSColor.systemBlue.cgColor
         view.record = { [weak self] event, phase, point in
             self?.events.append(["phase": phase, "x": point.x, "y": point.y,
-                                 "timestamp": event.timestamp])
+                                 "timestamp": event.timestamp, "receivedAt": ProcessInfo.processInfo.systemUptime,
+                                 "button": event.buttonNumber, "clickCount": event.clickCount])
             self?.snapshot()
         }
         window.contentView = view

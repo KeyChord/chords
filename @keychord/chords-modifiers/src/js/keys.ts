@@ -2,18 +2,19 @@ import { tap } from "chord";
 
 const modifierKeys = { a: "alt", c: "ctrl", f: "fn", m: "cmd", s: "shift" } as const;
 
-/** Preserve the former command grammar, with '-' separating modifiers from regular keys. */
+/** A modifier entry point, one regular key, then additional modifiers in any order. */
 export function modifierShortcut(sequence: string): string {
-  const match = /^(a[cfms]*|c[fms]*|f[ms]*|ms*|s)-(.*)(?![\s\S])/.exec(sequence);
-  if (!match) throw new TypeError("Expected modifier letters followed by '-' and regular keys");
-  const [, letters, keys] = match;
-  if (!/^[a-z0-9`\-=\[\]\\;',./]*$/.test(keys)) {
-    throw new TypeError("Expected literal regular keys after '-'");
-  }
-  const modifiers = [...new Set(letters)]
+  const match = /^([acfms])([a-z0-9`\-=[\]\\;',./])([acfms]*)(?![\s\S])/.exec(sequence);
+  if (!match)
+    throw new TypeError(
+      "Expected a modifier letter, one regular key, and optional modifier letters",
+    );
+  const [, modifier, key, additionalModifiers] = match;
+  const modifiers = [...new Set(modifier + additionalModifiers)]
+    .sort()
     .map((letter) => modifierKeys[letter as keyof typeof modifierKeys])
     .join("+");
-  return keys ? [...keys].map((key) => `${modifiers}+${key}`).join(" ") : modifiers;
+  return `${modifiers}+${key}`;
 }
 
 export default function buildKeysHandler() {

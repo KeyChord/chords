@@ -27,13 +27,15 @@ private struct ScreenBounds: Codable, Equatable {
 }
 
 #NodeModule(exports: [
-    "getScreenBounds": try NodeFunction { () async throws -> String in
-        try await getScreenBounds()
+    "getScreenBounds": try NodeFunction { () throws -> NodePromise in
+        try mainActorPromise { try getScreenBounds() }
     },
-    "validateScreenBounds": try NodeFunction { (request: String) async throws in
-        let decoded = try JSONDecoder().decode(ScreenBounds.self, from: Data(request.utf8))
-        try await validateScreenBounds(decoded)
-        return try NodeUndefined()
+    "validateScreenBounds": try NodeFunction { (request: String) throws -> NodePromise in
+        try mainActorPromise {
+            let decoded = try JSONDecoder().decode(ScreenBounds.self, from: Data(request.utf8))
+            try validateScreenBounds(decoded)
+            return nil
+        }
     },
 ])
 
@@ -103,7 +105,7 @@ private func mirroringApplication() throws -> (NSRunningApplication, AXUIElement
 }
 
 @MainActor
-private func getScreenBounds() async throws -> String {
+private func getScreenBounds() throws -> String {
     let (app, application) = try mirroringApplication()
     let window = try screenWindow(application)
     guard !hasConnectionOverlay(window) else {
@@ -133,7 +135,7 @@ private func screenBounds(_ element: AXUIElement, processIdentifier: pid_t) thro
 }
 
 @MainActor
-private func validateScreenBounds(_ expected: ScreenBounds) async throws {
+private func validateScreenBounds(_ expected: ScreenBounds) throws {
     guard expected.isValid, expected.windowId != 0 else { throw MirroringError("Invalid mirrored iPhone window") }
     let (app, application) = try mirroringApplication()
     let window = try screenWindow(application)

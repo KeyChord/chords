@@ -219,6 +219,186 @@ function editor() {
   return dialog;
 }
 
+const gotoActions = ["HOME", "REELS", "MESSAGES", "SEARCH", "CREATE", "PROFILE"] as const;
+
+function prepareGoto(action: (typeof gotoActions)[number]) {
+  if (action === "SEARCH") {
+    window.document.querySelector('a[href="/explore/"]')!.addEventListener("click", () => {
+      const input = window.document.createElement("input");
+      input.setAttribute("aria-label", "Search input");
+      input.value = "existing query";
+      window.document.querySelector("main")!.append(input);
+    });
+  } else if (action === "CREATE") {
+    window.document.querySelector('a[href="#"]')!.addEventListener("click", () => {
+      const composer = window.document.createElement("div");
+      composer.setAttribute("role", "dialog");
+      composer.textContent = "Create new post";
+      window.document.body.append(composer);
+    });
+  }
+}
+
+function expectGoto(action: (typeof gotoActions)[number]) {
+  const paths = {
+    HOME: "/",
+    REELS: "/reels/",
+    MESSAGES: "/direct/inbox/",
+    SEARCH: "/explore/",
+    CREATE: "/",
+    PROFILE: "/owner/",
+  };
+  expect(window.location.pathname).toBe(paths[action]);
+  if (action === "SEARCH") {
+    const input = window.document.querySelector<HTMLInputElement>("input")!;
+    expect(window.document.activeElement).toBe(input);
+    expect([input.selectionStart, input.selectionEnd]).toEqual([0, input.value.length]);
+  } else if (action === "CREATE") {
+    expect(window.document.querySelector('[role="dialog"]')?.textContent).toBe("Create new post");
+  }
+}
+
+function storyViewer(dialog = false) {
+  const nav = window.document.querySelector("nav")!;
+  nav.setAttribute("aria-hidden", "true");
+  window.history.pushState(null, "", "/stories/account1/123/");
+  const viewer = window.document.createElement("div");
+  if (dialog) viewer.setAttribute("role", "dialog");
+  viewer.innerHTML = `<div role="button"><svg aria-label="Close"></svg></div>
+    <textarea placeholder="Reply to account1..."></textarea><button>Send</button>`;
+  const close = vi.fn(() => {
+    setTimeout(() => {
+      viewer.remove();
+      window.history.pushState(null, "", "/");
+      // Navigation can render after the story route has gone away.
+      setTimeout(() => nav.removeAttribute("aria-hidden"), 10);
+    }, 10);
+  });
+  viewer.querySelector('[role="button"]')!.addEventListener("click", close);
+  const send = vi.fn();
+  viewer.querySelector("button")!.addEventListener("click", send);
+  window.document.body.append(viewer);
+  viewer.querySelector("textarea")!.focus();
+  return { viewer, close, send };
+}
+
+test.each(gotoActions)("%s leaves a focused story and waits for navigation", async (action) => {
+  prepareGoto(action);
+  const { viewer, close, send } = storyViewer();
+  expect(window.document.activeElement).toBe(viewer.querySelector("textarea"));
+  expect(await run(action)).toEqual({ ok: true });
+  expect(close).toHaveBeenCalledOnce();
+  expect(viewer.isConnected).toBe(false);
+  expect(send).not.toHaveBeenCalled();
+  expectGoto(action);
+});
+
+test.each(gotoActions)("%s also leaves a story marked as a dialog", async (action) => {
+  prepareGoto(action);
+  const { close, send } = storyViewer(true);
+  expect(await run(action)).toEqual({ ok: true });
+  expect(close).toHaveBeenCalledOnce();
+  expect(send).not.toHaveBeenCalled();
+  expectGoto(action);
+});
+
+test("goto waits when the story dialog disappears before its route changes", async () => {
+  const { viewer, close } = storyViewer(true);
+  close.mockImplementation(() => {
+    viewer.remove();
+    setTimeout(() => {
+      window.history.pushState(null, "", "/");
+      window.document.querySelector("nav")!.removeAttribute("aria-hidden");
+    }, 10);
+  });
+  expect(await run("HOME")).toEqual({ ok: true });
+  expect(close).toHaveBeenCalledOnce();
+  expect(window.location.pathname).toBe("/");
+});
+
+test.each(gotoActions)("%s closes the current editor before navigating", async (action) => {
+  window.history.pushState(null, "", "/");
+  prepareGoto(action);
+  const dialog = editor();
+  const share = vi.fn();
+  const remove = vi.fn();
+  dialog.querySelectorAll("button")[0].addEventListener("click", share);
+  dialog.querySelectorAll("button")[1].addEventListener("click", remove);
+  expect(await run(action)).toEqual({ ok: true });
+  expect(dialog.isConnected).toBe(false);
+  expect(share).not.toHaveBeenCalled();
+  expect(remove).not.toHaveBeenCalled();
+  expectGoto(action);
+});
+
+test("goto closes stacked dialogs from the top before leaving a story", async () => {
+  const { close: closeStory } = storyViewer();
+  const first = editor();
+  const second = editor();
+  const order: string[] = [];
+  first.querySelector('[role="button"]')!.addEventListener("click", () => order.push("first"));
+  second.querySelector('[role="button"]')!.addEventListener("click", () => order.push("second"));
+  expect(await run("HOME")).toEqual({ ok: true });
+  expect(order).toEqual(["second", "first"]);
+  expect(closeStory).toHaveBeenCalledOnce();
+  expect(window.location.pathname).toBe("/");
+});
+
+test("goto leaves Instagram's unsaved-draft confirmation for the user", async () => {
+  const dialog = editor();
+  const discard = vi.fn();
+  const navigate = vi.fn();
+  window.document.querySelector('a[href="/"]')!.addEventListener("click", navigate);
+  dialog.querySelector('[role="button"]')!.addEventListener("click", () => {
+    const confirmation = window.document.createElement("div");
+    confirmation.setAttribute("role", "dialog");
+    confirmation.innerHTML =
+      "<h1>Discard note?</h1><button>Discard</button><button>Keep editing</button>";
+    confirmation.querySelector("button")!.addEventListener("click", discard);
+    window.document.body.append(confirmation);
+  });
+  expect((await run("HOME")).error).toContain("resolve its confirmation");
+  expect(window.document.querySelector('[role="dialog"]')?.textContent).toContain("Discard note?");
+  expect(discard).not.toHaveBeenCalled();
+  expect(navigate).not.toHaveBeenCalled();
+});
+
+test("goto cannot use a background Close control to dismiss an unrelated dialog", async () => {
+  const background = editor();
+  const closeBackground = vi.fn();
+  background.querySelector('[role="button"]')!.addEventListener("click", closeBackground);
+  const foreground = window.document.createElement("div");
+  foreground.setAttribute("role", "dialog");
+  foreground.innerHTML = "<button>Discard</button><button>Keep editing</button>";
+  window.document.body.append(foreground);
+  expect((await run("HOME")).error).toContain("resolve its confirmation");
+  expect(closeBackground).not.toHaveBeenCalled();
+  expect(foreground.isConnected).toBe(true);
+});
+
+test("goto reports a stalled story close instead of navigating behind it", async () => {
+  let now = 0;
+  vi.spyOn(window.Date, "now").mockImplementation(() => (now += 1000));
+  const { viewer, close } = storyViewer();
+  close.mockImplementation(() => undefined);
+  const navigate = vi.fn();
+  window.document.querySelector('a[href="/"]')!.addEventListener("click", navigate);
+  expect((await run("HOME")).error).toContain("story viewer did not close");
+  expect(close).toHaveBeenCalledOnce();
+  expect(viewer.isConnected).toBe(true);
+  expect(navigate).not.toHaveBeenCalled();
+});
+
+test("goto reports an unavailable story Close control", async () => {
+  let now = 0;
+  vi.spyOn(window.Date, "now").mockImplementation(() => (now += 1000));
+  const { viewer } = storyViewer();
+  viewer.querySelector('[role="button"]')!.remove();
+  expect((await run("HOME")).error).toContain("story viewer Close control is unavailable");
+  expect(viewer.isConnected).toBe(true);
+  expect(window.location.pathname).toBe("/stories/account1/123/");
+});
+
 test.each([
   ["HOME", "/"],
   ["REELS", "/reels/"],

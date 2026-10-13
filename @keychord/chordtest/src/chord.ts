@@ -19,6 +19,9 @@ export const click = vi.fn(
     x: number;
     y: number;
     expectedBounds?: WindowBounds;
+    button?: "left" | "right" | "middle";
+    clickCount?: 1 | 2;
+    pressDurationMs?: number;
   }): Promise<void> => unconfigured("click"),
 );
 export const getAppWindows = vi.fn((_bundleId: string): NativeWindow[] =>

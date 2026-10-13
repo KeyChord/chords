@@ -28,10 +28,9 @@ selects the first application menu starting with A (or reports no match).
 
 `Sources/KeychordChordsMenuNativeMenu/menu.swift` drives the menu bar through AXorcist on Swift’s `@MainActor` and exposes
 `runMenuAction` as an async Node-API function with NodeSwift. `@keychord/config` compiles it to the
-committed `target/<triple>/menu/menu.node` add-on, and `src/js/menu.ts` loads it in-process with
-`process.dlopen`. The path comes from Chord's built-in
-`import.meta.chord.resolveNative("menu")`, so the handler also works when the package is
-vendored inside another chord package. Chord's handler context supplies the bundle identifier of
+committed `target/<triple>/menu/menu.node` add-on. `src/js/menu.ts` uses `import addon from "./menu.node"`;
+the built-in config plugin packages the addon and `libNodeAPI.dylib` with its JavaScript so the
+handler also works when vendored inside another chord package. Chord's handler context supplies the bundle identifier of
 the app for which the chord was resolved, so menu actions target that app directly instead of
 re-reading the frontmost application after dispatch.
 

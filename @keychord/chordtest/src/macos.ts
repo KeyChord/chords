@@ -66,7 +66,7 @@ export async function nativeTestTargets(root: string): Promise<NativeTestTarget[
   ].map((match) => {
     const suffix = match[1].split("Native")[1];
     if (!suffix) throw new Error(`Cannot infer native output name for ${match[1]}`);
-    return { product: match[1], name: suffix.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase() };
+    return { product: match[1], name: suffix[0].toLowerCase() + suffix.slice(1) };
   });
 }
 

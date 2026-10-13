@@ -4,21 +4,12 @@ name = "Click"
 file = 'click.js'
 
 [chords]
-# Each click has one vertical (t/b) and one horizontal (l/r) offset, in either order.
-# Numbers starting with a digit are pixels; .5 is half the corresponding dimension.
-# Example: .b20l.5b.5l0b.3l.3b20r0b.5r.4
-# Capture the initial edge too; subsequent clicks can start from any edge.
-'?.b' = { name = "Click from Bottom" }
-'.(b.+)' = { name = "Click from Bottom", '@input:click' = ['$1'] }
+'?.' = { name = "Click" }
+'.([-0-9].+)' = { name = "Click", '@input:click' = ['$1', 'left'] }
 
-'?.t' = { name = "Click from Top" }
-'.(t.+)' = { name = "Click from Top", '@input:click' = ['$1'] }
-
-'?.l' = { name = "Click from Left" }
-'.(l.+)' = { name = "Click from Left", '@input:click' = ['$1'] }
-
-'?.r' = { name = "Click from Right" }
-'.(r.+)' = { name = "Click from Right", '@input:click' = ['$1'] }
-
-'?.2' = { name = "Right Click" }
+'?..' = { name = "Double Click" }
+'..([-0-9].+)' = { name = "Double Click", '@input:click' = ['$1', 'double'] }
+'?.,' = { name = "Right Click" }
+'.,([-0-9].+)' = { name = "Right Click", '@input:click' = ['$1', 'right'] }
 '?.;' = { name = "Middle Click" }
+'.;([-0-9].+)' = { name = "Middle Click", '@input:click' = ['$1', 'middle'] }

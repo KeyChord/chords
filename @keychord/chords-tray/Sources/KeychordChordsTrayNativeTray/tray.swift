@@ -416,10 +416,9 @@ private func press(_ element: Element, name: String) async throws {
 
 @MainActor
 private func menuBarItem(identifiers: [String]) -> Element? {
-    let owners = NSWorkspace.shared.runningApplications.filter {
-        ["com.apple.controlcenter", "com.apple.MenuBarAgent", "com.apple.systemuiserver"]
-            .contains($0.bundleIdentifier ?? "")
-    }.map { Element(AXUIElementCreateApplication($0.processIdentifier)) }
+    let owners = ["com.apple.controlcenter", "com.apple.MenuBarAgent", "com.apple.systemuiserver"]
+        .flatMap { NSRunningApplication.runningApplications(withBundleIdentifier: $0) }
+        .map { Element(AXUIElementCreateApplication($0.processIdentifier)) }
     let roots = owners.flatMap { owner in
         // Menu bars are not always included in the application's AXChildren.
         [kAXMenuBarAttribute, kAXExtrasMenuBarAttribute].compactMap { name in
@@ -465,7 +464,8 @@ private func expandedSection(in application: Element, section: ControlCenterSect
             return element.identifier() == "controlcenter-volume" && element.role() == kAXStaticTextRole
                 || element.identifier()?.hasPrefix("sound-device-") == true
         case .wifi:
-            return element.identifier() == "controlcenter-wifi" && element.role() == kAXStaticTextRole
+            return ["wifi-header", "controlcenter-wifi"].contains(element.identifier() ?? "")
+                && element.role() == kAXStaticTextRole
         }
     } != nil || settingsButton(in: application, section: section) != nil
 }
@@ -479,6 +479,24 @@ private func overviewControl(in application: Element) -> Element? {
 }
 
 @MainActor
+private func wifiPowerControl(in application: Element) -> Element? {
+    find(in: windows(of: application)) { element in
+        guard [kAXCheckBoxRole, "AXSwitch"].contains(element.role() ?? "") else { return false }
+        let identifier = element.identifier()?.lowercased() ?? ""
+        // Network rows are also checkboxes. Never mistake one for the radio's power control.
+        guard !identifier.contains("network"), !identifier.contains("hotspot") else { return false }
+        if ["wifi-header", "controlcenter-wifi"].contains(identifier)
+            || (identifier.contains("wifi") && (identifier.contains("power") || identifier.contains("toggle"))) {
+            return true
+        }
+        return [element.title(), element.descriptionText()].compactMap { $0 }.contains {
+            let label = $0.replacingOccurrences(of: "‑", with: "-")
+            return label == "Wi-Fi" || label.hasPrefix("Wi-Fi,")
+        }
+    }
+}
+
+@MainActor
 private func openControlCenter(_ application: Element) async throws {
     if overviewControl(in: application) != nil { return }
     let item = try await waitForControl("Control Center menu bar item") {
@@ -486,8 +504,20 @@ private func openControlCenter(_ application: Element) async throws {
     }
     // AXPress on this menu extra returns from an expanded section to the overview as well.
     try await press(item, name: "Control Center")
-    _ = try await waitForControl("Control Center overview") {
-        overviewControl(in: application)
+    do {
+        _ = try await waitForControl("Control Center overview") {
+            overviewControl(in: application)
+        }
+    } catch TrayError.controlNotFound(_) {
+        // macOS can accept AXPress without opening the panel while another menu extra closes.
+        // Recheck the UI and use the current AXFrame for a real click if the press had no effect.
+        if overviewControl(in: application) != nil { return }
+        guard let frame = menuBarItem(identifiers: ["com.apple.menuextra.controlcenter"])?.frame(),
+              !frame.isEmpty else { throw TrayError.controlNotFound("Control Center menu bar item") }
+        try await click(at: CGPoint(x: frame.midX, y: frame.midY), type: .left)
+        _ = try await waitForControl("Control Center overview") {
+            overviewControl(in: application)
+        }
     }
 }
 
@@ -499,6 +529,7 @@ private func expand(_ section: ControlCenterSection, in application: Element) as
         find(in: windows(of: application)) { $0.identifier() == section.identifier }
     }
     // AXPress on the heading/chevron expands the section; it does not click its slider.
+    // Wi-Fi's overview checkbox also opens the section; its power toggle is `wifi-header`.
     try await press(button, name: section.rawValue)
     _ = try await waitForControl("expanded \(section.rawValue)") {
         expandedSection(in: application, section: section) ? button : nil
@@ -572,13 +603,7 @@ private func runControlCenterAction(section: ControlCenterSection?, action: Cont
         try await press(button, name: action.rawValue)
     case .toggle:
         let button = try await waitForControl("Wi-Fi power toggle") {
-            find(in: windows(of: application)) { element in
-                guard [kAXCheckBoxRole, "AXSwitch"].contains(element.role() ?? "") else { return false }
-                return element.identifier()?.localizedCaseInsensitiveContains("wifi") == true
-                    || [element.title(), element.descriptionText()].compactMap { $0 }.contains {
-                        $0.hasPrefix("Wi-Fi")
-                    }
-            }
+            wifiPowerControl(in: application)
         }
         try await press(button, name: "Wi-Fi power toggle")
     }

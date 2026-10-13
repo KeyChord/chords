@@ -3,6 +3,7 @@
  * `@keychord/config` compiles the Swift source to
  * `target/<triple>/tray/tray.node`.
  */
+import addon from "./tray.node";
 
 export type TrayClickType = "left" | "right";
 
@@ -28,24 +29,11 @@ export type TrayAction =
 
 export type TrayHandler = (...args: TrayAction) => Promise<void>;
 
-type TrayAddon = {
-  runTrayAction(type: string, value: string, action: string): Promise<void>;
-};
-
-let addon: TrayAddon | undefined;
-
-function openTrayAddon(): TrayAddon {
-  const module = { exports: {} as TrayAddon };
-  process.dlopen(module, import.meta.chord.resolveNative("tray"));
-  return module.exports;
-}
-
 export async function runTrayAction(...args: TrayAction): Promise<void> {
   const [type, value, action] = args;
   if (type === "ITEM" && !Number.isSafeInteger(value)) {
     throw new TypeError("tray index must be a safe integer");
   }
-  addon ??= openTrayAddon();
   return addon.runTrayAction(
     type,
     value === undefined ? "" : String(value),

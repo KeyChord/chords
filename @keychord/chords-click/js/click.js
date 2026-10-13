@@ -1,38 +1,63 @@
 import { click, getAppWindows } from "chord";
 //#region src/js/utils/click-sequence.ts
-/** Parse the complete sequence before requesting any native clicks. */
-function parseClickSequence(sequence) {
-  const input = sequence.replace(/\s+/g, "");
-  const token = /([tblr])(\.\d+|\d+(?:\.\d+)?)/y;
+/** Parse x/y pairs completely before requesting any native clicks. */
+function parseClickSequence(sequence, defaultClick) {
+  const input = sequence.trim();
+  const token = /\s*(?:(\d+(?:\.\d+)?)([lrtb])|([-0-9]))\s*/y;
   const positions = [];
   let index = 0;
+  function coordinate() {
+    token.lastIndex = index;
+    const match = token.exec(input);
+    if (!match) throw new TypeError(`Expected a click coordinate at character ${index + 1}`);
+    index = token.lastIndex;
+    const [, pixels, edge, digit] = match;
+    const fraction = pixels === void 0;
+    const value = fraction
+      ? digit === "-"
+        ? 0
+        : digit === "0"
+          ? 1
+          : Number(digit) / 10
+      : Number(pixels);
+    if (!Number.isFinite(value) || (!fraction && value > Number.MAX_SAFE_INTEGER))
+      throw new TypeError(
+        "Click offsets must be finite proportions or pixel amounts within the safe numeric range",
+      );
+    return {
+      edge,
+      value,
+      fraction,
+    };
+  }
   while (index < input.length) {
-    const position = {};
+    if (positions.length && input[index] === "/") index++;
+    let click = defaultClick;
+    if (input[index] === ",") {
+      click = defaultClick === void 0 ? "long" : "right";
+      index++;
+    } else if (defaultClick !== void 0 && input[index] === ";") {
+      click = "middle";
+      index++;
+    } else if (input[index] === ".") {
+      click = defaultClick === void 0 ? void 0 : input[index + 1] === "." ? "double" : "left";
+      index += click === "double" ? 2 : 1;
+    }
+    const position = click ? { click } : {};
     for (let axis = 0; axis < 2; axis++) {
-      token.lastIndex = index;
-      const match = token.exec(input);
-      if (!match) throw new TypeError(`Expected an edge and offset at character ${index + 1}`);
-      index = token.lastIndex;
-      const [, edge, amount] = match;
-      const fraction = amount.startsWith(".");
-      const value = Number(amount);
-      if (!Number.isFinite(value) || (!fraction && value > Number.MAX_SAFE_INTEGER))
-        throw new TypeError(
-          "Click offsets must be finite fractions or pixel amounts within the safe numeric range",
-        );
+      const amount = coordinate();
+      const edge = amount.edge ?? (position.horizontal ? "t" : "l");
       if (edge === "l" || edge === "r") {
-        if (position.horizontal) throw new TypeError("Each click needs one horizontal edge");
+        if (position.horizontal) throw new TypeError("Each click needs one horizontal coordinate");
         position.horizontal = {
+          ...amount,
           edge,
-          value,
-          fraction,
         };
       } else {
-        if (position.vertical) throw new TypeError("Each click needs one vertical edge");
+        if (position.vertical) throw new TypeError("Each click needs one vertical coordinate");
         position.vertical = {
+          ...amount,
           edge,
-          value,
-          fraction,
         };
       }
     }
@@ -56,13 +81,15 @@ function resolveClickSequence(positions, bounds) {
     const result = fromEnd ? size - distance : distance;
     return result === size ? size - 1 : result;
   }
-  return positions.map(({ horizontal, vertical }) => ({
+  return positions.map(({ horizontal, vertical, click }) => ({
     x: bounds.x + coordinate(horizontal, bounds.width, horizontal.edge === "r"),
     y: bounds.y + coordinate(vertical, bounds.height, vertical.edge === "b"),
+    ...(click ? { click } : {}),
   }));
 }
 //#endregion
 //#region src/js/click.ts
+const CLICK_SEQUENCE_DELAY_MS = 500;
 /** Send resolved screen points to one window, with an optional check before each click. */
 async function clickPoints(bounds, points, validate) {
   const { x, y, width, height, windowId } = bounds;
@@ -78,18 +105,24 @@ async function clickPoints(bounds, points, validate) {
         width,
         height,
       },
+      ...(point.click === "right" || point.click === "middle" ? { button: point.click } : {}),
+      ...(point.click === "double" ? { clickCount: 2 } : {}),
+      ...(point.click === "long" ? { pressDurationMs: 500 } : {}),
     });
-    if (index < points.length - 1) await new Promise((resolve) => setTimeout(resolve, 200));
+    if (index < points.length - 1)
+      await new Promise((resolve) => setTimeout(resolve, CLICK_SEQUENCE_DELAY_MS));
   }
 }
 /** Click the captured app's frontmost on-screen window, or an explicitly named app. */
 function buildClickHandler(bundleId) {
   let pending = Promise.resolve();
-  return function click(sequence) {
+  return function click(sequence, defaultClick = "left") {
     const appId = bundleId ?? this?.focusedAppId;
     let positions;
     try {
-      positions = parseClickSequence(sequence);
+      if (!["left", "right", "middle", "double"].includes(defaultClick))
+        throw new TypeError("Unknown default click type");
+      positions = parseClickSequence(sequence, defaultClick);
       if (!appId?.trim()) throw new TypeError("A focused application or bundle ID is required");
     } catch (error) {
       return Promise.reject(error);

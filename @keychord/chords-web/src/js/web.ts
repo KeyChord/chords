@@ -5,6 +5,7 @@
  */
 import jquery from "jquery-as-string";
 import outdent from "outdent";
+import addon from "./web.node";
 
 type Args =
   | [type: "placeholder", input: string]
@@ -14,20 +15,7 @@ type Args =
   | [type: "button", input: string]
   | [type: "scroll", direction: "north" | "south" | "east" | "west"];
 
-type WebAddon = {
-  runJavaScript(source: string): void;
-};
-
-let addon: WebAddon | undefined;
-
-function openWebAddon(): WebAddon {
-  const module = { exports: {} as WebAddon };
-  process.dlopen(module, import.meta.chord.resolveNative("web"));
-  return module.exports;
-}
-
 export function runWebJavaScript(source: string): void {
-  addon ??= openWebAddon();
   addon.runJavaScript(source);
 }
 

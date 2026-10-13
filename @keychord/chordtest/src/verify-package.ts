@@ -2,6 +2,7 @@
 import { click, getAppWindows } from "chord";
 import { join } from "node:path";
 import { requireMacOSVM } from "./runtime";
+import { hostTriple } from "./native";
 
 requireMacOSVM();
 const root = process.argv[2];
@@ -23,7 +24,7 @@ for (const path of definitions) {
     throw new Error(`${path}: missing name`);
   for (const handler of Object.values(definition.on ?? {}) as { file?: string }[]) {
     if (!handler.file) throw new Error(`${path}: missing handler file`);
-    const vendor = path.match(/^chords\/(\@[^/]+\/[^/]+)\/chords\//)?.[1];
+    const vendor = path.match(/^chords\/(@[^/]+\/[^/]+)\/chords\//)?.[1];
     const module =
       vendor && !handler.file.startsWith("@")
         ? join(root, "js", vendor, "js", handler.file)
@@ -39,9 +40,16 @@ for (const path of definitions) {
 for (const path of new Bun.Glob("js/*.js").scanSync({ cwd: root })) {
   await import(Bun.pathToFileURL(join(root, path)).href);
 }
-for (const path of new Bun.Glob("target/*-apple-darwin/*/*.node").scanSync({ cwd: root })) {
-  const module = { exports: {} };
-  process.dlopen(module, join(root, path));
-  if (!Object.keys(module.exports).length) throw new Error(`${path}: addon has no exports`);
+const packagedAddons = [
+  ...new Bun.Glob(`js/native/${hostTriple}/**/*.node`).scanSync({ cwd: root }),
+];
+const nativeAddons = packagedAddons.length
+  ? packagedAddons
+  : [...new Bun.Glob(`target/${hostTriple}/*/*.node`).scanSync({ cwd: root })];
+for (const path of nativeAddons) {
+  // The plugin's loaders already require these files. Share Bun's cache so validating
+  // exports doesn't register the same Swift classes from a second copy under target/.
+  const exports = require(join(root, path));
+  if (!Object.keys(exports).length) throw new Error(`${path}: addon has no exports`);
 }
 console.log(`package-macos-ok ${manifest.name} (${definitions.length} definitions)`);

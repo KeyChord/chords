@@ -10,5 +10,6 @@
     "@keychord/config": "catalog:",
     "@keychord/tsconfig": "catalog:",
     "happy-dom": "^21.0.1"
-  }
+  },
+  "packageManager": "pnpm@12.11.2"
 }

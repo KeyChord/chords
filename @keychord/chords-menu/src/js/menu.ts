@@ -4,10 +4,10 @@
  * `target/<triple>/menu/menu.node`. Chord runs handlers on Bun, so the addon is
  * opened in-process — no helper process, no `osascript` round trip.
  *
- * The addon is located through `import.meta.chord.resolveNative`, which Chord attaches to every
- * module it loads and which knows the package layout (including vendored copies), so nothing here
- * depends on where the package is installed.
+ * `@keychord/config` resolves the native import and packages the addon with its runtime,
+ * including when the JavaScript bundle is vendored into another package.
  */
+import addon from "./menu.node";
 
 export type MenuAction = "by-index" | "by-letters" | "by-path";
 
@@ -52,24 +52,11 @@ export type MenuHandler = {
   (this: MenuHandlerContext | void, action: "by-path", path: MenuPath): Promise<void>;
 };
 
-type MenuAddon = {
-  runMenuAction(processName: string | undefined, action: MenuAction, value: string): Promise<void>;
-};
-
-let addon: MenuAddon | undefined;
-
-function openMenuAddon(): MenuAddon {
-  const module = { exports: {} as MenuAddon };
-  process.dlopen(module, import.meta.chord.resolveNative("menu"));
-  return module.exports;
-}
-
 export async function runMenuAction(
   processName: string | undefined,
   action: MenuAction,
   value: number | string | MenuPath,
 ): Promise<void> {
-  addon ??= openMenuAddon();
   if (action === "by-path") {
     if (
       !Array.isArray(value) ||

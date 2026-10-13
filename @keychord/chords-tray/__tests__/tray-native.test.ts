@@ -1,4 +1,5 @@
 import { loadNativeAddon } from "@keychord/chordtest/native";
+import { waitFor } from "@keychord/chordtest/macos";
 import { macOSUITestsEnabled, withMacOSRunLoop } from "@keychord/chordtest/runtime";
 import { beforeAll, describe, expect, test } from "bun:test";
 import { buildNative } from "../scripts/build-native";
@@ -24,9 +25,16 @@ describe.skipIf(process.platform !== "darwin")("Swift tray addon in Bun", () => 
     ["ITEM", "9223372036854775808", "left", "invalid tray index"],
     ["ITEM", "-9223372036854775808", "left", "invalid tray index"],
     ["ITEM", "0", "middle", "invalid tray click type"],
-    ["CONTROL_CENTER", "WIFI", "", "invalid Control Center action"],
+    ["BATTERY", "TOGGLE", "", "invalid BATTERY tray action"],
+    ["DATE_TIME", "TOGGLE", "", "invalid DATE_TIME tray action"],
+    ["BATTERY", "", "CLICK", "invalid BATTERY tray action"],
+    ["WIFI", "OFF", "", "invalid WIFI tray action"],
+    ["WIFI", "TOGGLE", "CLICK", "invalid WIFI tray action"],
+    ["CONTROL_CENTER", "BLUETOOTH", "", "invalid Control Center action"],
     ["CONTROL_CENTER", "", "INCREASE", "invalid Control Center action"],
     ["CONTROL_CENTER", "DISPLAY", "MISSING", "invalid Control Center action"],
+    ["CONTROL_CENTER", "DISPLAY", "TOGGLE", "invalid Control Center action"],
+    ["CONTROL_CENTER", "WIFI", "INCREASE", "invalid Control Center action"],
     ["CONTROL_CENTER", "SOUND", "DARK_MODE", "invalid Control Center action"],
     ["CONTROL_CENTER", "SOUND", "NIGHT_SHIFT", "invalid Control Center action"],
     ["CONTROL_CENTER", "SOUND", "TRUE_TONE", "invalid Control Center action"],
@@ -37,6 +45,117 @@ describe.skipIf(process.platform !== "darwin")("Swift tray addon in Bun", () => 
       await expect(addon.runTrayAction(type, value, action)).rejects.toThrow(error);
     });
   }
+
+  test.skipIf(!macOSUITestsEnabled)(
+    "opens named system tray items and toggles Wi-Fi when available",
+    () =>
+      withMacOSRunLoop(async () => {
+        const probeSource = Bun.fileURLToPath(
+          new URL("./ControlCenterProbe.swift", import.meta.url),
+        );
+        const probeBinary = Bun.fileURLToPath(
+          new URL("../node_modules/.cache/chord/native/system-tray-probe", import.meta.url),
+        );
+        const compilation = Bun.spawn(["swiftc", probeSource, "-o", probeBinary], {
+          stderr: "inherit",
+        });
+        expect(await compilation.exited).toBe(0);
+        type Control = {
+          role: string;
+          identifier?: string;
+          title?: string;
+          value?: number;
+          enabled?: boolean;
+        };
+        async function probe(...args: string[]): Promise<Control[]> {
+          const child = Bun.spawn([probeBinary, ...args], { stdout: "pipe", stderr: "inherit" });
+          const output = await new Response(child.stdout).text();
+          expect(await child.exited).toBe(0);
+          return output ? JSON.parse(output) : [];
+        }
+        const run = (type: string, value = "") => addon.runTrayAction(type, value, "");
+        const items = await probe("menu-bar");
+        try {
+          if (items.some((item) => item.identifier === "com.apple.menuextra.battery")) {
+            await run("BATTERY");
+            await waitFor(async () =>
+              (await probe()).find((element) => element.role === "AXWindow"),
+            );
+            await probe("close");
+          } else {
+            await expect(run("BATTERY")).rejects.toThrow("BATTERY menu bar item");
+          }
+
+          // Desktop widgets keep their own AXWindows even when Notification Center is closed.
+          const desktopWindows = (await probe("windows", "com.apple.notificationcenterui"))
+            .filter((element) => element.role === "AXWindow")
+            .map((element) => element.title);
+          await run("DATE_TIME");
+          const notificationWindow = await waitFor(async () =>
+            (await probe("windows", "com.apple.notificationcenterui")).find(
+              (element) => element.role === "AXWindow" && !desktopWindows.includes(element.title),
+            ),
+          );
+          await run("DATE_TIME");
+          await waitFor(async () =>
+            (await probe("windows", "com.apple.notificationcenterui")).some(
+              (element) =>
+                element.role === "AXWindow" && element.title === notificationWindow.title,
+            )
+              ? undefined
+              : true,
+          );
+
+          // Virtual Macs may expose no Wi-Fi hardware or tile. Check that absence is reported.
+          await addon.runTrayAction("CONTROL_CENTER", "", "");
+          const hasWifi = (await probe()).some(
+            (element) => element.identifier === "controlcenter-wifi",
+          );
+          if (!hasWifi) {
+            await expect(run("WIFI")).rejects.toThrow("could not find WIFI");
+            await expect(run("WIFI", "TOGGLE")).rejects.toThrow("could not find WIFI");
+            return;
+          }
+          await run("WIFI");
+          const before = await probe();
+          expect(before.some((element) => element.role === "AXWindow")).toBe(true);
+          const toggle = before.find((element) =>
+            ["AXCheckBox", "AXSwitch"].includes(element.role),
+          );
+          if (!toggle) {
+            await expect(run("WIFI", "TOGGLE")).rejects.toThrow("Wi-Fi power toggle");
+          } else if (toggle.enabled === false) {
+            await expect(run("WIFI", "TOGGLE")).rejects.toThrow("disabled");
+          } else {
+            const readToggle = async () =>
+              (await probe()).find(
+                (element) =>
+                  element.identifier === toggle.identifier && element.role === toggle.role,
+              )!;
+            try {
+              await run("WIFI", "TOGGLE");
+              await waitFor(async () =>
+                (await readToggle()).value !== toggle.value ? true : undefined,
+              );
+              expect((await readToggle()).value).not.toBe(toggle.value);
+            } finally {
+              if ((await readToggle()).value !== toggle.value) await run("WIFI", "TOGGLE");
+            }
+            expect((await readToggle()).value).toBe(toggle.value);
+          }
+        } catch (error) {
+          console.info("System tray accessibility evidence", {
+            items: items.filter((element) => element.role === "AXMenuBarItem"),
+            panel: await probe(),
+            notifications: await probe("windows", "com.apple.notificationcenterui"),
+          });
+          throw error;
+        } finally {
+          await probe("close");
+        }
+      }),
+    60_000,
+  );
 
   test.skipIf(!macOSUITestsEnabled)(
     "opens and switches panels, adjusts sliders, toggles display options, and opens Settings",

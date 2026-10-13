@@ -1,20 +1,26 @@
 # @keychord/chords-modifiers
 
-Execute modifier shortcuts using `.` followed by modifier letters, `-`, and the
-regular keys to send. Each regular key becomes a separate shortcut with the same
-modifiers, in order:
+Execute modifier shortcuts using `.` followed by one modifier letter, one regular
+key, and optional additional modifier letters:
 
 ```text
-.m-cv       Command+C, then Command+V
-.cms-cv     Control+Command+Shift+C, then Control+Command+Shift+V
-.a-[]       Alt+[, then Alt+]
+.mv         Command+V
+.mvs        Command+Shift+V
+.mcsa       Command+Shift+Alt+C
+.mcas       Command+Shift+Alt+C
+.ms         Command+S
+.a[         Alt+[
 ```
 
 Modifier letters are `a` (Alt/Option), `c` (Control), `f` (Fn), `m` (Meta/Command),
-and `s` (Shift). Put modifiers in that order, as in the former `chords-commands`
-package. The first modifier determines the entry point; all 31 nonempty modifier
-combinations are supported. `-` separates modifiers from regular keys; later `-`
-characters are literal minus keys. An empty suffix taps only the selected modifiers.
+and `s` (Shift). The first modifier determines the entry point; the next character
+is always the regular key, even when it is also a modifier letter. Additional
+modifiers can follow in any order, and repeated modifiers are applied only once.
+All 31 nonempty modifier combinations are supported from any included modifier's
+entry point. No separator is needed: `.m-` sends Command+Minus.
+
+This replaces the former modifier-first `-` syntax. Use separate chords for
+separate shortcuts, such as `.mc` for Command+C and `.mv` for Command+V.
 
 The sequence runs when you execute the chord. The native `chord.tap` helper presses
 and releases each shortcut, including its modifiers. Unmodified-key chords are

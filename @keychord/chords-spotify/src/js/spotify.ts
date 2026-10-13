@@ -1,13 +1,14 @@
 import { buildSpotifyJavaScript, type SpotifyTrackAction } from "./page";
 import { runSpotifyJavaScript } from "./spotify/cdp";
+import type { SpotifyBarAction } from "./now-playing";
 
-export type SpotifyAction = SpotifyTrackAction | "liked-songs";
+export type SpotifyAction = SpotifyTrackAction | SpotifyBarAction | "liked-songs";
 
 export default function buildHandler(port = 9223) {
   if (!Number.isInteger(port) || port < 1 || port > 65535) {
     throw new Error("The Spotify debugging port must be an integer between 1 and 65535.");
   }
-  // Menu commands must finish before the next chord changes the selected track.
+  // Finish each command before the next chord changes the track or playback state.
   let previous: Promise<unknown> = Promise.resolve();
   return function handler(action: SpotifyAction, index?: string | number): Promise<boolean> {
     const pending = previous.then(async () => {

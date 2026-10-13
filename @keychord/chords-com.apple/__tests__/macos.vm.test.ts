@@ -7,7 +7,7 @@ test.skipIf(!macOSUITestsEnabled)(
   () =>
     testMacOSPackage(import.meta.url, [
       { product: "KeychordChordsComAppleNativeSafari", name: "safari" },
-      { product: "KeychordChordsComAppleNativeScreenContinuity", name: "screen-continuity" },
+      { product: "KeychordChordsComAppleNativeScreenContinuity", name: "screenContinuity" },
     ]),
   300_000,
 );

@@ -7,7 +7,7 @@ url = "https://manual.raycast.com/keyboard-shortcuts"
 file = "raycast.js"
 
 [chords]
-'/r' = { name = "Raycast", '@input:raycast' = [] }
+'//(.*)' = { name = "Raycast: Search $1", '@input:raycast' = ['$1'] }
 
 'nn' = { name = "Navigate: North", shortcut = "up" }
 'ne' = { name = "Navigate: East", shortcut = "right" }

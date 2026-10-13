@@ -2,43 +2,34 @@
 var name = "@keychord/chords-com.apple";
 var version = "0.0.0";
 var repository = {
-  type: "git",
-  url: "https://github.com/KeyChord/chords-com.apple",
+	"type": "git",
+	"url": "https://github.com/KeyChord/chords-com.apple"
 };
 var type = "module";
 var dependencies = {
-  "@keychord/chords-click": "workspace:*",
-  "@keychord/chords-menu": "workspace:*",
-  desm: "latest",
-  "get-port": "latest",
-  "jquery-as-string": "latest",
-  ky: "^1.14.3",
-  outdent: "latest",
+	"@keychord/chords-click": "workspace:*",
+	"@keychord/chords-menu": "workspace:*",
+	"desm": "latest",
+	"get-port": "latest",
+	"jquery-as-string": "latest",
+	"ky": "^1.14.3",
+	"outdent": "latest"
 };
 var devDependencies = {
-  "@keychord/chordtest": "workspace:*",
-  "@keychord/config": "catalog:",
-  "@keychord/tsconfig": "catalog:",
-  "@types/bun": "latest",
+	"@keychord/chordtest": "workspace:*",
+	"@keychord/config": "catalog:",
+	"@keychord/tsconfig": "catalog:",
+	"@types/bun": "latest"
 };
-var packageManager = "pnpm@10.33.0";
+var packageManager = "pnpm@12.11.2";
 var package_default = {
-  name,
-  version,
-  repository,
-  type,
-  dependencies,
-  devDependencies,
-  packageManager,
+	name,
+	version,
+	repository,
+	type,
+	dependencies,
+	devDependencies,
+	packageManager
 };
 //#endregion
-export {
-  package_default as default,
-  dependencies,
-  devDependencies,
-  name,
-  packageManager,
-  repository,
-  type,
-  version,
-};
+export { package_default as default, dependencies, devDependencies, name, packageManager, repository, type, version };

@@ -76,11 +76,11 @@ export async function runSpotifyJavaScript(source: string, port: number): Promis
     targets = ((await response.json()) as Target[]).filter(isSpotifyTarget);
   } catch {
     throw new Error(
-      `Start Spotify with --remote-debugging-port=${port} before using playlist chords. See the chords-spotify README for setup.`,
+      `Start Spotify with --remote-debugging-port=${port} before using playlist or bar chords. See the chords-spotify README for setup.`,
     );
   }
   if (targets.length === 0)
-    throw new Error("Open the Spotify desktop app before using playlist chords.");
+    throw new Error("Open the Spotify desktop app before using playlist or bar chords.");
 
   let target: Target | undefined;
   if (targets.length === 1) target = targets[0];
@@ -92,6 +92,6 @@ export async function runSpotifyJavaScript(source: string, port: number): Promis
       }
     }
   }
-  if (!target) throw new Error("Focus the Spotify app before using playlist chords.");
+  if (!target) throw new Error("Focus the Spotify app before using playlist or bar chords.");
   return evaluate(target, source);
 }

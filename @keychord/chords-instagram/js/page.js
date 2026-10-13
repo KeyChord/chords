@@ -158,21 +158,44 @@ async function runInPage(action, storyNumber) {
       if (!avatar) throw new Error("Open a profile before using the avatar chord.");
       click(avatar);
     } else {
-      if (dialogs().length)
-        throw new Error("Close the current dialog before navigating Instagram.");
-      const navigation = byLabel(
-        document,
-        {
-          HOME: ["Home"],
-          REELS: ["Reels"],
-          MESSAGES: ["Messages", "Messenger"],
-          SEARCH: ["Search"],
-          CREATE: ["New post", "Create"],
-          PROFILE: ["Profile"],
-        }[action],
+      for (let closed = 0; dialogs().length; closed++) {
+        const dialog = dialogs().at(-1);
+        const close = byLabel(dialog, ["Close", "Cancel"]);
+        if (!close || closed >= 4)
+          throw new Error(
+            "Close the current dialog or resolve its confirmation before navigating Instagram.",
+          );
+        click(close);
+        await waitFor(
+          () => !dialog.isConnected || !visible(dialog) || void 0,
+          "Instagram's current dialog did not close.",
+        );
+      }
+      if (location.pathname.startsWith("/stories/")) {
+        const close = await waitFor(
+          () => !location.pathname.startsWith("/stories/") || byLabel(document, ["Close"]),
+          "Instagram's story viewer Close control is unavailable.",
+        );
+        if (close !== true) click(close);
+        await waitFor(
+          () => !location.pathname.startsWith("/stories/") || void 0,
+          "Instagram's story viewer did not close.",
+        );
+        if (dialogs().length)
+          throw new Error("Resolve the current confirmation before navigating Instagram.");
+      }
+      const labels = {
+        HOME: ["Home"],
+        REELS: ["Reels"],
+        MESSAGES: ["Messages", "Messenger"],
+        SEARCH: ["Search"],
+        CREATE: ["New post", "Create"],
+        PROFILE: ["Profile"],
+      };
+      const navigation = await waitFor(
+        () => byLabel(document, labels[action]),
+        `Instagram's ${action.toLowerCase()} navigation control is unavailable.`,
       );
-      if (!navigation)
-        throw new Error(`Instagram's ${action.toLowerCase()} navigation control is unavailable.`);
       const destination =
         navigation instanceof HTMLAnchorElement ? new URL(navigation.href).pathname : void 0;
       if (

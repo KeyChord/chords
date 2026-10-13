@@ -15,5 +15,5 @@
     "@octokit/rest": "latest",
     "bun-types": "latest"
   },
-  "packageManager": "pnpm@10.33.0"
+  "packageManager": "pnpm@12.11.2"
 }

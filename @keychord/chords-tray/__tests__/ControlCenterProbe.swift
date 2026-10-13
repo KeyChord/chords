@@ -35,7 +35,9 @@ guard let app = NSRunningApplication.runningApplications(withBundleIdentifier: "
 }
 let application = AXUIElementCreateApplication(app.processIdentifier)
 // The icon can belong to MenuBarAgent even though the panel belongs to Control Center.
-let owners = [application] + NSRunningApplication.runningApplications(withBundleIdentifier: "com.apple.MenuBarAgent")
+let owners = NSWorkspace.shared.runningApplications.filter {
+    ["com.apple.controlcenter", "com.apple.MenuBarAgent", "com.apple.systemuiserver"].contains($0.bundleIdentifier ?? "")
+}
     .map { AXUIElementCreateApplication($0.processIdentifier) }
 let elements = owners.flatMap { owner in
     let menuBars = [kAXMenuBarAttribute, kAXExtrasMenuBarAttribute].compactMap { name -> AXUIElement? in
@@ -60,8 +62,16 @@ if arguments.first == "close" {
         _ = AXUIElementPerformAction(item, kAXPressAction as CFString)
     }
 } else {
-    let windows = attribute(application, kAXWindowsAttribute) as? [AXUIElement] ?? []
-    let snapshot = windows.flatMap { descendants($0) }.map { element -> [String: Any] in
+    let target: AXUIElement
+    if arguments.first == "windows", arguments.count == 2,
+       let app = NSRunningApplication.runningApplications(withBundleIdentifier: arguments[1]).first {
+        target = AXUIElementCreateApplication(app.processIdentifier)
+    } else {
+        target = application
+    }
+    let windows = attribute(target, kAXWindowsAttribute) as? [AXUIElement] ?? []
+    let roots = arguments.first == "menu-bar" ? elements : windows.flatMap { descendants($0) }
+    let snapshot = roots.map { element -> [String: Any] in
         var actions: CFArray?
         _ = AXUIElementCopyActionNames(element, &actions)
         var entry: [String: Any] = ["actions": actions as? [String] ?? []]

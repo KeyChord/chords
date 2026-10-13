@@ -4,10 +4,14 @@ import {
   resolveClickSequence,
   type ClickPoint,
   type ScreenBounds,
+  type ClickKind,
 } from "./utils/click-sequence";
 
 export type ClickHandlerContext = { focusedAppId?: string };
 export type ClickBounds = ScreenBounds & { windowId: number };
+
+// Leave time for UI transitions between coordinate actions.
+const CLICK_SEQUENCE_DELAY_MS = 500;
 
 /** Send resolved screen points to one window, with an optional check before each click. */
 export async function clickPoints(
@@ -23,9 +27,12 @@ export async function clickPoints(
       x: point.x - x,
       y: point.y - y,
       expectedBounds: { x, y, width, height },
+      ...(point.click === "right" || point.click === "middle" ? { button: point.click } : {}),
+      ...(point.click === "double" ? { clickCount: 2 } : {}),
+      ...(point.click === "long" ? { pressDurationMs: 500 } : {}),
     });
     if (index < points.length - 1) {
-      await new Promise<void>((resolve) => setTimeout(resolve, 200));
+      await new Promise<void>((resolve) => setTimeout(resolve, CLICK_SEQUENCE_DELAY_MS));
     }
   }
 }
@@ -34,12 +41,19 @@ export async function clickPoints(
 export default function buildClickHandler(bundleId?: string) {
   let pending = Promise.resolve();
 
-  return function click(this: ClickHandlerContext | void, sequence: string): Promise<void> {
+  return function click(
+    this: ClickHandlerContext | void,
+    sequence: string,
+    defaultClick: Exclude<ClickKind, "long"> = "left",
+  ): Promise<void> {
     // Capture the invocation context before waiting for a previous sequence to finish.
     const appId = bundleId ?? this?.focusedAppId;
     let positions: ReturnType<typeof parseClickSequence>;
     try {
-      positions = parseClickSequence(sequence);
+      if (!["left", "right", "middle", "double"].includes(defaultClick)) {
+        throw new TypeError("Unknown default click type");
+      }
+      positions = parseClickSequence(sequence, defaultClick);
       if (!appId?.trim()) throw new TypeError("A focused application or bundle ID is required");
     } catch (error) {
       return Promise.reject(error);

@@ -1,4 +1,5 @@
 import { fileURLToPath } from "node:url";
+import { dirname, resolve } from "node:path";
 import type { Plugin } from "vite-plus";
 import { configDefaults } from "vite-plus/test/config";
 
@@ -9,6 +10,18 @@ export function chordTestRuntime() {
     name: "chord-testing-runtime",
     enforce: "pre",
     apply: () => process.env.VITEST === "true",
+    resolveId(source, importer) {
+      if (process.env.VITEST !== "true" || !importer || !/^\.\.?\/.*\.node$/.test(source)) {
+        return null;
+      }
+      // Give vi.mock/vi.doMock a stable module identity even though the native import's
+      // source-side filename is supplied by the production bundler rather than by a file.
+      return resolve(dirname(importer.split("?")[0]), source);
+    },
+    load(id) {
+      if (process.env.VITEST !== "true" || !id.endsWith(".node")) return null;
+      return `throw new Error(${JSON.stringify("Mock native .node imports in vp test; run packaged native addons in Bun or the macOS VM.")});`;
+    },
     transform(source, id) {
       if (process.env.VITEST !== "true") return null;
       const path = id.split("?")[0];

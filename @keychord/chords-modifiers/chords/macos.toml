@@ -4,19 +4,21 @@ name = "Modifier Keys"
 file = 'keys.js'
 
 [chords]
-# Modifiers precede '-'; each following regular key uses the selected modifiers.
-# Example: .cms-cv sends Control+Command+Shift+C, then Control+Command+Shift+V.
-'?.m' = { name = "Meta (Cmd)" }
-'.(m[s]*-.*)' = { name = "Meta (Cmd) Combo", '@input:keys' = ['$1'] }
+'?.' = { name = "Click / Modifiers" }
+
+# The first modifier precedes one regular key; additional modifiers follow in any order.
+# Examples: .mv sends Command+V; .mvs sends Command+Shift+V; .mcsa sends Command+Shift+Alt+C.
+'?.m' = { name = "Meta (Command)" }
+'.(m.[acfms]*)' = { name = "Meta (Cmd) Combo", '@input:keys' = ['$1'] }
 
 '?.c' = { name = "Control" }
-'.(c[fms]*-.*)' = { name = "Control Combo", '@input:keys' = ['$1'] }
+'.(c.[acfms]*)' = { name = "Control Combo", '@input:keys' = ['$1'] }
 
-'?.a' = { name = "Alt" }
-'.(a[cfms]*-.*)' = { name = "Alt Combo", '@input:keys' = ['$1'] }
+'?.a' = { name = "Alt (Option)" }
+'.(a.[acfms]*)' = { name = "Alt Combo", '@input:keys' = ['$1'] }
 
 '?.f' = { name = "Fn" }
-'.(f[ms]*-.*)' = { name = "Fn Combo", '@input:keys' = ['$1'] }
+'.(f.[acfms]*)' = { name = "Fn Combo", '@input:keys' = ['$1'] }
 
 '?.s' = { name = "Shift" }
-'.(s-.*)' = { name = "Shift Combo", '@input:keys' = ['$1'] }
+'.(s.[acfms]*)' = { name = "Shift Combo", '@input:keys' = ['$1'] }

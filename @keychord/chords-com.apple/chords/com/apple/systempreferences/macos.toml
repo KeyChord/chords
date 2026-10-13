@@ -1,46 +1,50 @@
 name = "System Preferences"
 
+[on.appearance]
+file = 'systempreferences.js'
+
 [chords]
 '/,' = { name = "System Preferences", shell = "open -b com.apple.systempreferences" }
 
-# Goto
-'gaa' = { name = "Goto: Apple Account" }
-'gwi' = { name = "Goto: Wi-fi" }
-'gbl' = { name = "Goto: Bluetooth" }
-'gne' = { name = "Goto: Network" }
-'gvp' = { name = "Goto: VPN" }
-'gba' = { name = "Goto: Battery" }
+'?g' = { name = "Goto" }
+'gaa' = { name = "Goto: Apple Account", shell = "open 'x-apple.systempreferences:com.apple.systempreferences.AppleIDSettings'" }
+'gwi' = { name = "Goto: Wi-fi", shell = "open 'x-apple.systempreferences:com.apple.wifi-settings-extension'" }
+'gbl' = { name = "Goto: Bluetooth", shell = "open 'x-apple.systempreferences:com.apple.BluetoothSettings'" }
+'gne' = { name = "Goto: Network", shell = "open 'x-apple.systempreferences:com.apple.Network-Settings.extension'" }
+'gvp' = { name = "Goto: VPN", shell = "open 'x-apple.systempreferences:com.apple.NetworkExtensionSettingsUI.NESettingsUIExtension'" }
+'gba' = { name = "Goto: Battery", shell = "open 'x-apple.systempreferences:com.apple.Battery-Settings.extension'" }
 
-'gge' = { name = "Goto: General" }
-'gac' = { name = "Goto: Accessibility" }
-'gap' = { name = "Goto: Appearance" }
-'gai' = { name = "Goto: Apple Intelligence" }
-'gdd' = { name = "Goto: Desktop & Dock" }
-'gdi' = { name = "Goto: Displays" }
-'gmb' = { name = "Goto: Menu Bar" }
-'gsp' = { name = "Goto: Spotlight" }
-'gwa' = { name = "Goto: Wallpaper" }
+'gge' = { name = "Goto: General", shell = "open 'x-apple.systempreferences:com.apple.systempreferences.GeneralSettings'" }
+'gac' = { name = "Goto: Accessibility", shell = "open 'x-apple.systempreferences:com.apple.Accessibility-Settings.extension'" }
+'gap' = { name = "Goto: Appearance", shell = "open 'x-apple.systempreferences:com.apple.Appearance-Settings.extension'" }
+'gai' = { name = "Goto: Apple Intelligence", shell = "open 'x-apple.systempreferences:com.apple.Siri-Settings.extension'" }
+'gdd' = { name = "Goto: Desktop & Dock", shell = "open 'x-apple.systempreferences:com.apple.Desktop-Settings.extension'" }
+'gdi' = { name = "Goto: Displays", shell = "open 'x-apple.systempreferences:com.apple.Displays-Settings.extension'" }
+'gmb' = { name = "Goto: Menu Bar", shell = "open 'x-apple.systempreferences:com.apple.ControlCenter-Settings.extension'" }
+'gsp' = { name = "Goto: Spotlight", shell = "open 'x-apple.systempreferences:com.apple.Spotlight-Settings.extension'" }
+'gwa' = { name = "Goto: Wallpaper", shell = "open 'x-apple.systempreferences:com.apple.Wallpaper-Settings.extension'" }
 
-'gno' = { name = "Goto: Notifications" }
-'gso' = { name = "Goto: Sound" }
-'gfo' = { name = "Goto: Focus" }
-'gst' = { name = "Goto: Screen Time" }
+'gno' = { name = "Goto: Notifications", shell = "open 'x-apple.systempreferences:com.apple.Notifications-Settings.extension'" }
+'gso' = { name = "Goto: Sound", shell = "open 'x-apple.systempreferences:com.apple.Sound-Settings.extension'" }
+'gfo' = { name = "Goto: Focus", shell = "open 'x-apple.systempreferences:com.apple.Focus-Settings.extension'" }
+'gst' = { name = "Goto: Screen Time", shell = "open 'x-apple.systempreferences:com.apple.Screen-Time-Settings.extension'" }
 
-'gls' = { name = "Goto: Lock Screen" }
-'gps' = { name = "Goto: Privacy & Security" }
-'gtp' = { name = "Goto: Touch ID & Password" }
-'gup' = { name = "Goto: Users & Groups" }
+'gls' = { name = "Goto: Lock Screen", shell = "open 'x-apple.systempreferences:com.apple.Lock-Screen-Settings.extension'" }
+'gps' = { name = "Goto: Privacy & Security", shell = "open 'x-apple.systempreferences:com.apple.settings.PrivacySecurity.extension'" }
+'gtp' = { name = "Goto: Touch ID & Password", shell = "open 'x-apple.systempreferences:com.apple.Touch-ID-Settings.extension'" }
+'gup' = { name = "Goto: Users & Groups", shell = "open 'x-apple.systempreferences:com.apple.Users-Groups-Settings.extension'" }
 
-'gia' = { name = "Goto: Internet Accounts" }
-'ggc' = { name = "Goto: Game Center" }
-'gic' = { name = "Goto: iCloud" }
-'gwp' = { name = "Goto: Wallet & (Apple) Pay" }
+'gia' = { name = "Goto: Internet Accounts", shell = "open 'x-apple.systempreferences:com.apple.Internet-Accounts-Settings.extension'" }
+'ggc' = { name = "Goto: Game Center", shell = "open 'x-apple.systempreferences:com.apple.Game-Center-Settings.extension'" }
+'gic' = { name = "Goto: iCloud", shell = "open 'x-apple.systempreferences:com.apple.systempreferences.AppleIDSettings:icloud'" }
+'gwp' = { name = "Goto: Wallet & (Apple) Pay", shell = "open 'x-apple.systempreferences:com.apple.WalletSettingsExtension'" }
 
-'gke' = { name = "Goto: Keyboard" }
-'gtr' = { name = "Goto: Trackpad" }
-'gpr' = { name = "Goto: Printers" }
+'gke' = { name = "Goto: Keyboard", shell = "open 'x-apple.systempreferences:com.apple.Keyboard-Settings.extension'" }
+'gtr' = { name = "Goto: Trackpad", shell = "open 'x-apple.systempreferences:com.apple.Trackpad-Settings.extension'" }
+'gpr' = { name = "Goto: Printers", shell = "open 'x-apple.systempreferences:com.apple.Print-Scan-Settings.extension'" }
 
 # Appearance
-'apa' = { name = "Appearance: Auto" }
-'apd' = { name = "Appearance: Dark" }
-'apl' = { name = "Appearance: Light" }
+'?ap' = { name = "Appearance" }
+'apa' = { name = "Appearance: Auto", '@input:appearance' = ['auto'] }
+'apd' = { name = "Appearance: Dark", '@input:appearance' = ['dark'] }
+'apl' = { name = "Appearance: Light", '@input:appearance' = ['light'] }

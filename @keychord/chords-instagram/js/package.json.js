@@ -13,11 +13,13 @@ var devDependencies = {
   "@types/node": "26.5.0",
   "happy-dom": "^21.0.1",
 };
+var packageManager = "pnpm@12.11.2";
 var package_default = {
   name,
   repository,
   type,
   devDependencies,
+  packageManager,
 };
 //#endregion
-export { package_default as default, devDependencies, name, repository, type };
+export { package_default as default, devDependencies, name, packageManager, repository, type };

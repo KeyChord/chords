@@ -15,5 +15,5 @@
     "@keychord/tsconfig": "catalog:",
     "@types/bun": "latest"
   },
-  "packageManager": "pnpm@10.33.0"
+  "packageManager": "pnpm@12.11.2"
 }

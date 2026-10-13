@@ -1,3 +1,5 @@
+import { buildSpotifyBarJavaScript, type SpotifyBarAction } from "./now-playing";
+
 export type SpotifyTrackAction =
   | "more"
   | "remove"
@@ -154,9 +156,12 @@ async function runInPage(action: SpotifyTrackAction, index: number): Promise<str
 }
 
 export function buildSpotifyJavaScript(
-  action: SpotifyTrackAction,
+  action: SpotifyTrackAction | SpotifyBarAction,
   index?: string | number,
 ): string {
+  if (action.startsWith("bar-")) {
+    return buildSpotifyBarJavaScript(action as SpotifyBarAction, index);
+  }
   if (
     ![
       "more",

@@ -52,7 +52,7 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
-test("all twelve TOML chords dispatch their intended Spotify action and track number", async () => {
+test("all TOML chords dispatch their intended playlist or bar action and argument", async () => {
   // Chord discovers app bindings at chords/<bundle-id segments>/macos.toml.
   const path = new URL("../chords/com/spotify/client/macos.toml", import.meta.url);
   // Chord uses Bun's TOML parser, so validate the actual host format.
@@ -72,34 +72,50 @@ test("all twelve TOML chords dispatch their intended Spotify action and track nu
   const actionBindings = Object.entries(bindings.chords).filter(
     ([, binding]) => "@input:spotify" in (binding as Record<string, unknown>),
   );
-  expect(actionBindings).toHaveLength(12);
+  expect(actionBindings).toHaveLength(24);
+  expect(bindings.chords["?b"]).toEqual({ name: "Bar (Now Playing)" });
+  expect(bindings.chords["?bs"]).toEqual({ name: "Bar: Shuffle / Scrub" });
   const expected = {
     gls: "liked-songs",
-    p5m: "more",
-    p5r: "remove",
-    p5a: "queue",
-    p5e: "exclude",
-    p5sj: "jam",
-    p5gsr: "song-radio",
-    p5gar: "artist",
-    p5gal: "album",
-    p5vc: "credits",
-    p5sc: "copy-link",
-    p5se: "embed",
+    pm5: "more",
+    pr5: "remove",
+    pa5: "queue",
+    pe5: "exclude",
+    psj5: "jam",
+    pgsr5: "song-radio",
+    pgar5: "artist",
+    pgal5: "album",
+    pvc5: "credits",
+    psc5: "copy-link",
+    pse5: "embed",
+    "b[": "bar-previous",
+    "b]": "bar-next",
+    bp: "bar-play",
+    bh: "bar-halt",
+    br: "bar-repeat",
+    bl: "bar-lyrics",
+    bq: "bar-queue",
+    bc: "bar-connect",
+    bm: "bar-miniplayer",
+    bf: "bar-fullscreen",
+    bs: "bar-shuffle",
+    bs37: "bar-scrub",
   };
+  // Chord treats ordinary key sequences literally; only parenthesized groups are regex.
+  const matches = (pattern: string, chord: string) =>
+    pattern.includes("(") ? new RegExp("^(?:" + pattern + ")$").test(chord) : pattern === chord;
   const handler = buildHandler();
   for (const [chord, action] of Object.entries(expected)) {
-    const matched = actionBindings.filter(([pattern]) =>
-      new RegExp("^(?:" + pattern + ")$").test(chord),
-    );
+    const matched = actionBindings.filter(([pattern]) => matches(pattern, chord));
     expect(matched).toHaveLength(1);
     const [pattern, binding] = matched[0] as [
       string,
       { "@input:spotify": Parameters<typeof handler> },
     ];
     const args = binding["@input:spotify"];
-    expect(args).toEqual(action === "liked-songs" ? [action] : [action, "$1"]);
-    const captures = new RegExp("^(?:" + pattern + ")$").exec(chord)!;
+    const numbered = pattern.includes("(");
+    expect(args).toEqual(numbered ? [action, "$1"] : [action]);
+    const captures = numbered ? new RegExp("^(?:" + pattern + ")$").exec(chord)! : [];
     const resolved = args.map((arg) => (arg === "$1" ? captures[1] : arg)) as Parameters<
       typeof handler
     >;
@@ -141,6 +157,14 @@ test("invalid track numbers and actions never contact Spotify", async () => {
   await expect(buildHandler()("unknown" as "remove", "1")).rejects.toThrow(
     "Unknown Spotify action",
   );
+  expect(fetchMock).not.toHaveBeenCalled();
+  expect(spawnMock).not.toHaveBeenCalled();
+});
+
+test("invalid scrub times never contact Spotify", async () => {
+  for (const seconds of [undefined, "", "-1", "1.5", "1);alert(1)//", Infinity]) {
+    await expect(buildHandler()("bar-scrub", seconds)).rejects.toThrow("non-negative safe integer");
+  }
   expect(fetchMock).not.toHaveBeenCalled();
   expect(spawnMock).not.toHaveBeenCalled();
 });

@@ -2,7 +2,7 @@ import {
   parseClickSequence,
   resolveClickSequence,
   type ScreenBounds,
-} from "./utils/click-sequence";
+} from "@keychord/chords-click/sequence";
 import {
   openScreenContinuityAddon,
   type ScreenContinuityAddon,

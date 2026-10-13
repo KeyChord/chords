@@ -18,12 +18,15 @@ declare module "chord" {
     bounds: WindowBounds;
     title: string | null;
   }[];
-  /** Left click in window-local top-left macOS points, without moving the cursor or activating. */
+  /** Click in window-local top-left macOS points, without moving the cursor or activating. */
   export function click(options: {
     windowId: number;
     x: number;
     y: number;
     expectedBounds?: WindowBounds;
+    button?: "left" | "right" | "middle";
+    clickCount?: 1 | 2;
+    pressDurationMs?: number;
   }): Promise<void>;
 }
 

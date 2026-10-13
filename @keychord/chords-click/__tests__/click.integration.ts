@@ -1,12 +1,20 @@
 import assert from "node:assert/strict";
 import { getAppWindows } from "chord";
 import { requireMacOSVM } from "@keychord/chordtest/runtime";
-import buildClickHandler from "../js/click.js";
+import buildClickHandler, { clickPoints } from "../js/click.js";
 import { chordPattern } from "@keychord/chordtest/patterns";
 
 requireMacOSVM();
 const [appId, output, coverId, coverOutput] = process.argv.slice(2);
-type Event = { phase: "down" | "up"; x: number; y: number; timestamp: number };
+type Event = {
+  phase: "down" | "up";
+  x: number;
+  y: number;
+  timestamp: number;
+  receivedAt: number;
+  button: number;
+  clickCount: number;
+};
 type State = {
   events: Event[];
   cursor: { x: number; y: number };
@@ -37,8 +45,8 @@ const initial = await state();
 assert.equal(getAppWindows(appId).length, 1);
 const handler = buildClickHandler();
 const context = { focusedAppId: appId };
-await assert.rejects(handler.call(context, "b20l.5b10"));
-await assert.rejects(handler.call(context, "b20l.5b601r0"), /outside/);
+await assert.rejects(handler.call(context, "20b5/1"));
+await assert.rejects(handler.call(context, "20b5/0r601b"), /outside/);
 assert.equal((await state()).events.length, 0);
 console.log("click fixture: validated input and stable background window");
 
@@ -56,12 +64,12 @@ async function invokeChord(input: string) {
   assert.equal(matches.length, 1);
   const { capture, binding } = matches[0];
   const args = binding["@input:click"];
-  assert.equal(args.length, 1);
+  assert.equal(args.length, 2);
   const sequence = capture[Number(args[0].slice(1))];
-  assert.equal(sequence, input.slice(1));
-  await handler.call(context, sequence);
+  assert.equal(sequence, input.slice(args[1] === "left" ? 1 : 2));
+  await handler.call(context, sequence, args[1]);
 }
-await invokeChord(".b20l.5b.5l0b.3l.3b20r0b.5r.4");
+await invokeChord(".20b5/-5/37/0r20b/65");
 await until(async () => (await state()).events.length === 10);
 const clicked = await state();
 assert.deepEqual(
@@ -81,19 +89,22 @@ assert.deepEqual(
 assert.deepEqual(clicked.cursor, initial.cursor);
 assert.equal(clicked.frontmostAppId, coverId);
 assert.equal((await state(coverOutput)).events.length, 0);
-const down = clicked.events.filter((event) => event.phase === "down");
-for (let index = 1; index < down.length; index++)
-  assert.ok(down[index].timestamp - down[index - 1].timestamp >= 0.19);
+for (let index = 2; index < clicked.events.length; index += 2) {
+  const previousUp = clicked.events[index - 1];
+  const nextDown = clicked.events[index];
+  assert.ok(nextDown.timestamp - previousUp.timestamp >= 0.49);
+  assert.ok(nextDown.receivedAt - previousUp.receivedAt >= 0.49);
+}
 console.log("click fixture: offsets, timing, pointer and background targeting passed");
 
 let eventCount = 10;
 const topLeft = { x: 30, y: 20 };
 const bottomRight = { x: 250, y: 560 };
 for (const [input, points] of [
-  [".b40r50t20l30", [bottomRight, topLeft]],
-  [".t20l30b40r50", [topLeft, bottomRight]],
-  [".l30t20r50b40", [topLeft, bottomRight]],
-  [".r50b40t20l30", [bottomRight, topLeft]],
+  [".50r40b/30l20t", [bottomRight, topLeft]],
+  [".30l20t/50r40b", [topLeft, bottomRight]],
+  [".20t30l/40b50r", [topLeft, bottomRight]],
+  [".40b50r/20t30l", [bottomRight, topLeft]],
 ] as const) {
   await invokeChord(input);
   eventCount += 4;
@@ -106,9 +117,54 @@ for (const [input, points] of [
     points,
   );
 }
-console.log("click fixture: all four dot-letter entry points accept mixed-edge sequences");
+console.log("click fixture: exact direction suffixes accept either axis order");
 
-await Promise.all([handler.call(context, "t20l30"), handler.call(context, "t40l50")]);
+await invokeChord("..-9,9228");
+eventCount += 10;
+await until(async () => (await state()).events.length === eventCount);
+const doubleEvents = (await state()).events.slice(-10);
+assert.ok(doubleEvents[2].receivedAt - doubleEvents[1].receivedAt < 1);
+assert.ok(doubleEvents[8].receivedAt - doubleEvents[7].receivedAt < 1);
+assert.deepEqual(
+  doubleEvents
+    .filter((event) => event.phase === "down")
+    .map(({ x, y, button, clickCount }) => ({ x, y, button, clickCount })),
+  [
+    { x: 0, y: 540, button: 0, clickCount: 1 },
+    { x: 0, y: 540, button: 0, clickCount: 2 },
+    { x: 270, y: 120, button: 1, clickCount: 1 },
+    { x: 60, y: 480, button: 0, clickCount: 1 },
+    { x: 60, y: 480, button: 0, clickCount: 2 },
+  ],
+);
+await invokeChord(".;-9.9228");
+eventCount += 6;
+await until(async () => (await state()).events.length === eventCount);
+assert.deepEqual(
+  (await state()).events
+    .slice(-6)
+    .filter((event) => event.phase === "down")
+    .map((event) => event.button),
+  [2, 0, 2],
+);
+const targetBounds = getAppWindows(appId)[0];
+await clickPoints({ ...targetBounds.bounds, windowId: targetBounds.windowId }, [
+  { x: targetBounds.bounds.x + 30, y: targetBounds.bounds.y + 20, click: "long" },
+]);
+eventCount += 2;
+await until(async () => (await state()).events.length === eventCount);
+const press = (await state()).events.slice(-2);
+assert.ok(press[1].receivedAt - press[0].receivedAt >= 0.48, "long press must hold for 500 ms");
+assert.ok(
+  press[1].timestamp - press[0].timestamp >= 0.48,
+  "event timestamps must include the hold",
+);
+assert.deepEqual((await state()).cursor, initial.cursor);
+assert.equal((await state()).frontmostAppId, coverId);
+assert.equal((await state(coverOutput)).events.length, 0);
+console.log("click fixture: double/right/middle overrides, reset and long press passed");
+
+await Promise.all([handler.call(context, "30l20t"), handler.call(context, "50l40t")]);
 eventCount += 4;
 await until(async () => (await state()).events.length === eventCount);
 assert.deepEqual(
@@ -123,7 +179,7 @@ assert.deepEqual(
 );
 console.log("click fixture: overlapping sequences passed");
 
-const sequence = handler.call(context, "t20l30t40l50");
+const sequence = handler.call(context, "30l20t/50l40t");
 // Attach rejection handling immediately while the fixture changes its window.
 const rejected = assert.rejects(sequence, /moved or resized/);
 eventCount += 2;
@@ -139,14 +195,14 @@ await until(async () => {
   const bounds = getAppWindows(appId)[0]?.bounds;
   return bounds?.width === 400 && bounds.height === 500;
 });
-await handler.call(context, "t.5r.25");
+await handler.call(context, "85");
 eventCount += 2;
 await until(async () => (await state()).events.length === eventCount);
 const last = (await state()).events.at(-2)!;
-assert.deepEqual({ x: last.x, y: last.y }, { x: 300, y: 250 });
+assert.deepEqual({ x: last.x, y: last.y }, { x: 320, y: 250 });
 await Bun.write(`${output}.command`, "hide");
 await until(async () => !(await state()).visible && getAppWindows(appId).length === 0);
-await assert.rejects(handler.call(context, "t0l0"), /No on-screen window/);
+await assert.rejects(handler.call(context, "--"), /No on-screen window/);
 console.log(
   "click-macos-events-ok: capture, background targeting, offsets, timing, queue, geometry changes, recovery",
 );

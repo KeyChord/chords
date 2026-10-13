@@ -8,5 +8,6 @@
   "devDependencies": {
     "@keychord/chordtest": "workspace:*",
     "@keychord/config": "catalog:"
-  }
+  },
+  "packageManager": "pnpm@12.11.2"
 }

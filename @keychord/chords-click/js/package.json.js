@@ -16,7 +16,7 @@ var devDependencies = {
   "@keychord/tsconfig": "catalog:",
   "@types/bun": "latest",
 };
-var packageManager = "pnpm@10.33.0";
+var packageManager = "pnpm@12.11.2";
 var package_default = {
   name,
   version,
