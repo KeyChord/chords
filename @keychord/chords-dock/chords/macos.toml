@@ -9,50 +9,51 @@ file = 'dock.js'
 [chords]
 # Built-in macOS window management shortcuts
 # Can be overriden if using a dedicated window manager such as yabai, Aerospace, etc.
-'?.' = { name = "Dock / Window Management" }
+'?/w' = { name = "Dock / Window Management" }
 
 # Move and Resize
-'.ml' = { name = "Move: Left", shortcut = "ctrl+fn+left" }
-'.mr' = { name = "Move: Right", shortcut = "ctrl+fn+right" }
-'.mt' = { name = "Move: Top", shortcut = "ctrl+fn+up" }
-'.mb' = { name = "Move: Bottom", shortcut = "ctrl+fn+down" }
-'.mtl' = { name = "Move: Top Left", '@input:menu' = ["Window", "Move & Resize", "Top Left"] }
-'.mtr' = { name = "Move: Top Right", '@input:menu' = ["Window", "Move & Resize", "Top Right"] }
-'.mbl' = { name = "Move: Bottom Left", '@input:menu' = ["Window", "Move & Resize", "Bottom Left"] }
-'.mbr' = { name = "Move: Bottom Right", '@input:menu' = [
+'/wl' = { name = "Window: (Move) Left", shortcut = "ctrl+fn+left" }
+'/wr' = { name = "Window: (Move) Right", shortcut = "ctrl+fn+right" }
+'/wt' = { name = "Window: (Move) Top", shortcut = "ctrl+fn+up" }
+'/wb' = { name = "Window: (Move) Bottom", shortcut = "ctrl+fn+down" }
+'/wtl' = { name = "Window: (Move) Top Left", '@input:menu' = ["Window", "Move & Resize", "Top Left"] }
+'/wtr' = { name = "Window: (Move) Top Right", '@input:menu' = ["Window", "Move & Resize", "Top Right"] }
+'/wbl' = { name = "Window: (Move) Bottom Left", '@input:menu' = ["Window", "Move & Resize", "Bottom Left"] }
+'/wbr' = { name = "Window: (Move) Bottom Right", '@input:menu' = [
   "Window",
   "Move & Resize",
   "Bottom Right",
 ] }
-'.mlr' = { name = "Move: Left Right", shortcut = "ctrl+fn+shift+left" }
-'.mrl' = { name = "Move: Right Left", shortcut = "ctrl+fn+shift+right" }
-'.mtb' = { name = "Move: Top Bottom", shortcut = "ctrl+fn+shift+up" }
-'.mbt' = { name = "Move: Bottom Top", shortcut = "ctrl+fn+shift+down" }
-'.mq' = { name = "Move: Quarters", '@input:menu' = ["Window", "Move & Resize", "Quarters"] }
+'/wlr' = { name = "Window: (Move) Left Right", shortcut = "ctrl+fn+shift+left" }
+'/wrl' = { name = "Window: (Move) Right Left", shortcut = "ctrl+fn+shift+right" }
+'/wtb' = { name = "Window: (Move) Top Bottom", shortcut = "ctrl+fn+shift+up" }
+'/wbt' = { name = "Window: (Move) Bottom Top", shortcut = "ctrl+fn+shift+down" }
+'/wq' = { name = "Window: (Move) Quarters", '@input:menu' = ["Window", "Move & Resize", "Quarters"] }
 
-'.s[' = { name = "Size: Previous", shortcut = "ctrl+fn+r" }
+'/ws[' = { name = "Window: Size Previous", shortcut = "ctrl+fn+r" }
+'/wz' = { name = "Window: Zoom", '@input:menu' = ["Window", 'Zoom'] }
 
-'.m' = { name = "Minimize", shortcut = "cmd+m" }
-'.q' = { name = "Quit", shortcut = "cmd+q" }
-'.z' = { name = "Zoom", '@input:menu' = ["Window", 'Zoom'] }
-'.f' = { name = "Fill", shortcut = "ctrl+fn+f" }
-'.c' = { name = "Center", shortcut = "ctrl+fn+c" }
-'.fl' = { name = "Fullscreen Left", '@input:menu' = [
+'/m' = { name = "Minimize", shortcut = "cmd+m" }
+'/q' = { name = "Quit", shortcut = "cmd+q" }
+
+'/wf' = { name = "Window: Fill", shortcut = "ctrl+fn+f" }
+'/wc' = { name = "Window: Center", shortcut = "ctrl+fn+c" }
+'/wfl' = { name = "Window: Fullscreen Left", '@input:menu' = [
   "Window",
   "Full Screen Tile",
   "Left of Screen",
 ] }
-'.fr' = { name = "Fullscreen Right", '@input:menu' = [
+'/wfr' = { name = "Window: Fullscreen Right", '@input:menu' = [
   "Window",
   "Full Screen Tile",
   "Right of Screen",
 ] }
-'.a' = { name = "All to Front", '@input:menu' = ["Window", "Bring All to Front"] }
-'.[' = { name = "Previous Window" }
-'.]' = { name = "Next Window" }
+'/waf' = { name = "Window: All to Front", '@input:menu' = ["Window", "Bring All to Front"] }
+'/w[' = { name = "Window: Previous " }
+'/w]' = { name = "Window: Window" }
 
 # Dock
-'.v' = { name = "Dock: Vary On/Off", shortcut = "ctrl+f3" }
-'.(\d+)' = { name = "Dock Item $1: Focus", '@input:dock' = ['$1'] }
-'.(\d+),' = { name = "Dock Item $1: Left Click", '@input:dock' = ['$1'] }
-'.(\d+)/' = { name = "Dock Item $1: Right Click", '@input:dock' = ['$1', 'right'] }
+'/dv' = { name = "Dock: Vary (On/Off)", shortcut = "ctrl+f3" }
+'/d(\d+)' = { name = "Dock > Focus $1", '@input:dock' = ['$1'] }
+'/d.(\d+)\.' = { name = "Dock > Click @ Item $1", '@input:dock' = ['$1'] }
+'/d\.,(\d+)' = { name = "Dock > Right Click @ Item $1", '@input:dock' = ['$1', 'right'] }

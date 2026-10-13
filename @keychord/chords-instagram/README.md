@@ -10,8 +10,8 @@ For the installed Brave Instagram app (`com.brave.Browser.app.akpamiohjfcnimfljf
 | `gs`   | Open Search, focus the input, and select the existing query                                      |
 | `gc`   | Open the Create post composer                                                                    |
 | `gp`   | Open your own profile                                                                            |
-| `hs,N` | Click story N in Home's rendered story tray, starting at 1 (`hs,1`, `hs,2`, etc.)                |
-| `pa,`  | Click the avatar on the displayed profile; on your own profile this opens the profile-photo menu |
+| `hs.N` | Click story N in Home's rendered story tray, starting at 1 (`hs.1`, `hs.2`, etc.)                |
+| `pa.`  | Click the avatar on the displayed profile; on your own profile this opens the profile-photo menu |
 | `pan`  | Open the note editor above your own profile avatar                                               |
 | `panx` | Close the note editor                                                                            |
 

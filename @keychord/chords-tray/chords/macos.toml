@@ -28,24 +28,24 @@ file = "tray.js"
 '=-7' = { name = "Tray: 7th End Item", '@input:tray' = ['ITEM', -7] }
 '=-8' = { name = "Tray: 8th End Item", '@input:tray' = ['ITEM', -8] }
 '=-9' = { name = "Tray: 9th End Item", '@input:tray' = ['ITEM', -9] }
-'=1/' = { name = "Tray: 1st Item Right Click", '@input:tray' = ['ITEM', 0, 'right'] }
-'=2/' = { name = "Tray: 2nd Item Right Click", '@input:tray' = ['ITEM', 1, 'right'] }
-'=3/' = { name = "Tray: 3rd Item Right Click", '@input:tray' = ['ITEM', 2, 'right'] }
-'=4/' = { name = "Tray: 4th Item Right Click", '@input:tray' = ['ITEM', 3, 'right'] }
-'=5/' = { name = "Tray: 5th Item Right Click", '@input:tray' = ['ITEM', 4, 'right'] }
-'=6/' = { name = "Tray: 6th Item Right Click", '@input:tray' = ['ITEM', 5, 'right'] }
-'=7/' = { name = "Tray: 7th Item Right Click", '@input:tray' = ['ITEM', 6, 'right'] }
-'=8/' = { name = "Tray: 8th Item Right Click", '@input:tray' = ['ITEM', 7, 'right'] }
-'=9/' = { name = "Tray: 9th Item Right Click", '@input:tray' = ['ITEM', 8, 'right'] }
-'=-1/' = { name = "Tray: 1st End Item Right Click", '@input:tray' = ['ITEM', -1, 'right'] }
-'=-2/' = { name = "Tray: 2nd End Item Right Click", '@input:tray' = ['ITEM', -2, 'right'] }
-'=-3/' = { name = "Tray: 3rd End Item Right Click", '@input:tray' = ['ITEM', -3, 'right'] }
-'=-4/' = { name = "Tray: 4th End Item Right Click", '@input:tray' = ['ITEM', -4, 'right'] }
-'=-5/' = { name = "Tray: 5th End Item Right Click", '@input:tray' = ['ITEM', -5, 'right'] }
-'=-6/' = { name = "Tray: 6th End Item Right Click", '@input:tray' = ['ITEM', -6, 'right'] }
-'=-7/' = { name = "Tray: 7th End Item Right Click", '@input:tray' = ['ITEM', -7, 'right'] }
-'=-8/' = { name = "Tray: 8th End Item Right Click", '@input:tray' = ['ITEM', -8, 'right'] }
-'=-9/' = { name = "Tray: 9th End Item Right Click", '@input:tray' = ['ITEM', -9, 'right'] }
+'=1.,' = { name = "Tray: 1st Item Right Click", '@input:tray' = ['ITEM', 0, 'right'] }
+'=2.,' = { name = "Tray: 2nd Item Right Click", '@input:tray' = ['ITEM', 1, 'right'] }
+'=3.,' = { name = "Tray: 3rd Item Right Click", '@input:tray' = ['ITEM', 2, 'right'] }
+'=4.,' = { name = "Tray: 4th Item Right Click", '@input:tray' = ['ITEM', 3, 'right'] }
+'=5.,' = { name = "Tray: 5th Item Right Click", '@input:tray' = ['ITEM', 4, 'right'] }
+'=6.,' = { name = "Tray: 6th Item Right Click", '@input:tray' = ['ITEM', 5, 'right'] }
+'=7.,' = { name = "Tray: 7th Item Right Click", '@input:tray' = ['ITEM', 6, 'right'] }
+'=8.,' = { name = "Tray: 8th Item Right Click", '@input:tray' = ['ITEM', 7, 'right'] }
+'=9.,' = { name = "Tray: 9th Item Right Click", '@input:tray' = ['ITEM', 8, 'right'] }
+'=-1.,' = { name = "Tray: 1st End Item Right Click", '@input:tray' = ['ITEM', -1, 'right'] }
+'=-2.,' = { name = "Tray: 2nd End Item Right Click", '@input:tray' = ['ITEM', -2, 'right'] }
+'=-3.,' = { name = "Tray: 3rd End Item Right Click", '@input:tray' = ['ITEM', -3, 'right'] }
+'=-4.,' = { name = "Tray: 4th End Item Right Click", '@input:tray' = ['ITEM', -4, 'right'] }
+'=-5.,' = { name = "Tray: 5th End Item Right Click", '@input:tray' = ['ITEM', -5, 'right'] }
+'=-6.,' = { name = "Tray: 6th End Item Right Click", '@input:tray' = ['ITEM', -6, 'right'] }
+'=-7.,' = { name = "Tray: 7th End Item Right Click", '@input:tray' = ['ITEM', -7, 'right'] }
+'=-8.,' = { name = "Tray: 8th End Item Right Click", '@input:tray' = ['ITEM', -8, 'right'] }
+'=-9.,' = { name = "Tray: 9th End Item Right Click", '@input:tray' = ['ITEM', -9, 'right'] }
 
 '=p' = { name = "Tray: Power / Battery" }
 
@@ -62,7 +62,7 @@ file = "tray.js"
   'DISPLAY',
   'INCREASE',
 ] }
-'=cd,' = { name = "Tray: Control Center > Display > Click", '@input:tray' = [
+'=cd.' = { name = "Tray: Control Center > Display > Click", '@input:tray' = [
   'CONTROL_CENTER',
   'DISPLAY',
   'CLICK',
@@ -98,7 +98,7 @@ file = "tray.js"
   'SOUND',
   'INCREASE',
 ] }
-'=cs,' = { name = "Tray: Control Center > Sound > Click", '@input:tray' = [
+'=cs.' = { name = "Tray: Control Center > Sound > Click", '@input:tray' = [
   'CONTROL_CENTER',
   'SOUND',
   'CLICK',

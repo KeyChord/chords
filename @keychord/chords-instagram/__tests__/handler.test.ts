@@ -80,18 +80,19 @@ test("every TOML chord is wired to the Instagram handler", async () => {
     "gs",
     "gc",
     "gp",
-    "hs,(\\d+)",
-    "pa,",
+    "hs\\.(\\d+)",
+    "pa.",
     "pan",
     "panx",
   ]);
   const handler = buildHandler();
   for (const [chord, binding] of chords) {
     const args = binding["@input:instagram"];
-    if (chord === "hs,(\\d+)") {
+    if (chord === "hs\\.(\\d+)") {
       expect(args).toEqual(["story", "$1"]);
-      const captures = new RegExp(`^${chord}$`).exec("hs,12");
+      const captures = new RegExp(`^${chord}$`).exec("hs.12");
       expect(captures?.[1]).toBe("12");
+      expect(new RegExp(`^${chord}$`).test("hs,12")).toBe(false);
       args[1] = captures![1];
     } else expect(args).toHaveLength(1);
     await expect(handler(...args)).resolves.toBe(true);

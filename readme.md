@@ -55,7 +55,7 @@ In the default chord package, these are the categories assigned to the global ch
 `/` Global General-Purpose/Custom Commands\
 `-` Menu Bar/Menus\
 `=` Tray / System Shortcuts\
-`.` Click\
+`.` Window Clicks\
 `;` Web
 
 > `'` is reserved for pass-through input\
@@ -101,9 +101,11 @@ In the default chord package, these are the categories assigned to the global ch
 `]` Next\
 `-` Decrease\
 `=` Increase\
-`,` Settings / Left Click\
-`.` Right Click\
-`;` Middle Click (Rare)\
+`,` Settings\
+`.` Left Click\
+`.,` Right Click\
+`..` Double Click (not currently used)\
+`.;` Middle Click (Rare)\
 `/` Search
 
 ## Native addons

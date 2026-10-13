@@ -14,13 +14,13 @@ file = 'instagram.js'
 
 '?h' = { name = "Home" }
 '?hs' = { name = "Home: Stories" }
-'?hs,' = { name = "Home: Stories > Click" }
+'?hs.' = { name = "Home: Stories > Click" }
 
-'hs,(\d+)' = { name = "Home: Stories Click by #", '@input:instagram' = ['story', '$1'] }
+'hs\.(\d+)' = { name = "Home: Stories Click by #", '@input:instagram' = ['story', '$1'] }
 
 '?p' = { name = "Profile" }
 '?pa' = { name = "Profile: Avatar" }
-'pa,' = { name = "Profile: Avatar > Click", '@input:instagram' = ['avatar'] }
+'pa.' = { name = "Profile: Avatar > Click", '@input:instagram' = ['avatar'] }
 '?pan' = { name = "Profile: Avatar > Note" }
 'pan' = { name = "Profile: Avatar > Note", '@input:instagram' = ['note'] }
 'panx' = { name = "Profile: Avatar > Note > Close", '@input:instagram' = ['close-note'] }

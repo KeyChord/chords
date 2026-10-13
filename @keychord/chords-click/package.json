@@ -1,0 +1,20 @@
+{
+  "name": "@keychord/chords-click",
+  "version": "0.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KeyChord/chords-click"
+  },
+  "type": "module",
+  "exports": {
+    ".": "./src/js/click.ts",
+    "./sequence": "./src/js/utils/click-sequence.ts"
+  },
+  "devDependencies": {
+    "@keychord/chordtest": "workspace:*",
+    "@keychord/config": "catalog:",
+    "@keychord/tsconfig": "catalog:",
+    "@types/bun": "latest"
+  },
+  "packageManager": "pnpm@10.33.0"
+}

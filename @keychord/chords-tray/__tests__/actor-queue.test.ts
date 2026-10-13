@@ -9,7 +9,7 @@ test.skipIf(process.platform !== "darwin")(
   "multiple addons resolve and reject main-actor promises without losing their JS queues",
   async () => {
     const scratch = Bun.fileURLToPath(
-      new URL("../node_modules/.cache/chord-native/actor-regression", import.meta.url),
+      new URL("../node_modules/.cache/chord/native/actor-regression", import.meta.url),
     );
     const modules = ["ChordActorRegressionTray", "ChordActorRegressionMenu"];
     await mkdir(scratch, { recursive: true });
@@ -17,7 +17,7 @@ test.skipIf(process.platform !== "darwin")(
     // SwiftSyntax for fixtures. Register their N-API entrypoints directly.
     await buildNative(join(scratch, "tray"), "debug");
     const swiftpm = Bun.fileURLToPath(
-      new URL("../node_modules/.cache/chord-native/swiftpm", import.meta.url),
+      new URL("../node_modules/.cache/chord/native/swiftpm", import.meta.url),
     );
     const build = join(swiftpm, "debug");
     const binaries: string[] = [];

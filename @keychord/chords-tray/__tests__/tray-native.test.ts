@@ -10,7 +10,7 @@ describe.skipIf(process.platform !== "darwin")("Swift tray addon in Bun", () => 
   let addon: TrayAddon;
   beforeAll(async () => {
     const directory = Bun.fileURLToPath(
-      new URL("../node_modules/.cache/chord-native/test-addon", import.meta.url),
+      new URL("../node_modules/.cache/chord/native/test-addon", import.meta.url),
     );
     const binary = await buildNative(directory, "debug");
     addon = loadNativeAddon<TrayAddon>(binary);
@@ -46,7 +46,7 @@ describe.skipIf(process.platform !== "darwin")("Swift tray addon in Bun", () => 
           new URL("./ControlCenterProbe.swift", import.meta.url),
         );
         const probeBinary = Bun.fileURLToPath(
-          new URL("../node_modules/.cache/chord-native/control-center-probe", import.meta.url),
+          new URL("../node_modules/.cache/chord/native/control-center-probe", import.meta.url),
         );
         const compilation = Bun.spawn(["swiftc", probeSource, "-o", probeBinary], {
           stderr: "inherit",

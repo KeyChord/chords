@@ -27,7 +27,7 @@ test("every indexed binding preserves its index and mouse button with the ITEM t
   for (let index = 1; index <= 9; index++) {
     for (const fromEnd of [false, true]) {
       for (const rightClick of [false, true]) {
-        const chord = `=${fromEnd ? "-" : ""}${index}${rightClick ? "/" : ""}`;
+        const chord = `=${fromEnd ? "-" : ""}${index}${rightClick ? ".," : ""}`;
         const expectedIndex = fromEnd ? -index : index - 1;
         const args = bindings[chord]["@input:tray"]!;
         expect(args).toEqual(
@@ -51,7 +51,7 @@ const controlCenterBindings: [string, TrayAction][] = [
   ["=cd", ["CONTROL_CENTER", "DISPLAY"]],
   ["=cd-", ["CONTROL_CENTER", "DISPLAY", "DECREASE"]],
   ["=cd=", ["CONTROL_CENTER", "DISPLAY", "INCREASE"]],
-  ["=cd,", ["CONTROL_CENTER", "DISPLAY", "CLICK"]],
+  ["=cd.", ["CONTROL_CENTER", "DISPLAY", "CLICK"]],
   ["=cdd", ["CONTROL_CENTER", "DISPLAY", "DARK_MODE"]],
   ["=cdn", ["CONTROL_CENTER", "DISPLAY", "NIGHT_SHIFT"]],
   ["=cdt", ["CONTROL_CENTER", "DISPLAY", "TRUE_TONE"]],
@@ -59,7 +59,7 @@ const controlCenterBindings: [string, TrayAction][] = [
   ["=cs", ["CONTROL_CENTER", "SOUND"]],
   ["=cs-", ["CONTROL_CENTER", "SOUND", "DECREASE"]],
   ["=cs=", ["CONTROL_CENTER", "SOUND", "INCREASE"]],
-  ["=cs,", ["CONTROL_CENTER", "SOUND", "CLICK"]],
+  ["=cs.", ["CONTROL_CENTER", "SOUND", "CLICK"]],
 ];
 
 for (const [chord, args] of controlCenterBindings) {
@@ -77,7 +77,7 @@ test("all Control Center entries have executable bindings", () => {
   expect(entries.map(([chord]) => chord).sort()).toEqual(
     controlCenterBindings.map(([chord]) => chord).sort(),
   );
-  expect(bindings["=cd,"].name).toEndWith("Click");
+  expect(bindings["=cd."].name).toEndWith("Click");
   expect(bindings["=cds"].name).toEndWith("Settings");
 });
 

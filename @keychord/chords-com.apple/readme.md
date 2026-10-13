@@ -12,14 +12,18 @@ Chord package for pre-installed macOS apps.
 
 ## iPhone Mirroring clicks
 
-Use `j,` followed by one or more coordinate pairs to click the mirrored iPhone screen in order.
+For general clicks in the focused app, use `.` with
+[`@keychord/chords-click`](../chords-click/readme.md). The Mirroring-specific `j.`
+handler shares its coordinate parser and click routine, and adds connection checks.
+
+Use `j.` followed by one or more coordinate pairs to click the mirrored iPhone screen in order.
 Each pair needs a vertical edge (`t` top or `b` bottom) and a horizontal edge (`l` left or `r`
 right), in either order. A number starting with a digit is a pixel offset from that edge;
 `.5` means half the screen's height or width. Coordinates use the current mirroring window,
 including its position and size, rather than the Mac display. Pixel offsets are macOS logical screen pixels (points),
 so they are independent of the display's Retina scale.
 
-For example, `j,b20l.5b.5l0b.3l.3b20r0b.5r.4` clicks 20 pixels above the bottom at the horizontal
+For example, `j.b20l.5b.5l0b.3l.3b20r0b.5r.4` clicks 20 pixels above the bottom at the horizontal
 center, halfway up at the left edge, 30% up and 30% from the left, 20 pixels above the bottom
 at the right edge, and halfway up and 40% from the right. Spaces may be included for readability.
 Zero offsets on the right or bottom land on the last pixel inside the screen.
@@ -80,30 +84,30 @@ The built-in tray chord handler uses the prefix `=` and is dynamic based on what
 
 Typing a number `n` will left click the `n`th tray item. Typing `0` will click the Notch area.
 
-### `\d+/`
+### `\d+\.,`
 
-Typing a number `n` followed by a `/` will right click the `n`th tray item. Typing `0` will right click the Notch area.
+Typing a number `n` followed by `.,` will right click the `n`th tray item. Typing `0` will right click the Notch area.
 
 ### `-\d+`
 
 Typing a negative number `n` will left click the `n`th item from the end of the tray. For example, `-1` will always click the last tray item.
 
-### `-\d+/`
+### `-\d+\.,`
 
-Typing a negative number `n` followed by a `/` will right click the `n`th item from the end of the tray.
+Typing a negative number `n` followed by `.,` will right click the `n`th item from the end of the tray.
 
-### `b/?`
+### `b(\.,)?`
 
-Clicks the battery tray item. `/` for right click.
+Clicks the battery tray item. `.,` for right click.
 
-### `w/?`
+### `w(\.,)?`
 
-Clicks the Wi-Fi tray item. `/` for right click.
+Clicks the Wi-Fi tray item. `.,` for right click.
 
-### `c/?`
+### `c(\.,)?`
 
-Clicks the Control Center tray item. `/` for right click.
+Clicks the Control Center tray item. `.,` for right click.
 
-### `t/?`
+### `t(\.,)?`
 
-Clicks the Time & Date tray item. `/` for right click.
+Clicks the Time & Date tray item. `.,` for right click.

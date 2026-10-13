@@ -63,7 +63,7 @@ function getJavascript(...args: Args): string {
         `;
       }
 
-      if (input.endsWith(",")) {
+      if (input.endsWith(".,")) {
         // TODO: need a native event for a true right click.
         return "";
       }

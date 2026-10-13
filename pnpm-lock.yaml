@@ -104,8 +104,26 @@ importers:
         specifier: latest
         version: 0.45.0
 
+  '@keychord/chords-click':
+    devDependencies:
+      '@keychord/chordtest':
+        specifier: workspace:*
+        version: link:../chordtest
+      '@keychord/config':
+        specifier: 'catalog:'
+        version: 0.0.9
+      '@keychord/tsconfig':
+        specifier: 'catalog:'
+        version: 0.0.6
+      '@types/bun':
+        specifier: latest
+        version: 1.4.3
+
   '@keychord/chords-com.apple':
     dependencies:
+      '@keychord/chords-click':
+        specifier: workspace:*
+        version: link:../chords-click
       '@keychord/chords-menu':
         specifier: workspace:*
         version: link:../chords-menu
@@ -276,22 +294,6 @@ importers:
         specifier: latest
         version: 4.0.9
 
-  '@keychord/chordtest':
-    dependencies:
-      node-swift:
-        specifier: 1.5.1
-        version: 1.5.1
-    devDependencies:
-      '@types/bun':
-        specifier: latest
-        version: 1.4.2
-      typescript:
-        specifier: 'catalog:'
-        version: 6.0.2
-      vite-plus:
-        specifier: 'catalog:'
-        version: 0.1.15(@types/node@26.5.0)(esbuild@0.27.7)(happy-dom@21.0.1)(jiti@2.7.0)(typescript@6.0.2)(vite@7.3.1(@types/node@26.5.0)(jiti@2.7.0)(lightningcss@1.33.0)(yaml@2.9.0))(yaml@2.9.0)
-
   '@keychord/chords-tray':
     devDependencies:
       '@keychord/chordtest':
@@ -350,6 +352,22 @@ importers:
       happy-dom:
         specifier: ^21.0.1
         version: 21.0.1
+
+  '@keychord/chordtest':
+    dependencies:
+      node-swift:
+        specifier: 1.5.1
+        version: 1.5.1
+    devDependencies:
+      '@types/bun':
+        specifier: latest
+        version: 1.4.2
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.2
+      vite-plus:
+        specifier: 'catalog:'
+        version: 0.1.15(@types/node@26.5.0)(esbuild@0.27.7)(happy-dom@21.0.1)(jiti@2.7.0)(typescript@6.0.2)(vite@7.3.1(@types/node@26.5.0)(jiti@2.7.0)(lightningcss@1.33.0)(yaml@2.9.0))(yaml@2.9.0)
 
   packages/com/npmjs/execa:
     dependencies:
@@ -1078,6 +1096,9 @@ packages:
   '@types/bun@1.4.2':
     resolution: {integrity: sha512-GimotNn7+ZV0uVArItBbriZsR1oNf0+WTzPkdcFrzShI7k2norL0uzEaJT8T33dWr7O/c9ZDuAFQrctKCi72oQ==}
 
+  '@types/bun@1.4.3':
+    resolution: {integrity: sha512-N67Pqy8JXbAY/j0tNraS3V5mubGvc6rrrNDmDCtZLlFzccbUJPDb0tvgUBC5q4m8ybkP93Jcn1QB+RYQ6PvBhw==}
+
   '@types/chai@5.2.3':
     resolution: {integrity: sha512-Mw558oeA9fFbv65/y4mHtXDs9bPnFMZAL/jxdPFUpOHHIXX91mcgEHbS5Lahr+pwZFR8A7GQleRWeI6cGFC2UA==}
 
@@ -1287,6 +1308,9 @@ packages:
 
   bun-types@1.4.2:
     resolution: {integrity: sha512-bxV1FgK7yBIzjRe5zBozIM4Bem11ZJcCXSrjWRG3YWLt8yFDePu4cLjpebO8OvPeIE9trbyPF4fuj3Cia4Fj3w==}
+
+  bun-types@1.4.3:
+    resolution: {integrity: sha512-tinRJNGOmUN+tEAsn2y2e942n9JHRHR42iUYzDH75NmhJqVBokGSQkkfSFdNWwsANIdrK6ACH9t01M452YyTwg==}
 
   cac@7.0.0:
     resolution: {integrity: sha512-tixWYgm5ZoOD+3g6UTea91eow5z6AAHaho3g0V9CNSNb45gM8SmflpAc+GRd1InC4AqN/07Unrgp56Y94N9hJQ==}
@@ -2238,6 +2262,10 @@ snapshots:
     dependencies:
       bun-types: 1.4.2
 
+  '@types/bun@1.4.3':
+    dependencies:
+      bun-types: 1.4.3
+
   '@types/chai@5.2.3':
     dependencies:
       '@types/deep-eql': 4.0.2
@@ -2384,6 +2412,11 @@ snapshots:
   bun-types@1.4.2:
     dependencies:
       '@types/node': 22.20.1
+
+  bun-types@1.4.3:
+    dependencies:
+      '@types/node': 22.20.1
+      undici-types: 8.9.0
 
   cac@7.0.0: {}
 

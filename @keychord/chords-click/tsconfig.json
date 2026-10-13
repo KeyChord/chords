@@ -1,0 +1,8 @@
+{
+  "extends": "@keychord/tsconfig",
+  "compilerOptions": {
+    "types": ["bun"],
+    "skipLibCheck": true
+  },
+  "include": ["src"]
+}

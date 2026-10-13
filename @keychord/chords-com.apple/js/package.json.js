@@ -7,6 +7,7 @@ var repository = {
 };
 var type = "module";
 var dependencies = {
+  "@keychord/chords-click": "workspace:*",
   "@keychord/chords-menu": "workspace:*",
   desm: "latest",
   "get-port": "latest",

@@ -21,7 +21,7 @@ Chord's Bun process without an `osascript` hop.
 `SOUND` supports `CLICK`, `DECREASE`, and `INCREASE`. Omitting the operation or using `CLICK` expands the
 section via its heading/chevron. Adjustments use native slider increment/decrement actions; display
 options toggle their accessibility controls. Controls absent on a particular Mac reject with an
-unavailable-control error. Display Settings uses `=cds`; `=cd,` expands the section.
+unavailable-control error. Display Settings uses `=cds`; `=cd.` expands the section.
 
 `vp pack` builds the Swift addon and JS. `CHORD_SKIP_NATIVE=1 vp pack` builds JS only. `vp run test`
 inside this package runs its `bun:test` suites, including building and loading the actual Swift addon.

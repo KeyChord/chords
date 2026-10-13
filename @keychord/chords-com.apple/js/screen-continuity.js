@@ -1,5 +1,5 @@
 import { click } from "chord";
-//#region src/js/utils/click-sequence.ts
+//#region ../chords-click/src/js/utils/click-sequence.ts
 /** Parse the complete sequence before requesting any native clicks. */
 function parseClickSequence(sequence) {
   const input = sequence.replace(/\s+/g, "");
@@ -48,11 +48,11 @@ function resolveClickSequence(positions, bounds) {
     bounds.width < 1 ||
     bounds.height < 1
   )
-    throw new TypeError("The mirrored iPhone screen has invalid bounds");
+    throw new TypeError("The target window has invalid bounds");
   function coordinate(offset, size, fromEnd) {
     const distance = offset.fraction ? offset.value * size : offset.value;
     if (!Number.isFinite(distance) || distance < 0 || distance > size)
-      throw new RangeError("Click offset is outside the mirrored iPhone screen");
+      throw new RangeError("Click offset is outside the target window");
     const result = fromEnd ? size - distance : distance;
     return result === size ? size - 1 : result;
   }
@@ -60,6 +60,27 @@ function resolveClickSequence(positions, bounds) {
     x: bounds.x + coordinate(horizontal, bounds.width, horizontal.edge === "r"),
     y: bounds.y + coordinate(vertical, bounds.height, vertical.edge === "b"),
   }));
+}
+//#endregion
+//#region ../chords-click/src/js/click.ts
+/** Send resolved screen points to one window, with an optional check before each click. */
+async function clickPoints(bounds, points, validate) {
+  const { x, y, width, height, windowId } = bounds;
+  for (const [index, point] of points.entries()) {
+    await validate?.();
+    await click({
+      windowId,
+      x: point.x - x,
+      y: point.y - y,
+      expectedBounds: {
+        x,
+        y,
+        width,
+        height,
+      },
+    });
+    if (index < points.length - 1) await new Promise((resolve) => setTimeout(resolve, 200));
+  }
 }
 //#endregion
 //#region src/js/utils/screen-continuity-native.ts
@@ -71,22 +92,9 @@ function openScreenContinuityAddon() {
     getScreenBounds: () => geometry.getScreenBounds(),
     async clickPoints(request) {
       const { bounds, points } = JSON.parse(request);
-      const { x, y, width, height } = bounds;
-      for (const [index, point] of points.entries()) {
-        await geometry.validateScreenBounds(JSON.stringify(bounds));
-        await click({
-          windowId: bounds.windowId,
-          x: point.x - x,
-          y: point.y - y,
-          expectedBounds: {
-            x,
-            y,
-            width,
-            height,
-          },
-        });
-        if (index < points.length - 1) await new Promise((resolve) => setTimeout(resolve, 200));
-      }
+      await clickPoints(bounds, points, () =>
+        geometry.validateScreenBounds(JSON.stringify(bounds)),
+      );
     },
   };
 }

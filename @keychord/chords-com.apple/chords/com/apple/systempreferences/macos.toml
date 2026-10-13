@@ -34,7 +34,7 @@ name = "System Preferences"
 'gia' = { name = "Goto: Internet Accounts" }
 'ggc' = { name = "Goto: Game Center" }
 'gic' = { name = "Goto: iCloud" }
-'gap' = { name = "Goto: Apple Pay" }
+'gwp' = { name = "Goto: Wallet & (Apple) Pay" }
 
 'gke' = { name = "Goto: Keyboard" }
 'gtr' = { name = "Goto: Trackpad" }

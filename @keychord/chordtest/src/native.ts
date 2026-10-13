@@ -13,7 +13,7 @@ export async function buildNativeAddon(options: {
   mode?: "debug" | "release";
 }) {
   const { packageRoot, product, name, mode = "debug" } = options;
-  const cacheDirectory = join(packageRoot, "node_modules", ".cache", "chord-native");
+  const cacheDirectory = join(packageRoot, "node_modules", ".cache", "chord", "native");
   const outputDirectory = options.outputDirectory ?? join(cacheDirectory, "test-addon", name);
   const binary = await build(mode, {
     packagePath: packageRoot,

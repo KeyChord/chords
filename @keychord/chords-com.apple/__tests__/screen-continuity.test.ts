@@ -142,9 +142,10 @@ test("the configured chord captures and forwards the full sequence to the native
   expect(source).toMatch(/\[on\.click\]\s+file = 'screen-continuity\.js'/);
   const binding = source.match(/^'([^']+)' = .*'@input:click' = \['(\$1)'\]/m);
   expect(binding).not.toBeNull();
-  const capture = new RegExp(`^(?:${binding![1]})$`).exec(`j,${example}`);
+  const capture = new RegExp(`^(?:${binding![1]})$`).exec(`j.${example}`);
   expect(capture?.[1]).toBe(example);
-  expect(new RegExp(`^(?:${binding![1]})$`).test("j,")).toBe(false);
+  expect(new RegExp(`^(?:${binding![1]})$`).test("j.")).toBe(false);
+  expect(new RegExp(`^(?:${binding![1]})$`).test(`j,${example}`)).toBe(false);
   const { default: buildHandler } = await import("../src/js/screen-continuity");
   await buildHandler()(capture![1]);
   expect(native.clickPoints).toHaveBeenCalledWith(
