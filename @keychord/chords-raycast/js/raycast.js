@@ -1,111 +1,183 @@
-import { createRequire } from "node:module";
-import { fileURLToPath } from "node:url";
-//#region \0rolldown/runtime.js
-var __create = Object.create;
-var __defProp = Object.defineProperty;
-var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
-var __getOwnPropNames = Object.getOwnPropertyNames;
-var __getProtoOf = Object.getPrototypeOf;
-var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __commonJSMin = (cb, mod) => () => (mod || cb((mod = { exports: {} }).exports, mod), mod.exports);
-var __copyProps = (to, from, except, desc) => {
-	if (from && typeof from === "object" || typeof from === "function") for (var keys = __getOwnPropNames(from), i = 0, n = keys.length, key; i < n; i++) {
-		key = keys[i];
-		if (!__hasOwnProp.call(to, key) && key !== except) __defProp(to, key, {
-			get: ((k) => from[k]).bind(null, key),
-			enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
-		});
-	}
-	return to;
-};
-var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", {
-	value: mod,
-	enumerable: true
-}) : target, mod));
-//#endregion
+import { n as __toESM } from "./chunk-BYIdrdsR.js";
 //#region src/js/utils/native.ts
-var import__keychord_native_raycast = /* @__PURE__ */ __toESM((/* @__PURE__ */ __commonJSMin(((exports, module) => {
-	const nativeRequire = createRequire(import.meta.url);
-	const nativeFiles = { "darwin-arm64": new URL("native/aarch64-apple-darwin/raycast/raycast-39efc959c767.node", import.meta.url).href };
-	const nativeTarget = process.platform + "-" + process.arch;
-	const nativeFile = nativeFiles[nativeTarget];
-	if (!nativeFile) throw new Error("[chord-native] raycast has no addon for " + nativeTarget);
-	module.exports = nativeRequire(fileURLToPath(nativeFile));
-})))(), 1);
-async function readRaycastFocus() {
-	return JSON.parse(await import__keychord_native_raycast.default.readFocus());
+let addon;
+const native = async () =>
+  (
+    await (addon ??= import("./_keychord-native_raycast-oAipIlqf.js").then((m) =>
+      /* @__PURE__ */ __toESM(m.default, 1),
+    ))
+  ).default;
+async function readRaycastState() {
+  return JSON.parse(await (await native()).readState());
 }
-async function typeRaycastSearch(query) {
-	await import__keychord_native_raycast.default.typeSearch(query);
+async function setRaycastSearch(query, remainingMs) {
+  await (await native()).setSearch(query, remainingMs);
 }
-async function submitRaycastSearch(query) {
-	await import__keychord_native_raycast.default.submitSearch(query);
+async function returnToRaycastRoot(fingerprint, remainingMs) {
+  return JSON.parse(await (await native()).returnToRoot(fingerprint, remainingMs));
+}
+async function activateRaycastSearch(query, fingerprint, remainingMs) {
+  return JSON.parse(await (await native()).activateSearch(query, fingerprint, remainingMs));
 }
 //#endregion
 //#region src/js/raycast.ts
 const bundleId = "com.raycast.macos";
 const pollIntervalMs = 50;
-const searchSettleMs = 200;
-function isRaycastInputFocused(focus) {
-	return focus.bundleId === bundleId && focus.focused === true && (focus.role === "AXTextField" || focus.role === "AXSearchField") && /^Search for apps (?:and|or) commands(?:[.\u2026]|$)/i.test(focus.placeholder || focus.description || "");
+function isRaycastInputFocused(state) {
+  return (
+    state.bundleId === bundleId &&
+    state.focused === true &&
+    (state.role === "AXTextField" || state.role === "AXSearchField") &&
+    /^Search for apps (?:and|or) commands(?:[.\u2026]|$)/i.test(
+      state.placeholder || state.description || "",
+    )
+  );
 }
-/** Open Raycast, replace its search text, and activate the first result. */
-function buildRaycastHandler(timeoutMs = 5e3) {
-	if (!Number.isSafeInteger(timeoutMs) || timeoutMs <= 0) throw new TypeError("Raycast's focus timeout must be a positive integer in milliseconds");
-	let pending;
-	async function openAndSearch(query) {
-		const deadline = performance.now() + timeoutMs;
-		const child = Bun.spawn([
-			"/usr/bin/open",
-			"-b",
-			bundleId
-		], {
-			stdout: "ignore",
-			stderr: "pipe",
-			timeout: timeoutMs
-		});
-		const [exitCode, stderr] = await Promise.all([child.exited, new Response(child.stderr).text()]);
-		if (exitCode !== 0) throw new Error(`Unable to open Raycast (exit ${exitCode}): ${stderr.trim()}`);
-		while (performance.now() < deadline) {
-			if (isRaycastInputFocused(await readRaycastFocus())) {
-				if (!query) return;
-				await typeRaycastSearch(query);
-				let searchReadyAt;
-				while (performance.now() < deadline) {
-					const focus = await readRaycastFocus();
-					if (!isRaycastInputFocused(focus)) throw new Error("Raycast's search input lost focus before selecting a result");
-					if (focus.value === query) {
-						searchReadyAt ??= performance.now() + searchSettleMs;
-						if (performance.now() >= searchReadyAt) {
-							await submitRaycastSearch(query);
-							return;
-						}
-					} else searchReadyAt = void 0;
-					await pause(deadline);
-				}
-				throw new Error(`Raycast's search did not become ready within ${timeoutMs}ms`);
-			}
-			await pause(deadline);
-		}
-		throw new Error(`Raycast's search input did not receive focus within ${timeoutMs}ms`);
-	}
-	async function pause(deadline) {
-		const remaining = deadline - performance.now();
-		if (remaining > 0) await Bun.sleep(Math.min(pollIntervalMs, remaining));
-	}
-	return function raycast(query = "") {
-		if (typeof query !== "string") return Promise.reject(/* @__PURE__ */ new TypeError("Raycast's query must be a string"));
-		if (pending?.query === query) return pending.action;
-		const previous = pending?.action;
-		const action = (previous ? previous.catch(() => {}).then(() => openAndSearch(query)) : openAndSearch(query)).finally(() => {
-			if (pending?.action === action) pending = void 0;
-		});
-		pending = {
-			query,
-			action
-		};
-		return action;
-	};
+function commandDeeplink(value) {
+  const url = new URL(value);
+  if (
+    url.protocol !== "raycast:" ||
+    url.hostname !== "extensions" ||
+    url.pathname.split("/").filter(Boolean).length !== 3 ||
+    url.username ||
+    url.password ||
+    url.hash
+  )
+    throw new TypeError(
+      "Expected a Raycast command deeplink: raycast://extensions/owner/extension/command",
+    );
+  return url.href;
+}
+async function pause(deadline) {
+  const remaining = deadline - performance.now();
+  if (remaining > 0) await Bun.sleep(Math.min(pollIntervalMs, remaining));
+}
+/** Complete a search in an already-open Raycast window; also used by native integration tests. */
+async function searchRaycast(query, timeoutMs = 5e3, deadline = performance.now() + timeoutMs) {
+  let initial;
+  let previousNavigation;
+  while (performance.now() < deadline) {
+    const state = await readRaycastState();
+    if (performance.now() >= deadline) break;
+    if (isRaycastInputFocused(state)) {
+      initial = state;
+      break;
+    }
+    if (
+      state.bundleId === bundleId &&
+      state.focused &&
+      state.navigationFingerprint &&
+      state.navigationFingerprint !== previousNavigation
+    ) {
+      if (await returnToRaycastRoot(state.navigationFingerprint, deadline - performance.now()))
+        previousNavigation = state.navigationFingerprint;
+    }
+    await pause(deadline);
+  }
+  if (!initial)
+    throw new Error(`Raycast's search input did not receive focus within ${timeoutMs}ms`);
+  if (!query) return;
+  if (initial.value === query) {
+    await setRaycastSearch("", deadline - performance.now());
+    let cleared;
+    while (performance.now() < deadline) {
+      const state = await readRaycastState();
+      if (performance.now() >= deadline) break;
+      if (!isRaycastInputFocused(state))
+        throw new Error("Raycast's search input lost focus while resetting selection");
+      if (
+        state.value === "" &&
+        !state.busy &&
+        (state.fingerprint !== initial.fingerprint || state.rootSearchVisible === false)
+      ) {
+        cleared = state;
+        break;
+      }
+      await pause(deadline);
+    }
+    if (!cleared)
+      throw new Error(`Raycast's previous selection did not reset within ${timeoutMs}ms`);
+    initial = cleared;
+  }
+  await setRaycastSearch(query, deadline - performance.now());
+  let previousFingerprint;
+  let activated = false;
+  while (performance.now() < deadline) {
+    const state = await readRaycastState();
+    if (performance.now() >= deadline) break;
+    if (!isRaycastInputFocused(state))
+      throw new Error("Raycast's search input lost focus before activation");
+    const updated = state.fingerprint !== initial.fingerprint;
+    const ready =
+      state.value === query &&
+      state.rootSearchVisible &&
+      !state.busy &&
+      state.fingerprint &&
+      updated;
+    if (ready && previousFingerprint === state.fingerprint) {
+      if (await activateRaycastSearch(query, state.fingerprint, deadline - performance.now())) {
+        activated = true;
+        break;
+      }
+      previousFingerprint = void 0;
+    } else previousFingerprint = ready ? state.fingerprint : void 0;
+    await pause(deadline);
+  }
+  if (!activated) throw new Error(`Raycast's results did not become ready within ${timeoutMs}ms`);
+  while (performance.now() < deadline) {
+    const state = await readRaycastState();
+    if (state.bundleId !== bundleId || state.rootSearchVisible === false) return;
+    await pause(deadline);
+  }
+  throw new Error(
+    `Raycast's primary action was invoked but activation was not confirmed within ${timeoutMs}ms`,
+  );
+}
+/** Prefer official command deeplinks; use Accessibility only for arbitrary root-search queries. */
+function buildRaycastHandler(timeoutMs = 5e3, commands = {}) {
+  if (!Number.isSafeInteger(timeoutMs) || timeoutMs <= 0)
+    throw new TypeError("Raycast's timeout must be a positive integer in milliseconds");
+  const directCommands = new Map(
+    Object.entries(commands).map(([query, url]) => [query, commandDeeplink(url)]),
+  );
+  let pending;
+  async function open(args) {
+    const child = Bun.spawn(["/usr/bin/open", ...args], {
+      stdout: "ignore",
+      stderr: "pipe",
+      timeout: timeoutMs,
+    });
+    const [exitCode, stderr] = await Promise.all([child.exited, new Response(child.stderr).text()]);
+    if (exitCode !== 0)
+      throw new Error(`Unable to open Raycast (exit ${exitCode}): ${stderr.trim()}`);
+  }
+  async function run(query) {
+    const direct =
+      directCommands.get(query) ?? (/^raycast:/i.test(query) ? commandDeeplink(query) : void 0);
+    if (direct) {
+      await open([direct]);
+      return;
+    }
+    const deadline = performance.now() + timeoutMs;
+    await open(["-b", bundleId]);
+    await searchRaycast(query, timeoutMs, deadline);
+  }
+  return function raycast(query = "") {
+    if (typeof query !== "string")
+      return Promise.reject(/* @__PURE__ */ new TypeError("Raycast's query must be a string"));
+    if (pending?.query === query) return pending.action;
+    const previous = pending?.action;
+    const action = (
+      previous ? previous.catch(() => {}).then(() => run(query)) : run(query)
+    ).finally(() => {
+      if (pending?.action === action) pending = void 0;
+    });
+    pending = {
+      query,
+      action,
+    };
+    return action;
+  };
 }
 //#endregion
-export { buildRaycastHandler as default, isRaycastInputFocused };
+export { buildRaycastHandler as default, isRaycastInputFocused, searchRaycast };

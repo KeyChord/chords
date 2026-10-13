@@ -8,6 +8,7 @@ export type RaycastState = {
   rootSearchVisible?: boolean;
   busy?: boolean;
   fingerprint?: string;
+  navigationFingerprint?: string;
 };
 
 // Direct command launches need neither a native addon nor Accessibility access.
@@ -18,10 +19,21 @@ export async function readRaycastState(): Promise<RaycastState> {
   return JSON.parse(await (await native()).readState());
 }
 
-export async function setRaycastSearch(query: string): Promise<void> {
-  await (await native()).setSearch(query);
+export async function setRaycastSearch(query: string, remainingMs: number): Promise<void> {
+  await (await native()).setSearch(query, remainingMs);
 }
 
-export async function activateRaycastSearch(query: string, fingerprint: string): Promise<boolean> {
-  return JSON.parse(await (await native()).activateSearch(query, fingerprint));
+export async function returnToRaycastRoot(
+  fingerprint: string,
+  remainingMs: number,
+): Promise<boolean> {
+  return JSON.parse(await (await native()).returnToRoot(fingerprint, remainingMs));
+}
+
+export async function activateRaycastSearch(
+  query: string,
+  fingerprint: string,
+  remainingMs: number,
+): Promise<boolean> {
+  return JSON.parse(await (await native()).activateSearch(query, fingerprint, remainingMs));
 }

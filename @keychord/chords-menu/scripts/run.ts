@@ -6,7 +6,7 @@ const [action = "by-index", value = "1"] = process.argv.slice(2);
 const menu = buildMenuHandler();
 if (action === "by-index") {
   await menu(action, value);
-} else if (action === "by-letters") {
+} else if (action === "by-letters" || action === "search") {
   await menu(action, value);
 } else {
   throw new Error(`unknown menu action "${action}"`);

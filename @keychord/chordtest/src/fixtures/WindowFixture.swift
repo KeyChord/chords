@@ -18,6 +18,9 @@ final class EventView: NSView {
     override func rightMouseUp(with event: NSEvent) { record?(event, "up", convert(event.locationInWindow, from: nil)) }
     override func otherMouseDown(with event: NSEvent) { record?(event, "down", convert(event.locationInWindow, from: nil)) }
     override func otherMouseUp(with event: NSEvent) { record?(event, "up", convert(event.locationInWindow, from: nil)) }
+    override func mouseDragged(with event: NSEvent) { record?(event, "drag", convert(event.locationInWindow, from: nil)) }
+    override func rightMouseDragged(with event: NSEvent) { record?(event, "drag", convert(event.locationInWindow, from: nil)) }
+    override func otherMouseDragged(with event: NSEvent) { record?(event, "drag", convert(event.locationInWindow, from: nil)) }
 }
 
 @MainActor
@@ -28,7 +31,7 @@ final class WindowFixture: NSObject, NSApplicationDelegate {
     var timer: Timer?
 
     func snapshot() {
-        let mouse = NSEvent.mouseLocation
+        let mouse = CGEvent(source: nil)!.location
         let state: [String: Any] = [
             "events": events,
             "cursor": ["x": mouse.x, "y": mouse.y],

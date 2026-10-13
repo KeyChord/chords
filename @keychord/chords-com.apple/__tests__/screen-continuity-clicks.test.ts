@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, expect, test, vi } from "vite-plus/test";
-import { click } from "chord";
+import { click, mouse } from "chord";
 import { openScreenContinuityAddon } from "../src/js/utils/screen-continuity-native";
 
 const bounds = { x: -100, y: 200, width: 300, height: 600, windowId: 123 };
@@ -19,6 +19,7 @@ beforeEach(() => {
   geometry.getScreenBounds.mockReset().mockResolvedValue(JSON.stringify(bounds));
   geometry.validateScreenBounds.mockReset().mockResolvedValue(undefined);
   clickMock.mockResolvedValue(undefined);
+  vi.mocked(mouse).mockResolvedValue(undefined);
 });
 
 afterEach(() => {
@@ -45,8 +46,20 @@ test("passes window-local coordinates and the actual window ID to Chord's shared
   await vi.advanceTimersByTimeAsync(1);
   await result;
   const expectedBounds = { x: -100, y: 200, width: 300, height: 600 };
-  expect(click).toHaveBeenNthCalledWith(1, { windowId: 123, x: 150, y: 580, expectedBounds });
-  expect(click).toHaveBeenNthCalledWith(2, { windowId: 123, x: 30, y: 300, expectedBounds });
+  expect(click).toHaveBeenNthCalledWith(1, {
+    windowId: 123,
+    x: 150,
+    y: 580,
+    expectedBounds,
+    moveCursor: true,
+  });
+  expect(click).toHaveBeenNthCalledWith(2, {
+    windowId: 123,
+    x: 30,
+    y: 300,
+    expectedBounds,
+    moveCursor: true,
+  });
   expect(geometry.validateScreenBounds).toHaveBeenCalledTimes(2);
   expect(geometry.validateScreenBounds).toHaveBeenCalledWith(JSON.stringify(bounds));
   expect(order).toEqual(["validate", "click", "validate", "click"]);
@@ -71,9 +84,16 @@ test("a long press holds for the UIKit default duration and the next point is a 
     x: 150,
     y: 580,
     expectedBounds,
+    moveCursor: true,
     pressDurationMs: 500,
   });
-  expect(click).toHaveBeenNthCalledWith(2, { windowId: 123, x: 30, y: 300, expectedBounds });
+  expect(click).toHaveBeenNthCalledWith(2, {
+    windowId: 123,
+    x: 30,
+    y: 300,
+    expectedBounds,
+    moveCursor: true,
+  });
 });
 
 test("private API errors reach the caller and prevent the rest of the sequence", async () => {
@@ -82,4 +102,46 @@ test("private API errors reach the caller and prevent the rest of the sequence",
     "CGEventSetWindowLocation",
   );
   expect(click).toHaveBeenCalledOnce();
+});
+
+test("tap drags reuse native mouse down/movement/release with connection checks", async () => {
+  vi.useFakeTimers();
+  const action = openScreenContinuityAddon().clickPoints(
+    JSON.stringify({
+      bounds,
+      points: [
+        { ...points[0], click: "drag" },
+        { ...points[1], click: "drag" },
+      ],
+    }),
+  );
+  await vi.runAllTimersAsync();
+  await action;
+  expect(click).not.toHaveBeenCalled();
+  expect(vi.mocked(mouse).mock.calls.map(([options]) => options.action)).toEqual([
+    "down",
+    "move",
+    "up",
+  ]);
+  expect(geometry.validateScreenBounds).toHaveBeenCalledTimes(2);
+});
+
+test("a disconnected tap screen still releases a drag before rejecting", async () => {
+  vi.useFakeTimers();
+  geometry.validateScreenBounds
+    .mockResolvedValueOnce(undefined)
+    .mockRejectedValueOnce(new Error("disconnected"));
+  const action = openScreenContinuityAddon().clickPoints(
+    JSON.stringify({
+      bounds,
+      points: [
+        { ...points[0], click: "drag" },
+        { ...points[1], click: "drag", hold: true },
+      ],
+    }),
+  );
+  const rejected = expect(action).rejects.toThrow("disconnected");
+  await vi.runAllTimersAsync();
+  await rejected;
+  expect(vi.mocked(mouse).mock.calls.map(([options]) => options.action)).toEqual(["down", "up"]);
 });

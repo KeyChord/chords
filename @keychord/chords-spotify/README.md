@@ -40,15 +40,34 @@ Replace `5` with any positive playlist track number. Numbers follow the displaye
 
 Replace `37` with any non-negative whole second (`bs0` returns to the start). A time beyond the track's duration seeks to its last playable whole second. Bar commands work wherever Spotify shows its Now Playing bar and report an error when a control is unavailable. Play/Halt and controls without stable test IDs require Spotify's English interface. `?b` and `?bs` are group hints.
 
+## Now Playing view
+
+| Chord | Action                                    |
+| ----- | ----------------------------------------- |
+| `npv` | Show / hide the Now Playing view          |
+| `npx` | Hide the Now Playing view                 |
+| `npf` | Expand the Now Playing view               |
+| `npm` | Minimize the expanded view to the sidebar |
+| `npa` | View artwork                              |
+| `npc` | View Canvas                               |
+| `npi` | View the artist image                     |
+| `npl` | View lyrics                               |
+
+`?np` is the group hint. The four view commands open and expand Now Playing before selecting the requested view. Hide, Expand, Minimize, and view selection keep the requested state when repeated; Minimize leaves a hidden view hidden. Toggle and Hide also hide an expanded view. `npf` uses Spotify's **Expand Now Playing view** control; `bf` controls full screen. These commands require Spotify's English interface and report an error when the current track lacks the requested view.
+
 ## Setup
 
-Liked Songs uses Spotify's native deep link and needs no debugging port. Playlist and bar actions use the Chrome DevTools Protocol against Spotify's desktop renderer. Quit Spotify, then launch it with:
+All actions use the Chrome DevTools Protocol against Spotify's desktop renderer. When the package loads or Spotify launches, Chord checks its debugging port. If it does not match the configured port (9223 by default), Chord gracefully terminates Spotify and relaunches it with debugging enabled.
+
+Spotify appears in Chord's apps-needing-relaunch settings until a launch with the correct port is observed. A normal quit stays quit. If a chord runs before Spotify finishes relaunching, try it again once Spotify is open. Port 9223 leaves the usual browser debugging port 9222 available.
+
+For manual setup, quit Spotify, then launch it with:
 
 ```sh
 open -na Spotify --args --remote-debugging-port=9223
 ```
 
-For another port, launch Spotify with that port and configure the same value in the chord file:
+For another port, configure the value in the chord file; Chord relaunches Spotify with that port:
 
 ```toml
 [on.spotify]
@@ -56,7 +75,9 @@ file = 'spotify.js'
 args = [9333]
 ```
 
-The handler targets the desktop renderer (`xpui.app.spotify.com`), selecting the focused page when there are several. It reports a setup error when debugging is unavailable and does not restart Spotify automatically. Port 9223 leaves the usual browser debugging port 9222 available.
+The handler targets the desktop renderer (`xpui.app.spotify.com`), selecting the focused page when there are several. It reports a setup error when debugging is unavailable. Extra Spotify instances or a custom user-data directory require manual setup.
+
+`gls` navigates through Spotify's router and replaces the destination with fresh view state. This also works when Liked Songs is already the underlying page and another view, such as expanded Lyrics, covers it. It waits for the destination to render before the next chord runs. Router discovery uses React's committed tree and Spotify's navigation API; if an app update removes that API, the command reports an error.
 
 ## Development
 

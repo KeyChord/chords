@@ -33,37 +33,58 @@ Use `t` followed by x/y pairs from the top left. Each bare digit is a coordinate
 in tenths: `t13` taps 10% across and 30% down, and `t1313` taps that position twice.
 `-` means 0%, `1`–`9` mean 10%–90%, and `0` means 100%.
 
+Add `/` and one digit for mixed fractions: `1/2` means 12%, `9/5` means 95%,
+and `-/2` means 2%. `t91/2` taps (90%, 12%). Each `/` consumes exactly one digit
+as part of the preceding coordinate, so `t91/21/23/4` taps (90%, 12%), then
+(12%, 34%) without separators. `/0` adds zero to the coordinate.
+
 Direction suffixes mark exact pixels: `20l`, `20r`, `20t`, and `20b` mean
 20 pixels from the left, right, top, and bottom respectively. `t20l5` taps
 x=20 pixels, y=50%; `t20b5` taps halfway across and 20 pixels above the bottom.
 Explicit directions can appear in either axis order. Exact values support decimals
-and use macOS logical points, independent of Retina scale. Use `/` to separate
-mixed pairs so shorthand digits do not merge into pixel amounts: `t13/20l5`.
+and use macOS logical points, independent of Retina scale. Pairs run together;
+pixel offsets consume the complete number before their direction suffix. Refine
+a shorthand coordinate with `/0` before a pixel amount to keep the numbers
+distinct: `t13/020l5` taps (10%, 30%), then (20px, 50%). `/` is exclusively a
+fractional suffix.
 Coordinates use the current mirroring window's position and size.
 
 Prefix a pair with `,` for a long press: `t13,9228` taps (10%, 30%), holds
 (90%, 20%), then normally taps (20%, 80%). The hold lasts 500 ms, matching UIKit's
 [default long-press duration](https://developer.apple.com/documentation/uikit/uilongpressgesturerecognizer/minimumpressduration).
-`/` starts another normal pair, and `.` explicitly selects a normal tap. Tap
-sequences use normal taps and long presses; mouse-button and double-click markers
-belong to the general click package.
+`.` explicitly selects a normal tap.
 
-The five-tap example is `t20b5/-5/37/0r20b/65`: center/20 pixels above the bottom,
+Use `t-1328` to press at (10%, 30%), drag to (20%, 80%), then release.
+`t-1328-` keeps the button held after the sequence; `t13-` holds at a single
+position. `t=55` moves to the center without pressing, or continues an already
+held drag and releases it. A trailing `-` on that movement keeps it held again.
+Within a sequence, `.-` starts a drag and `.=` moves without a new press.
+The shared runner releases held buttons on errors, including disconnection.
+An initial `-` now selects drag; use `0l` to start a normal tap at the left edge.
+Global display input (`./`) belongs to the general mouse command, while taps
+continue to target the mirrored phone's screen.
+
+The five-tap example is `t20b5-53/07/00r20b65`: center/20 pixels above the bottom,
 left edge/halfway down, 30% across/70% down, right edge/20 pixels above the bottom,
 then 60% across/halfway down.
 
 The complete sequence is validated before clicking. The shared click runner waits
-500 ms after each tap or long press before the next pair, allowing time for
+500 ms between coordinate pairs, keeping drags held during the pause and allowing time for
 transitions. Single taps and the final action add no delay. This fixed pause
 cannot detect animation completion; see the [click timing rationale](../chords-click/readme.md).
 iPhone Mirroring must already be connected, and Chord needs Accessibility permission. The
-handler clicks the phone window in the background without moving the Mac pointer or changing
-the foreground app. It stops if Mirroring disconnects or its window moves, resizes, disappears,
+handler moves the Mac pointer to each tap for visibility, then clicks the phone window directly
+in the background without changing the foreground app or clicking through the pointer.
+It stops if Mirroring disconnects or its window moves, resizes, disappears,
 or is replaced. Other windows may cover Mirroring without blocking the targeted clicks.
 `src/js/screen-continuity.ts` uses the NodeSwift addon for geometry and connection checks,
 then calls the shared Rust `click` helper from the built-in `chord` module for input.
 The helper stamps the actual window ID and private `CGEventSetWindowLocation` coordinates,
 then posts to the target process. It reports an error if the private API is unavailable.
+Geometry callbacks capture their originating Node-API queue and complete their promises
+through that queue, avoiding NodeSwift's async actor fallback across multiple addons.
+The read-only regression runs 500 successful and rejected main-actor completions:
+`CHORD_NATIVE_TEST_HOST=<Chord executable> bun test @keychord/chords-com.apple/__tests__/actor-queue.vm.test.ts`.
 
 ## Safari handler
 

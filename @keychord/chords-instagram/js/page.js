@@ -188,12 +188,55 @@ async function runInPage(action, storyNumber) {
         HOME: ["Home"],
         REELS: ["Reels"],
         MESSAGES: ["Messages", "Messenger"],
-        SEARCH: ["Search"],
+        SEARCH: ["Search", "Explore", "Search & Explore"],
         CREATE: ["New post", "Create"],
         PROFILE: ["Profile"],
       };
+      const navigationTarget = (icon) => {
+        const target = icon.closest(clickable);
+        if (
+          target &&
+          visible(icon) &&
+          enabled(target) &&
+          !icon.closest('article, [role="dialog"], [data-pagelet="story_tray"]') &&
+          (!icon.closest("main") || icon.closest('nav, [role="navigation"]'))
+        )
+          return target;
+      };
+      const byIcon = (root, names) => {
+        const icons = [...root.querySelectorAll("svg")];
+        for (const name of names)
+          for (const icon of icons) {
+            if (
+              (icon.getAttribute("aria-label") ?? text(icon.querySelector("title") ?? icon)) !==
+              name
+            )
+              continue;
+            const target = navigationTarget(icon);
+            if (target && root.contains(target)) return target;
+          }
+      };
+      const profileIcon = () => {
+        for (const image of document.querySelectorAll('a[href] img[alt$="profile picture"]')) {
+          const target = navigationTarget(image);
+          if (!target) continue;
+          for (
+            let bar = target.parentElement;
+            bar && bar !== document.body;
+            bar = bar.parentElement
+          ) {
+            if (bar.tagName === "MAIN" || bar.querySelector("main")) break;
+            if (byIcon(bar, ["Home", "Reels"])) return target;
+          }
+        }
+      };
       const navigation = await waitFor(
-        () => byLabel(document, labels[action]),
+        () =>
+          byIcon(document, labels[action]) ??
+          (action === "PROFILE" ? profileIcon() : void 0) ??
+          [...document.querySelectorAll('nav, [role="navigation"]')]
+            .flatMap((bar) => [...bar.querySelectorAll(clickable)])
+            .find((target) => enabled(target) && labels[action].includes(text(target))),
         `Instagram's ${action.toLowerCase()} navigation control is unavailable.`,
       );
       const destination =

@@ -9,7 +9,8 @@ var devDependencies = {
 	"@keychord/chords-menu": "workspace:*",
 	"@keychord/chordtest": "workspace:*",
 	"@keychord/config": "catalog:",
-	"@keychord/tsconfig": "catalog:"
+	"@keychord/tsconfig": "catalog:",
+	"@types/bun": "latest"
 };
 var packageManager = "pnpm@12.11.2";
 var package_default = {

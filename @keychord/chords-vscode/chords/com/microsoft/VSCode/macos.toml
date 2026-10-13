@@ -113,7 +113,7 @@ ftr = { name = "Folding: Toggle Recursively", '@input:command' = [
   'editor.toggleFoldRecursively',
 ], shortcut = "cmd+k shift+cmd+l" }
 
-'?f{1..7}' = { name = "Folding: Level" }
+'?f"1-7"' = { name = "Folding: Level" }
 f1 = { name = "editor.foldLevel1", '@input:command' = [
   'editor.foldLevel1',
 ], shortcut = "cmd+k cmd+1" }

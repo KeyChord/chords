@@ -35,7 +35,7 @@ ce = { name = "Chat: Export", '@input:menu' = ["by-path", ["Chat", "Export chat"
 cc = { name = "Chat: Clear", '@input:menu' = ["by-path", ["Chat", "Clear chat"]] }
 cd = { name = "Chat: Delete", shortcut = "cmd+shift+d" }
 
-'?c([1-9])' = { name = "Chat: Switch to Chat #" }
+'?c"1-9"' = { name = "Chat: Switch to Chat #" }
 c1 = { name = "Chat 1", shortcut = "cmd+1" }
 c2 = { name = "Chat 2", shortcut = "cmd+2" }
 c3 = { name = "Chat 3", shortcut = "cmd+3" }

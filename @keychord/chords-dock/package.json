@@ -9,7 +9,8 @@
     "@keychord/chords-menu": "workspace:*",
     "@keychord/chordtest": "workspace:*",
     "@keychord/config": "catalog:",
-    "@keychord/tsconfig": "catalog:"
+    "@keychord/tsconfig": "catalog:",
+    "@types/bun": "latest"
   },
   "packageManager": "pnpm@12.11.2"
 }

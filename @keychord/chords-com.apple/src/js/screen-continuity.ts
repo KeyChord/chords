@@ -17,7 +17,11 @@ export default function buildScreenContinuityHandler() {
     // Validate now, including the tail, before loading native code or requesting input.
     let positions: ReturnType<typeof parseClickSequence>;
     try {
-      positions = parseClickSequence(sequence);
+      positions = sequence.startsWith("-")
+        ? parseClickSequence(sequence.slice(1), "drag")
+        : sequence.startsWith("=")
+          ? parseClickSequence(sequence.slice(1), "move")
+          : parseClickSequence(sequence);
     } catch (error) {
       return Promise.reject(error);
     }

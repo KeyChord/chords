@@ -1,16 +1,18 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
-import buildMenuHandler, { runMenuAction } from "../js/menu.js";
+import builtMenuHandler, { runMenuAction } from "../js/menu.js";
+
+// Exercise the production bundle with the source API's overloads.
+const buildMenuHandler = builtMenuHandler as typeof import("../src/js/menu").default;
 
 const output = process.env.MENU_FIXTURE_OUTPUT!;
 const appId = "dev.keychord.menu-fixture";
 const menu = buildMenuHandler(appId);
 async function recorded(expected: string) {
   for (let i = 0; i < 100; i++) {
-    if ((await readFile(output, "utf8")) === expected) return;
+    if ((await Bun.file(output).text()) === expected) return;
     await new Promise((resolve) => setTimeout(resolve, 20));
   }
-  assert.equal(await readFile(output, "utf8"), expected);
+  assert.equal(await Bun.file(output).text(), expected);
 }
 
 // The chord passes a string, like the captured indices for -1 through -9.
@@ -41,8 +43,17 @@ await assert.rejects(menu("by-path", ["File", "Disabled"]), /disabled/);
 await assert.rejects(menu("by-path", ["File", "Missing"]), /has no component/);
 await assert.rejects(menu("by-index", 999), /out of range/);
 await assert.rejects(menu("by-letters", ""), /non-empty lowercase query/);
-await assert.rejects(runMenuAction(appId, "by-path", [] as any), /at least two/);
+await assert.rejects(runMenuAction(appId, "by-path", [] as any), /at least one/);
 // Check captured app context is preserved across the Promise bridge.
 await buildMenuHandler().call({ focusedAppId: appId }, "by-path", ["Format", "Fixture Action"]);
 await recorded("Fixture Action");
+await assert.rejects(menu("search", "fixture action"), /ambiguous.*Format > Fixture Action/s);
+await menu("search", "Format > Fixture Action");
+await recorded("Fixture Action");
+await menu("search", "File > Submenu > Zoom Outer");
+await recorded("Zoom Outer");
+await menu("search", "100% … 日本語");
+await recorded("100% … 日本語");
+await assert.rejects(menu("search", "There is no such menu item 123!?"), /No menu item/);
+await assert.rejects(menu("search", "Disabled"), /disabled/);
 console.log("menu integration passed");

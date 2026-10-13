@@ -209,12 +209,61 @@ async function runInPage(action: InstagramAction, storyNumber?: number): Promise
         HOME: ["Home"],
         REELS: ["Reels"],
         MESSAGES: ["Messages", "Messenger"],
-        SEARCH: ["Search"],
+        SEARCH: ["Search", "Explore", "Search & Explore"],
         CREATE: ["New post", "Create"],
         PROFILE: ["Profile"],
       };
+      const navigationTarget = (icon: Element): HTMLElement | undefined => {
+        const target = icon.closest<HTMLElement>(clickable);
+        if (
+          target &&
+          visible(icon) &&
+          enabled(target) &&
+          !icon.closest('article, [role="dialog"], [data-pagelet="story_tray"]') &&
+          (!icon.closest("main") || icon.closest('nav, [role="navigation"]'))
+        )
+          return target;
+        return undefined;
+      };
+      const byIcon = (root: Document | Element, names: string[]): HTMLElement | undefined => {
+        const icons = [...root.querySelectorAll("svg")];
+        // Prefer Search's sidebar toggle when Explore is also available.
+        for (const name of names) {
+          for (const icon of icons) {
+            const label =
+              icon.getAttribute("aria-label") ?? text(icon.querySelector("title") ?? icon);
+            if (label !== name) continue;
+            const target = navigationTarget(icon);
+            if (target && root.contains(target)) return target;
+          }
+        }
+        return undefined;
+      };
+      const profileIcon = (): HTMLElement | undefined => {
+        for (const image of document.querySelectorAll('a[href] img[alt$="profile picture"]')) {
+          const target = navigationTarget(image);
+          if (!target) continue;
+          // Instagram uses the account avatar instead of a labeled Profile icon.
+          // Its bar may be a plain div; identify it by the other navigation icons.
+          for (
+            let bar = target.parentElement;
+            bar && bar !== document.body;
+            bar = bar.parentElement
+          ) {
+            if (bar.tagName === "MAIN" || bar.querySelector("main")) break;
+            if (byIcon(bar, ["Home", "Reels"])) return target;
+          }
+        }
+        return undefined;
+      };
       const navigation = await waitFor(
-        () => byLabel(document, labels[action]),
+        () =>
+          byIcon(document, labels[action]) ??
+          (action === "PROFILE" ? profileIcon() : undefined) ??
+          // Retain text-only navigation in older layouts without matching feed controls.
+          [...document.querySelectorAll('nav, [role="navigation"]')]
+            .flatMap((bar) => [...bar.querySelectorAll<HTMLElement>(clickable)])
+            .find((target) => enabled(target) && labels[action].includes(text(target))),
         `Instagram's ${action.toLowerCase()} navigation control is unavailable.`,
       );
       const destination =

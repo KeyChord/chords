@@ -1,22 +1,33 @@
 import { readFileSync } from "node:fs";
-import { click, getAppWindows } from "chord";
+import { click, getAppWindows, getScreenBounds, mouse } from "chord";
 import { chordPattern } from "@keychord/chordtest/patterns";
 import { afterEach, beforeEach, expect, test, vi } from "vite-plus/test";
 import buildClickHandler from "../src/js/click";
-import type { ClickKind } from "../src/js/utils/click-sequence";
+import { parseMouseCommand, resolveClickSequence } from "../src/js/utils/click-sequence";
 const bounds = { x: -100, y: 200, width: 300, height: 600 };
 const window = { windowId: 123, processId: 456, bounds, title: "First window" };
 const clickMock = vi.mocked(click);
 const windowsMock = vi.mocked(getAppWindows);
 const source = readFileSync(new URL("../chords/macos.toml", import.meta.url), "utf8");
 const bindings = Array.from(
-  source.matchAll(/^'([^']+)' = .*'@input:click' = \['(\$\d+)', '(left|right|middle|double)'\]/gm),
+  source.matchAll(/^'([^']+)' = .*'@input:click' = \['(\$\d+)', '(command)'\]/gm),
   ([, pattern, argument, defaultClick]) => ({
     pattern: chordPattern(pattern),
     argument,
-    defaultClick: defaultClick as Exclude<ClickKind, "long">,
+    defaultClick: defaultClick as "command",
   }),
 );
+const namedChords = [
+  { prefix: ".", name: "Click", action: "click" },
+  { prefix: "..", name: "Double Click", action: "click", clickCount: 2 },
+  { prefix: ".,", name: "Right Click", action: "click", button: "right" },
+  { prefix: ".;", name: "Middle Click", action: "click", button: "middle" },
+  { prefix: ".-", name: "Drag", action: "down", button: "left" },
+  { prefix: ".,-", name: "Right Drag", action: "down", button: "right" },
+  { prefix: ".;-", name: "Middle Drag", action: "down", button: "middle" },
+  { prefix: ".=", name: "Move Mouse", action: "move" },
+  { prefix: "./", name: "Global Mouse", action: "click", global: true },
+] as const;
 function capturedClick(input: string) {
   const matches = bindings.flatMap(({ pattern, argument, defaultClick }) => {
     const capture = pattern.exec(input);
@@ -27,20 +38,62 @@ function capturedClick(input: string) {
 }
 beforeEach(() => {
   clickMock.mockResolvedValue(undefined);
+  vi.mocked(mouse).mockResolvedValue(undefined);
+  vi.mocked(getScreenBounds).mockReturnValue({ x: -1200, y: -300, width: 1200, height: 800 });
   windowsMock.mockReturnValue([window, { ...window, windowId: 789, title: "Other window" }]);
 });
 afterEach(() => {
   vi.useRealTimers();
 });
 
-test("four initial click types capture coordinates and leave modifier prefixes unmatched", () => {
+test("every named chord in macos.toml has a behavior test", () => {
+  const definitions = Array.from(
+    source.matchAll(/^'\?([^']+)' = \{ name = "([^"]+)" \}/gm),
+    ([, prefix, name]) => ({ prefix, name }),
+  );
+  expect(definitions).toEqual(namedChords.map(({ prefix, name }) => ({ prefix, name })));
+  expect(source).toContain("name = \"Mouse\", '@input:click' = ['$1', 'command']");
+});
+
+test.each(namedChords)(
+  "$name reaches its native action through the TOML binding",
+  async (chord) => {
+    const captured = capturedClick(chord.prefix + "13");
+    await buildClickHandler().call(
+      { focusedAppId: "dev.fixture" },
+      captured.sequence,
+      captured.defaultClick,
+    );
+    const options = {
+      ...("global" in chord
+        ? { x: -1080, y: -60 }
+        : { windowId: 123, x: 30, y: 180, expectedBounds: bounds }),
+      ...("button" in chord ? { button: chord.button } : {}),
+      ...("clickCount" in chord ? { clickCount: chord.clickCount } : {}),
+    };
+    if ("global" in chord) {
+      expect(getAppWindows).not.toHaveBeenCalled();
+      expect(getScreenBounds).toHaveBeenCalledOnce();
+      expect(click).not.toHaveBeenCalled();
+      expect(mouse).toHaveBeenCalledExactlyOnceWith({ ...options, action: chord.action });
+    } else if (chord.action === "click") {
+      expect(getScreenBounds).not.toHaveBeenCalled();
+      expect(click).toHaveBeenCalledExactlyOnceWith({ ...options, moveCursor: true });
+      expect(mouse).not.toHaveBeenCalled();
+    } else {
+      expect(click).not.toHaveBeenCalled();
+      expect(mouse).toHaveBeenCalledTimes(2);
+      expect(mouse).toHaveBeenNthCalledWith(1, { ...options, action: chord.action });
+      expect(mouse).toHaveBeenLastCalledWith({ action: "up" });
+    }
+  },
+);
+
+test("one mouse binding captures commands and leaves application prefixes unmatched", () => {
   expect(source).toMatch(/\[on\.click\]\s+file = 'click\.js'/);
-  expect(bindings).toHaveLength(4);
+  expect(bindings).toHaveLength(1);
   for (const input of [
     ".",
-    "..",
-    ".,",
-    ".;",
     ".m",
     ".c",
     ".a",
@@ -60,7 +113,7 @@ test("four initial click types capture coordinates and leave modifier prefixes u
 });
 test("the documented sequence forwards all five clicks in order", async () => {
   vi.useFakeTimers();
-  const sequence = "20b5/-5/37/0r20b/65";
+  const sequence = "20b5-53/07/00r20b65";
   const captured = capturedClick("." + sequence);
   expect(captured.sequence).toBe(sequence);
   const action = buildClickHandler().call(
@@ -84,6 +137,7 @@ test("the documented sequence forwards all five clicks in order", async () => {
       windowId: 123,
       ...point,
       expectedBounds: bounds,
+      moveCursor: true,
     });
 });
 test.each([".1313", ".20l5", ".30r180b", ".20t5", ".0-"])(
@@ -113,14 +167,15 @@ test.each([".1313", ".20l5", ".30r180b", ".20t5", ".0-"])(
         windowId: 123,
         ...point,
         expectedBounds: bounds,
+        moveCursor: true,
       });
   },
 );
 test.each([
   ["..-9,9228", ["double", "right", "double"]],
-  [".,-9;9228", ["right", "middle", "right"]],
-  [".;-9.9228", ["middle", "left", "middle"]],
-  [".-9..9228", ["left", "double", "left"]],
+  [".,0l9;9228", ["right", "middle", "right"]],
+  [".;0l9.9228", ["middle", "left", "middle"]],
+  [".0l9..9228", ["left", "double", "left"]],
 ] as const)("one-click overrides reset to the initial click type: %s", async (input, kinds) => {
   vi.useFakeTimers();
   const captured = capturedClick(input);
@@ -139,6 +194,34 @@ test.each([
       windowId: 123,
       ...point,
       expectedBounds: bounds,
+      moveCursor: true,
+      ...(kind === "double" ? { clickCount: 2 } : {}),
+      ...(kind === "right" || kind === "middle" ? { button: kind } : {}),
+    });
+  }
+});
+test.each([
+  [".", "left"],
+  ["..", "double"],
+  [".,", "right"],
+  [".;", "middle"],
+] as const)("mixed-fraction pairs retain the initial click type: %s", async (prefix, kind) => {
+  vi.useFakeTimers();
+  const captured = capturedClick(prefix + "91/21/23/4");
+  expect(captured.sequence).toBe(prefix.slice(1) + "91/21/23/4");
+  const action = buildClickHandler("dev.fixture")(captured.sequence, captured.defaultClick);
+  await vi.runAllTimersAsync();
+  await action;
+  expect(click).toHaveBeenCalledTimes(2);
+  for (const [index, point] of [
+    { x: 270, y: 72 },
+    { x: 36, y: 204 },
+  ].entries()) {
+    expect(click).toHaveBeenNthCalledWith(index + 1, {
+      windowId: 123,
+      ...point,
+      expectedBounds: bounds,
+      moveCursor: true,
       ...(kind === "double" ? { clickCount: 2 } : {}),
       ...(kind === "right" || kind === "middle" ? { button: kind } : {}),
     });
@@ -151,8 +234,8 @@ test("an explicit app overrides the focused-app context and works for direct cal
   expect(getAppWindows).toHaveBeenNthCalledWith(1, "dev.target");
   expect(getAppWindows).toHaveBeenNthCalledWith(2, "dev.target");
 });
-test.each(["13,", "13;", "13.", "13..", "1,3", "13,5"])(
-  "an incomplete button override rejects before any input: %s",
+test.each(["13,", "13;", "13.", "13..", "1,3", "13,5", "91/", "13//28"])(
+  "a malformed sequence rejects before any input: %s",
   async (sequence) => {
     await expect(buildClickHandler("dev.fixture")(sequence)).rejects.toThrow(TypeError);
     expect(getAppWindows).not.toHaveBeenCalled();
@@ -173,7 +256,7 @@ test("malformed trailing input rejects before querying windows or sending input"
 });
 
 test("an out-of-bounds final click prevents the whole sequence", async () => {
-  await expect(buildClickHandler("dev.fixture")("20b5/0r601b")).rejects.toThrow("outside");
+  await expect(buildClickHandler("dev.fixture")("20b5/00r601b")).rejects.toThrow("outside");
   expect(click).not.toHaveBeenCalled();
 });
 
@@ -220,6 +303,7 @@ test("overlapping sequences serialize and retain each invocation's captured app"
     x: 270,
     y: 580,
     expectedBounds: bounds,
+    moveCursor: true,
   });
 });
 
@@ -234,12 +318,13 @@ test("the next sequence reads the window's current size and position", async () 
     x: 160,
     y: 200,
     expectedBounds: resized,
+    moveCursor: true,
   });
 });
 
 test("clicks wait 500 ms and retain the target window throughout a sequence", async () => {
   vi.useFakeTimers();
-  const action = buildClickHandler("dev.fixture")("--/0r0b");
+  const action = buildClickHandler("dev.fixture")("--0r0b");
   await vi.advanceTimersByTimeAsync(0);
   expect(click).toHaveBeenCalledOnce();
   windowsMock.mockReturnValue([{ ...window, windowId: 789 }]);
@@ -253,6 +338,7 @@ test("clicks wait 500 ms and retain the target window throughout a sequence", as
     x: 299,
     y: 599,
     expectedBounds: bounds,
+    moveCursor: true,
   });
 });
 
@@ -273,3 +359,209 @@ test("window lookup errors propagate without breaking later invocations", async 
   expect(click).not.toHaveBeenCalled();
   await expect(handler("--")).resolves.toBeUndefined();
 });
+
+test.each([
+  [".-1328", "left"],
+  [".,-1328", "right"],
+  [".;-1328", "middle"],
+] as const)("%s drags with one press and releases at the final point", async (input, button) => {
+  vi.useFakeTimers();
+  const captured = capturedClick(input);
+  const action = buildClickHandler("dev.fixture")(captured.sequence, captured.defaultClick);
+  await vi.runAllTimersAsync();
+  await action;
+  expect(click).not.toHaveBeenCalled();
+  expect(mouse).toHaveBeenCalledTimes(3);
+  expect(mouse).toHaveBeenNthCalledWith(1, {
+    action: "down",
+    button,
+    windowId: 123,
+    x: 30,
+    y: 180,
+    expectedBounds: bounds,
+  });
+  expect(mouse).toHaveBeenNthCalledWith(2, {
+    action: "move",
+    windowId: 123,
+    x: 60,
+    y: 480,
+    expectedBounds: bounds,
+  });
+  expect(mouse).toHaveBeenLastCalledWith({ action: "up" });
+});
+
+test("trailing dash latches the final click and a later move sequence releases it", async () => {
+  const handler = buildClickHandler("dev.fixture");
+  await handler("13-", "command");
+  expect(mouse).toHaveBeenCalledExactlyOnceWith({
+    action: "down",
+    button: "left",
+    windowId: 123,
+    x: 30,
+    y: 180,
+    expectedBounds: bounds,
+  });
+  await handler("=28", "command");
+  expect(mouse).toHaveBeenNthCalledWith(2, {
+    action: "move",
+    windowId: 123,
+    x: 60,
+    y: 480,
+    expectedBounds: bounds,
+  });
+  expect(mouse).toHaveBeenLastCalledWith({ action: "up" });
+});
+
+test("a trailing dash on a multi-point drag omits the final release", async () => {
+  vi.useFakeTimers();
+  const action = buildClickHandler("dev.fixture")("-1328-", "command");
+  await vi.runAllTimersAsync();
+  await action;
+  expect(mouse).toHaveBeenCalledTimes(2);
+  expect(vi.mocked(mouse).mock.calls.map(([options]) => options.action)).toEqual(["down", "move"]);
+});
+
+test.each(["left", "right", "middle"] as const)(
+  "a latched %s drag is released when the next command cannot be parsed",
+  async (button) => {
+    const handler = buildClickHandler("dev.fixture");
+    await handler("13-", button);
+    await expect(handler("13junk", "command")).rejects.toThrow(TypeError);
+    expect(mouse).toHaveBeenLastCalledWith({ action: "up" });
+    await expect(handler("13", "command")).resolves.toBeUndefined();
+  },
+);
+
+test.each(["missing window", "window lookup", "out of bounds", "screen lookup"])(
+  "a latched drag is released when the next command fails before native input: %s",
+  async (failure) => {
+    const handler = buildClickHandler("dev.fixture");
+    await handler("-13-", "command");
+    let sequence = "=28";
+    if (failure === "missing window") windowsMock.mockReturnValueOnce([]);
+    else if (failure === "window lookup") {
+      windowsMock.mockImplementationOnce(() => {
+        throw new Error("window lookup failed");
+      });
+    } else if (failure === "out of bounds") sequence = "=301l5";
+    else {
+      sequence = "/=28";
+      vi.mocked(getScreenBounds).mockImplementationOnce(() => {
+        throw new Error("screen lookup failed");
+      });
+    }
+    await expect(handler(sequence, "command")).rejects.toThrow();
+    expect(mouse).toHaveBeenCalledTimes(2);
+    expect(mouse).toHaveBeenLastCalledWith({ action: "up" });
+    expect(click).not.toHaveBeenCalled();
+    await expect(handler("13", "command")).resolves.toBeUndefined();
+  },
+);
+
+test("a malformed overlapping command waits for the earlier hold before releasing it", async () => {
+  vi.useFakeTimers();
+  const handler = buildClickHandler("dev.fixture");
+  const drag = handler("-1328-", "command");
+  const malformed = expect(handler("13junk", "command")).rejects.toThrow(TypeError);
+  await vi.advanceTimersByTimeAsync(0);
+  expect(vi.mocked(mouse).mock.calls.map(([options]) => options.action)).toEqual(["down"]);
+  await vi.runAllTimersAsync();
+  await Promise.all([drag, malformed]);
+  expect(vi.mocked(mouse).mock.calls.map(([options]) => options.action)).toEqual([
+    "down",
+    "move",
+    "up",
+  ]);
+});
+
+test.each(["=13", "/=13", "=/13"])(
+  "%s moves without sending any button presses",
+  async (sequence) => {
+    await buildClickHandler("dev.fixture")(sequence, "command");
+    expect(click).not.toHaveBeenCalled();
+    expect(vi.mocked(mouse).mock.calls.map(([options]) => options.action)).toEqual(["move", "up"]);
+  },
+);
+
+test("global clicks use the captured screen bounds and need no application context", async () => {
+  vi.useFakeTimers();
+  const action = buildClickHandler()("/551/23/4", "command");
+  await vi.runAllTimersAsync();
+  await action;
+  expect(getAppWindows).not.toHaveBeenCalled();
+  expect(getScreenBounds).toHaveBeenCalledOnce();
+  expect(mouse).toHaveBeenNthCalledWith(1, { action: "click", x: -600, y: 100 });
+  expect(mouse).toHaveBeenNthCalledWith(2, { action: "click", x: -1056, y: -28 });
+});
+
+test.each(["/-1328", "-/1328", "/;-1328"])(
+  "global drag modifiers combine: %s",
+  async (sequence) => {
+    vi.useFakeTimers();
+    const action = buildClickHandler()(sequence, "command");
+    await vi.runAllTimersAsync();
+    await action;
+    expect(getAppWindows).not.toHaveBeenCalled();
+    expect(vi.mocked(mouse).mock.calls.map(([options]) => options.action)).toEqual([
+      "down",
+      "move",
+      "up",
+    ]);
+    expect(mouse).toHaveBeenNthCalledWith(1, {
+      action: "down",
+      button: sequence.includes(";") ? "middle" : "left",
+      x: -1080,
+      y: -60,
+    });
+  },
+);
+
+test("a failed move releases the held mouse and the next sequence can recover", async () => {
+  vi.useFakeTimers();
+  vi.mocked(mouse)
+    .mockResolvedValueOnce(undefined)
+    .mockRejectedValueOnce(new Error("window moved"));
+  const handler = buildClickHandler("dev.fixture");
+  const action = handler("-1328-", "command");
+  const rejected = expect(action).rejects.toThrow("window moved");
+  await vi.runAllTimersAsync();
+  await rejected;
+  expect(mouse).toHaveBeenLastCalledWith({ action: "up" });
+  await expect(handler("13", "command")).resolves.toBeUndefined();
+});
+
+test("drag markers persist across bare pairs and explicit clicks end the drag", async () => {
+  vi.useFakeTimers();
+  const action = buildClickHandler("dev.fixture")("13.-2855.67", "command");
+  await vi.runAllTimersAsync();
+  await action;
+  expect(vi.mocked(mouse).mock.calls.map(([options]) => options.action)).toEqual([
+    "down",
+    "move",
+    "up",
+    "up",
+  ]);
+  expect(click).toHaveBeenCalledTimes(2);
+});
+
+test("dash coordinates and the trailing hold are unambiguous after complete pairs", () => {
+  const points = (sequence: string) =>
+    resolveClickSequence(parseMouseCommand(sequence).positions, bounds);
+  expect(points("-0l0t55-")).toEqual([
+    { x: -100, y: 200, click: "drag" },
+    { x: 50, y: 500, click: "drag", hold: true },
+  ]);
+  expect(points("=--")).toEqual([{ x: -100, y: 200, click: "move" }]);
+  expect(points("-/--")).toEqual([{ x: -100, y: 200, click: "drag" }]);
+  expect(points("0-")).toEqual([{ x: 199, y: 200, click: "left" }]);
+});
+
+test.each(["-13junk", "=131", "/13junk", "/=/13", "-=13", "=;13", ".13-"])(
+  "malformed mouse commands reject before sending input: %s",
+  async (sequence) => {
+    await expect(buildClickHandler("dev.fixture")(sequence, "command")).rejects.toThrow(TypeError);
+    expect(click).not.toHaveBeenCalled();
+    expect(mouse).not.toHaveBeenCalled();
+    expect(getScreenBounds).not.toHaveBeenCalled();
+  },
+);

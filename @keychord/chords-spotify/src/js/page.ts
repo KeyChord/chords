@@ -1,4 +1,6 @@
 import { buildSpotifyBarJavaScript, type SpotifyBarAction } from "./now-playing";
+import { buildSpotifyNavigationJavaScript, type SpotifyNavigationAction } from "./navigation";
+import { buildSpotifyNowPlayingJavaScript, type SpotifyNowPlayingAction } from "./now-playing-view";
 
 export type SpotifyTrackAction =
   | "more"
@@ -156,9 +158,13 @@ async function runInPage(action: SpotifyTrackAction, index: number): Promise<str
 }
 
 export function buildSpotifyJavaScript(
-  action: SpotifyTrackAction | SpotifyBarAction,
+  action: SpotifyTrackAction | SpotifyBarAction | SpotifyNavigationAction | SpotifyNowPlayingAction,
   index?: string | number,
 ): string {
+  if (action === "liked-songs") return buildSpotifyNavigationJavaScript();
+  if (action.startsWith("np-")) {
+    return buildSpotifyNowPlayingJavaScript(action as SpotifyNowPlayingAction);
+  }
   if (action.startsWith("bar-")) {
     return buildSpotifyBarJavaScript(action as SpotifyBarAction, index);
   }

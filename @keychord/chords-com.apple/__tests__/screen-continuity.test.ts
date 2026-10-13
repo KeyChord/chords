@@ -13,7 +13,7 @@ vi.mock("../src/js/utils/screen-continuity-native", () => ({
   openScreenContinuityAddon: openAddon,
 }));
 const bounds: ScreenBounds = { x: 100, y: 200, width: 300, height: 600 };
-const example = "20b5/-5/37/0r20b/65";
+const example = "20b5-53/07/00r20b65";
 const expectedPoints = [
   { x: 250, y: 780 },
   { x: 100, y: 500 },
@@ -31,10 +31,17 @@ beforeEach(() => {
 test("the compact sequence resolves all five clicks in order", () => {
   expect(resolveClickSequence(parseClickSequence(example), bounds)).toEqual(expectedPoints);
 });
-test("pair separators keep mixed shorthand and exact coordinates unambiguous", () => {
-  expect(resolveClickSequence(parseClickSequence("20b5/-5/37/0r20b/65"), bounds)).toEqual(
-    expectedPoints,
-  );
+test("zero fractional tenths keep shorthand distinct from a following pixel amount", () => {
+  expect(resolveClickSequence(parseClickSequence("13/020l5"), bounds)).toEqual([
+    { x: 130, y: 380 },
+    { x: 120, y: 500 },
+  ]);
+});
+test("a slash always refines its coordinate instead of separating pairs", () => {
+  expect(resolveClickSequence(parseClickSequence("13/20l5"), bounds)).toEqual([
+    { x: 130, y: 392 },
+    { x: 100, y: 500 },
+  ]);
 });
 test("each unsuffixed digit is one axis in tenths, starting from the top left", () => {
   expect(resolveClickSequence(parseClickSequence("1313"), bounds)).toEqual([
@@ -42,8 +49,25 @@ test("each unsuffixed digit is one axis in tenths, starting from the top left", 
     { x: 130, y: 380 },
   ]);
 });
+test.each([
+  ["91/2", { x: 370, y: 272 }],
+  ["1/23", { x: 136, y: 380 }],
+  ["1/23/4", { x: 136, y: 404 }],
+  ["-/2-/5", { x: 106, y: 230 }],
+  ["9/90/0", { x: 397, y: 799 }],
+  ["1/03/0", { x: 130, y: 380 }],
+] as const)("mixed fractions refine either axis to hundredths: %s", (sequence, point) => {
+  expect(resolveClickSequence(parseClickSequence(sequence), bounds)).toEqual([point]);
+});
+test("mixed-fraction pairs run together and preserve one-pair click overrides", () => {
+  expect(resolveClickSequence(parseClickSequence("91/2,1/23/491/2", "double"), bounds)).toEqual([
+    { x: 370, y: 272, click: "double" },
+    { x: 136, y: 404, click: "right" },
+    { x: 370, y: 272, click: "double" },
+  ]);
+});
 test("direction suffixes make the complete number an exact pixel offset", () => {
-  expect(resolveClickSequence(parseClickSequence("20l5/20t5/20l30t"), bounds)).toEqual([
+  expect(resolveClickSequence(parseClickSequence("20l5/020t5/020l30t"), bounds)).toEqual([
     { x: 120, y: 500 },
     { x: 250, y: 220 },
     { x: 120, y: 230 },
@@ -62,7 +86,7 @@ test("direction suffixes measure exact pixels from each named edge", () => {
   ]);
 });
 test("absolute coordinate directions may be written in either axis order", () => {
-  expect(resolveClickSequence(parseClickSequence("20l5/20t5/20l30t/20r30b"), bounds)).toEqual([
+  expect(resolveClickSequence(parseClickSequence("20l5/020t5/020l30t20r30b"), bounds)).toEqual([
     { x: 120, y: 500 },
     { x: 250, y: 220 },
     { x: 120, y: 230 },
@@ -70,7 +94,7 @@ test("absolute coordinate directions may be written in either axis order", () =>
   ]);
 });
 test("relative and explicit zero reach the corresponding edges inside the window", () => {
-  expect(resolveClickSequence(parseClickSequence("--/0r0b/300l600t/300r600b"), bounds)).toEqual([
+  expect(resolveClickSequence(parseClickSequence("--0r0b300l600t300r600b"), bounds)).toEqual([
     { x: 100, y: 200 },
     { x: 399, y: 799 },
     { x: 399, y: 799 },
@@ -78,14 +102,14 @@ test("relative and explicit zero reach the corresponding edges inside the window
   ]);
 });
 test("zero means 100 percent and dash means zero percent on either axis", () => {
-  expect(resolveClickSequence(parseClickSequence("0-/-0/00"), bounds)).toEqual([
+  expect(resolveClickSequence(parseClickSequence("0--000"), bounds)).toEqual([
     { x: 399, y: 200 },
     { x: 100, y: 799 },
     { x: 399, y: 799 },
   ]);
 });
 test("pixel offsets support decimal precision", () => {
-  expect(resolveClickSequence(parseClickSequence("0.5l1.25t/0.3r0.3b"), bounds)).toEqual([
+  expect(resolveClickSequence(parseClickSequence("0.5l1.25t0.3r0.3b"), bounds)).toEqual([
     { x: 100.5, y: 201.25 },
     { x: 399.7, y: 799.7 },
   ]);
@@ -132,18 +156,27 @@ test.each([
   "..13",
   ";13",
   "13,",
+  "91/",
+  "91/-",
+  "91/a",
+  "91/2/3",
+  "13//28",
+  "20l5/0r601b",
   "9007199254740992l-",
   "9007199254740992r-",
   "9".repeat(400) + "l-",
 ])("rejects the complete malformed tap sequence %j", (sequence) => {
   expect(() => parseClickSequence(sequence)).toThrow(TypeError);
 });
-test.each(["0l601t", "301l-", "20b5/0r601b", "301r-"])(
+test.each(["0l601t", "301l-", "20b5/00r601b", "301r-"])(
   "rejects out-of-bounds pixels %s",
   (sequence) => {
     expect(() => resolveClickSequence(parseClickSequence(sequence), bounds)).toThrow(RangeError);
   },
 );
+test.each(["90/1", "0/19"])("rejects mixed fractions beyond 100 percent: %s", (sequence) => {
+  expect(() => resolveClickSequence(parseClickSequence(sequence), bounds)).toThrow(RangeError);
+});
 test.each([
   { ...bounds, width: 0 },
   { ...bounds, height: -1 },
@@ -173,6 +206,27 @@ test("the configured chord captures and forwards the full sequence to the native
   );
 });
 
+test("the tap chord forwards mixed fractions without pair separators", async () => {
+  const source = readFileSync(
+    new URL("../chords/com/apple/ScreenContinuity/macos.toml", import.meta.url),
+    "utf8",
+  );
+  const binding = source.match(/^'([^']+)' = .*'@input:tap' = \['(\$1)'\]/m)!;
+  const sequence = chordPattern(binding[1]).exec("t91/21/23/4")?.[1];
+  expect(sequence).toBe("91/21/23/4");
+  const { default: buildHandler } = await import("../src/js/screen-continuity");
+  await buildHandler()(sequence!);
+  expect(native.clickPoints).toHaveBeenCalledExactlyOnceWith(
+    JSON.stringify({
+      bounds,
+      points: [
+        { x: 370, y: 272 },
+        { x: 136, y: 404 },
+      ],
+    }),
+  );
+});
+
 test("malformed trailing input never activates the app or requests clicks", async () => {
   const { default: buildHandler } = await import("../src/js/screen-continuity");
   await expect(buildHandler()("20b5.1")).rejects.toThrow();
@@ -183,7 +237,7 @@ test("malformed trailing input never activates the app or requests clicks", asyn
 
 test("an out-of-bounds final click prevents the entire native sequence", async () => {
   const { default: buildHandler } = await import("../src/js/screen-continuity");
-  await expect(buildHandler()("20b5/0r601b")).rejects.toThrow("outside");
+  await expect(buildHandler()("20b5/00r601b")).rejects.toThrow("outside");
   expect(native.clickPoints).not.toHaveBeenCalled();
 });
 
@@ -227,4 +281,27 @@ test("a failed native click does not block later sequences", async () => {
   native.clickPoints.mockRejectedValueOnce(new Error("window moved"));
   await expect(handler(example)).rejects.toThrow("window moved");
   await expect(handler(example)).resolves.toBeUndefined();
+});
+
+test.each([
+  [
+    "-1328",
+    [
+      { x: 130, y: 380, click: "drag" },
+      { x: 160, y: 680, click: "drag" },
+    ],
+  ],
+  [
+    "-1328-",
+    [
+      { x: 130, y: 380, click: "drag" },
+      { x: 160, y: 680, click: "drag", hold: true },
+    ],
+  ],
+  ["=13", [{ x: 130, y: 380, click: "move" }]],
+  ["13-", [{ x: 130, y: 380, click: "drag", hold: true }]],
+] as const)("tap commands support drag, hold and movement: %s", async (sequence, points) => {
+  const { default: buildHandler } = await import("../src/js/screen-continuity");
+  await buildHandler()(sequence);
+  expect(native.clickPoints).toHaveBeenCalledExactlyOnceWith(JSON.stringify({ bounds, points }));
 });

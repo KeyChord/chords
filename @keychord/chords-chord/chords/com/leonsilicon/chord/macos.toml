@@ -1,9 +1,16 @@
 name = "Chords"
 
-[chords]
-# A shortcut that likely won't conflict with any user-defined chords.
-'?\\' = { name = "Chords" }
+# This core file is always loaded globally and cannot be removed or disabled.
+# Other packages cannot define chords or hints in the reserved 0 namespace.
 
-'\\s' = { name = "Settings" }
-'\\r' = { name = "Reload Config" }
-'\\q' = { name = "Quit Chord" }
+[chords]
+'?"1-9"' = { name = "Repeat count" }
+
+'?0' = { name = "Chord" }
+
+'0,' = { name = "Chord: Settings", builtin = { command = "settings" } }
+'0,r' = { name = "Chord: Settings > Reload", builtin = { command = "reload" } }
+'0q' = { name = "Chord: Quit", builtin = { command = "quit" } }
+
+'?0h' = { name = "Chord: Halt (Loop)" }
+'0h(\d+)' = { name = "Halt loop #$1", builtin = { command = "halt-loop", argument = "$1" } }

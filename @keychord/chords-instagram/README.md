@@ -18,6 +18,8 @@ For the installed Brave Instagram app (`com.brave.Browser.app.akpamiohjfcnimfljf
 
 Goto chords close the current story viewer or dismissible dialog using Instagram's Close or Cancel control, then wait for navigation to become available. They also work while a story reply field has focus. Any unsaved-draft confirmation stays open for you to resolve before navigation continues.
 
+Navigation matches the labeled SVG icons and your profile avatar in both the sidebar and the compact bottom bar. Search also recognizes the compact Explore icon, then focuses and selects the search query.
+
 Notes requires your own profile to be open (`gp`) and Notes to be available on your account. The commands open and close Instagram's controls; they do not share a note or post, change a photo, or delete an existing note. Closing uses Instagram's Close action, leaving any unsaved-draft confirmation to you. The selectors support Instagram's English desktop interface.
 
 Story chords require Home to be open (`gh`) with no dialog. They count available story buttons in the rendered tray from left to right, including seen stories, and exclude the Create story and tray navigation controls. Numbers must be positive integers; unavailable positions report an error.

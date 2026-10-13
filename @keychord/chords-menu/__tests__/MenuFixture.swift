@@ -41,6 +41,7 @@ final class Fixture: NSObject, NSApplicationDelegate, NSMenuDelegate {
                 disabled.isEnabled = false
                 menu.addItem(disabled)
                 menu.addItem(item("\u{200B}Clean Title"))
+                menu.addItem(item("100% … 日本語"))
             } else {
                 menu.addItem(item("Fixture Action"))
             }

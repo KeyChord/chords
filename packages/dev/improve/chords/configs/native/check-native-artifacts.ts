@@ -1,4 +1,4 @@
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { execaSync } from "@chord/com.npmjs.execa";
@@ -12,9 +12,17 @@ type Run = ReturnType<typeof execaSync>;
  * checkable here, across the whole workspace.
  */
 function checkModuleNamesAreUnique(root: string, run: Run): number {
-  const manifests = run("git", ["ls-files", "-z", "--", "*/Package.swift"])
+  const manifests = run("git", [
+    "ls-files",
+    "-z",
+    "--cached",
+    "--others",
+    "--exclude-standard",
+    "--",
+    "*/Package.swift",
+  ])
     .stdout.split("\0")
-    .filter(Boolean);
+    .filter((file) => file && existsSync(join(root, file)));
   const owners = new Map<string, string>();
   const clashes: string[] = [];
 
@@ -50,7 +58,17 @@ export function checkNativeArtifacts(): number {
   const run = execaSync({ cwd: root });
   const duplicates = checkModuleNamesAreUnique(root, run);
   if (duplicates !== 0) return duplicates;
-  const addons = run("git", ["ls-files", "-z", "--", "*.node"]).stdout.split("\0").filter(Boolean);
+  const addons = run("git", [
+    "ls-files",
+    "-z",
+    "--cached",
+    "--others",
+    "--exclude-standard",
+    "--",
+    "*.node",
+  ])
+    .stdout.split("\0")
+    .filter((file) => file && existsSync(join(root, file)));
   const temporary = mkdtempSync(join(tmpdir(), "chords-native-"));
   // Mach-O UUIDs/signatures change on every build. Compare disassembled code,
   // removing otool's first line, which contains the input filename.

@@ -118,14 +118,16 @@ fu = { name = "Folding: Unfold", command = "Expand", shortcut = "cmd+NumpadAdd" 
 fua = { name = "Folding: Unfold All", command = "Collapse All", shortcut = "cmd+shift+NumpadSubtract" }
 fuc = { name = "Folding: Unfold Comments", '@input:command' = ['ExpandDocComments'] }
 fur = { name = "Folding: Unfold Recursively", command = "Expand Recursively", shortcut = "cmd+option+NumpadAdd" }
-'?f([1-5l])' = { name = "Folding Level" }
+'?f"1-5"' = { name = "Folding Level" }
+'?fl' = { name = "Folding Level" }
 fl = { name = "Folding: Level", '@input:command' = ['ExpandToLevel'] }
 f1 = { name = "Folding: Level 1", '@input:command' = ['ExpandToLevel1'] }
 f2 = { name = "Folding: Level 2", '@input:command' = ['ExpandToLevel2'] }
 f3 = { name = "Folding: Level 3", '@input:command' = ['ExpandToLevel3'] }
 f4 = { name = "Folding: Level 4", '@input:command' = ['ExpandToLevel4'] }
 f5 = { name = "Folding: Level 5", '@input:command' = ['ExpandToLevel5'] }
-'?fa([1-5l])' = { name = "Folding All Level" }
+'?fa"1-5"' = { name = "Folding All Level" }
+'?fal' = { name = "Folding All Level" }
 fal = { name = "Folding: All Level", '@input:command' = ['ExpandAllToLevel'] }
 fa1 = { name = "Folding: All Level 1", '@input:command' = ['ExpandAllToLevel1'] }
 fa2 = { name = "Folding: All Level 2", '@input:command' = ['ExpandAllToLevel2'] }

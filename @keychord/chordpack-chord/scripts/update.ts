@@ -26,10 +26,6 @@ const packageConfigs: PackageConfig[] = [
     name: "@keychord/chords-com.apple",
     git: "https://github.com/KeyChord/chords-com.apple",
   },
-  {
-    name: "@keychord/chords-tray",
-    git: "https://github.com/KeyChord/chords-tray",
-  },
 ];
 
 async function updatePackageRevisions(): Promise<void> {
@@ -51,6 +47,8 @@ async function updatePackageRevisions(): Promise<void> {
   } catch {
     console.warn("Could not parse existing chordpack.toml, proceeding with defaults.");
   }
+
+  delete chordpack.packages["@keychord/chords-tray"];
 
   for (const pkgConfig of packageConfigs) {
     const parts = pkgConfig.git.replace("https://github.com/", "").split("/");

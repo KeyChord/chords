@@ -5,7 +5,6 @@ $schema: "https://moonrepo.dev/schemas/workspace.json"
 projects:
   chords-menu: "@keychord/chords-menu"
   chords-web: "@keychord/chords-web"
-  chords-tray: "@keychord/chords-tray"
   chords-com.apple: "@keychord/chords-com.apple"
   chords-dock: "@keychord/chords-dock"
 

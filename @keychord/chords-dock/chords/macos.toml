@@ -6,68 +6,82 @@ file = '@keychord/chords-menu/js/menu.js'
 [on.dock]
 file = 'dock.js'
 
+[on.window]
+file = 'window.js'
+
+[on.monitor]
+file = 'monitor.js'
+
 [chords]
 # Built-in macOS window management shortcuts
 # Can be overriden if using a dedicated window manager such as yabai, Aerospace, etc.
-'?/w' = { name = "Dock / Window Management" }
+'?/w' = { name = "Window" }
 
-# Move and Resize
-'/wl' = { name = "Window: (Move) Left", shortcut = "ctrl+fn+left" }
-'/wr' = { name = "Window: (Move) Right", shortcut = "ctrl+fn+right" }
-'/wt' = { name = "Window: (Move) Top", shortcut = "ctrl+fn+up" }
-'/wb' = { name = "Window: (Move) Bottom", shortcut = "ctrl+fn+down" }
-'/wtl' = { name = "Window: (Move) Top Left", '@input:menu' = [
-  "Window",
-  "Move & Resize",
-  "Top Left",
-] }
-'/wtr' = { name = "Window: (Move) Top Right", '@input:menu' = [
-  "Window",
-  "Move & Resize",
-  "Top Right",
-] }
-'/wbl' = { name = "Window: (Move) Bottom Left", '@input:menu' = [
-  "Window",
-  "Move & Resize",
-  "Bottom Left",
-] }
-'/wbr' = { name = "Window: (Move) Bottom Right", '@input:menu' = [
-  "Window",
-  "Move & Resize",
-  "Bottom Right",
-] }
-'/wlr' = { name = "Window: (Move) Left Right", shortcut = "ctrl+fn+shift+left" }
-'/wrl' = { name = "Window: (Move) Right Left", shortcut = "ctrl+fn+shift+right" }
-'/wtb' = { name = "Window: (Move) Top Bottom", shortcut = "ctrl+fn+shift+up" }
-'/wbt' = { name = "Window: (Move) Bottom Top", shortcut = "ctrl+fn+shift+down" }
-'/wq' = { name = "Window: (Move) Quarters", '@input:menu' = [
-  "Window",
-  "Move & Resize",
-  "Quarters",
-] }
+# Native edge/corner snaps preserve size; stretch commands change one dimension.
+'/wl' = { name = "Window: left", '@input:window' = ['preset', 'left'] }
+'/wr' = { name = "Window: right", '@input:window' = ['preset', 'right'] }
+'/wt' = { name = "Window: top", '@input:window' = ['preset', 'top'] }
+'/wb' = { name = "Window: bottom", '@input:window' = ['preset', 'bottom'] }
+'/wtl' = { name = "Window: top-left", '@input:window' = ['preset', 'top-left'] }
+'/wtr' = { name = "Window: top-right", '@input:window' = ['preset', 'top-right'] }
+'/wbl' = { name = "Window: bottom-left", '@input:window' = ['preset', 'bottom-left'] }
+'/wbr' = { name = "Window: bottom-right", '@input:window' = ['preset', 'bottom-right'] }
+'/wlr' = { name = "Window: horizontal", '@input:window' = ['preset', 'horizontal'] }
+'/wrl' = { name = "Window: horizontal", '@input:window' = ['preset', 'horizontal'] }
+'/wtb' = { name = "Window: vertical", '@input:window' = ['preset', 'vertical'] }
+'/wbt' = { name = "Window: vertical", '@input:window' = ['preset', 'vertical'] }
+'/wf' = { name = "Window: fill", '@input:window' = ['preset', 'fill'] }
+'/wc' = { name = "Window: center", '@input:window' = ['preset', 'center'] }
 
-'/ws[' = { name = "Window: Size Previous", shortcut = "ctrl+fn+r" }
-'/wz' = { name = "Window: Zoom", '@input:menu' = ["Window", 'Zoom'] }
+'?/wpx' = { name = "Window: Position, X" }
+'/wpx(.+)' = { name = "Window: Position, X (Set)", '@input:window' = ['position', '$1'] }
+'?/wpy' = { name = "Window: Position, Y" }
+'/wpy(.+)' = { name = "Window: Position, Y (Set)", '@input:window' = ['position', '$1'] }
+'?/wp' = { name = "Window: Position" }
+'/wp(.+)' = { name = "Window: Position (Set)", '@input:window' = ['position', '$1'] }
+
+'?/wsw' = { name = "Window: Size, Width" }
+'/wsw(.+)' = { name = "Window: Size, Width (Set)", '@input:window' = ['size', '$1'] }
+'?/wsh' = { name = "Window: Size, Height" }
+'/wsh(.+)' = { name = "Window: Size, Height (Set)", '@input:window' = ['size', '$1'] }
+'?/ws' = { name = "Window: Size" }
+'/ws(.+)' = { name = "Window: Size (Set)", '@input:window' = ['size', '$1'] }
+
+'/w([0-9\s-]+)' = { name = "Window: Size + Position", '@input:window' = ['frame', '$1'] }
 
 '/h' = { name = "Hide", shortcut = "cmd+h" }
 '/m' = { name = "Minimize", shortcut = "cmd+m" }
 '/q' = { name = "Quit", shortcut = "cmd+q" }
 
-'/wf' = { name = "Window: Fill", shortcut = "ctrl+fn+f" }
-'/wc' = { name = "Window: Center", shortcut = "ctrl+fn+c" }
-'/wfl' = { name = "Window: Fullscreen Left", '@input:menu' = [
-  "Window",
-  "Full Screen Tile",
-  "Left of Screen",
-] }
-'/wfr' = { name = "Window: Fullscreen Right", '@input:menu' = [
-  "Window",
-  "Full Screen Tile",
-  "Right of Screen",
-] }
-'/waf' = { name = "Window: All to Front", '@input:menu' = ["Window", "Bring All to Front"] }
 '/w[' = { name = "Window: Previous " }
 '/w]' = { name = "Window: Window" }
+
+# Spaces (Mission Control shortcuts must be enabled in System Settings)
+'?/s' = { name = "Spaces" }
+'/s[' = { name = "Space: Previous", shortcut = "ctrl+left" }
+'/s]' = { name = "Space: Next", shortcut = "ctrl+right" }
+'/sl' = { name = "Space: Left", shortcut = "ctrl+left" }
+'/sr' = { name = "Space: Right", shortcut = "ctrl+right" }
+'/s1' = { name = "Space: Desktop 1", shortcut = "ctrl+1" }
+'/s2' = { name = "Space: Desktop 2", shortcut = "ctrl+2" }
+'/s3' = { name = "Space: Desktop 3", shortcut = "ctrl+3" }
+'/s4' = { name = "Space: Desktop 4", shortcut = "ctrl+4" }
+'/s5' = { name = "Space: Desktop 5", shortcut = "ctrl+5" }
+'/s6' = { name = "Space: Desktop 6", shortcut = "ctrl+6" }
+'/s7' = { name = "Space: Desktop 7", shortcut = "ctrl+7" }
+'/s8' = { name = "Space: Desktop 8", shortcut = "ctrl+8" }
+'/s9' = { name = "Space: Desktop 9", shortcut = "ctrl+9" }
+
+# Monitors (focus a display without moving windows)
+'?/m' = { name = "Monitors" }
+'?/m"#"' = { name = "Monitor: Focus #" }
+'/m([1-9]\d*)' = { name = "Monitor: Focus $1", '@input:monitor' = ['$1'] }
+'/m[' = { name = "Monitor: Previous", '@input:monitor' = ['previous'] }
+'/m]' = { name = "Monitor: Next", '@input:monitor' = ['next'] }
+'/ml' = { name = "Monitor: Left", '@input:monitor' = ['left'] }
+'/mr' = { name = "Monitor: Right", '@input:monitor' = ['right'] }
+'/mt' = { name = "Monitor: Top", '@input:monitor' = ['up'] }
+'/mb' = { name = "Monitor: Bottom", '@input:monitor' = ['down'] }
 
 # Dock
 '/dv' = { name = "Dock: Vary (On/Off)", shortcut = "ctrl+f3" }

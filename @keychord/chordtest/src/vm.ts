@@ -88,6 +88,10 @@ export function discoverMacOSTests(paths: string[] = [], workspace = workspaceRo
 export function guestTestScript(paths: string[]) {
   // Validate selectors before constructing shell code. Only discovered VM tests are executed.
   const tests = discoverMacOSTests(paths);
+  const packages = [...new Set(tests.map((test) => test.split("/__tests__/")[0]))];
+  const build = paths.length
+    ? `vp exec --filter=${shellQuote("./@keychord/chordtest")} ${packages.map((pkg) => `--filter=${shellQuote(`./${pkg}...`)}`).join(" ")} vp pack`
+    : "vp run build";
   return `set -euo pipefail
 export PATH="$HOME/.bun/bin:$HOME/.vite-plus/bin:$HOME/.vite-plus/0.1.15/bin:$HOME/.vite-plus/0.1.15:/opt/homebrew/opt/node@24/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
 /bin/bash '/Volumes/My Shared Files/chords-sources/@keychord/chordtest/src/guest-workspace.sh'
@@ -96,7 +100,7 @@ rsync -a --delete '/Volumes/My Shared Files/chords-runtime/' "$HOME/.local/share
 export CHORD_NATIVE_TEST_HOST="$HOME/.local/share/chordtest/runtime/MacOS/chord"
 export DYLD_LIBRARY_PATH="$HOME/.local/share/chordtest/runtime/Frameworks"
 cd "$HOME/chords-workspace"
-CHORD_SKIP_NATIVE=1 vp run build
+CHORD_SKIP_NATIVE=1 ${build}
 export CHORD_TESTING_UI=1
 export CHORD_TESTING_ARTIFACTS='/Volumes/My Shared Files/chords-results'
 bun test --timeout 300000 ${tests.map((path) => shellQuote(`./${path}`)).join(" ")} 2>&1 | tee '/Volumes/My Shared Files/chords-results/tests.log'
@@ -299,7 +303,6 @@ export class MacOSVM {
           "--exclude=.jj",
           "--exclude=.build",
           "--exclude=.chord-testing",
-          "--exclude=target",
           `${source.replace(/\/$/, "")}/`,
           `${destination}/`,
         ]);

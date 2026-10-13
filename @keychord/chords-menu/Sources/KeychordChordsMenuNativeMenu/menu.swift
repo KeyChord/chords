@@ -16,6 +16,14 @@ import Foundation
 import NodeAPI
 
 #NodeModule(exports: [
+    "runMenuBarAction": try NodeFunction {
+        (focusedAppId: String?, scope: String, index: String, steps: String, clickType: String) throws -> NodePromise in
+        try menuBarActionPromise(focusedAppId: focusedAppId, scope: scope, index: index, steps: steps, clickType: clickType)
+    },
+    "runTrayAction": try NodeFunction {
+        (type: String, value: String, action: String) throws -> NodePromise in
+        try trayActionPromise(type: type, value: value, action: action)
+    },
     "runMenuAction": try NodeFunction {
         (processName: String?, action: String, value: String) throws -> NodePromise in
         try mainActorPromise {
@@ -39,11 +47,17 @@ public enum MenuError: Error, CustomStringConvertible {
     case noTopLevelMatch(prefix: String, occurrence: Int, found: Int)
     case noExpandedMenu(query: String)
     case noExpandedMatch(pattern: String, occurrence: Int, found: Int)
+    case searchNotFound(String)
+    case ambiguousSearch(String, [String])
 
     public var description: String {
         switch self {
+        case .searchNotFound(let query):
+            return "No menu item contains \"\(query)\""
+        case .ambiguousSearch(let query, let paths):
+            return "Menu search \"\(query)\" is ambiguous: \(paths.joined(separator: ", ")). Include a menu path such as Window > Center."
         case .invalidAction(let action):
-            return "unknown menu action \"\(action)\" (expected \"by-index\", \"by-letters\", or \"by-path\")"
+            return "unknown menu action \"\(action)\" (expected \"by-index\", \"by-letters\", \"by-path\", or \"search\")"
         case .applicationNotFound(let name):
             return "application \"\(name)\" is not running and could not be launched"
         case .noFrontmostApplication:
@@ -273,8 +287,8 @@ private func parseMenuPath(_ value: String) throws -> [String] {
     } catch {
         throw MenuError.invalidPath("expected a JSON array of strings")
     }
-    guard path.count >= 2 else {
-        throw MenuError.invalidPath("expected at least a top-level menu and a menu item")
+    guard path.count >= 1 else {
+        throw MenuError.invalidPath("expected at least a top-level menu")
     }
     let cleanedPath = path.map(cleanTitle)
     guard cleanedPath.allSatisfy({ !$0.isEmpty }) else {
@@ -305,6 +319,37 @@ private func clickMenuItem(_ menuBarItems: [Element], path: [String]) throws {
     }
     log("Clicking menu path: \(path.joined(separator: " > "))")
     try axPress(item, label: "menu path \"\(path.joined(separator: " > "))\"")
+}
+
+/// Search literal text in titles and full paths, including punctuation and Unicode.
+@MainActor
+private func searchMenu(_ menuBarItems: [Element], query rawQuery: String) throws {
+    let query = normalize(rawQuery)
+    guard !query.isEmpty else { throw MenuError.emptyQuery }
+    var matches: [(path: [String], rank: Int)] = []
+    func walk(_ item: Element, path: [String], depth: Int) {
+        guard depth < 12 else { return }
+        let label = title(of: item)
+        guard !label.isEmpty else { return }
+        let path = path + [label]
+        let name = normalize(label)
+        let fullPath = normalize(path.joined(separator: " > "))
+        if name.contains(query) || fullPath.contains(query) {
+            let rank = name == query || fullPath == query ? 0 : name.hasPrefix(query) ? 1 : 2
+            matches.append((path, rank))
+        }
+        for menu in axChildren(item) {
+            for child in axChildren(menu) { walk(child, path: path, depth: depth + 1) }
+        }
+    }
+    for item in menuBarItems { walk(item, path: [], depth: 0) }
+    guard let bestRank = matches.map(\.rank).min() else { throw MenuError.searchNotFound(rawQuery) }
+    let ranked = matches.filter { $0.rank == bestRank }
+    let shortest = ranked.map { $0.path.count }.min()!
+    let best = ranked.filter { $0.path.count == shortest }
+    let paths = Array(Set(best.map { $0.path.joined(separator: " > ") })).sorted()
+    guard paths.count == 1 else { throw MenuError.ambiguousSearch(rawQuery, paths) }
+    try clickMenuItem(menuBarItems, path: best[0].path)
 }
 
 /// Activates `processName` (launching it when needed) and waits briefly for it to become
@@ -388,6 +433,8 @@ public func runMenuAction(processName: String?, action: String, value: String) a
     let items = axChildren(menuBar)
 
     switch action {
+    case "search":
+        try searchMenu(items, query: value)
     case "by-index":
         guard let index = Int(value) else {
             throw MenuError.invalidIndex(value)

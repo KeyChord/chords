@@ -48,7 +48,7 @@ describe("isolated macOS testing", () => {
       "/bin/bash '/Volumes/My Shared Files/chords-sources/@keychord/chordtest/src/guest-workspace.sh'",
     );
     expect(script).toContain("@keychord/chordtest/__tests__");
-    expect(script).toContain("@keychord/chords-tray/__tests__");
+    expect(script).toContain("@keychord/chords-menu/__tests__");
     expect(script).toContain("CHORD_NATIVE_TEST_HOST");
     expect(script).toContain("CHORD_SKIP_NATIVE=1 vp run build");
   });
@@ -60,6 +60,14 @@ describe("isolated macOS testing", () => {
     expect(result.exitCode).toBe(0);
     expect(result.stdout.toString()).toBe(path);
     expect(() => guestTestScript([path])).toThrow("No macOS VM tests");
+  });
+
+  test("selected suites build only their packages and workspace dependencies", () => {
+    const script = guestTestScript(["@keychord/chords-dock", "@keychord/chords-menu"]);
+    expect(script).toContain("--filter='./@keychord/chords-dock...'");
+    expect(script).toContain("--filter='./@keychord/chords-menu...'");
+    expect(script).not.toContain("vp run build");
+    expect(script).not.toContain("chords-terminal");
   });
 
   test("pins the guest image and requires one VM entry point per chord package", async () => {

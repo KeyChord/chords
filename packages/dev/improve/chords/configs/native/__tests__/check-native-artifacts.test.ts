@@ -1,4 +1,4 @@
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, expect, test, vi, onTestFinished } from "@chord/com.npmjs.vite-plus/test";
@@ -27,10 +27,15 @@ test.each([false, true])(
     onTestFinished(() => rmSync(root, { recursive: true, force: true }));
     const addon = join(root, "addon.node");
     writeFileSync(addon, "local bytes before check");
+    mkdirSync(join(root, "pkg"));
+    writeFileSync(join(root, "pkg/Package.swift"), "fixture");
     const run = vi.fn((command: string, args: string[]) => {
       if (command === "git" && args[0] === "ls-files")
         return {
-          stdout: args.at(-1) === "*/Package.swift" ? "pkg/Package.swift\0" : "addon.node\0",
+          stdout:
+            args.at(-1) === "*/Package.swift"
+              ? "retired/Package.swift\0pkg/Package.swift\0"
+              : "retired/retired.node\0addon.node\0",
         };
       if (command === "swift") {
         return {
@@ -61,6 +66,12 @@ test.each([false, true])(
 
 test("fails when two packages declare the same native module", () => {
   vi.stubGlobal("process", { ...process, platform: "darwin" });
+  const root = mkdtempSync(join(tmpdir(), "native-check-test-"));
+  onTestFinished(() => rmSync(root, { recursive: true, force: true }));
+  for (const pkg of ["one", "two"]) {
+    mkdirSync(join(root, pkg));
+    writeFileSync(join(root, pkg, "Package.swift"), "fixture");
+  }
   const dumped = {
     stdout: JSON.stringify({ products: [{ name: "Clash", type: { library: ["dynamic"] } }] }),
   };
@@ -71,7 +82,7 @@ test("fails when two packages declare the same native module", () => {
     throw new Error(`Unexpected command: ${command} ${args.join(" ")}`);
   });
   execaSync.mockImplementation((command: unknown) =>
-    typeof command === "string" ? { stdout: "/repo" } : run,
+    typeof command === "string" ? { stdout: root } : run,
   );
   const errors = vi.spyOn(console, "error").mockImplementation(() => {});
   expect(checkNativeArtifacts()).toBe(1);

@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { getAppWindows } from "chord";
+import { getAppWindows, getScreenBounds } from "chord";
 import { requireMacOSVM } from "@keychord/chordtest/runtime";
 import buildClickHandler, { clickPoints } from "../js/click.js";
 import { chordPattern } from "@keychord/chordtest/patterns";
@@ -7,7 +7,7 @@ import { chordPattern } from "@keychord/chordtest/patterns";
 requireMacOSVM();
 const [appId, output, coverId, coverOutput] = process.argv.slice(2);
 type Event = {
-  phase: "down" | "up";
+  phase: "down" | "up" | "drag";
   x: number;
   y: number;
   timestamp: number;
@@ -41,12 +41,12 @@ await until(async () => {
   await Bun.sleep(200);
   return !!before && JSON.stringify(getAppWindows(appId)[0]?.bounds) === JSON.stringify(before);
 });
-const initial = await state();
+const initialBounds = getAppWindows(appId)[0].bounds;
 assert.equal(getAppWindows(appId).length, 1);
 const handler = buildClickHandler();
 const context = { focusedAppId: appId };
-await assert.rejects(handler.call(context, "20b5/1"));
-await assert.rejects(handler.call(context, "20b5/0r601b"), /outside/);
+await assert.rejects(handler.call(context, "20b51"));
+await assert.rejects(handler.call(context, "20b5/00r601b"), /outside/);
 assert.equal((await state()).events.length, 0);
 console.log("click fixture: validated input and stable background window");
 
@@ -66,10 +66,10 @@ async function invokeChord(input: string) {
   const args = binding["@input:click"];
   assert.equal(args.length, 2);
   const sequence = capture[Number(args[0].slice(1))];
-  assert.equal(sequence, input.slice(args[1] === "left" ? 1 : 2));
+  assert.equal(sequence, input.slice(1));
   await handler.call(context, sequence, args[1]);
 }
-await invokeChord(".20b5/-5/37/0r20b/65");
+await invokeChord(".20b5-53/07/00r20b65");
 await until(async () => (await state()).events.length === 10);
 const clicked = await state();
 assert.deepEqual(
@@ -86,7 +86,7 @@ assert.deepEqual(
   clicked.events.map((event) => event.phase),
   Array.from({ length: 5 }, () => ["down", "up"]).flat(),
 );
-assert.deepEqual(clicked.cursor, initial.cursor);
+assert.deepEqual(clicked.cursor, { x: initialBounds.x + 180, y: initialBounds.y + 300 });
 assert.equal(clicked.frontmostAppId, coverId);
 assert.equal((await state(coverOutput)).events.length, 0);
 for (let index = 2; index < clicked.events.length; index += 2) {
@@ -95,16 +95,23 @@ for (let index = 2; index < clicked.events.length; index += 2) {
   assert.ok(nextDown.timestamp - previousUp.timestamp >= 0.49);
   assert.ok(nextDown.receivedAt - previousUp.receivedAt >= 0.49);
 }
-console.log("click fixture: offsets, timing, pointer and background targeting passed");
+console.log("click fixture: offsets, timing, cursor movement and background targeting passed");
 
 let eventCount = 10;
 const topLeft = { x: 30, y: 20 };
 const bottomRight = { x: 250, y: 560 };
 for (const [input, points] of [
-  [".50r40b/30l20t", [bottomRight, topLeft]],
-  [".30l20t/50r40b", [topLeft, bottomRight]],
-  [".20t30l/40b50r", [topLeft, bottomRight]],
-  [".40b50r/20t30l", [bottomRight, topLeft]],
+  [".50r40b30l20t", [bottomRight, topLeft]],
+  [".30l20t50r40b", [topLeft, bottomRight]],
+  [".20t30l40b50r", [topLeft, bottomRight]],
+  [".40b50r20t30l", [bottomRight, topLeft]],
+  [
+    ".91/21/23/4",
+    [
+      { x: 270, y: 72 },
+      { x: 36, y: 204 },
+    ],
+  ],
 ] as const) {
   await invokeChord(input);
   eventCount += 4;
@@ -117,7 +124,7 @@ for (const [input, points] of [
     points,
   );
 }
-console.log("click fixture: exact direction suffixes accept either axis order");
+console.log("click fixture: direction suffixes and mixed fractions run without separators");
 
 await invokeChord("..-9,9228");
 eventCount += 10;
@@ -137,7 +144,7 @@ assert.deepEqual(
     { x: 60, y: 480, button: 0, clickCount: 2 },
   ],
 );
-await invokeChord(".;-9.9228");
+await invokeChord(".;0l9.9228");
 eventCount += 6;
 await until(async () => (await state()).events.length === eventCount);
 assert.deepEqual(
@@ -159,7 +166,10 @@ assert.ok(
   press[1].timestamp - press[0].timestamp >= 0.48,
   "event timestamps must include the hold",
 );
-assert.deepEqual((await state()).cursor, initial.cursor);
+assert.deepEqual((await state()).cursor, {
+  x: targetBounds.bounds.x + 30,
+  y: targetBounds.bounds.y + 20,
+});
 assert.equal((await state()).frontmostAppId, coverId);
 assert.equal((await state(coverOutput)).events.length, 0);
 console.log("click fixture: double/right/middle overrides, reset and long press passed");
@@ -179,7 +189,139 @@ assert.deepEqual(
 );
 console.log("click fixture: overlapping sequences passed");
 
-const sequence = handler.call(context, "30l20t/50l40t");
+for (const [input, button] of [
+  [".-1328", 0],
+  [".,-1328", 1],
+  [".;-1328", 2],
+] as const) {
+  await invokeChord(input);
+  eventCount += 3;
+  await until(async () => (await state()).events.length === eventCount);
+  assert.deepEqual(
+    (await state()).events.slice(-3).map(({ phase, x, y, button }) => ({ phase, x, y, button })),
+    [
+      { phase: "down", x: 30, y: 180, button },
+      { phase: "drag", x: 60, y: 480, button },
+      { phase: "up", x: 60, y: 480, button },
+    ],
+  );
+}
+await invokeChord(".-1355-");
+eventCount += 2;
+await until(async () => (await state()).events.length === eventCount);
+await Bun.sleep(100);
+assert.equal((await state()).events.at(-1)!.phase, "drag");
+await invokeChord(".=28");
+eventCount += 2;
+await until(async () => (await state()).events.length === eventCount);
+assert.deepEqual(
+  (await state()).events.slice(-2).map(({ phase, x, y }) => ({ phase, x, y })),
+  [
+    { phase: "drag", x: 60, y: 480 },
+    { phase: "up", x: 60, y: 480 },
+  ],
+);
+await invokeChord(".=55");
+await Bun.sleep(100);
+assert.equal((await state()).events.length, eventCount);
+assert.deepEqual((await state()).cursor, { x: initialBounds.x + 150, y: initialBounds.y + 300 });
+assert.equal((await state()).frontmostAppId, coverId);
+assert.equal((await state(coverOutput)).events.length, 0);
+
+for (const [input, button] of [
+  [".13-", 0],
+  [".,13-", 1],
+  [".;13-", 2],
+] as const) {
+  await invokeChord(input);
+  eventCount += 1;
+  await until(async () => (await state()).events.length === eventCount);
+  await assert.rejects(invokeChord(".13junk"), /coordinate/);
+  eventCount += 1;
+  await until(async () => (await state()).events.length === eventCount);
+  assert.deepEqual(
+    (await state()).events.slice(-2).map(({ phase, button }) => ({ phase, button })),
+    [
+      { phase: "down", button },
+      { phase: "up", button },
+    ],
+  );
+}
+await invokeChord(".-13-");
+eventCount += 1;
+await until(async () => (await state()).events.length === eventCount);
+await assert.rejects(invokeChord(".=301l5"), /outside/);
+eventCount += 1;
+await until(async () => (await state()).events.length === eventCount);
+assert.deepEqual(
+  (await state()).events.slice(-2).map((event) => event.phase),
+  ["down", "up"],
+);
+console.log("click fixture: preflight failures release latched left/right/middle buttons");
+
+// Move globally without clicks or focus changes, then click the covering fixture globally.
+const screen = getScreenBounds();
+await invokeChord("./=55");
+await until(async () => (await state()).cursor.x === screen.x + screen.width / 2);
+assert.deepEqual((await state()).cursor, {
+  x: screen.x + screen.width / 2,
+  y: screen.y + screen.height / 2,
+});
+assert.equal((await state()).events.length, eventCount);
+const coverBounds = getAppWindows(coverId)[0].bounds;
+const globalPoint = `${coverBounds.x - screen.x + 30}l${coverBounds.y - screen.y + 20}t`;
+await invokeChord(`./${globalPoint}`);
+await until(async () => (await state(coverOutput)).events.length === 2);
+assert.deepEqual(
+  (await state(coverOutput)).events.map(({ phase, x, y }) => ({ phase, x, y })),
+  [
+    { phase: "down", x: 30, y: 20 },
+    { phase: "up", x: 30, y: 20 },
+  ],
+);
+let coverEventCount = 2;
+for (const [prefix, button, count] of [
+  ["./.", 0, 2],
+  ["./,", 1, 1],
+  ["./;", 2, 1],
+] as const) {
+  await invokeChord(prefix + globalPoint);
+  coverEventCount += count * 2;
+  await until(async () => (await state(coverOutput)).events.length === coverEventCount);
+  assert.deepEqual(
+    (await state(coverOutput)).events
+      .slice(-count * 2)
+      .map(({ phase, x, y, button, clickCount }) => ({ phase, x, y, button, clickCount })),
+    Array.from({ length: count }, (_, index) => [
+      { phase: "down", x: 30, y: 20, button, clickCount: index + 1 },
+      { phase: "up", x: 30, y: 20, button, clickCount: index + 1 },
+    ]).flat(),
+  );
+}
+const globalEnd = `${coverBounds.x - screen.x + 60}l${coverBounds.y - screen.y + 40}t`;
+for (const [prefix, button] of [
+  ["./-", 0],
+  ["./,-", 1],
+  ["./;-", 2],
+] as const) {
+  await invokeChord(prefix + globalPoint + globalEnd);
+  coverEventCount += 3;
+  await until(async () => (await state(coverOutput)).events.length === coverEventCount);
+  assert.deepEqual(
+    (await state(coverOutput)).events
+      .slice(-3)
+      .map(({ phase, x, y, button }) => ({ phase, x, y, button })),
+    [
+      { phase: "down", x: 30, y: 20, button },
+      { phase: "drag", x: 60, y: 40, button },
+      { phase: "up", x: 60, y: 40, button },
+    ],
+  );
+}
+assert.equal((await state()).events.length, eventCount);
+console.log("click fixture: native drags, latched holds, movement and global input passed");
+
+const sequence = handler.call(context, "30l20t50l40t");
 // Attach rejection handling immediately while the fixture changes its window.
 const rejected = assert.rejects(sequence, /moved or resized/);
 eventCount += 2;
@@ -190,11 +332,22 @@ await until(async () => getAppWindows(appId)[0].bounds.x !== previous.x);
 await rejected;
 assert.equal((await state()).events.length, eventCount);
 console.log("click fixture: moving window rejected the remaining input");
+const failedDrag = handler.call(context, "30l20t50l40t", "drag");
+const rejectedDrag = assert.rejects(failedDrag, /moved or resized/);
+eventCount += 1;
+await until(async () => (await state()).events.length === eventCount);
 await Bun.write(`${output}.command`, "resize");
 await until(async () => {
   const bounds = getAppWindows(appId)[0]?.bounds;
   return bounds?.width === 400 && bounds.height === 500;
 });
+await rejectedDrag;
+eventCount += 1;
+await until(async () => (await state()).events.length === eventCount);
+assert.deepEqual(
+  (await state()).events.slice(-2).map((event) => event.phase),
+  ["down", "up"],
+);
 await handler.call(context, "85");
 eventCount += 2;
 await until(async () => (await state()).events.length === eventCount);

@@ -9,15 +9,20 @@
  */
 import addon from "./menu.node";
 
-export type MenuAction = "by-index" | "by-letters" | "by-path";
+export type MenuAction = "by-index" | "by-letters" | "by-path" | "search";
 
 /** An exact menu path, starting at a top-level menu and ending at the item to invoke. */
-export type MenuPath = readonly [menu: string, item: string, ...subitems: string[]];
+export type MenuPath = readonly [menu: string, ...subitems: string[]];
 
 export type MenuHandlerContext = {
   /** Bundle identifier captured by Chord when it resolved the chord. */
   focusedAppId?: string;
 };
+
+export type MenuArguments =
+  | [action: "by-index", menuIndex: number | string]
+  | [action: "by-letters" | "search", query: string]
+  | [action: "by-path", path: MenuPath];
 
 /** Resolves when the native action completes; rejects on validation or accessibility errors. */
 export type MenuHandler = {
@@ -44,12 +49,14 @@ export type MenuHandler = {
    * - "z-o2"  => 2nd expanded menu item matching word-prefixes "z" + "o"
    */
   (this: MenuHandlerContext | void, action: "by-letters", query: string): Promise<void>;
+  (this: MenuHandlerContext | void, action: "search", query: string): Promise<void>;
 
   /**
    * Exact menu titles from the menu bar down to the item to invoke. For example:
    * `["Window", "Move Tab to New Window"]`.
    */
   (this: MenuHandlerContext | void, action: "by-path", path: MenuPath): Promise<void>;
+  (this: MenuHandlerContext | void, ...args: MenuArguments): Promise<void>;
 };
 
 export async function runMenuAction(
@@ -60,12 +67,15 @@ export async function runMenuAction(
   if (action === "by-path") {
     if (
       !Array.isArray(value) ||
-      value.length < 2 ||
+      value.length < 1 ||
       value.some((component) => typeof component !== "string" || component.trim().length === 0)
     ) {
-      throw new TypeError('"by-path" expects at least two non-empty string components');
+      throw new TypeError('"by-path" expects at least one non-empty string component');
     }
     return addon.runMenuAction(processName, action, JSON.stringify(value));
+  }
+  if (action === "search" && (typeof value !== "string" || !value.trim())) {
+    throw new TypeError('"search" expects non-empty text');
   }
   return addon.runMenuAction(processName, action, String(value));
 }

@@ -13,12 +13,27 @@ export type NativeWindow = {
   title: string | null;
 };
 
+export const getScreenBounds = vi.fn((): WindowBounds => unconfigured("getScreenBounds"));
+export const mouse = vi.fn(
+  async (_options: {
+    action: "click" | "down" | "move" | "up";
+    windowId?: number;
+    x?: number;
+    y?: number;
+    expectedBounds?: WindowBounds;
+    button?: "left" | "right" | "middle";
+    clickCount?: 1 | 2;
+    pressDurationMs?: number;
+  }): Promise<void> => unconfigured("mouse"),
+);
+
 export const click = vi.fn(
   async (_options: {
     windowId: number;
     x: number;
     y: number;
     expectedBounds?: WindowBounds;
+    moveCursor?: boolean;
     button?: "left" | "right" | "middle";
     clickCount?: 1 | 2;
     pressDurationMs?: number;

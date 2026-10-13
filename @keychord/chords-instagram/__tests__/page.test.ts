@@ -21,7 +21,7 @@ beforeEach(() => {
     </section></header></main>`;
   // DOM fixtures have no layout engine. Give rendered elements a frame; hidden attributes
   // and CSS still exercise the page's visibility checks.
-  window.HTMLElement.prototype.getBoundingClientRect = () => ({
+  window.Element.prototype.getBoundingClientRect = () => ({
     x: 0,
     y: 0,
     width: 40,
@@ -221,6 +221,56 @@ function editor() {
 
 const gotoActions = ["HOME", "REELS", "MESSAGES", "SEARCH", "CREATE", "PROFILE"] as const;
 
+function bottomNavigation(svgTitles = false) {
+  window.document.querySelector("nav")!.hidden = true;
+  const icon = (label: string) =>
+    svgTitles ? `<svg><title>${label}</title></svg>` : `<svg aria-label="${label}"></svg>`;
+  const bar = window.document.createElement("div");
+  bar.innerHTML = `
+    <a href="/">${icon("Home")}</a>
+    <a href="/explore/">${icon("Explore")}</a>
+    <div role="button">${icon("New post")}</div>
+    <a href="/reels/">${icon("Reels")}</a>
+    <a href="/direct/inbox/">${icon("Messenger")}</a>
+    <a href="/owner/"><img alt="owner's profile picture" /></a>`;
+  const actions = ["HOME", "SEARCH", "CREATE", "REELS", "MESSAGES", "PROFILE"] as const;
+  const labels = ["Home", "Explore", "New post", "Reels", "Messenger", "Profile"];
+  const clicked = vi.fn();
+  for (const [index, target] of [...bar.children].entries()) {
+    target.addEventListener("click", (event) => {
+      event.preventDefault();
+      clicked(actions[index]);
+      if (target.tagName === "A") window.history.pushState(null, "", target.getAttribute("href")!);
+      if (actions[index] === "SEARCH") {
+        window.document
+          .querySelector("main")!
+          .insertAdjacentHTML(
+            "beforeend",
+            '<input aria-label="Search input" value="existing query" />',
+          );
+      } else if (actions[index] === "CREATE") {
+        const composer = window.document.createElement("div");
+        composer.setAttribute("role", "dialog");
+        composer.textContent = "Create new post";
+        window.document.body.append(composer);
+      }
+    });
+  }
+  // Content avatars and similarly labeled controls must not win by DOM order.
+  const content = window.document.createElement("div");
+  content.innerHTML = `
+    ${labels.map((label) => `<button>${icon(label)}</button>`).join("")}
+    <a href="/someone-else/"><img alt="someone-else's profile picture" /></a>`;
+  const unrelated = vi.fn();
+  content.addEventListener("click", unrelated);
+  window.document.querySelector("main")!.prepend(content);
+  const suggestion = window.document.createElement("aside");
+  suggestion.innerHTML = '<a href="/suggested/"><img alt="suggested\'s profile picture" /></a>';
+  suggestion.addEventListener("click", unrelated);
+  window.document.body.append(suggestion, bar);
+  return { bar, clicked, unrelated };
+}
+
 function prepareGoto(action: (typeof gotoActions)[number]) {
   if (action === "SEARCH") {
     window.document.querySelector('a[href="/explore/"]')!.addEventListener("click", () => {
@@ -257,6 +307,75 @@ function expectGoto(action: (typeof gotoActions)[number]) {
     expect(window.document.querySelector('[role="dialog"]')?.textContent).toBe("Create new post");
   }
 }
+
+test.each(gotoActions)("%s uses the icon-only bottom bar", async (action) => {
+  window.history.pushState(null, "", "/");
+  const { clicked, unrelated } = bottomNavigation();
+  expect(await run(action)).toEqual({ ok: true });
+  expect(clicked).toHaveBeenCalledExactlyOnceWith(action);
+  expect(unrelated).not.toHaveBeenCalled();
+  expectGoto(action);
+});
+
+test.each(gotoActions)("%s also recognizes SVG title icons", async (action) => {
+  window.history.pushState(null, "", "/");
+  const { clicked, unrelated } = bottomNavigation(true);
+  expect(await run(action)).toEqual({ ok: true });
+  expect(clicked).toHaveBeenCalledExactlyOnceWith(action);
+  expect(unrelated).not.toHaveBeenCalled();
+  expectGoto(action);
+});
+
+test("Profile uses the avatar in the sidebar when its text is absent", async () => {
+  const profile = window.document.querySelector('nav a[href="/owner/"]')!;
+  profile.innerHTML = '<img alt="owner\'s profile picture" />';
+  const clicked = vi.fn();
+  profile.addEventListener("click", clicked);
+  expect(await run("PROFILE")).toEqual({ ok: true });
+  expect(clicked).toHaveBeenCalledOnce();
+});
+
+test("navigation ignores hidden icons inside otherwise visible controls", async () => {
+  const { clicked } = bottomNavigation();
+  const hidden = window.document.createElement("nav");
+  hidden.innerHTML = '<button><svg aria-label="Home" hidden></svg></button>';
+  const hiddenClick = vi.fn();
+  hidden.addEventListener("click", hiddenClick);
+  window.document.body.prepend(hidden);
+  expect(await run("HOME")).toEqual({ ok: true });
+  expect(clicked).toHaveBeenCalledExactlyOnceWith("HOME");
+  expect(hiddenClick).not.toHaveBeenCalled();
+});
+
+test("Search prefers its sidebar toggle to a separate Explore icon", async () => {
+  prepareGoto("SEARCH");
+  const explore = window.document.createElement("a");
+  explore.href = "/explore/";
+  explore.innerHTML = '<svg aria-label="Explore"></svg>';
+  const exploreClick = vi.fn();
+  explore.addEventListener("click", exploreClick);
+  window.document.querySelector("nav")!.prepend(explore);
+  expect(await run("SEARCH")).toEqual({ ok: true });
+  expect(exploreClick).not.toHaveBeenCalled();
+  expectGoto("SEARCH");
+});
+
+test("Search recognizes the compact Search & Explore icon", async () => {
+  const { bar, clicked } = bottomNavigation();
+  bar.querySelector('svg[aria-label="Explore"]')!.setAttribute("aria-label", "Search & Explore");
+  expect(await run("SEARCH")).toEqual({ ok: true });
+  expect(clicked).toHaveBeenCalledExactlyOnceWith("SEARCH");
+  expectGoto("SEARCH");
+});
+
+test("bottom bar navigation still works after closing a story", async () => {
+  bottomNavigation();
+  const { close, send } = storyViewer();
+  expect(await run("PROFILE")).toEqual({ ok: true });
+  expect(close).toHaveBeenCalledOnce();
+  expect(send).not.toHaveBeenCalled();
+  expectGoto("PROFILE");
+});
 
 function storyViewer(dialog = false) {
   const nav = window.document.querySelector("nav")!;

@@ -7,10 +7,33 @@ file = 'spotify.js'
 
 # Goto
 '?g' = { name = "Goto" }
+'g/' = { name = "Goto: Search" }
+'gh' = { name = "Goto: Home" }
+'gb' = { name = "Goto: Browse" }
+'gn' = { name = "Goto: Notifications (What's New)" }
+'gla' = { name = "Goto: Listening Activity" }
 'gls' = { name = "Goto: Liked Songs", '@input:spotify' = ['liked-songs'] }
+'gl' = { name = "Goto: Library" }
+'gl/' = { name = "Goto: Library > Search" }
+'glpl' = { name = "Goto: Library > Playlists" }
+'glpy' = { name = "Goto: Library > Playlists (by) You" }
+'glps' = { name = "Goto: Library > Playlists (by) Spotify" }
+'glpo' = { name = "Goto: Library > Podcasts" }
+'glal' = { name = "Goto: Library > Albums" }
+'glar' = { name = "Goto: Library > Artists" }
+'glev' = { name = "Goto: Library > Events" }
+'gleu' = { name = "Goto: Library > Events Upcoming" }
+'gc' = { name = "Goto: Create" }
+'gl(.+)' = { name = "Goto: Library > Item @ #" }
+
+'g[' = { name = "Go: Back" }
+'g]' = { name = "Go: Forward" }
+
+'?l' = { name = "Library (Sidebar)" }
 
 # Playlist
 '?p' = { name = "Playlist" }
+'p/' = { name = "Playlist: Search" }
 
 'pm(\d+)' = { name = "Playlist: More @ #$1", '@input:spotify' = ['more', '$1'] }
 'pr(\d+)' = { name = "Playlist: Remove @ #$1", '@input:spotify' = ['remove', '$1'] }
@@ -34,7 +57,7 @@ file = 'spotify.js'
 ] }
 'pse(\d+)' = { name = "Playlist: #$1 > Share > Embed (track)", '@input:spotify' = ['embed', '$1'] }
 
-'?b' = { name = "Bar (Now Playing)" }
+'?b' = { name = "Bar (Player)" }
 'b[' = { name = "Bar: Previous", '@input:spotify' = ['bar-previous'] }
 'b]' = { name = "Bar: Next", '@input:spotify' = ['bar-next'] }
 'bp' = { name = "Bar: Play", '@input:spotify' = ['bar-play'] }
@@ -49,3 +72,13 @@ file = 'spotify.js'
 '?bs' = { name = "Bar: Shuffle / Scrub" }
 'bs' = { name = "Bar: Shuffle", '@input:spotify' = ['bar-shuffle'] }
 'bs(\d+)' = { name = "Bar: Scrub (to second)", '@input:spotify' = ['bar-scrub', '$1'] }
+
+'?np' = { name = "Now Playing" }
+'npv' = { name = "Now Playing: Vary (Toggle Hidden)", '@input:spotify' = ['np-toggle'] }
+'npx' = { name = "Now Playing: X (Hide)", '@input:spotify' = ['np-hide'] }
+'npf' = { name = "Now Playing: Fullscreen (Expand)", '@input:spotify' = ['np-expand'] }
+'npm' = { name = "Now Playing: Minimize", '@input:spotify' = ['np-minimize'] }
+'npa' = { name = "Now Playing: Artwork (View)", '@input:spotify' = ['np-artwork'] }
+'npc' = { name = "Now Playing: Canvas (View)", '@input:spotify' = ['np-canvas'] }
+'npi' = { name = "Now Playing: Image (Artist Image View)", '@input:spotify' = ['np-artist-image'] }
+'npl' = { name = "Now Playing: Lyrics (View)", '@input:spotify' = ['np-lyrics'] }

@@ -3,15 +3,17 @@ import { afterEach, beforeEach, expect, test, vi } from "vite-plus/test";
 import { chordPattern } from "@keychord/chordtest/patterns";
 import buildRaycastHandler, { isRaycastInputFocused } from "../src/js/raycast";
 
-const { readState, setSearch, activateSearch } = vi.hoisted(() => ({
+const { readState, setSearch, activateSearch, returnRoot } = vi.hoisted(() => ({
   readState: vi.fn(),
   setSearch: vi.fn(),
   activateSearch: vi.fn(),
+  returnRoot: vi.fn(),
 }));
 vi.mock("../src/js/utils/native", () => ({
   readRaycastState: readState,
   setRaycastSearch: setSearch,
   activateRaycastSearch: activateSearch,
+  returnToRaycastRoot: returnRoot,
 }));
 
 const ready = {
@@ -35,6 +37,10 @@ beforeEach(() => {
   vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "performance"] });
   spawn.mockReset().mockImplementation(() => launchResult());
   state = { ...ready };
+  returnRoot.mockReset().mockImplementation(async () => {
+    state = { ...ready };
+    return true;
+  });
   readState.mockReset().mockImplementation(async () => state);
   setSearch.mockReset().mockImplementation(async (query: string) => {
     state = { ...ready, value: query, fingerprint: `results:${query}` };
@@ -203,7 +209,7 @@ test("atomic text entry waits for updated results and confirms activation", asyn
   const settled = vi.fn();
   const action = buildRaycastHandler()(query).then(settled);
   await vi.advanceTimersByTimeAsync(150);
-  expect(setSearch).toHaveBeenCalledExactlyOnceWith(query);
+  expect(setSearch).toHaveBeenCalledExactlyOnceWith(query, expect.any(Number));
   expect(activateSearch).not.toHaveBeenCalled();
   state = { ...ready, value: query, fingerprint: "updated results", busy: true };
   await vi.advanceTimersByTimeAsync(150);
@@ -211,7 +217,11 @@ test("atomic text entry waits for updated results and confirms activation", asyn
   state.busy = false;
   await vi.advanceTimersByTimeAsync(100);
   await action;
-  expect(activateSearch).toHaveBeenCalledExactlyOnceWith(query, "updated results");
+  expect(activateSearch).toHaveBeenCalledExactlyOnceWith(
+    query,
+    "updated results",
+    expect.any(Number),
+  );
   expect(settled).toHaveBeenCalledOnce();
 });
 
@@ -223,17 +233,32 @@ test("a result change between readiness and AXPress restarts observation", async
   const action = buildRaycastHandler()("calculator");
   await vi.runAllTimersAsync();
   await action;
-  expect(activateSearch).toHaveBeenNthCalledWith(1, "calculator", "results:calculator");
-  expect(activateSearch).toHaveBeenNthCalledWith(2, "calculator", "new ranking");
+  expect(activateSearch).toHaveBeenNthCalledWith(
+    1,
+    "calculator",
+    "results:calculator",
+    expect.any(Number),
+  );
+  expect(activateSearch).toHaveBeenNthCalledWith(
+    2,
+    "calculator",
+    "new ranking",
+    expect.any(Number),
+  );
 });
 
-test("an already populated query can activate without requiring different results", async () => {
+test("repeating an already populated query resets the previous result selection", async () => {
   state = { ...ready, value: "calculator" };
-  setSearch.mockResolvedValue(undefined);
   const action = buildRaycastHandler()("calculator");
   await vi.runAllTimersAsync();
   await action;
-  expect(activateSearch).toHaveBeenCalledExactlyOnceWith("calculator", "old results");
+  expect(setSearch).toHaveBeenNthCalledWith(1, "", expect.any(Number));
+  expect(setSearch).toHaveBeenNthCalledWith(2, "calculator", expect.any(Number));
+  expect(activateSearch).toHaveBeenCalledExactlyOnceWith(
+    "calculator",
+    "results:calculator",
+    expect.any(Number),
+  );
 });
 
 test("a command view appearing inside Raycast confirms activation", async () => {
@@ -254,6 +279,31 @@ test("an action that leaves root search unchanged is not silently reported as su
   await vi.advanceTimersByTimeAsync(300);
   await rejected;
   expect(activateSearch).toHaveBeenCalledOnce();
+});
+
+test("an unreadable window is not mistaken for confirmed activation", async () => {
+  activateSearch.mockImplementation(async () => {
+    state = { bundleId: "com.raycast.macos" };
+    return true;
+  });
+  const rejected = expect(buildRaycastHandler(300)("calculator")).rejects.toThrow(
+    "activation was not confirmed",
+  );
+  await vi.runAllTimersAsync();
+  await rejected;
+  expect(activateSearch).toHaveBeenCalledOnce();
+});
+
+test("a slow native read cannot dispatch text after the overall deadline", async () => {
+  readState.mockImplementation(async () => {
+    await new Promise<void>((resolve) => setTimeout(resolve, 250));
+    return ready;
+  });
+  const rejected = expect(buildRaycastHandler(200)("calculator")).rejects.toThrow("within 200ms");
+  await vi.runAllTimersAsync();
+  await rejected;
+  expect(setSearch).not.toHaveBeenCalled();
+  expect(activateSearch).not.toHaveBeenCalled();
 });
 
 test("losing focus after the query is set rejects before activating", async () => {
@@ -282,7 +332,7 @@ test("duplicate queries share an action and different queries run in order", asy
   expect(handler("calculator")).toBe(first);
   const second = handler("calendar");
   await vi.advanceTimersByTimeAsync(0);
-  expect(setSearch).toHaveBeenCalledExactlyOnceWith("calculator");
+  expect(setSearch).toHaveBeenCalledExactlyOnceWith("calculator", expect.any(Number));
   // Each subsequent open puts Raycast back in the foreground.
   spawn.mockImplementation(() => {
     state = { ...ready };
@@ -290,7 +340,7 @@ test("duplicate queries share an action and different queries run in order", asy
   });
   await vi.runAllTimersAsync();
   await Promise.all([first, second]);
-  expect(setSearch).toHaveBeenNthCalledWith(2, "calendar");
+  expect(setSearch).toHaveBeenNthCalledWith(2, "calendar", expect.any(Number));
   expect(activateSearch).toHaveBeenCalledTimes(2);
 });
 
@@ -301,7 +351,11 @@ test("native failures propagate and a queued query can recover", async () => {
   const next = handler("calendar");
   await vi.runAllTimersAsync();
   await Promise.all([rejected, next]);
-  expect(activateSearch).toHaveBeenCalledExactlyOnceWith("calendar", "results:calendar");
+  expect(activateSearch).toHaveBeenCalledExactlyOnceWith(
+    "calendar",
+    "results:calendar",
+    expect.any(Number),
+  );
 });
 
 test("a configured command uses the official deeplink without loading the Accessibility path", async () => {
@@ -346,4 +400,35 @@ test.each([
 test("invalid query arguments reject before opening Raycast", async () => {
   await expect(buildRaycastHandler()(123 as unknown as string)).rejects.toThrow("must be a string");
   expect(spawn).not.toHaveBeenCalled();
+});
+
+test("an existing command view returns to Root Search before entering the query", async () => {
+  state = {
+    ...ready,
+    rootSearchVisible: false,
+    description: "Calculator History",
+    placeholder: "Do math...",
+    navigationFingerprint: "history view",
+  };
+  const action = buildRaycastHandler()("calculator");
+  await vi.runAllTimersAsync();
+  await action;
+  expect(returnRoot).toHaveBeenCalledExactlyOnceWith("history view", expect.any(Number));
+  expect(setSearch).toHaveBeenCalledExactlyOnceWith("calculator", expect.any(Number));
+  expect(activateSearch).toHaveBeenCalledOnce();
+});
+
+test("a pending Back action is not repeated against the same view", async () => {
+  state = {
+    ...ready,
+    rootSearchVisible: false,
+    placeholder: "Do math...",
+    navigationFingerprint: "history view",
+  };
+  returnRoot.mockResolvedValue(true);
+  const rejected = expect(buildRaycastHandler(200)("calculator")).rejects.toThrow("within 200ms");
+  await vi.runAllTimersAsync();
+  await rejected;
+  expect(returnRoot).toHaveBeenCalledOnce();
+  expect(setSearch).not.toHaveBeenCalled();
 });

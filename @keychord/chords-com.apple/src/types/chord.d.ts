@@ -11,6 +11,17 @@ declare global {
 }
 
 declare module "chord" {
+  export function getScreenBounds(): { x: number; y: number; width: number; height: number };
+  export function mouse(options: {
+    action: "click" | "down" | "move" | "up";
+    windowId?: number;
+    x?: number;
+    y?: number;
+    expectedBounds?: { x: number; y: number; width: number; height: number };
+    button?: "left" | "right" | "middle";
+    clickCount?: 1 | 2;
+    pressDurationMs?: number;
+  }): Promise<void>;
   export type WindowBounds = { x: number; y: number; width: number; height: number };
   export function getAppWindows(bundleId: string): {
     windowId: number;
@@ -18,12 +29,14 @@ declare module "chord" {
     bounds: WindowBounds;
     title: string | null;
   }[];
-  /** Click in window-local top-left macOS points, without moving the cursor or activating. */
+  /** Click in window-local top-left macOS points without activating the target. */
   export function click(options: {
     windowId: number;
     x: number;
     y: number;
     expectedBounds?: WindowBounds;
+    /** Move the cursor to the target point; clicks still go directly to the window. */
+    moveCursor?: boolean;
     button?: "left" | "right" | "middle";
     clickCount?: 1 | 2;
     pressDurationMs?: number;

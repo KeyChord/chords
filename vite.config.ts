@@ -13,7 +13,7 @@ export default defineConfig({
     exclude: [
       ...configDefaults.exclude,
       ".chord-testing/**",
-      "@keychord/chords-tray/__tests__/**",
+      "**/*.bun.test.ts",
       "@keychord/chordtest/__tests__/**",
       "**/*.vm.test.ts",
     ],

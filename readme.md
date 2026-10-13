@@ -112,7 +112,7 @@ In TOML chord keys, only parenthesized sections use regex syntax; all surroundin
 
 ## Native addons
 
-Some packages (`chords-menu`, `chords-web`, `chords-tray`, `chords-com.apple`)
+Some packages (`chords-menu`, `chords-web`, `chords-com.apple`)
 ship NodeSwift addons built from `src/swift/`. They can only be compiled on
 macOS, so the built `.node` files are committed and CI syncs them to the
 mirrors as-is; CI builds the JS only, via `CHORD_SKIP_NATIVE=1`.

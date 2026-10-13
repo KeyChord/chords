@@ -2,6 +2,7 @@ import {
   readRaycastState,
   setRaycastSearch,
   activateRaycastSearch,
+  returnToRaycastRoot,
   type RaycastState,
 } from "./utils/native";
 
@@ -35,6 +36,111 @@ function commandDeeplink(value: string): string {
   return url.href;
 }
 
+async function pause(deadline: number): Promise<void> {
+  const remaining = deadline - performance.now();
+  if (remaining > 0) await Bun.sleep(Math.min(pollIntervalMs, remaining));
+}
+
+/** Complete a search in an already-open Raycast window; also used by native integration tests. */
+export async function searchRaycast(
+  query: string,
+  timeoutMs = 5_000,
+  deadline = performance.now() + timeoutMs,
+): Promise<void> {
+  let initial: RaycastState | undefined;
+  let previousNavigation: string | undefined;
+  while (performance.now() < deadline) {
+    const state = await readRaycastState();
+    if (performance.now() >= deadline) break;
+    if (isRaycastInputFocused(state)) {
+      initial = state;
+      break;
+    }
+    if (
+      state.bundleId === bundleId &&
+      state.focused &&
+      state.navigationFingerprint &&
+      state.navigationFingerprint !== previousNavigation
+    ) {
+      if (await returnToRaycastRoot(state.navigationFingerprint, deadline - performance.now())) {
+        previousNavigation = state.navigationFingerprint;
+      }
+    }
+    await pause(deadline);
+  }
+  if (!initial)
+    throw new Error(`Raycast's search input did not receive focus within ${timeoutMs}ms`);
+  if (!query) return;
+
+  // Re-entering the same text can preserve Raycast's old row selection. Observe
+  // a cleared search first so the new query starts at its first ranked result.
+  if (initial.value === query) {
+    await setRaycastSearch("", deadline - performance.now());
+    let cleared: RaycastState | undefined;
+    while (performance.now() < deadline) {
+      const state = await readRaycastState();
+      if (performance.now() >= deadline) break;
+      if (!isRaycastInputFocused(state))
+        throw new Error("Raycast's search input lost focus while resetting selection");
+      if (
+        state.value === "" &&
+        !state.busy &&
+        (state.fingerprint !== initial.fingerprint || state.rootSearchVisible === false)
+      ) {
+        cleared = state;
+        break;
+      }
+      await pause(deadline);
+    }
+    if (!cleared)
+      throw new Error(`Raycast's previous selection did not reset within ${timeoutMs}ms`);
+    initial = cleared;
+  }
+
+  // One AXValue assignment replaces the entire query, avoiding races between
+  // Select All and individual Unicode key events (including a dropped first letter).
+  await setRaycastSearch(query, deadline - performance.now());
+  let previousFingerprint: string | undefined;
+  let activated = false;
+  while (performance.now() < deadline) {
+    const state = await readRaycastState();
+    if (performance.now() >= deadline) break;
+    if (!isRaycastInputFocused(state))
+      throw new Error("Raycast's search input lost focus before activation");
+    const updated = state.fingerprint !== initial.fingerprint;
+    const ready =
+      state.value === query &&
+      state.rootSearchVisible &&
+      !state.busy &&
+      state.fingerprint &&
+      updated;
+    if (ready && previousFingerprint === state.fingerprint) {
+      // Native code re-reads focus, query and the action fingerprint immediately
+      // before AXPress. A changed result goes back through readiness, not submission.
+      if (await activateRaycastSearch(query, state.fingerprint!, deadline - performance.now())) {
+        activated = true;
+        break;
+      }
+      previousFingerprint = undefined;
+    } else {
+      previousFingerprint = ready ? state.fingerprint : undefined;
+    }
+    await pause(deadline);
+  }
+  if (!activated) throw new Error(`Raycast's results did not become ready within ${timeoutMs}ms`);
+
+  // AXPress can time out after dispatching its callback. Observe completion and
+  // never press twice: launching a command twice can have non-idempotent effects.
+  while (performance.now() < deadline) {
+    const state = await readRaycastState();
+    if (state.bundleId !== bundleId || state.rootSearchVisible === false) return;
+    await pause(deadline);
+  }
+  throw new Error(
+    `Raycast's primary action was invoked but activation was not confirmed within ${timeoutMs}ms`,
+  );
+}
+
 /** Prefer official command deeplinks; use Accessibility only for arbitrary root-search queries. */
 export default function buildRaycastHandler(
   timeoutMs = 5_000,
@@ -59,11 +165,6 @@ export default function buildRaycastHandler(
       throw new Error(`Unable to open Raycast (exit ${exitCode}): ${stderr.trim()}`);
   }
 
-  async function pause(deadline: number): Promise<void> {
-    const remaining = deadline - performance.now();
-    if (remaining > 0) await Bun.sleep(Math.min(pollIntervalMs, remaining));
-  }
-
   async function run(query: string): Promise<void> {
     const direct =
       directCommands.get(query) ?? (/^raycast:/i.test(query) ? commandDeeplink(query) : undefined);
@@ -75,60 +176,7 @@ export default function buildRaycastHandler(
     }
     const deadline = performance.now() + timeoutMs;
     await open(["-b", bundleId]);
-    let initial: RaycastState | undefined;
-    while (performance.now() < deadline) {
-      const state = await readRaycastState();
-      if (isRaycastInputFocused(state)) {
-        initial = state;
-        break;
-      }
-      await pause(deadline);
-    }
-    if (!initial)
-      throw new Error(`Raycast's search input did not receive focus within ${timeoutMs}ms`);
-    if (!query) return;
-
-    // One AXValue assignment replaces the entire query, avoiding races between
-    // Select All and individual Unicode key events (including a dropped first letter).
-    await setRaycastSearch(query);
-    let previousFingerprint: string | undefined;
-    let activated = false;
-    while (performance.now() < deadline) {
-      const state = await readRaycastState();
-      if (!isRaycastInputFocused(state))
-        throw new Error("Raycast's search input lost focus before activation");
-      const updated = initial.value === query || state.fingerprint !== initial.fingerprint;
-      const ready =
-        state.value === query &&
-        state.rootSearchVisible &&
-        !state.busy &&
-        state.fingerprint &&
-        updated;
-      if (ready && previousFingerprint === state.fingerprint) {
-        // Native code re-reads focus, query and the action fingerprint immediately
-        // before AXPress. A changed result goes back through readiness, not submission.
-        if (await activateRaycastSearch(query, state.fingerprint!)) {
-          activated = true;
-          break;
-        }
-        previousFingerprint = undefined;
-      } else {
-        previousFingerprint = ready ? state.fingerprint : undefined;
-      }
-      await pause(deadline);
-    }
-    if (!activated) throw new Error(`Raycast's results did not become ready within ${timeoutMs}ms`);
-
-    // AXPress can time out after dispatching its callback. Observe completion and
-    // never press twice: launching a command twice can have non-idempotent effects.
-    while (performance.now() < deadline) {
-      const state = await readRaycastState();
-      if (state.bundleId !== bundleId || state.rootSearchVisible === false) return;
-      await pause(deadline);
-    }
-    throw new Error(
-      `Raycast's primary action was invoked but activation was not confirmed within ${timeoutMs}ms`,
-    );
+    await searchRaycast(query, timeoutMs, deadline);
   }
 
   return function raycast(query = ""): Promise<void> {

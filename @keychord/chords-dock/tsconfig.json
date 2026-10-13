@@ -1,4 +1,4 @@
 {
   "extends": "@keychord/tsconfig",
-  "include": ["src/js"]
+  "include": ["src"]
 }

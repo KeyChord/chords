@@ -76,11 +76,11 @@ export async function runSpotifyJavaScript(source: string, port: number): Promis
     targets = ((await response.json()) as Target[]).filter(isSpotifyTarget);
   } catch {
     throw new Error(
-      `Start Spotify with --remote-debugging-port=${port} before using playlist or bar chords. See the chords-spotify README for setup.`,
+      `Spotify's debugging endpoint on port ${port} is unavailable. If Spotify is relaunching, try the chord again once it is open. Otherwise use Chord's Spotify relaunch button or start Spotify with --remote-debugging-port=${port}. See the chords-spotify README for setup.`,
     );
   }
   if (targets.length === 0)
-    throw new Error("Open the Spotify desktop app before using playlist or bar chords.");
+    throw new Error("Open the Spotify desktop app before using Spotify chords.");
 
   let target: Target | undefined;
   if (targets.length === 1) target = targets[0];
@@ -92,6 +92,6 @@ export async function runSpotifyJavaScript(source: string, port: number): Promis
       }
     }
   }
-  if (!target) throw new Error("Focus the Spotify app before using playlist or bar chords.");
+  if (!target) throw new Error("Focus the Spotify app before using Spotify chords.");
   return evaluate(target, source);
 }

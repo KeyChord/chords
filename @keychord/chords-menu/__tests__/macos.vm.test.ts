@@ -9,10 +9,11 @@ import { expect } from "bun:test";
 
 test.skipIf(!macOSUITestsEnabled)(
   "@keychord/chords-menu: production package loads in the macOS VM",
-  () =>
-    testMacOSPackage(import.meta.url, [{ product: "KeychordChordsMenuNativeMenu", name: "menu" }]),
+  () => testMacOSPackage(import.meta.url, []),
   300_000,
 );
+
+if (macOSUITestsEnabled) await import("./tray-native.bun.test");
 
 test.skipIf(!macOSUITestsEnabled)(
   "native menu handler invokes items in a controlled AppKit app",
