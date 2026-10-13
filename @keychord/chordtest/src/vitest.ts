@@ -1,5 +1,6 @@
 import { fileURLToPath } from "node:url";
 import type { Plugin } from "vite-plus";
+import { configDefaults } from "vite-plus/test/config";
 
 /** Preload the host module and attach per-module resolvers for Vitest handler tests. */
 export function chordTestRuntime() {
@@ -22,6 +23,7 @@ export function chordTestRuntime() {
   return {
     plugins: [plugin],
     test: {
+      exclude: [...configDefaults.exclude, "**/*.vm.test.ts"],
       alias: { chord: fileURLToPath(new URL("./chord.ts", import.meta.url)) },
       setupFiles: [fileURLToPath(new URL("./vitest-setup.ts", import.meta.url))],
     },

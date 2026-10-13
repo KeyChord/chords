@@ -31,6 +31,7 @@ private enum TrayClickType: String {
 
 private enum TrayError: Error, CustomStringConvertible {
     case invalidAction(String)
+    case invalidSystemItemAction(type: String, value: String, action: String)
     case invalidIndex(String)
     case invalidControlCenterAction(section: String, action: String)
     case invalidClickType(String)
@@ -43,7 +44,9 @@ private enum TrayError: Error, CustomStringConvertible {
     var description: String {
         switch self {
         case .invalidAction(let value):
-            return "unknown tray action \"\(value)\" (expected \"ITEM\" or \"CONTROL_CENTER\")"
+            return "unknown tray action \"\(value)\" (expected \"ITEM\", \"BATTERY\", \"DATE_TIME\", \"WIFI\", or \"CONTROL_CENTER\")"
+        case .invalidSystemItemAction(let type, let value, let action):
+            return "invalid \(type) tray action \"\(value) > \(action)\""
         case .invalidIndex(let value):
             return "invalid tray index \"\(value)\""
         case .invalidControlCenterAction(let section, let action):
@@ -55,7 +58,7 @@ private enum TrayError: Error, CustomStringConvertible {
         case .couldNotCreateMouseEvent(let event):
             return "could not create the \(event) mouse event"
         case .controlNotFound(let name):
-            return "could not find \(name) in Control Center (it may be unavailable on this Mac)"
+            return "could not find \(name) (it may be hidden or unavailable on this Mac)"
         case .controlDisabled(let name):
             return "Control Center control \"\(name)\" is disabled"
         case .invalidSliderValue:
@@ -64,21 +67,38 @@ private enum TrayError: Error, CustomStringConvertible {
     }
 }
 
+private enum SystemTrayItem: String {
+    case battery = "BATTERY"
+    case dateTime = "DATE_TIME"
+    case wifi = "WIFI"
+
+    var identifiers: [String] {
+        switch self {
+        case .battery: ["com.apple.menuextra.battery"]
+        case .dateTime: ["com.apple.menuextra.clock"]
+        case .wifi: ["com.apple.menuextra.airport", "com.apple.menuextra.wifi"]
+        }
+    }
+}
+
 private enum ControlCenterSection: String {
     case display = "DISPLAY"
     case sound = "SOUND"
+    case wifi = "WIFI"
 
     var identifier: String {
         switch self {
         case .display: "controlcenter-display"
         case .sound: "controlcenter-volume"
+        case .wifi: "controlcenter-wifi"
         }
     }
 
-    var sliderIdentifier: String {
+    var sliderIdentifier: String? {
         switch self {
         case .display: "controlcenter-display-brightness-slider"
         case .sound: "controlcenter-volume-slider"
+        case .wifi: nil
         }
     }
 
@@ -86,6 +106,7 @@ private enum ControlCenterSection: String {
         switch self {
         case .display: "Display Settings"
         case .sound: "Sound Settings"
+        case .wifi: "Wi-Fi Settings"
         }
     }
 }
@@ -98,6 +119,7 @@ private enum ControlCenterAction: String {
     case nightShift = "NIGHT_SHIFT"
     case trueTone = "TRUE_TONE"
     case settings = "SETTINGS"
+    case toggle = "TOGGLE"
 
     var identifier: String? {
         switch self {
@@ -112,6 +134,7 @@ private enum ControlCenterAction: String {
 /// Validate before moving to MainActor or touching the system UI.
 private enum TrayAction: Sendable {
     case item(Int, TrayClickType)
+    case systemItem(SystemTrayItem, toggle: Bool)
     case controlCenter(ControlCenterSection?, ControlCenterAction)
 
     init(type: String, value: String, action: String) throws {
@@ -124,6 +147,13 @@ private enum TrayAction: Sendable {
                 throw TrayError.invalidClickType(action)
             }
             self = .item(index, clickType)
+        case "BATTERY", "DATE_TIME", "WIFI":
+            guard let item = SystemTrayItem(rawValue: type), action.isEmpty,
+                  value.isEmpty || (item == .wifi && value == "TOGGLE")
+            else {
+                throw TrayError.invalidSystemItemAction(type: type, value: value, action: action)
+            }
+            self = .systemItem(item, toggle: value == "TOGGLE")
         case "CONTROL_CENTER":
             if value.isEmpty && action.isEmpty {
                 self = .controlCenter(nil, .click)
@@ -131,7 +161,9 @@ private enum TrayAction: Sendable {
             }
             guard let section = ControlCenterSection(rawValue: value),
                   let command = ControlCenterAction(rawValue: action.isEmpty ? "CLICK" : action),
-                  section == .display || [.click, .decrease, .increase].contains(command)
+                  (section == .display && command != .toggle)
+                    || (section == .sound && [.click, .decrease, .increase].contains(command))
+                    || (section == .wifi && [.click, .toggle].contains(command))
             else {
                 throw TrayError.invalidControlCenterAction(section: value, action: action)
             }
@@ -157,6 +189,8 @@ private enum TrayAction: Sendable {
             switch command {
             case .item(let index, let clickType):
                 try await runTrayItemAction(trayIndex: index, clickType: clickType)
+            case .systemItem(let item, let toggle):
+                try await runSystemTrayAction(item, toggle: toggle)
             case .controlCenter(let section, let command):
                 try await runControlCenterAction(section: section, action: command)
             }
@@ -381,6 +415,35 @@ private func press(_ element: Element, name: String) async throws {
 }
 
 @MainActor
+private func menuBarItem(identifiers: [String]) -> Element? {
+    let owners = NSWorkspace.shared.runningApplications.filter {
+        ["com.apple.controlcenter", "com.apple.MenuBarAgent", "com.apple.systemuiserver"]
+            .contains($0.bundleIdentifier ?? "")
+    }.map { Element(AXUIElementCreateApplication($0.processIdentifier)) }
+    let roots = owners.flatMap { owner in
+        // Menu bars are not always included in the application's AXChildren.
+        [kAXMenuBarAttribute, kAXExtrasMenuBarAttribute].compactMap { name in
+            owner.attribute(Attribute<AXUIElement>(name)).map(Element.init)
+        } + [owner]
+    }
+    return find(in: roots) { identifiers.contains($0.identifier() ?? "") }
+}
+
+@MainActor
+private func runSystemTrayAction(_ item: SystemTrayItem, toggle: Bool) async throws {
+    guard AXIsProcessTrusted() else { throw TrayError.accessibilityPermissionRequired }
+    if item == .wifi && toggle {
+        try await runControlCenterAction(section: .wifi, action: .toggle)
+    } else if let element = menuBarItem(identifiers: item.identifiers) {
+        try await press(element, name: "\(item.rawValue) menu bar item")
+    } else if item == .wifi {
+        try await runControlCenterAction(section: .wifi, action: .click)
+    } else {
+        throw TrayError.controlNotFound("\(item.rawValue) menu bar item")
+    }
+}
+
+@MainActor
 private func settingsButton(in application: Element, section: ControlCenterSection) -> Element? {
     find(in: windows(of: application)) { element in
         // These footer buttons have no AXIdentifier. Titles/descriptions vary by macOS version.
@@ -401,6 +464,8 @@ private func expandedSection(in application: Element, section: ControlCenterSect
         case .sound:
             return element.identifier() == "controlcenter-volume" && element.role() == kAXStaticTextRole
                 || element.identifier()?.hasPrefix("sound-device-") == true
+        case .wifi:
+            return element.identifier() == "controlcenter-wifi" && element.role() == kAXStaticTextRole
         }
     } != nil || settingsButton(in: application, section: section) != nil
 }
@@ -417,17 +482,7 @@ private func overviewControl(in application: Element) -> Element? {
 private func openControlCenter(_ application: Element) async throws {
     if overviewControl(in: application) != nil { return }
     let item = try await waitForControl("Control Center menu bar item") {
-        // Newer macOS versions host the icon in MenuBarAgent, while the panel remains
-        // in Control Center. Keep both owners for compatibility with older versions.
-        let owners = [application] + NSRunningApplication.runningApplications(withBundleIdentifier: "com.apple.MenuBarAgent")
-            .map { Element(AXUIElementCreateApplication($0.processIdentifier)) }
-        let roots = owners.flatMap { owner in
-            // Menu bars are not always included in the application's AXChildren.
-            [kAXMenuBarAttribute, kAXExtrasMenuBarAttribute].compactMap { name in
-                owner.attribute(Attribute<AXUIElement>(name)).map(Element.init)
-            } + [owner]
-        }
-        return find(in: roots) { $0.identifier() == "com.apple.menuextra.controlcenter" }
+        menuBarItem(identifiers: ["com.apple.menuextra.controlcenter"])
     }
     // AXPress on this menu extra returns from an expanded section to the overview as well.
     try await press(item, name: "Control Center")
@@ -498,8 +553,11 @@ private func runControlCenterAction(section: ControlCenterSection?, action: Cont
     case .click:
         return
     case .decrease, .increase:
+        guard let identifier = section.sliderIdentifier else {
+            throw TrayError.invalidControlCenterAction(section: section.rawValue, action: action.rawValue)
+        }
         let slider = try await waitForControl("\(section.rawValue) slider") {
-            find(in: windows(of: application)) { $0.identifier() == section.sliderIdentifier }
+            find(in: windows(of: application)) { $0.identifier() == identifier }
         }
         try await adjust(slider, increase: action == .increase)
     case .settings:
@@ -512,5 +570,16 @@ private func runControlCenterAction(section: ControlCenterSection?, action: Cont
             find(in: windows(of: application)) { $0.identifier() == action.identifier }
         }
         try await press(button, name: action.rawValue)
+    case .toggle:
+        let button = try await waitForControl("Wi-Fi power toggle") {
+            find(in: windows(of: application)) { element in
+                guard [kAXCheckBoxRole, "AXSwitch"].contains(element.role() ?? "") else { return false }
+                return element.identifier()?.localizedCaseInsensitiveContains("wifi") == true
+                    || [element.title(), element.descriptionText()].compactMap { $0 }.contains {
+                        $0.hasPrefix("Wi-Fi")
+                    }
+            }
+        }
+        try await press(button, name: "Wi-Fi power toggle")
     }
 }

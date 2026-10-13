@@ -19,6 +19,9 @@ export type SoundAction = "CLICK" | "DECREASE" | "INCREASE";
 
 export type TrayAction =
   | [type: "ITEM", index: number, clickType?: TrayClickType]
+  | [type: "BATTERY"]
+  | [type: "DATE_TIME"]
+  | [type: "WIFI", action?: "TOGGLE"]
   | [type: "CONTROL_CENTER"]
   | [type: "CONTROL_CENTER", section: "DISPLAY", action?: DisplayAction]
   | [type: "CONTROL_CENTER", section: "SOUND", action?: SoundAction];
@@ -54,6 +57,8 @@ export async function runTrayAction(...args: TrayAction): Promise<void> {
  * Builds the typed `@input:tray` handler. ITEM indexes count from the first menu-bar extra to the
  * right of the application menus; negative indexes count from the right edge. CONTROL_CENTER
  * opens the panel and optionally expands a section or operates one of its controls.
+ * BATTERY and DATE_TIME activate their named menu-bar extras. WIFI opens its menu (or its
+ * Control Center section when the icon is hidden); WIFI > TOGGLE switches Wi-Fi on/off.
  */
 export default function buildHandler(): TrayHandler {
   return runTrayAction;

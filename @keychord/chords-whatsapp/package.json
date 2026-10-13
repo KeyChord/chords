@@ -1,0 +1,14 @@
+{
+  "name": "@keychord/chords-whatsapp",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KeyChord/chords-whatsapp"
+  },
+  "type": "module",
+  "devDependencies": {
+    "@keychord/chords-menu": "workspace:*",
+    "@keychord/chordtest": "workspace:*",
+    "@keychord/config": "catalog:"
+  },
+  "packageManager": "pnpm@10.33.0"
+}

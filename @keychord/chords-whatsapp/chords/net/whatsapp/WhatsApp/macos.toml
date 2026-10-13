@@ -1,0 +1,79 @@
+name = "WhatsApp"
+
+[on.menu]
+file = "menu.js"
+args = ["WhatsApp"]
+
+[on.menu-item]
+file = "menu.js"
+args = ["WhatsApp"]
+
+[chords]
+'?c' = { name = "Chat" }
+cq = { name = "Chat: Quit", shortcut = "cmd+shift+w" }
+ci = { name = "Chat: Info", shortcut = "cmd+shift+i" }
+cb = { name = "Chat: Block", '@input:menu' = [
+  "by-letters",
+  "c",
+], '@input:menu-item' = [
+  "by-letters",
+  "block",
+] }
+cs = { name = "Chat: Search", shortcut = "cmd+opt+f" }
+cvi = { name = "Chat: Video Call", '@input:menu' = ["by-path", ["Chat", "Video Call"]] }
+cvo = { name = "Chat: Voice Call", '@input:menu' = ["by-path", ["Chat", "Voice Call"]] }
+cn = { name = "Chat: New", shortcut = "cmd+shift+n" }
+cp = { name = "Chat: Pin", shortcut = "cmd+p" }
+ca = { name = "Chat: Archive", shortcut = "cmd+shift+a" }
+cm = { name = "Chat: Mute", shortcut = "cmd+shift+m" }
+cm8 = { name = "Chat: Mute 8 Hours", '@input:menu' = ["by-path", ["Chat", "8 hours"]] }
+cmw = { name = "Chat: Mute 1 Week", '@input:menu' = ["by-path", ["Chat", "1 week"]] }
+cu = { name = "Chat: Unread", shortcut = "cmd+shift+u" }
+cv = { name = "Chat: Previous", shortcut = "cmd+shift+[" }
+cx = { name = "Chat: Next", shortcut = "cmd+shift+]" }
+ce = { name = "Chat: Export", '@input:menu' = ["by-path", ["Chat", "Export chat"]] }
+cc = { name = "Chat: Clear", '@input:menu' = ["by-path", ["Chat", "Clear chat"]] }
+cd = { name = "Chat: Delete", shortcut = "cmd+shift+d" }
+
+'?c([1-9])' = { name = "Chat: Switch to Chat #" }
+c1 = { name = "Chat 1", shortcut = "cmd+1" }
+c2 = { name = "Chat 2", shortcut = "cmd+2" }
+c3 = { name = "Chat 3", shortcut = "cmd+3" }
+c4 = { name = "Chat 4", shortcut = "cmd+4" }
+c5 = { name = "Chat 5", shortcut = "cmd+5" }
+c6 = { name = "Chat 6", shortcut = "cmd+6" }
+c7 = { name = "Chat 7", shortcut = "cmd+7" }
+c8 = { name = "Chat 8", shortcut = "cmd+8" }
+c9 = { name = "Chat 9", shortcut = "cmd+9" }
+
+'?v' = { name = "View" }
+vc = { name = "View: Chats", shortcut = "ctrl+1" }
+vk = { name = "View: Kalls (Calls)", shortcut = "ctrl+2" }
+vu = { name = "View: Updates", shortcut = "ctrl+3" }
+va = { name = "View: Archived", shortcut = "ctrl+4" }
+vs = { name = "View: Starred", shortcut = "ctrl+5" }
+'v,' = { name = "View: Settings", shortcut = "ctrl+6" }
+vp = { name = "View: Profile", shortcut = "ctrl+p" }
+
+'?k' = { name = "Kall (Call)" }
+kn = { name = "Call: New", shortcut = "cmd+shift+c" }
+kg = { name = "Call: Group Call", shortcut = "cmd+shift+g" }
+kl = { name = "Call: Link", shortcut = "cmd+shift+l" }
+kc = { name = "Call: Camera Toggle", shortcut = "cmd+ctrl+v" }
+km = { name = "Call: Mic Toggle", shortcut = "cmd+ctrl+m" }
+kr = { name = "Call: React", shortcut = "cmd+ctrl+r" }
+kh = { name = "Call: Hand Raise", shortcut = "cmd+ctrl+h" }
+ks = { name = "Call: Screen Share", shortcut = "cmd+ctrl+s" }
+kp = { name = "Call: Participants", shortcut = "cmd+ctrl+p" }
+ke = { name = "Call: End", shortcut = "cmd+ctrl+w" }
+kt = { name = "Call: Top Always", shortcut = "cmd+ctrl+t" }
+
+'?i' = { name = "Input" }
+ie = { name = "Input: Emoji", shortcut = "cmd+e" }
+ig = { name = "Input: GIF", shortcut = "cmd+g" }
+is = { name = "Input: Sticker", shortcut = "cmd+g" }
+
+'?z' = { name = "Zoom" }
+zi = { name = "Zoom In", shortcut = "cmd+plus" }
+zo = { name = "Zoom Out", shortcut = "cmd+minus" }
+zr = { name = "Zoom Reset", shortcut = "cmd+0" }

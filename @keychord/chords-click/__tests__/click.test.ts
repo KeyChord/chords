@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 import { click, getAppWindows } from "chord";
+import { chordPattern } from "@keychord/chordtest/patterns";
 import { afterEach, beforeEach, expect, test, vi } from "vite-plus/test";
 import buildClickHandler from "../src/js/click";
 
@@ -7,6 +8,20 @@ const bounds = { x: -100, y: 200, width: 300, height: 600 };
 const window = { windowId: 123, processId: 456, bounds, title: "First window" };
 const clickMock = vi.mocked(click);
 const windowsMock = vi.mocked(getAppWindows);
+const source = readFileSync(new URL("../chords/macos.toml", import.meta.url), "utf8");
+const bindings = Array.from(
+  source.matchAll(/^'([^']+)' = .*'@input:click' = \['(\$\d+)'\]/gm),
+  ([, pattern, argument]) => ({ pattern: chordPattern(pattern), argument }),
+);
+
+function capturedSequence(input: string): string {
+  const matches = bindings.flatMap(({ pattern, argument }) => {
+    const capture = pattern.exec(input);
+    return capture ? [capture[Number(argument.slice(1))]] : [];
+  });
+  expect(matches).toHaveLength(1);
+  return matches[0];
+}
 
 beforeEach(() => {
   clickMock.mockResolvedValue(undefined);
@@ -17,21 +32,71 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
-test("the global chord starts with a literal dot and forwards the complete sequence", async () => {
-  vi.useFakeTimers();
-  const source = readFileSync(new URL("../chords/macos.toml", import.meta.url), "utf8");
+test("click entry points retain their hints and leave modifier prefixes unmatched", () => {
   expect(source).toMatch(/\[on\.click\]\s+file = 'click\.js'/);
-  const binding = source.match(/^'([^']+)' = .*'@input:click' = \['\$1'\]/m);
-  expect(binding).not.toBeNull();
-  const pattern = new RegExp(`^(?:${binding![1]})$`);
-  const sequence = "b20l.5b.5l0b.3l.3b20r0b.5r.4";
-  const capture = pattern.exec(`.${sequence}`);
-  expect(capture?.[1]).toBe(sequence);
-  expect(pattern.test(".")).toBe(false);
-  expect(pattern.test(`x${sequence}`)).toBe(false);
-  expect(pattern.test(`j.${sequence}`)).toBe(false);
+  expect(bindings).toHaveLength(4);
+  for (const edge of ["b", "t", "l", "r"]) {
+    expect(source).toContain(`'?.${edge}' = { name = "Click from `);
+  }
+  for (const input of [
+    ".",
+    ".b",
+    ".t",
+    ".l",
+    ".r",
+    ".m",
+    ".c",
+    ".a",
+    ".f",
+    ".s",
+    ".m20l30",
+    "xb20l30",
+    "j.b20l30",
+    ",b20l30",
+  ]) {
+    expect(
+      bindings.some(({ pattern }) => pattern.test(input)),
+      input,
+    ).toBe(false);
+  }
+});
 
-  const action = buildClickHandler().call({ focusedAppId: "dev.fixture" }, capture![1]);
+test.each(["b20l.5", "t20l.5", "l.5b20", "r.5t20"])(
+  "the . + letter entry point forwards the complete mixed-edge sequence: %s",
+  async (first) => {
+    vi.useFakeTimers();
+    const sequence = `${first}t.5r0b20l.5l30b.25r.4t0`;
+    const captured = capturedSequence(`.${sequence}`);
+    expect(captured).toBe(sequence);
+    const action = buildClickHandler().call({ focusedAppId: "dev.fixture" }, captured);
+    await vi.runAllTimersAsync();
+    await action;
+    expect(getAppWindows).toHaveBeenCalledExactlyOnceWith("dev.fixture");
+    const points = [
+      { x: 150, y: first === "b20l.5" || first === "l.5b20" ? 580 : 20 },
+      { x: 299, y: 300 },
+      { x: 150, y: 580 },
+      { x: 30, y: 450 },
+      { x: 180, y: 0 },
+    ];
+    expect(click).toHaveBeenCalledTimes(points.length);
+    for (const [index, point] of points.entries()) {
+      expect(click).toHaveBeenNthCalledWith(index + 1, {
+        windowId: 123,
+        ...point,
+        expectedBounds: bounds,
+      });
+    }
+  },
+);
+
+test("the documented global chord forwards the complete sequence", async () => {
+  vi.useFakeTimers();
+  const sequence = "b20l.5b.5l0b.3l.3b20r0b.5r.4";
+  const captured = capturedSequence(`.${sequence}`);
+  expect(captured).toBe(sequence);
+
+  const action = buildClickHandler().call({ focusedAppId: "dev.fixture" }, captured);
   await vi.runAllTimersAsync();
   await action;
   expect(getAppWindows).toHaveBeenCalledExactlyOnceWith("dev.fixture");

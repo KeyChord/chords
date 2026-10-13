@@ -10,6 +10,9 @@
     ".": "./src/index.ts",
     "./native": "./src/native.ts",
     "./runtime": "./src/runtime.ts",
+    "./vm": "./src/vm.ts",
+    "./macos": "./src/macos.ts",
+    "./patterns": "./src/patterns.ts",
     "./vitest": "./src/vitest.ts"
   },
   "scripts": {

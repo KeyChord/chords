@@ -7,6 +7,7 @@
   "type": "module",
   "devDependencies": {
     "@chord/com.npmjs.types__node": "workspace:*",
+    "@keychord/chordtest": "workspace:*",
     "@keychord/config": "catalog:",
     "@keychord/tsconfig": "catalog:",
     "@types/bun": "^1.4.0",

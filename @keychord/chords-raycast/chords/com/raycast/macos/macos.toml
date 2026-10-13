@@ -3,8 +3,11 @@ name = "Raycast"
 [meta]
 url = "https://manual.raycast.com/keyboard-shortcuts"
 
+[on.raycast]
+file = "raycast.js"
+
 [chords]
-'/r' = { name = "Raycast", shell = "open -a Raycast" }
+'/r' = { name = "Raycast", '@input:raycast' = [] }
 
 'nn' = { name = "Navigate: North", shortcut = "up" }
 'ne' = { name = "Navigate: East", shortcut = "right" }

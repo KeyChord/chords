@@ -6,9 +6,6 @@ settings:
 
 catalogs:
   default:
-    '@keychord/config':
-      specifier: ^0.0.9
-      version: 0.0.9
     '@keychord/tsconfig':
       specifier: ^0.0.6
       version: 0.0.6
@@ -18,6 +15,9 @@ catalogs:
     vite-plus:
       specifier: ^0.1.15
       version: 0.1.15
+
+overrides:
+  '@keychord/config': link:../config
 
 importers:
 
@@ -51,6 +51,9 @@ importers:
         specifier: latest
         version: 0.2.3
     devDependencies:
+      '@keychord/chordtest':
+        specifier: workspace:*
+        version: link:../chordtest
       '@octokit/rest':
         specifier: latest
         version: 22.0.1
@@ -60,15 +63,21 @@ importers:
 
   '@keychord/chords-aerospace':
     devDependencies:
+      '@keychord/chordtest':
+        specifier: workspace:*
+        version: link:../chordtest
       '@keychord/config':
-        specifier: 'catalog:'
-        version: 0.0.9
+        specifier: link:../../../config
+        version: link:../../../config
 
   '@keychord/chords-chord':
     devDependencies:
+      '@keychord/chordtest':
+        specifier: workspace:*
+        version: link:../chordtest
       '@keychord/config':
-        specifier: 'catalog:'
-        version: 0.0.9
+        specifier: link:../../../config
+        version: link:../../../config
 
   '@keychord/chords-chromium':
     dependencies:
@@ -88,9 +97,12 @@ importers:
         specifier: latest
         version: 2.0.6
     devDependencies:
+      '@keychord/chordtest':
+        specifier: workspace:*
+        version: link:../chordtest
       '@keychord/config':
-        specifier: 'catalog:'
-        version: 0.0.9
+        specifier: link:../../../config
+        version: link:../../../config
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -110,8 +122,8 @@ importers:
         specifier: workspace:*
         version: link:../chordtest
       '@keychord/config':
-        specifier: 'catalog:'
-        version: 0.0.9
+        specifier: link:../../../config
+        version: link:../../../config
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -147,8 +159,8 @@ importers:
         specifier: workspace:*
         version: link:../chordtest
       '@keychord/config':
-        specifier: 'catalog:'
-        version: 0.0.9
+        specifier: link:../../../config
+        version: link:../../../config
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -156,29 +168,29 @@ importers:
         specifier: latest
         version: 1.4.0
 
-  '@keychord/chords-commands':
-    devDependencies:
-      '@keychord/config':
-        specifier: 'catalog:'
-        version: 0.0.9
-
   '@keychord/chords-dock':
     devDependencies:
       '@keychord/chords-menu':
         specifier: workspace:*
         version: link:../chords-menu
+      '@keychord/chordtest':
+        specifier: workspace:*
+        version: link:../chordtest
       '@keychord/config':
-        specifier: 'catalog:'
-        version: 0.0.9
+        specifier: link:../../../config
+        version: link:../../../config
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
 
   '@keychord/chords-instagram':
     devDependencies:
+      '@keychord/chordtest':
+        specifier: workspace:*
+        version: link:../chordtest
       '@keychord/config':
-        specifier: 'catalog:'
-        version: 0.0.9
+        specifier: link:../../../config
+        version: link:../../../config
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -201,9 +213,12 @@ importers:
         specifier: latest
         version: 0.8.0
     devDependencies:
+      '@keychord/chordtest':
+        specifier: workspace:*
+        version: link:../chordtest
       '@keychord/config':
-        specifier: 'catalog:'
-        version: 0.0.9
+        specifier: link:../../../config
+        version: link:../../../config
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -217,14 +232,29 @@ importers:
         specifier: workspace:*
         version: link:../chordtest
       '@keychord/config':
-        specifier: 'catalog:'
-        version: 0.0.9
+        specifier: link:../../../config
+        version: link:../../../config
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
       '@types/bun':
         specifier: latest
         version: 1.4.0
+
+  '@keychord/chords-modifiers':
+    devDependencies:
+      '@keychord/chordtest':
+        specifier: workspace:*
+        version: link:../chordtest
+      '@keychord/config':
+        specifier: link:../../../config
+        version: link:../../../config
+      '@keychord/tsconfig':
+        specifier: 'catalog:'
+        version: 0.0.6
+      '@types/bun':
+        specifier: latest
+        version: 1.4.3
 
   '@keychord/chords-raycast':
     dependencies:
@@ -241,24 +271,36 @@ importers:
         specifier: latest
         version: 3.2.0
     devDependencies:
+      '@keychord/chordtest':
+        specifier: workspace:*
+        version: link:../chordtest
       '@keychord/config':
-        specifier: 'catalog:'
-        version: 0.0.9
+        specifier: link:../../../config
+        version: link:../../../config
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
+      '@types/bun':
+        specifier: latest
+        version: 1.4.3
       '@types/js-yaml':
         specifier: latest
         version: 4.0.9
+      '@types/node':
+        specifier: 26.5.0
+        version: 26.5.0
 
   '@keychord/chords-spotify':
     devDependencies:
       '@chord/com.npmjs.types__node':
         specifier: workspace:*
         version: link:../../packages/com/npmjs/types__node
+      '@keychord/chordtest':
+        specifier: workspace:*
+        version: link:../chordtest
       '@keychord/config':
-        specifier: 'catalog:'
-        version: 0.0.9
+        specifier: link:../../../config
+        version: link:../../../config
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -284,9 +326,12 @@ importers:
         specifier: latest
         version: 3.2.0
     devDependencies:
+      '@keychord/chordtest':
+        specifier: workspace:*
+        version: link:../chordtest
       '@keychord/config':
-        specifier: 'catalog:'
-        version: 0.0.9
+        specifier: link:../../../config
+        version: link:../../../config
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -300,8 +345,8 @@ importers:
         specifier: workspace:*
         version: link:../chordtest
       '@keychord/config':
-        specifier: 'catalog:'
-        version: 0.0.9
+        specifier: link:../../../config
+        version: link:../../../config
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -315,9 +360,12 @@ importers:
         specifier: latest
         version: 2.0.6
     devDependencies:
+      '@keychord/chordtest':
+        specifier: workspace:*
+        version: link:../chordtest
       '@keychord/config':
-        specifier: 'catalog:'
-        version: 0.0.9
+        specifier: link:../../../config
+        version: link:../../../config
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -331,9 +379,12 @@ importers:
         specifier: ^0.8.0
         version: 0.8.0
     devDependencies:
+      '@keychord/chordtest':
+        specifier: workspace:*
+        version: link:../chordtest
       '@keychord/config':
-        specifier: 'catalog:'
-        version: 0.0.9
+        specifier: link:../../../config
+        version: link:../../../config
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -341,11 +392,26 @@ importers:
         specifier: latest
         version: 1.4.0
 
+  '@keychord/chords-whatsapp':
+    devDependencies:
+      '@keychord/chords-menu':
+        specifier: workspace:*
+        version: link:../chords-menu
+      '@keychord/chordtest':
+        specifier: workspace:*
+        version: link:../chordtest
+      '@keychord/config':
+        specifier: link:../../../config
+        version: link:../../../config
+
   '@keychord/chords-youtube':
     devDependencies:
+      '@keychord/chordtest':
+        specifier: workspace:*
+        version: link:../chordtest
       '@keychord/config':
-        specifier: 'catalog:'
-        version: 0.0.9
+        specifier: link:../../../config
+        version: link:../../../config
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -598,10 +664,6 @@ packages:
     engines: {node: '>=18'}
     cpu: [x64]
     os: [win32]
-
-  '@keychord/config@0.0.9':
-    resolution: {integrity: sha512-zLnUGJcbiFBx1B1sRfY961NjCBf26BF+xUlzr6Mj0NZPrR9H0XsEvYdgpkrSkKVEK6C4lFkfe8mY7bNj8FHNLg==}
-    hasBin: true
 
   '@keychord/tsconfig@0.0.6':
     resolution: {integrity: sha512-TwU3agMUhTzTbfoHKtzJQKwzpzQpjje3Z+6i7FrSuZLBygTZq/W9j0SI+6IlmuTnf0whgbLBOukJJ4K51V4wAw==}
@@ -1965,10 +2027,6 @@ snapshots:
 
   '@esbuild/win32-x64@0.27.7':
     optional: true
-
-  '@keychord/config@0.0.9':
-    dependencies:
-      node-swift: 1.5.1
 
   '@keychord/tsconfig@0.0.6': {}
 

@@ -16,9 +16,21 @@ file = 'dock.js'
 '/wr' = { name = "Window: (Move) Right", shortcut = "ctrl+fn+right" }
 '/wt' = { name = "Window: (Move) Top", shortcut = "ctrl+fn+up" }
 '/wb' = { name = "Window: (Move) Bottom", shortcut = "ctrl+fn+down" }
-'/wtl' = { name = "Window: (Move) Top Left", '@input:menu' = ["Window", "Move & Resize", "Top Left"] }
-'/wtr' = { name = "Window: (Move) Top Right", '@input:menu' = ["Window", "Move & Resize", "Top Right"] }
-'/wbl' = { name = "Window: (Move) Bottom Left", '@input:menu' = ["Window", "Move & Resize", "Bottom Left"] }
+'/wtl' = { name = "Window: (Move) Top Left", '@input:menu' = [
+  "Window",
+  "Move & Resize",
+  "Top Left",
+] }
+'/wtr' = { name = "Window: (Move) Top Right", '@input:menu' = [
+  "Window",
+  "Move & Resize",
+  "Top Right",
+] }
+'/wbl' = { name = "Window: (Move) Bottom Left", '@input:menu' = [
+  "Window",
+  "Move & Resize",
+  "Bottom Left",
+] }
 '/wbr' = { name = "Window: (Move) Bottom Right", '@input:menu' = [
   "Window",
   "Move & Resize",
@@ -28,7 +40,11 @@ file = 'dock.js'
 '/wrl' = { name = "Window: (Move) Right Left", shortcut = "ctrl+fn+shift+right" }
 '/wtb' = { name = "Window: (Move) Top Bottom", shortcut = "ctrl+fn+shift+up" }
 '/wbt' = { name = "Window: (Move) Bottom Top", shortcut = "ctrl+fn+shift+down" }
-'/wq' = { name = "Window: (Move) Quarters", '@input:menu' = ["Window", "Move & Resize", "Quarters"] }
+'/wq' = { name = "Window: (Move) Quarters", '@input:menu' = [
+  "Window",
+  "Move & Resize",
+  "Quarters",
+] }
 
 '/ws[' = { name = "Window: Size Previous", shortcut = "ctrl+fn+r" }
 '/wz' = { name = "Window: Zoom", '@input:menu' = ["Window", 'Zoom'] }
@@ -55,5 +71,5 @@ file = 'dock.js'
 # Dock
 '/dv' = { name = "Dock: Vary (On/Off)", shortcut = "ctrl+f3" }
 '/d(\d+)' = { name = "Dock > Focus $1", '@input:dock' = ['$1'] }
-'/d.(\d+)\.' = { name = "Dock > Click @ Item $1", '@input:dock' = ['$1'] }
-'/d\.,(\d+)' = { name = "Dock > Right Click @ Item $1", '@input:dock' = ['$1', 'right'] }
+'/d.(\d+).' = { name = "Dock > Click @ Item $1", '@input:dock' = ['$1'] }
+'/d.,(\d+)' = { name = "Dock > Right Click @ Item $1", '@input:dock' = ['$1', 'right'] }

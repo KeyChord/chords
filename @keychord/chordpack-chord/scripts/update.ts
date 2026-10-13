@@ -15,8 +15,8 @@ const packageConfigs: PackageConfig[] = [
     git: "https://github.com/KeyChord/chords-chord",
   },
   {
-    name: "@keychord/chords-commands",
-    git: "https://github.com/KeyChord/chords-commands",
+    name: "@keychord/chords-modifiers",
+    git: "https://github.com/KeyChord/chords-modifiers",
   },
   {
     name: "@keychord/chords-menu",

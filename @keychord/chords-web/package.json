@@ -10,6 +10,7 @@
     "outdent": "^0.8.0"
   },
   "devDependencies": {
+    "@keychord/chordtest": "workspace:*",
     "@keychord/config": "catalog:",
     "@keychord/tsconfig": "catalog:",
     "@types/bun": "latest"

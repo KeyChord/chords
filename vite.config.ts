@@ -12,8 +12,10 @@ export default defineConfig({
     // This package tests its native addon and TOML loader using Bun's runtime.
     exclude: [
       ...configDefaults.exclude,
+      ".chord-testing/**",
       "@keychord/chords-tray/__tests__/**",
-      "@keychord/chordtest/__tests__/vm.test.ts",
+      "@keychord/chordtest/__tests__/**",
+      "**/*.vm.test.ts",
     ],
   },
   staged: {

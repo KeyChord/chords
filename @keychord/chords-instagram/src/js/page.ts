@@ -1,14 +1,15 @@
 export type InstagramAction =
-  | "home"
-  | "reels"
-  | "messages"
-  | "search"
-  | "create"
-  | "profile"
-  | "story"
-  | "avatar"
-  | "note"
-  | "close-note";
+  | "HOME"
+  | "REELS"
+  | "MESSAGES"
+  | "SEARCH"
+  | "CREATE"
+  | "PROFILE"
+  | "STORY"
+  | "STORY_REPLY"
+  | "AVATAR"
+  | "NOTE"
+  | "CLOSE_NOTE";
 
 // Serialized into Instagram's page. Keep every DOM helper inside this function.
 async function runInPage(action: InstagramAction, storyNumber?: number): Promise<string> {
@@ -77,7 +78,7 @@ async function runInPage(action: InstagramAction, storyNumber?: number): Promise
       element.click();
     };
 
-    if (action === "story") {
+    if (action === "STORY" || action === "STORY_REPLY") {
       if (dialogs().length) throw new Error("Close the current dialog before opening a story.");
       if (location.pathname !== "/") throw new Error("Open Home before using the story chord.");
       const stories = await waitFor(() => {
@@ -98,7 +99,33 @@ async function runInPage(action: InstagramAction, storyNumber?: number): Promise
         () => location.pathname.startsWith("/stories/") || undefined,
         `Instagram did not open story #${storyNumber}.`,
       );
-    } else if (action === "close-note") {
+      if (action === "STORY_REPLY") {
+        const replyInput = (): HTMLElement | undefined =>
+          [
+            ...document.querySelectorAll<HTMLElement>('textarea, input, [contenteditable="true"]'),
+          ].find(
+            (element) =>
+              enabled(element) &&
+              !element.matches("[readonly]") &&
+              ["placeholder", "aria-label"].some((attribute) =>
+                /^(Reply to .+|Send message(?:\.\.\.)?)$/.test(
+                  element.getAttribute(attribute) ?? "",
+                ),
+              ),
+          );
+        const input = await waitFor(
+          replyInput,
+          "This story's reply field is unavailable. Replies may be disabled for this story.",
+        );
+        click(input);
+        await waitFor(() => {
+          // Instagram can replace the collapsed reply field when it is clicked.
+          const editor = replyInput();
+          editor?.focus();
+          return editor && document.activeElement === editor ? editor : undefined;
+        }, "Instagram did not focus the story reply field.");
+      }
+    } else if (action === "CLOSE_NOTE") {
       const editor = noteEditor();
       if (!editor) {
         if (dialogs().length) throw new Error("The open dialog is not an Instagram note editor.");
@@ -112,7 +139,7 @@ async function runInPage(action: InstagramAction, storyNumber?: number): Promise
         () => !visible(editor) || !editor.isConnected || undefined,
         "The note editor did not close.",
       );
-    } else if (action === "note") {
+    } else if (action === "NOTE") {
       if (noteEditor()) return JSON.stringify({ ok: true });
       if (dialogs().length) throw new Error("Close the current dialog before opening a note.");
       const header = document.querySelector("main header");
@@ -137,7 +164,7 @@ async function runInPage(action: InstagramAction, storyNumber?: number): Promise
         click(byLabel(editor, ["Leave a new note"])!);
         await waitFor(noteEditor, "Instagram did not open the new note editor.");
       }
-    } else if (action === "avatar") {
+    } else if (action === "AVATAR") {
       if (dialogs().length)
         throw new Error("Close the current dialog before opening the profile avatar.");
       const header = document.querySelector("main header");
@@ -153,21 +180,22 @@ async function runInPage(action: InstagramAction, storyNumber?: number): Promise
       if (dialogs().length)
         throw new Error("Close the current dialog before navigating Instagram.");
       const labels = {
-        home: ["Home"],
-        reels: ["Reels"],
-        messages: ["Messages", "Messenger"],
-        search: ["Search"],
-        create: ["New post", "Create"],
-        profile: ["Profile"],
+        HOME: ["Home"],
+        REELS: ["Reels"],
+        MESSAGES: ["Messages", "Messenger"],
+        SEARCH: ["Search"],
+        CREATE: ["New post", "Create"],
+        PROFILE: ["Profile"],
       };
       const navigation = byLabel(document, labels[action]);
-      if (!navigation) throw new Error(`Instagram's ${action} navigation control is unavailable.`);
+      if (!navigation)
+        throw new Error(`Instagram's ${action.toLowerCase()} navigation control is unavailable.`);
       const destination =
         navigation instanceof HTMLAnchorElement ? new URL(navigation.href).pathname : undefined;
       // Repeating Search keeps its field open instead of toggling the old sidebar closed.
       if (
         !(
-          action === "search" &&
+          action === "SEARCH" &&
           searchInput() &&
           (location.pathname.startsWith("/explore/") ||
             searchInput()?.getAttribute("aria-label") === "Search input")
@@ -175,12 +203,12 @@ async function runInPage(action: InstagramAction, storyNumber?: number): Promise
       )
         click(navigation);
 
-      if (action === "search") {
+      if (action === "SEARCH") {
         const input = await waitFor(searchInput, "Instagram's Search input is unavailable.");
         input.click();
         input.focus();
         input.select();
-      } else if (action === "create") {
+      } else if (action === "CREATE") {
         const post = await waitFor(
           () =>
             dialogs().find((dialog) => /Create new post/i.test(text(dialog))) ??
@@ -195,9 +223,9 @@ async function runInPage(action: InstagramAction, storyNumber?: number): Promise
       } else if (destination && destination !== "#") {
         await waitFor(
           () => location.pathname === destination || undefined,
-          `Instagram did not open ${action}.`,
+          `Instagram did not open ${action.toLowerCase()}.`,
         );
-        if (action === "profile") {
+        if (action === "PROFILE") {
           await waitFor(
             () =>
               document.querySelector('main header img[alt="Change profile photo"]') ?? undefined,
@@ -218,21 +246,22 @@ export function buildInstagramJavaScript(
 ): string {
   if (
     ![
-      "home",
-      "reels",
-      "messages",
-      "search",
-      "create",
-      "profile",
-      "story",
-      "avatar",
-      "note",
-      "close-note",
+      "HOME",
+      "REELS",
+      "MESSAGES",
+      "SEARCH",
+      "CREATE",
+      "PROFILE",
+      "STORY",
+      "STORY_REPLY",
+      "AVATAR",
+      "NOTE",
+      "CLOSE_NOTE",
     ].includes(action)
   ) {
     throw new Error(`Unknown Instagram action: ${action}`);
   }
-  if (action === "story") {
+  if (action === "STORY" || action === "STORY_REPLY") {
     if (
       (typeof storyNumber !== "number" &&
         (typeof storyNumber !== "string" || !/^\d+$/.test(storyNumber))) ||

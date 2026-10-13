@@ -6,6 +6,7 @@
   },
   "type": "module",
   "devDependencies": {
+    "@keychord/chordtest": "workspace:*",
     "@keychord/config": "catalog:"
   }
 }

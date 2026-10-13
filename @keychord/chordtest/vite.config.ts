@@ -6,6 +6,6 @@ const runtime = chordTestRuntime();
 
 export default defineConfig({
   ...runtime,
-  test: { ...runtime.test, exclude: [...configDefaults.exclude, "__tests__/vm.test.ts"] },
+  test: { ...runtime.test, exclude: [...configDefaults.exclude, "__tests__/**"] },
   pack: { entry: ["src/index.ts", "src/cli.ts"], dts: false, deps: { neverBundle: ["bun:ffi"] } },
 });

@@ -47,7 +47,7 @@ file = "tray.js"
 '=-8.,' = { name = "Tray: 8th End Item Right Click", '@input:tray' = ['ITEM', -8, 'right'] }
 '=-9.,' = { name = "Tray: 9th End Item Right Click", '@input:tray' = ['ITEM', -9, 'right'] }
 
-'=p' = { name = "Tray: Power / Battery" }
+'=p' = { name = "Tray: Power / Battery", '@input:tray' = ['BATTERY'] }
 
 # Control Center
 '=c' = { name = "Tray: Control Center", '@input:tray' = ['CONTROL_CENTER'] }
@@ -104,11 +104,12 @@ file = "tray.js"
   'CLICK',
 ] }
 
-'=t' = { name = "Tray: Time & Date" }
+'=s' = { name = "Tray: Spotlight", shortcut = "cmd+space" }
+'=t' = { name = "Tray: Time & Date", '@input:tray' = ['DATE_TIME'] }
 
 '?=w' = { name = "Tray Wi-Fi" }
-'=w' = { name = "Tray: Wi-Fi" }
-'=wv' = { name = "Tray Wi-Fi: Vary On/Off" }
+'=w' = { name = "Tray: Wi-Fi", '@input:tray' = ['WIFI'] }
+'=wv' = { name = "Tray Wi-Fi: Vary On/Off", '@input:tray' = ['WIFI', 'TOGGLE'] }
 
 '=q' = { name = "Force Quit", shortcut = "opt+cmd+esc" }
 '=ls' = { name = "Lock Screen", shortcut = "opt+cmd+esc" }

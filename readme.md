@@ -55,13 +55,15 @@ In the default chord package, these are the categories assigned to the global ch
 `/` Global General-Purpose/Custom Commands\
 `-` Menu Bar/Menus\
 `=` Tray / System Shortcuts\
-`.` Window Clicks\
+`.` Window Clicks / Modifier Keys\
 `;` Web
 
 > `'` is reserved for pass-through input\
 > `\` is reserved for escape characters
 
 ## Conventions
+
+In TOML chord keys, only parenthesized sections use regex syntax; all surrounding keys are literal. Write `hs.(\d+)` to match `hs.12` and pass `12` as `$1`. Dots outside parentheses need no backslash; dots inside a regex section still use `\.` when they must match literally. Chord patterns match the complete entered sequence automatically.
 
 `l` Left\
 `r` Right\
@@ -167,3 +169,16 @@ Third-party runtime helpers are accessed through wrappers in
 `packages/com/npmjs/`; scoped names use `scope__name` directory names.
 
 Tests and their fixtures live in each package's `__tests__/` directory.
+
+Chord packages normally use `export default config()` from `@keychord/config` in
+`vite.config.ts`. This includes the shared Chord test runtime automatically.
+Until the updated config and test runtime are published, the root
+`pnpm-workspace.yaml` links `@keychord/config` to `../config`, whose workspace
+override links back to the local `@keychord/chordtest` package. Run `vp install`
+in both workspaces and `vp pack` in `../config` after changing the shared config.
+
+All chord packages have a macOS VM smoke test. Run `vp run test:macos:setup`
+once, then `vp run test:macos` for the full suite or
+`vp run test:macos -- @keychord/chords-click` for one package. Each run uses a fresh
+Tart clone of a pinned, prepared macOS image. Shared helpers and fixture apps are
+exported by [`@keychord/chordtest`](./@keychord/chordtest/readme.md).

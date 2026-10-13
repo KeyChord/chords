@@ -11,6 +11,7 @@
     "toml-patch": "latest"
   },
   "devDependencies": {
+    "@keychord/chordtest": "workspace:*",
     "@octokit/rest": "latest",
     "bun-types": "latest"
   },

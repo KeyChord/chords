@@ -4,10 +4,6 @@ name = "Chord's default chordpack"
 git = "https://github.com/KeyChord/chords-chord"
 rev = "54ff9b5c8481fd8311dedca8dfeb1b7736bed16c"
 
-[packages."@keychord/chords-commands"]
-git = "https://github.com/KeyChord/chords-commands"
-rev = "b1acf04c83239dfe7ac9a4b066167d5324ed6679"
-
 [packages."@keychord/chords-os"]
 git = "https://github.com/KeyChord/chords-os"
 rev = "13a44c0714e3b1dc138c67ae26969bf925b8ca96"

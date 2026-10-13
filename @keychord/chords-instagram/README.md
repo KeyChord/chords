@@ -11,6 +11,7 @@ For the installed Brave Instagram app (`com.brave.Browser.app.akpamiohjfcnimfljf
 | `gc`   | Open the Create post composer                                                                    |
 | `gp`   | Open your own profile                                                                            |
 | `hs.N` | Click story N in Home's rendered story tray, starting at 1 (`hs.1`, `hs.2`, etc.)                |
+| `hsrN` | Open story N from Home and focus its reply field (`hsr1`, `hsr2`, etc.)                          |
 | `pa.`  | Click the avatar on the displayed profile; on your own profile this opens the profile-photo menu |
 | `pan`  | Open the note editor above your own profile avatar                                               |
 | `panx` | Close the note editor                                                                            |
@@ -18,6 +19,8 @@ For the installed Brave Instagram app (`com.brave.Browser.app.akpamiohjfcnimfljf
 Notes requires your own profile to be open (`gp`) and Notes to be available on your account. The commands open and close Instagram's controls; they do not share a note or post, change a photo, or delete an existing note. Closing uses Instagram's Close action, leaving any unsaved-draft confirmation to you. The selectors support Instagram's English desktop interface.
 
 Story chords require Home to be open (`gh`) with no dialog. They count available story buttons in the rendered tray from left to right, including seen stories, and exclude the Create story and tray navigation controls. Numbers must be positive integers; unavailable positions report an error.
+
+`hsrN` leaves the reply editor ready for you to type and send. Stories with replies disabled report an error. Action arguments use screaming snake case: `hs.N` sends `['STORY', '$1']`, while `hsrN` sends `['STORY_REPLY', '$1']`. Story patterns require a Chord runtime that treats text outside parenthesized regex sections as literal keys.
 
 ## Browser setup
 
@@ -48,6 +51,8 @@ The tests cover every TOML binding, the serialized page payload, navigation and 
 All nine actions were verified in the installed Instagram app through Chord's embedded Bun runtime on 2026-10-12.
 
 The generated story action was also verified in signed-in Brave on 2026-10-12: position 2 opened the matching account's story viewer.
+
+The generated story reply action was verified in the installed PWA on 2026-10-13: position 1 opened the selected story and focused its empty reply textarea.
 
 The recorded Notes control walkthrough is [instagram-controls-20261012.yaml](../../.argent/flows/instagram-controls-20261012.yaml). From the monorepo root, replay it with:
 

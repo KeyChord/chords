@@ -139,15 +139,13 @@ test("the configured chord captures and forwards the full sequence to the native
     new URL("../chords/com/apple/ScreenContinuity/macos.toml", import.meta.url),
     "utf8",
   );
-  expect(source).toMatch(/\[on\.click\]\s+file = 'screen-continuity\.js'/);
-  const binding = source.match(/^'([^']+)' = .*'@input:click' = \['(\$1)'\]/m);
+  expect(source).toMatch(/\[on\.tap\]\s+file = 'screen-continuity\.js'/);
+  const binding = source.match(/^'([^']+)' = .*'@input:tap' = \['(\$1)'\]/m);
   expect(binding).not.toBeNull();
-  const capture = new RegExp(`^(?:${binding![1]})$`).exec(`j.${example}`);
-  expect(capture?.[1]).toBe(example);
-  expect(new RegExp(`^(?:${binding![1]})$`).test("j.")).toBe(false);
-  expect(new RegExp(`^(?:${binding![1]})$`).test(`j,${example}`)).toBe(false);
+  expect(binding![1]).toBe("t.(.+)");
+  expect(binding![2]).toBe("$1");
   const { default: buildHandler } = await import("../src/js/screen-continuity");
-  await buildHandler()(capture![1]);
+  await buildHandler()(example);
   expect(native.clickPoints).toHaveBeenCalledWith(
     JSON.stringify({ bounds, points: expectedPoints }),
   );

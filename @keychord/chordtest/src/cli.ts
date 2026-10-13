@@ -1,7 +1,8 @@
 #!/usr/bin/env bun
-import { MacOSVM, withVMLock } from "./vm";
+import { MacOSVM, discoverMacOSTests, withVMLock } from "./vm";
 
-const [action = "help", ...paths] = process.argv.slice(2);
+const [action = "help", ...selectors] = process.argv.slice(2);
+const paths = selectors.filter((path) => path !== "--");
 try {
   const vm = new MacOSVM();
   switch (action) {
@@ -14,12 +15,17 @@ try {
     case "status":
       console.log((await vm.status()) ?? "The shared macOS VM has not been created.");
       break;
+    case "list":
+      console.log(discoverMacOSTests(paths).join("\n"));
+      break;
     case "stop":
       await withVMLock(() => vm.stop());
       break;
     case "help":
     case "--help":
-      console.log("chordtest setup | test [workspace-relative test paths...] | status | stop");
+      console.log(
+        "chordtest setup | test [workspace-relative package/test paths...] | list | status | stop",
+      );
       break;
     default:
       throw new Error(`Unknown command: ${action}`);

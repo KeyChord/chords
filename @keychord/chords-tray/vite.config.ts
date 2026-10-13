@@ -1,7 +1,7 @@
 import { config } from "@keychord/config";
 import { buildNative } from "./scripts/build-native";
 
-const trayConfig = config({ native: { scratchDir: "node_modules/.cache/chord/native" } });
+const trayConfig = config();
 let nativeBuild: ReturnType<typeof buildNative> | undefined;
 
 export default {

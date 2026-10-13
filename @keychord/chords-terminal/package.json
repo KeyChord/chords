@@ -16,6 +16,7 @@
     "just-zip-it": "latest"
   },
   "devDependencies": {
+    "@keychord/chordtest": "workspace:*",
     "@keychord/config": "catalog:",
     "@keychord/tsconfig": "catalog:",
     "@types/js-yaml": "latest"

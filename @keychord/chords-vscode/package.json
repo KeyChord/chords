@@ -10,6 +10,7 @@
     "nano-spawn-compat": "latest"
   },
   "devDependencies": {
+    "@keychord/chordtest": "workspace:*",
     "@keychord/config": "catalog:",
     "@keychord/tsconfig": "catalog:"
   },

@@ -1,0 +1,19 @@
+{
+  "name": "@keychord/chords-modifiers",
+  "version": "0.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KeyChord/chords-modifiers"
+  },
+  "type": "module",
+  "exports": {
+    ".": "./src/js/keys.ts"
+  },
+  "devDependencies": {
+    "@keychord/chordtest": "workspace:*",
+    "@keychord/config": "catalog:",
+    "@keychord/tsconfig": "catalog:",
+    "@types/bun": "latest"
+  },
+  "packageManager": "pnpm@10.33.0"
+}

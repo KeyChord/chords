@@ -6,6 +6,10 @@ General macOS window clicks. Start with `.` followed by one or more coordinate p
 .b20l.5b.5l0b.3l.3b20r0b.5r.4
 ```
 
+Enter through `.b`, `.t`, `.l`, or `.r`, according to the first coordinate's edge.
+Later clicks in the same sequence can use any edge. These prefixes leave `.m`,
+`.c`, `.a`, `.f`, and `.s` available for global modifier shortcuts.
+
 Each click needs one vertical edge (`t` top or `b` bottom) and one horizontal edge
 (`l` left or `r` right), in either order. A number beginning with a digit is a pixel
 offset from that edge; a leading-dot number such as `.5` is a fraction of the
@@ -27,3 +31,8 @@ moves, resizes, disappears, or a click fails. No additional native addon is need
 Other chord packages can reuse `click.js`, optionally passing a bundle ID to the
 builder to target a specific app. The existing iPhone Mirroring handler shares the
 parser and click routine while retaining its connection checks.
+
+Run `vp run test:macos -- @keychord/chords-click` from the workspace root after
+`vp run test:macos:setup`. The VM test sends real native clicks to a controlled
+AppKit window behind a covering app and verifies received coordinates, order,
+timing, pointer/focus preservation, and failures when the window moves or disappears.

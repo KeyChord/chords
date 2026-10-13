@@ -1,10 +1,14 @@
 name = "iPhone Mirroring"
 
-[on.click]
+[on.tap]
 file = 'screen-continuity.js'
 
 [chords]
-# Each click has one vertical (t/b) and one horizontal (l/r) offset, in either order.
+# Each tap has one vertical (t/b) and one horizontal (l/r) offset, in either order.
 # Numbers starting with a digit are pixels; .5 is half the corresponding dimension.
-# Example: j.b20l.5b.5l0b.3l.3b20r0b.5r.4
-'j\.(.+)' = { name = "Click", '@input:click' = ['$1'] }
+# Example: t.b20l.5b.5l0b.3l.3b20r0b.5r.4
+'t.(.+)' = { name = "Tap", '@input:tap' = ['$1'] }
+'gh' = { name = "Goto: Home Screen", shortcut = "cmd+1" }
+'ga' = { name = "Goto: App Switcher", shortcut = "cmd+2" }
+'gs' = { name = "Goto: Spotlight", shortcut = "cmd+3" }
+'gc' = { name = "Goto: Command Centre", shortcut = "cmd+4" }

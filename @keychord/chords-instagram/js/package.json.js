@@ -6,6 +6,7 @@ var repository = {
 };
 var type = "module";
 var devDependencies = {
+  "@keychord/chordtest": "workspace:*",
   "@keychord/config": "catalog:",
   "@keychord/tsconfig": "catalog:",
   "@types/bun": "^1.4.2",
