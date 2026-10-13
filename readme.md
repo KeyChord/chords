@@ -51,11 +51,11 @@ You can also use this Chord Package as a template for creating your own chords. 
 
 In the default chord package, these are the categories assigned to the global chords (which must start with a non-alphanumeric character). If you want to define your own custom global chord which doesn't fit into any of the following categories, it's recommended to use one of the remaining symbols (`` ` ``, `[`, `]`, but NOT `'` or `\` since they're reserved).
 
-`,` Universal Commands (`,<key>` maps to `cmd+<key>`)\
-`/` Global Shortcuts / Applications\
-`-` Menu Bar\
+`,` Free
+`/` Global General-Purpose/Custom Commands\
+`-` Menu Bar/Menus\
 `=` Tray / System Shortcuts\
-`.` Dock / Window Management\
+`.` Click\
 `;` Web
 
 > `'` is reserved for pass-through input\
