@@ -55,7 +55,7 @@ In the default chord package, these are the categories assigned to the global ch
 `/` Global General-Purpose/Custom Commands\
 `-` Menu Bar/Menus\
 `=` Tray / System Shortcuts\
-`.` Mouse / Keybord (e.g. modifiers)\
+`.` Mouse / Keyboard (e.g. modifiers)\
 `;` Web
 
 > `'` is reserved for pass-through input\
