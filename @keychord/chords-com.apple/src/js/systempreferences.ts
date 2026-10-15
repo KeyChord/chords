@@ -2,7 +2,7 @@ import { dlopen } from "bun:ffi";
 
 export default function buildAppearanceHandler() {
   return function setAppearance(mode: string): void {
-    if (mode !== "auto" && mode !== "dark" && mode !== "light") {
+    if (mode !== "AUTO" && mode !== "DARK" && mode !== "LIGHT") {
       throw new TypeError("Appearance must be auto, dark, or light");
     }
 
@@ -13,9 +13,9 @@ export default function buildAppearanceHandler() {
       SLSSetAppearanceThemeNotifying: { args: ["bool", "bool"], returns: "void" },
     });
     try {
-      library.symbols.SLSSetAppearanceThemeSwitchesAutomatically(mode === "auto");
-      if (mode !== "auto") {
-        library.symbols.SLSSetAppearanceThemeNotifying(mode === "dark", true);
+      library.symbols.SLSSetAppearanceThemeSwitchesAutomatically(mode === "AUTO");
+      if (mode !== "AUTO") {
+        library.symbols.SLSSetAppearanceThemeNotifying(mode === "DARK", true);
       }
     } finally {
       library.close();

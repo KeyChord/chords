@@ -16,7 +16,7 @@ const display = ["--type=Display", `--UUID=${target}`];
 const initial = await command(["get", ...display, "--resolution"]);
 const resolution = () => command(["get", ...display, "--resolution"]);
 try {
-  for (const size of ["1440x1728", "1600x1000"]) {
+  for (const size of ["1440x1728", "720x864", "1600x1000"]) {
     // New factories exercise recognition of a managed source after package reload.
     await buildMonitorHandler()(size);
     assert.equal(await resolution(), size);
@@ -26,7 +26,7 @@ try {
   assert.equal(await resolution(), "1600x1000");
   await buildMonitorHandler()("0");
   assert.equal(await resolution(), initial);
-  await buildMonitorHandler()("1440x1728");
+  await buildMonitorHandler()("720x864");
   const failure = createMonitorHandler((args) => {
     if (
       args[0] === "set" &&
@@ -38,7 +38,7 @@ try {
     return command(args);
   });
   await assert.rejects(failure("1600x1000"), /Simulated mirror failure/);
-  assert.equal(await resolution(), "1440x1728");
+  assert.equal(await resolution(), "720x864");
   await buildMonitorHandler()(initial);
   assert.equal(await resolution(), initial);
   console.log(

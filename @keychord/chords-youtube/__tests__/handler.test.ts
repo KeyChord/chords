@@ -67,16 +67,19 @@ test("all ten TOML bindings reach the page through the configured handler", asyn
   );
   expect(bindings.name).toBe("YouTube");
   expect(bindings.on.youtube.file).toBe("youtube.js");
-  expect(Object.keys(bindings.chords)).toHaveLength(10);
+  const executable = Object.entries(bindings.chords).filter(
+    ([, binding]) => "@input:youtube" in (binding as object),
+  );
+  expect(executable).toHaveLength(10);
   const handler = buildHandler();
-  for (const [chord, binding] of Object.entries(bindings.chords) as [
+  for (const [chord, binding] of executable as [
     string,
     { "@input:youtube": Parameters<typeof handler> },
   ][]) {
     const args = binding["@input:youtube"];
     expect(args).toBeDefined();
     if (chord === "vs(\\d+)") {
-      expect(args).toEqual(["seek", "$1"]);
+      expect(args).toEqual(["SEEK", "$1"]);
       args[1] = "30";
     }
     await expect(handler(...args)).resolves.toBe(true);
@@ -91,7 +94,7 @@ test("all ten TOML bindings reach the page through the configured handler", asyn
 });
 
 test("the handler supports a configured local debugging port", async () => {
-  await buildHandler(9333)("pause");
+  await buildHandler(9333)("PAUSE");
   expect(fetchMock.mock.calls[0][0]).toBe("http://127.0.0.1:9333/json/list");
 });
 
@@ -101,13 +104,13 @@ test.each([0, 65536, -1, 1.5, NaN])("rejects invalid debugging port %s", (port) 
 });
 
 test("invalid seeks never contact the browser", async () => {
-  await expect(buildHandler()("seek", "-1")).rejects.toThrow("non-negative safe integer");
+  await expect(buildHandler()("SEEK", "-1")).rejects.toThrow("non-negative safe integer");
   expect(fetchMock).not.toHaveBeenCalled();
 });
 
 test("unavailable debugging gives actionable setup instructions", async () => {
   fetchMock.mockRejectedValue(new Error("Connection refused"));
-  await expect(buildHandler()("play")).rejects.toThrow("--remote-debugging-port=9222");
+  await expect(buildHandler()("PLAY")).rejects.toThrow("--remote-debugging-port=9222");
 });
 
 test("non-YouTube pages, workers, and lookalike domains are excluded", async () => {
@@ -120,7 +123,7 @@ test("non-YouTube pages, workers, and lookalike domains are excluded", async () 
       target("not a URL"),
     ],
   });
-  await expect(buildHandler()("play")).rejects.toThrow("Open the YouTube app");
+  await expect(buildHandler()("PLAY")).rejects.toThrow("Open the YouTube app");
   expect(sockets).toHaveLength(0);
 });
 
@@ -137,7 +140,7 @@ test("several YouTube pages route the action only to the focused one", async () 
       },
     },
   });
-  await buildHandler()("mute");
+  await buildHandler()("MUTE");
   expect(sockets.map((s) => s.url)).toEqual(["ws://first", "ws://focused", "ws://focused"]);
   expect(sockets[0].requests).toHaveLength(1);
   expect(sockets.every((s) => s.close.mock.calls.length === 1)).toBe(true);
@@ -149,7 +152,7 @@ test("multiple unfocused pages do not receive a command", async () => {
     json: async () => [target(), target(undefined, "ws://second")],
   });
   replies = () => ({ id: 1, result: { result: { value: false } } });
-  await expect(buildHandler()("play")).rejects.toThrow("Focus the YouTube app");
+  await expect(buildHandler()("PLAY")).rejects.toThrow("Focus the YouTube app");
   expect(
     sockets.every((s) => s.requests.every((r) => r.params.expression === "document.hasFocus()")),
   ).toBe(true);
@@ -160,12 +163,12 @@ test("page failures propagate to Chord", async () => {
     id: 1,
     result: { result: { value: '{"ok":false,"error":"Captions unavailable"}' } },
   });
-  await expect(buildHandler()("captions")).rejects.toThrow("Captions unavailable");
+  await expect(buildHandler()("CAPTIONS")).rejects.toThrow("Captions unavailable");
 });
 
 test("protocol failures close the socket and propagate", async () => {
   replies = () => ({ id: 1, error: { message: "Runtime unavailable" } });
-  await expect(buildHandler()("play")).rejects.toThrow("Runtime unavailable");
+  await expect(buildHandler()("PLAY")).rejects.toThrow("Runtime unavailable");
   expect(sockets[0].close).toHaveBeenCalledOnce();
 });
 
@@ -176,14 +179,14 @@ test("runtime exceptions close the socket and propagate", async () => {
       exceptionDetails: { text: "Uncaught", exception: { description: "Error: player failed" } },
     },
   });
-  await expect(buildHandler()("play")).rejects.toThrow("player failed");
+  await expect(buildHandler()("PLAY")).rejects.toThrow("player failed");
   expect(sockets[0].close).toHaveBeenCalledOnce();
 });
 
 test("a stalled runtime times out and closes its socket", async () => {
   vi.useFakeTimers();
   replies = () => undefined;
-  const pending = buildHandler()("play");
+  const pending = buildHandler()("PLAY");
   const assertion = expect(pending).rejects.toThrow("did not respond");
   await vi.advanceTimersByTimeAsync(5000);
   await assertion;

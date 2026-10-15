@@ -7,6 +7,7 @@ This package owns `/ms`; `chords-dock` continues to provide monitor focusing.
 | Chord          | Result                                                          |
 | -------------- | --------------------------------------------------------------- |
 | `/ms1440x1728` | Set a 1440 × 1728 desktop                                       |
+| `/ms720x864`   | Set a 720 × 864 desktop                                         |
 | `/ms1920x1080` | Set a 1920 × 1080 desktop                                       |
 | `/ms0`         | Remove this package's virtual screens for the pointer's display |
 

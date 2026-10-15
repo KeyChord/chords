@@ -57,7 +57,7 @@ public enum MenuError: Error, CustomStringConvertible {
         case .ambiguousSearch(let query, let paths):
             return "Menu search \"\(query)\" is ambiguous: \(paths.joined(separator: ", ")). Include a menu path such as Window > Center."
         case .invalidAction(let action):
-            return "unknown menu action \"\(action)\" (expected \"by-index\", \"by-letters\", \"by-path\", or \"search\")"
+            return "unknown menu action \"\(action)\" (expected \"BY_INDEX\", \"BY_LETTERS\", \"BY_PATH\", or \"SEARCH\")"
         case .applicationNotFound(let name):
             return "application \"\(name)\" is not running and could not be launched"
         case .noFrontmostApplication:
@@ -433,14 +433,14 @@ public func runMenuAction(processName: String?, action: String, value: String) a
     let items = axChildren(menuBar)
 
     switch action {
-    case "search":
+    case "SEARCH":
         try searchMenu(items, query: value)
-    case "by-index":
+    case "BY_INDEX":
         guard let index = Int(value) else {
             throw MenuError.invalidIndex(value)
         }
         try clickTopLevelMenu(items, index: index)
-    case "by-letters":
+    case "BY_LETTERS":
         let query = normalize(value)
         if query.isEmpty {
             throw MenuError.emptyQuery
@@ -452,7 +452,7 @@ public func runMenuAction(processName: String?, action: String, value: String) a
         } else {
             try clickExpandedMenuItem(items, query: query)
         }
-    case "by-path":
+    case "BY_PATH":
         try clickMenuItem(items, path: try parseMenuPath(value))
     default:
         throw MenuError.invalidAction(action)

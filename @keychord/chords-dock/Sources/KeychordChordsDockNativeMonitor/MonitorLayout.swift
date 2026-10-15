@@ -27,9 +27,9 @@ struct MonitorLayout {
             distance($0, from: pointer) < distance($1, from: pointer)
         }!
         switch command {
-        case "previous": return (current + frames.count - 1) % frames.count
-        case "next": return (current + 1) % frames.count
-        case "left", "right", "up", "down":
+        case "PREVIOUS": return (current + frames.count - 1) % frames.count
+        case "NEXT": return (current + 1) % frames.count
+        case "LEFT", "RIGHT", "UP", "DOWN":
             let origin = frames[current]
             let candidates = frames.indices.filter { index in
                 guard index != current else { return false }
@@ -37,9 +37,9 @@ struct MonitorLayout {
                 let dy = frames[index].midY - origin.midY
                 // A slightly offset display above us is still above, not right.
                 switch command {
-                case "left": return dx < 0 && abs(dx) >= abs(dy)
-                case "right": return dx > 0 && abs(dx) >= abs(dy)
-                case "up": return dy < 0 && abs(dy) >= abs(dx)
+                case "LEFT": return dx < 0 && abs(dx) >= abs(dy)
+                case "RIGHT": return dx > 0 && abs(dx) >= abs(dy)
+                case "UP": return dy < 0 && abs(dy) >= abs(dx)
                 default: return dy > 0 && abs(dy) >= abs(dx)
                 }
             }

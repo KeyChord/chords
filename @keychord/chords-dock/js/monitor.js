@@ -26,7 +26,7 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 //#region src/js/monitor.ts
 var import__keychord_native_monitor = /* @__PURE__ */ __toESM((/* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const nativeRequire = createRequire(import.meta.url);
-	const nativeFiles = { "darwin-arm64": new URL("native/aarch64-apple-darwin/monitor/monitor-a9007df3ca30.node", import.meta.url).href };
+	const nativeFiles = { "darwin-arm64": new URL("native/aarch64-apple-darwin/monitor/monitor-c44ed8adad8b.node", import.meta.url).href };
 	const nativeTarget = process.platform + "-" + process.arch;
 	const nativeFile = nativeFiles[nativeTarget];
 	if (!nativeFile) throw new Error("[chord-native] monitor has no addon for " + nativeTarget);
@@ -46,14 +46,14 @@ function parseMonitorResolution(expression) {
 }
 function buildMonitorHandler() {
 	let pending = Promise.resolve();
-	return function monitor(target, action = "focus") {
+	return function monitor(target, action = "FOCUS") {
 		let operation;
 		try {
-			if (action === "size") {
+			if (action === "SIZE") {
 				const { width, height } = parseMonitorResolution(target);
 				operation = () => import__keychord_native_monitor.default.setMonitorResolution(width, height);
-			} else if (action === "focus") {
-				if (typeof target !== "string" || !/^(?:[1-9]\d*|previous|next|left|right|up|down)$/.test(target) || /^\d/.test(target) && !Number.isSafeInteger(Number(target))) throw new TypeError("Expected a positive monitor number or direction");
+			} else if (action === "FOCUS") {
+				if (typeof target !== "string" || !/^(?:[1-9]\d*|PREVIOUS|NEXT|LEFT|RIGHT|UP|DOWN)$/.test(target) || /^\d/.test(target) && !Number.isSafeInteger(Number(target))) throw new TypeError("Expected a positive monitor number or direction");
 				operation = () => import__keychord_native_monitor.default.focusMonitor(target);
 			} else throw new TypeError("Unknown monitor action");
 		} catch (error) {

@@ -26,7 +26,7 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 //#region src/js/tray.ts
 var import__keychord_native_menu = /* @__PURE__ */ __toESM((/* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const nativeRequire = createRequire(import.meta.url);
-	const nativeFiles = { "darwin-arm64": new URL("native/aarch64-apple-darwin/menu/menu-52fc8ee4dbd6.node", import.meta.url).href };
+	const nativeFiles = { "darwin-arm64": new URL("native/aarch64-apple-darwin/menu/menu-952e35ea9b83.node", import.meta.url).href };
 	const nativeTarget = process.platform + "-" + process.arch;
 	const nativeFile = nativeFiles[nativeTarget];
 	if (!nativeFile) throw new Error("[chord-native] menu has no addon for " + nativeTarget);
@@ -43,30 +43,30 @@ function parseMenuBarSelection(sequence) {
 	const match = /^([[\]]?)(-?)(0|[1-9][0-9]*)([lr]?)([[\]]*)([.,]?)$/.exec(sequence);
 	if (!match) return;
 	const [, prefix, fromEnd, digits, side, steps, click] = match;
-	const scope = prefix === "[" || !prefix && !fromEnd && digits === "0" && !side && !steps ? "menu" : "tray";
+	const scope = prefix === "[" || !prefix && !fromEnd && digits === "0" && !side && !steps ? "MENU" : "TRAY";
 	const count = Number(side ? digits : digits.at(-1));
 	const fromRight = side === "r" || !side && !!fromEnd;
-	if (!Number.isSafeInteger(count) || count === 0 && (fromRight || scope === "tray")) return;
+	if (!Number.isSafeInteger(count) || count === 0 && (fromRight || scope === "TRAY")) return;
 	return {
 		scope,
-		index: fromRight ? -count : scope === "tray" ? count - 1 : count,
+		index: fromRight ? -count : scope === "TRAY" ? count - 1 : count,
 		steps,
-		...click ? { clickType: click === "." ? "left" : "right" } : {}
+		...click ? { clickType: click === "." ? "LEFT" : "RIGHT" } : {}
 	};
 }
 function buildSelectionHandler() {
 	return async function select(trigger, sequence) {
 		const event = this?.event;
-		if (trigger === "input" && event) return;
-		if (trigger === "keydown" && (event?.type !== "keydown" || event.repeat)) return;
+		if (trigger === "INPUT" && event) return;
+		if (trigger === "KEYDOWN" && (event?.type !== "keydown" || event.repeat)) return;
 		const selection = parseMenuBarSelection(sequence);
 		if (!selection) {
 			if (/[.,]$/.test(sequence)) throw new RangeError("Select a valid menu bar index, or use a full index followed by l/r");
 			return;
 		}
 		if (selection.clickType) {
-			if (trigger === "keydown" && event?.key !== sequence.at(-1)) return;
-		} else if (trigger !== "keydown") return;
+			if (trigger === "KEYDOWN" && event?.key !== sequence.at(-1)) return;
+		} else if (trigger !== "KEYDOWN") return;
 		await runMenuBarAction(selection, this?.focusedAppId);
 	};
 }

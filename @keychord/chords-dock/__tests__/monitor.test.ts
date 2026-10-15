@@ -28,12 +28,12 @@ afterEach(() => {
 test.each([
   ["/m1", "1"],
   ["/m12", "12"],
-  ["/m[", "previous"],
-  ["/m]", "next"],
-  ["/ml", "left"],
-  ["/mr", "right"],
-  ["/mt", "up"],
-  ["/mb", "down"],
+  ["/m[", "PREVIOUS"],
+  ["/m]", "NEXT"],
+  ["/ml", "LEFT"],
+  ["/mr", "RIGHT"],
+  ["/mt", "UP"],
+  ["/mb", "DOWN"],
 ])("%s resolves one monitor action", async (input, expected) => {
   const native = vi.fn().mockResolvedValue(undefined);
   vi.doMock("../src/js/monitor.node", () => ({ default: { focusMonitor: native } }));
@@ -62,7 +62,7 @@ test("invalid targets never reach native code; native failures reject and the qu
   }
   expect(native).not.toHaveBeenCalled();
   await expect(handler("2")).rejects.toThrow("does not exist");
-  await handler("next");
+  await handler("NEXT");
   expect(native).toHaveBeenCalledTimes(2);
 });
 
@@ -80,8 +80,8 @@ test("monitor actions wait for the previous focus change before reading the poin
   vi.doMock("../src/js/monitor.node", () => ({ default: { focusMonitor: native } }));
   const { default: buildMonitorHandler } = await import("../src/js/monitor");
   const handler = buildMonitorHandler();
-  const first = handler("next");
-  const second = handler("next");
+  const first = handler("NEXT");
+  const second = handler("NEXT");
   await vi.waitFor(() => expect(native).toHaveBeenCalledTimes(1));
   finish();
   await Promise.all([first, second]);
@@ -150,7 +150,7 @@ test.each([
   const resolution = vi.fn().mockResolvedValue(undefined);
   vi.doMock("../src/js/monitor.node", () => ({ default: { setMonitorResolution: resolution } }));
   const { default: buildMonitorHandler } = await import("../src/js/monitor");
-  await expect(buildMonitorHandler()(expression, "size")).rejects.toThrow(TypeError);
+  await expect(buildMonitorHandler()(expression, "SIZE")).rejects.toThrow(TypeError);
   expect(resolution).not.toHaveBeenCalled();
 });
 
@@ -171,15 +171,15 @@ test("the native resolution API preserves the focus queue; /ms belongs to Better
   }));
   const { default: buildMonitorHandler } = await import("../src/js/monitor");
   const handler = buildMonitorHandler();
-  const first = handler("next");
-  const changing = handler("2000x200", "size");
+  const first = handler("NEXT");
+  const changing = handler("2000x200", "SIZE");
   const rejected = expect(changing).rejects.toThrow("Unsupported monitor resolution");
   await vi.waitFor(() => expect(focus).toHaveBeenCalledTimes(1));
   expect(resolution).not.toHaveBeenCalled();
   finish();
   await first;
   await rejected;
-  await handler("1920x1080", "size");
+  await handler("1920x1080", "SIZE");
   expect(resolution.mock.calls).toEqual([
     [2000, 200],
     [1920, 1080],

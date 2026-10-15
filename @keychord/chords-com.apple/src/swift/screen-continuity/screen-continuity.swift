@@ -1,5 +1,6 @@
 // iPhone Mirroring renders the phone in its main window. AX supplies that window's
-// geometry and connection state. Mouse input is shared through Rust's `chord.click`.
+// geometry and connection state. Device coordinates exclude its toolbar and bezel.
+// Mouse input is shared through Rust's `chord.click`.
 import AppKit
 import ApplicationServices
 import CoreGraphics
@@ -19,10 +20,25 @@ private struct ScreenBounds: Codable, Equatable {
     let width: Double
     let height: Double
     var windowId: UInt32 = 0
+    var windowBounds: WindowBounds?
 
     var rect: CGRect { CGRect(x: x, y: y, width: width, height: height) }
     var isValid: Bool {
         [x, y, width, height].allSatisfy(\.isFinite) && width >= 1 && height >= 1
+    }
+}
+
+private struct WindowBounds: Codable, Equatable {
+    let x: Double
+    let y: Double
+    let width: Double
+    let height: Double
+
+    init(_ rect: CGRect) {
+        x = rect.minX
+        y = rect.minY
+        width = rect.width
+        height = rect.height
     }
 }
 
@@ -128,15 +144,21 @@ private func screenBounds(_ element: AXUIElement, processIdentifier: pid_t) thro
               abs(frame.width - screen.width) < 1, abs(frame.height - screen.height) < 1,
               let id = window[kCGWindowNumber as String] as? UInt32 else { continue }
         // Match the exact AX phone window, even when other windows cover it.
-        // Use the WindowServer geometry for the shared click helper's expectedBounds check.
-        return ScreenBounds(x: frame.minX, y: frame.minY, width: frame.width, height: frame.height, windowId: id)
+        // Retain WindowServer geometry for routing, independently of the device viewport.
+        guard let device = deviceScreenRect(window: frame) else {
+            throw MirroringError("Could not determine the mirrored iPhone device bounds: invalid window geometry (\(frame))")
+        }
+        return ScreenBounds(x: device.minX, y: device.minY, width: device.width, height: device.height,
+                            windowId: id, windowBounds: WindowBounds(frame))
     }
     throw MirroringError("The mirrored iPhone window is not on-screen")
 }
 
 @MainActor
 private func validateScreenBounds(_ expected: ScreenBounds) throws {
-    guard expected.isValid, expected.windowId != 0 else { throw MirroringError("Invalid mirrored iPhone window") }
+    guard expected.isValid, expected.windowId != 0, expected.windowBounds != nil else {
+        throw MirroringError("Invalid mirrored iPhone window")
+    }
     let (app, application) = try mirroringApplication()
     let window = try screenWindow(application)
 

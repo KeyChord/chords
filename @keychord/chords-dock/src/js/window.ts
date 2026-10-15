@@ -13,13 +13,16 @@ export default function buildWindowHandler() {
       // Named axis chords intentionally pass the same action/capture pair. Chord's
       // entered input distinguishes width/height and X/Y after regex substitution.
       const axis = /^(?:\/)?(?:ws([wh])|wp([xy]))/.exec(this?.input ?? "");
-      if (axis && (action === "size" || action === "position")) {
+      if (axis && (action === "SIZE" || action === "POSITION")) {
         const { height: value } = parseWindowDimensions(action, `h${expression}`);
         request = JSON.stringify(
           axis[1] === "w" || axis[2] === "x" ? { width: value } : { height: value },
         );
       } else request = JSON.stringify(parseWindowDimensions(action, expression));
     } catch (error) {
+      if (error instanceof TypeError) {
+        error.message += ` (received ${JSON.stringify(this?.input ?? expression)})`;
+      }
       return Promise.reject(error);
     }
     const appId = this?.focusedAppId;

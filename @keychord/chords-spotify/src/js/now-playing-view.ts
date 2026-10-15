@@ -1,12 +1,12 @@
 export type SpotifyNowPlayingAction =
-  | "np-toggle"
-  | "np-hide"
-  | "np-expand"
-  | "np-minimize"
-  | "np-artwork"
-  | "np-canvas"
-  | "np-artist-image"
-  | "np-lyrics";
+  | "NP_TOGGLE"
+  | "NP_HIDE"
+  | "NP_EXPAND"
+  | "NP_MINIMIZE"
+  | "NP_ARTWORK"
+  | "NP_CANVAS"
+  | "NP_ARTIST_IMAGE"
+  | "NP_LYRICS";
 
 // Serialized into Spotify's renderer; keep every dependency inside this function.
 async function runInPage(action: SpotifyNowPlayingAction): Promise<string> {
@@ -78,7 +78,7 @@ async function runInPage(action: SpotifyNowPlayingAction): Promise<string> {
       );
     }
 
-    if (action === "np-hide" || action === "np-toggle") {
+    if (action === "NP_HIDE" || action === "NP_TOGGLE") {
       if (isOpen()) {
         // Clicking the cover in the expanded view only minimizes it. Collapse first,
         // then hide the sidebar so Toggle and Hide both reach the hidden state.
@@ -94,10 +94,10 @@ async function runInPage(action: SpotifyNowPlayingAction): Promise<string> {
         );
         return JSON.stringify({ ok: true });
       }
-      if (action === "np-hide") return JSON.stringify({ ok: true });
+      if (action === "NP_HIDE") return JSON.stringify({ ok: true });
     }
 
-    if (action === "np-minimize") {
+    if (action === "NP_MINIMIZE") {
       await collapse();
       return JSON.stringify({ ok: true });
     }
@@ -113,19 +113,19 @@ async function runInPage(action: SpotifyNowPlayingAction): Promise<string> {
         "Spotify did not open the Now Playing view.",
       );
     }
-    if (action === "np-toggle") return JSON.stringify({ ok: true });
+    if (action === "NP_TOGGLE") return JSON.stringify({ ok: true });
 
     if (!minimize()) {
       click(find('button[aria-label="Expand Now Playing view"]', panel()), "Expand");
       await waitFor(minimize, "Spotify did not expand the Now Playing view.");
     }
-    if (action === "np-expand") return JSON.stringify({ ok: true });
+    if (action === "NP_EXPAND") return JSON.stringify({ ok: true });
 
     const views = {
-      "np-artwork": ["artwork", "Artwork"],
-      "np-canvas": ["canvas", "Canvas"],
-      "np-artist-image": ["hero", "Artist image"],
-      "np-lyrics": ["lyrics", "Lyrics"],
+      NP_ARTWORK: ["artwork", "Artwork"],
+      NP_CANVAS: ["canvas", "Canvas"],
+      NP_ARTIST_IMAGE: ["hero", "Artist image"],
+      NP_LYRICS: ["lyrics", "Lyrics"],
     };
     const [value, label] = views[action];
     const selector = `[role="radiogroup"][aria-label="Media control options"] button[role="radio"][value="${value}"]`;
@@ -146,14 +146,14 @@ async function runInPage(action: SpotifyNowPlayingAction): Promise<string> {
 export function buildSpotifyNowPlayingJavaScript(action: SpotifyNowPlayingAction): string {
   if (
     ![
-      "np-toggle",
-      "np-hide",
-      "np-expand",
-      "np-minimize",
-      "np-artwork",
-      "np-canvas",
-      "np-artist-image",
-      "np-lyrics",
+      "NP_TOGGLE",
+      "NP_HIDE",
+      "NP_EXPAND",
+      "NP_MINIMIZE",
+      "NP_ARTWORK",
+      "NP_CANVAS",
+      "NP_ARTIST_IMAGE",
+      "NP_LYRICS",
     ].includes(action)
   ) {
     throw new Error(`Unknown Spotify action: ${action}`);

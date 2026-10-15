@@ -1,6 +1,6 @@
 # Project Environment
 
-Argent environment inspection (confirmed 2026-10-14) identified a TypeScript chord-package monorepo for macOS, including desktop Chromium apps. `is_react_native`, `is_native_ios`, and `is_native_android` are all false. There is no Metro server.
+Argent environment inspection (confirmed 2026-10-15) identified a TypeScript chord-package monorepo for macOS, including desktop Chromium apps. `is_react_native`, `is_native_ios`, and `is_native_android` are all false. There is no Metro server.
 
 Use Vite+ wrappers with pnpm@12.11.2: `vp install`, `vp check`, and `vp test`. Build all packages with `vp run build`, or a single package with `vp pack` in its directory. Bun and macOS VM checks are available through `vp run test:bun` and `vp run test:macos`. Chord's embedded runtime is available through the sibling `../Chord/apps/chord-tauri/chord` CLI.
 

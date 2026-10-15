@@ -2,7 +2,19 @@
 
 Prefer Bun APIs over `node:*` in Chord handlers and Bun scripts. Use `Bun.file` / `Bun.write` for file contents and copies, `Bun.spawn` / `Bun.spawnSync` for subprocesses, and Bun's URL helpers. Keep Node APIs for operations without a Bun equivalent or code that must run under Node, including Vite+ configuration and tests. Preserve failure handling, timeouts, permissions, and locking semantics.
 
+# Action identifiers
+
+Use `SCREAMING_SNAKE_CASE` for string constants that identify internal actions
+in every chord package, for example `CHAT_INFO` and `BY_PATH`. Keep handler
+dispatch, TOML arguments, native bridges, tests, and documentation consistent.
+Preserve external identifiers such as accessibility IDs, DOM selectors, app
+command IDs, URLs, and operating-system API values in their required spelling.
+
 # Version control
+
+GitHub Actions YAML in `.github/workflows/` is generated from `*.wac.ts` sources.
+Edit the TypeScript source and run `vp run workflows:build`; never hand-edit the
+generated YAML. `vp install` also regenerates it.
 
 This shared checkout uses colocated Jujutsu (`.jj/` alongside `.git/`), following
 Haniverse's workflow with `main` as the integration bookmark. Use `jj` for version

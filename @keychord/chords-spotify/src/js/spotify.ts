@@ -8,7 +8,7 @@ export type SpotifyAction =
   | SpotifyTrackAction
   | SpotifyBarAction
   | SpotifyNowPlayingAction
-  | "liked-songs";
+  | "LIKED_SONGS";
 
 export default function buildHandler(port = 9223) {
   if (!Number.isInteger(port) || port < 1 || port > 65535) {

@@ -114,8 +114,9 @@ In TOML chord keys, only parenthesized sections use regex syntax; all surroundin
 
 Some packages (`chords-menu`, `chords-web`, `chords-com.apple`)
 ship NodeSwift addons built from `src/swift/`. They can only be compiled on
-macOS, so the built `.node` files are committed and CI syncs them to the
-mirrors as-is; CI builds the JS only, via `CHORD_SKIP_NATIVE=1`.
+macOS, so the built `.node` files are committed. Mirrors copy all committed
+files, including JS and native artifacts, as-is. Build and commit generated
+handlers before pushing changes to their source.
 
 A pre-commit hook formats staged JS, TS, TSX, and JSON files. Native artifact
 checks are manual because rebuilding addons can be slow. To enable the hooks
@@ -136,22 +137,30 @@ To check native artifacts manually, run `vp run native:check`.
 
 ## Repository mirrors
 
-Each `@keychord/*/package.json` declares its mirror destination using
-`repository.url`:
+Every directory `@keychord/<name>` automatically mirrors to
+`https://github.com/KeyChord/<name>`, including private workspace packages such as
+`chordtest`. No list or manifest opt-in is required, and `repository.url` does not
+control mirroring. Missing repositories are created as public repositories.
 
-```json
-{
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/KeyChord/chords-menu"
-  }
-}
-```
+`KeyChord/chords` is the source of truth. The Sync workflow force-replaces each
+mirror's `main` with an independent snapshot of the committed package directory;
+mirror-only commits and files are discarded. Uncommitted files, local build
+outputs and `node_modules` never enter a snapshot. Committed executable modes
+and symlinks are preserved. Replaying the same source produces the same commit.
+Tags on the source commit named `<name>-js-v<version>` are force-synced as
+`v<version>` even on a repeat run. Older mirror release tags are retained.
 
-The Sync workflow discovers these manifests and mirrors each package directory
-to its declared GitHub repository. URLs may end in `.git`. Packages without
-`repository.url` are skipped; invalid URLs fail the sync. Adding a package only
-requires setting its URL, with no separate mirror list to maintain.
+Mirrors are read-only distribution repositories: contribute changes here.
+The workflow sets their description and homepage to point here and disables
+issues, projects, discussions and wikis. It runs on every push to `main`, hourly
+to repair drift, and through manual dispatch. Runs are serialized and always
+check out the latest `main`. There is no sync from a mirror back into this repo.
+
+The existing `ORG_KEYCHORD_BOT_PAT` Actions secret must have permission to create
+public repositories in the KeyChord organization, push (including force pushes)
+to all mirrors, and update repository settings. A classic PAT needs `public_repo`
+(or `repo`); organization policies must also permit repository creation and force
+pushes. Newly created mirrors must be accessible to the same token.
 
 Mirror tooling lives in two private workspace packages under
 `packages/dev/improve/chords/configs/mirrors`:
@@ -161,7 +170,19 @@ Mirror tooling lives in two private workspace packages under
   repository root to inspect destinations.
 - `@chord/dev.improve.chords.configs.mirrors.sync` in `sync/` depends on the list
   package and provides the `_sync-mirrors` command. The Sync workflow calls it
-  through the root `mirrors:sync` script.
+  through the root `mirrors:sync` script. With `CI` unset, it creates temporary
+  local snapshots without contacting GitHub or changing package directories:
+
+  ```sh
+  env -u CI BUILD_BASE="$PWD/@keychord" GITHUB_REF=refs/heads/main GITHUB_SHA=HEAD vp run mirrors:sync
+  ```
+
+The workflow is authored in
+`packages/dev/improve/chords/configs/mirrors/sync/sync.wac.ts`, using
+`github-actions-workflow-ts` as in Haniverse. Run `vp run workflows:build` after
+editing it and commit the generated `.github/workflows/sync.yml`. `vp install`
+also regenerates workflows through the root postinstall. Do not edit generated
+YAML directly; the workflow checks that regeneration leaves it unchanged.
 
 The native artifact checker lives in `packages/dev/improve/chords/configs/native`.
 All three tooling packages run TypeScript directly on Node.js 22.18 or newer.

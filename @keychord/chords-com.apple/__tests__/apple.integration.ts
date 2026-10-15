@@ -11,6 +11,6 @@ const tap = buildScreenContinuityHandler();
 // Exercise repeated MainActor completions after Safari's separate Node-API
 // environment has disabled NodeSwift's single-environment fallback queue.
 for (let round = 0; round < 100; round++) {
-  await assert.rejects(tap("20b5"), /iPhone Mirroring/);
+  await assert.rejects(tap("=20bi"), /iPhone Mirroring/);
 }
 console.log("apple-native-validation-ok");

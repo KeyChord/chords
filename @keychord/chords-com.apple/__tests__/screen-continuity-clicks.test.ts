@@ -2,7 +2,14 @@ import { afterEach, beforeEach, expect, test, vi } from "vite-plus/test";
 import { click, mouse } from "chord";
 import { openScreenContinuityAddon } from "../src/js/utils/screen-continuity-native";
 
-const bounds = { x: -100, y: 200, width: 300, height: 600, windowId: 123 };
+const bounds = {
+  x: -92,
+  y: 238,
+  width: 284,
+  height: 554,
+  windowId: 123,
+  windowBounds: { x: -100, y: 200, width: 300, height: 600 },
+};
 const points = [
   { x: 50, y: 780 },
   { x: -70, y: 500 },
@@ -71,10 +78,101 @@ test("a disconnected or changed screen stops before sending any input", async ()
   expect(click).not.toHaveBeenCalled();
 });
 
+test("edge taps retain their small inset and window-local routing", async () => {
+  vi.useFakeTimers();
+  const action = openScreenContinuityAddon().clickPoints(
+    JSON.stringify({
+      bounds,
+      points: [
+        { x: bounds.x, y: bounds.y },
+        { x: bounds.x + bounds.width - 1, y: bounds.y + bounds.height - 1 },
+      ],
+    }),
+  );
+  await vi.runAllTimersAsync();
+  await action;
+  expect(click).toHaveBeenNthCalledWith(1, {
+    windowId: 123,
+    x: 10,
+    y: 40,
+    expectedBounds: bounds.windowBounds,
+    moveCursor: true,
+  });
+  expect(click).toHaveBeenNthCalledWith(2, {
+    windowId: 123,
+    x: 290,
+    y: 590,
+    expectedBounds: bounds.windowBounds,
+    moveCursor: true,
+  });
+});
+
+test("hover reaches raw device boundaries without tap insets", async () => {
+  vi.useFakeTimers();
+  const action = openScreenContinuityAddon().clickPoints(
+    JSON.stringify({
+      bounds,
+      hover: true,
+      points: [
+        { x: bounds.x, y: bounds.y, click: "MOVE" },
+        { x: bounds.x + bounds.width, y: bounds.y + bounds.height, click: "MOVE" },
+      ],
+    }),
+  );
+  await vi.runAllTimersAsync();
+  await action;
+  expect(click).not.toHaveBeenCalled();
+  expect(mouse).toHaveBeenNthCalledWith(2, {
+    action: "move",
+    windowId: 123,
+    x: 8,
+    y: 38,
+    expectedBounds: bounds.windowBounds,
+  });
+  expect(mouse).toHaveBeenNthCalledWith(3, {
+    action: "move",
+    windowId: 123,
+    x: 292,
+    y: 592,
+    expectedBounds: bounds.windowBounds,
+  });
+});
+
+test("hover only moves the pointer and releases an earlier held drag first", async () => {
+  vi.useFakeTimers();
+  const action = openScreenContinuityAddon().clickPoints(
+    JSON.stringify({ bounds, points, hover: true }),
+  );
+  await vi.runAllTimersAsync();
+  await action;
+  expect(click).not.toHaveBeenCalled();
+  expect(vi.mocked(mouse).mock.calls.map(([options]) => options.action)).toEqual([
+    "up",
+    "move",
+    "move",
+    "up",
+  ]);
+  expect(mouse).toHaveBeenNthCalledWith(2, {
+    action: "move",
+    windowId: 123,
+    x: 150,
+    y: 580,
+    expectedBounds: bounds.windowBounds,
+  });
+  expect(mouse).toHaveBeenNthCalledWith(3, {
+    action: "move",
+    windowId: 123,
+    x: 30,
+    y: 300,
+    expectedBounds: bounds.windowBounds,
+  });
+  expect(geometry.validateScreenBounds).toHaveBeenCalledTimes(2);
+});
+
 test("a long press holds for the UIKit default duration and the next point is a normal tap", async () => {
   vi.useFakeTimers();
   const action = openScreenContinuityAddon().clickPoints(
-    JSON.stringify({ bounds, points: [{ ...points[0], click: "long" }, points[1]] }),
+    JSON.stringify({ bounds, points: [{ ...points[0], click: "LONG" }, points[1]] }),
   );
   await vi.runAllTimersAsync();
   await action;
@@ -110,8 +208,8 @@ test("tap drags reuse native mouse down/movement/release with connection checks"
     JSON.stringify({
       bounds,
       points: [
-        { ...points[0], click: "drag" },
-        { ...points[1], click: "drag" },
+        { ...points[0], click: "DRAG" },
+        { ...points[1], click: "DRAG" },
       ],
     }),
   );
@@ -135,8 +233,8 @@ test("a disconnected tap screen still releases a drag before rejecting", async (
     JSON.stringify({
       bounds,
       points: [
-        { ...points[0], click: "drag" },
-        { ...points[1], click: "drag", hold: true },
+        { ...points[0], click: "DRAG" },
+        { ...points[1], click: "DRAG", hold: true },
       ],
     }),
   );

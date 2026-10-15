@@ -1,14 +1,14 @@
 export type YouTubeAction =
-  | "search"
-  | "seek"
-  | "play"
-  | "pause"
-  | "mute"
-  | "autoplay"
-  | "captions"
-  | "settings"
-  | "theater"
-  | "fullscreen";
+  | "SEARCH"
+  | "SEEK"
+  | "PLAY"
+  | "PAUSE"
+  | "MUTE"
+  | "AUTOPLAY"
+  | "CAPTIONS"
+  | "SETTINGS"
+  | "THEATER"
+  | "FULLSCREEN";
 
 // This function is serialized into the page. Keep it independent of module scope.
 function runInPage(action: YouTubeAction, seconds?: number): string {
@@ -17,7 +17,7 @@ function runInPage(action: YouTubeAction, seconds?: number): string {
       throw new Error("The active Brave window is not YouTube.");
     }
 
-    if (action === "search") {
+    if (action === "SEARCH") {
       const input = document.querySelector<HTMLInputElement>('input[name="search_query"]');
       if (!input) throw new Error("The YouTube search field is unavailable.");
       input.focus();
@@ -36,7 +36,7 @@ function runInPage(action: YouTubeAction, seconds?: number): string {
     if (!player || !video) throw new Error("Open a YouTube video before using video chords.");
 
     switch (action) {
-      case "seek": {
+      case "SEEK": {
         if (!Number.isSafeInteger(seconds) || seconds! < 0) {
           throw new Error("Seek time must be a non-negative safe integer.");
         }
@@ -50,7 +50,7 @@ function runInPage(action: YouTubeAction, seconds?: number): string {
         else video.currentTime = target;
         break;
       }
-      case "play":
+      case "PLAY":
         if (player.playVideo) player.playVideo();
         else if (video.paused) {
           const button = player.querySelector<HTMLButtonElement>(".ytp-play-button");
@@ -58,18 +58,18 @@ function runInPage(action: YouTubeAction, seconds?: number): string {
           button.click();
         }
         break;
-      case "pause":
+      case "PAUSE":
         if (player.pauseVideo) player.pauseVideo();
         else video.pause();
         break;
       default: {
         const selectors = {
-          mute: ".ytp-mute-button",
-          autoplay: ".ytp-autonav-toggle-button",
-          captions: ".ytp-subtitles-button",
-          settings: ".ytp-settings-button",
-          theater: ".ytp-size-button",
-          fullscreen: ".ytp-fullscreen-button",
+          MUTE: ".ytp-mute-button",
+          AUTOPLAY: ".ytp-autonav-toggle-button",
+          CAPTIONS: ".ytp-subtitles-button",
+          SETTINGS: ".ytp-settings-button",
+          THEATER: ".ytp-size-button",
+          FULLSCREEN: ".ytp-fullscreen-button",
         };
         const button = player.querySelector<HTMLElement>(selectors[action]);
         if (
@@ -80,7 +80,7 @@ function runInPage(action: YouTubeAction, seconds?: number): string {
           getComputedStyle(button).display === "none" ||
           getComputedStyle(button).visibility === "hidden"
         ) {
-          throw new Error(`The ${action} control is unavailable for this video.`);
+          throw new Error(`The ${action.toLowerCase()} control is unavailable for this video.`);
         }
         button.click();
       }
@@ -94,22 +94,22 @@ function runInPage(action: YouTubeAction, seconds?: number): string {
 export function buildYouTubeJavaScript(action: YouTubeAction, seconds?: string | number): string {
   if (
     ![
-      "search",
-      "seek",
-      "play",
-      "pause",
-      "mute",
-      "autoplay",
-      "captions",
-      "settings",
-      "theater",
-      "fullscreen",
+      "SEARCH",
+      "SEEK",
+      "PLAY",
+      "PAUSE",
+      "MUTE",
+      "AUTOPLAY",
+      "CAPTIONS",
+      "SETTINGS",
+      "THEATER",
+      "FULLSCREEN",
     ].includes(action)
   ) {
     throw new Error(`Unknown YouTube action: ${action}`);
   }
   let target: number | undefined;
-  if (action === "seek") {
+  if (action === "SEEK") {
     if (typeof seconds === "string" && !/^\d+$/.test(seconds)) {
       throw new Error("Seek time must be a non-negative safe integer.");
     }

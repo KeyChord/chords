@@ -7,15 +7,15 @@ let window: Window;
 let clicks: string[];
 let seeks: number[];
 const controls: [SpotifyBarAction, string, string][] = [
-  ["bar-previous", "control-button-skip-back", "Previous"],
-  ["bar-next", "control-button-skip-forward", "Next"],
-  ["bar-repeat", "control-button-repeat", "Enable repeat"],
-  ["bar-lyrics", "lyrics-button", "Lyrics"],
-  ["bar-queue", "control-button-queue", "Queue"],
-  ["bar-connect", "", "Connect to a device"],
-  ["bar-miniplayer", "pip-toggle-button", "Open Miniplayer"],
-  ["bar-fullscreen", "fullscreen-mode-button", "Enter Full screen"],
-  ["bar-shuffle", "", "Enable Shuffle for Ninajirachi Popular"],
+  ["BAR_PREVIOUS", "control-button-skip-back", "Previous"],
+  ["BAR_NEXT", "control-button-skip-forward", "Next"],
+  ["BAR_REPEAT", "control-button-repeat", "Enable repeat"],
+  ["BAR_LYRICS", "lyrics-button", "Lyrics"],
+  ["BAR_QUEUE", "control-button-queue", "Queue"],
+  ["BAR_CONNECT", "", "Connect to a device"],
+  ["BAR_MINIPLAYER", "pip-toggle-button", "Open Miniplayer"],
+  ["BAR_FULLSCREEN", "fullscreen-mode-button", "Enter Full screen"],
+  ["BAR_SHUFFLE", "", "Enable Shuffle for Ninajirachi Popular"],
 ];
 
 beforeEach(() => {
@@ -78,7 +78,7 @@ test.each(controls)("%s clicks its Now Playing control without needing a playlis
 });
 
 test("Play and Halt request explicit states, including repeated invocations", () => {
-  for (const action of ["bar-play", "bar-play", "bar-halt", "bar-halt"] as const) {
+  for (const action of ["BAR_PLAY", "BAR_PLAY", "BAR_HALT", "BAR_HALT"] as const) {
     expect(run(action)).toEqual({ ok: true });
   }
   expect(clicks).toEqual(["Play", "Pause"]);
@@ -88,14 +88,14 @@ test("an unknown playback state fails without toggling", () => {
   window.document
     .querySelector('[data-testid="control-button-playpause"]')!
     .setAttribute("aria-label", "Loading");
-  expect(run("bar-play").error).toContain("determine Spotify's playback state");
+  expect(run("BAR_PLAY").error).toContain("determine Spotify's playback state");
   expect(clicks).toEqual([]);
 });
 
 test.each([
-  ["bar-shuffle", "Disable Shuffle"],
-  ["bar-miniplayer", "Close Miniplayer"],
-  ["bar-fullscreen", "Exit full screen"],
+  ["BAR_SHUFFLE", "Disable Shuffle"],
+  ["BAR_MINIPLAYER", "Close Miniplayer"],
+  ["BAR_FULLSCREEN", "Exit full screen"],
 ] as const)("%s supports the control's enabled label", (action, label) => {
   const control = controls.find(([candidate]) => candidate === action)!;
   window.document
@@ -122,20 +122,20 @@ test.each(["disabled", "aria-disabled", "hidden", "display", "visibility", "miss
       default:
         button.setAttribute(reason, reason === "aria-disabled" ? "true" : "");
     }
-    expect(run("bar-next").error).toContain("Next control is unavailable");
+    expect(run("BAR_NEXT").error).toContain("Next control is unavailable");
     expect(clicks).toEqual([]);
   },
 );
 
 test("controls outside a hidden Now Playing bar cannot satisfy a bar command", () => {
   window.document.querySelector('[data-testid="now-playing-bar"]')!.setAttribute("hidden", "");
-  expect(run("bar-play").error).toContain("Now Playing bar is unavailable");
+  expect(run("BAR_PLAY").error).toContain("Now Playing bar is unavailable");
   expect(clicks).toEqual([]);
 });
 
 test("a missing bar does not use a playlist's play button", () => {
   window.document.querySelector('[data-testid="now-playing-bar"]')!.remove();
-  expect(run("bar-play").ok).toBe(false);
+  expect(run("BAR_PLAY").ok).toBe(false);
   expect(clicks).toEqual([]);
 });
 
@@ -145,7 +145,7 @@ test.each([
   "https://xpui.app.spotify.com.example.com",
 ])("unrelated renderers are not modified (%s)", (url) => {
   window.location.href = url;
-  expect(run("bar-next").error).toBe("The selected page is not the Spotify desktop app.");
+  expect(run("BAR_NEXT").error).toBe("The selected page is not the Spotify desktop app.");
   expect(clicks).toEqual([]);
 });
 
@@ -154,7 +154,7 @@ test.each([
   ["37", 37],
   ["999", 230],
 ])("Scrub %s seeks to an exact second, clamping beyond the track's end", (seconds, target) => {
-  expect(run("bar-scrub", seconds)).toEqual({ ok: true });
+  expect(run("BAR_SCRUB", seconds)).toEqual({ ok: true });
   expect(seeks).toHaveLength(1);
   expect(seeks[0]).toBeCloseTo(target as number);
   expect(
@@ -166,7 +166,7 @@ test("Scrub respects a right-to-left progress bar", () => {
   window.document
     .querySelector('[data-testid="playback-progressbar"] [data-testid="progress-bar"]')!
     .setAttribute("style", "direction: rtl");
-  expect(run("bar-scrub", 37)).toEqual({ ok: true });
+  expect(run("BAR_SCRUB", 37)).toEqual({ ok: true });
   expect(seeks[0]).toBeCloseTo(37);
 });
 
@@ -174,7 +174,7 @@ test.each(["0", "", "NaN", "Infinity"])("Scrub rejects an unseekable duration %s
   window.document
     .querySelector('[data-testid="playback-progressbar"] input')!
     .setAttribute("max", max);
-  expect(run("bar-scrub", 37).ok).toBe(false);
+  expect(run("BAR_SCRUB", 37).ok).toBe(false);
   expect(seeks).toEqual([]);
 });
 
@@ -182,7 +182,7 @@ test("Scrub fails if the progress control is disabled", () => {
   window.document
     .querySelector('[data-testid="playback-progressbar"] input')!
     .setAttribute("disabled", "");
-  expect(run("bar-scrub", 37).error).toContain("Scrub control is unavailable");
+  expect(run("BAR_SCRUB", 37).error).toContain("Scrub control is unavailable");
   expect(seeks).toEqual([]);
 });
 
@@ -191,7 +191,7 @@ test("Scrub fails if the progress bar has no visible geometry", () => {
     '[data-testid="playback-progressbar"] [data-testid="progress-bar"]',
   )!;
   Object.assign(slider, { getBoundingClientRect: () => ({ width: 0, height: 0 }) });
-  expect(run("bar-scrub", 37).error).toContain("progress bar is not visible");
+  expect(run("BAR_SCRUB", 37).error).toContain("progress bar is not visible");
   expect(seeks).toEqual([]);
 });
 
@@ -207,7 +207,7 @@ test.each([
   -1,
   Number.MAX_SAFE_INTEGER + 1,
 ])("invalid scrub input %s fails before generating page code", (seconds) => {
-  expect(() => buildSpotifyJavaScript("bar-scrub", seconds)).toThrow("non-negative safe integer");
+  expect(() => buildSpotifyJavaScript("BAR_SCRUB", seconds)).toThrow("non-negative safe integer");
 });
 
 test("unknown bar commands fail before generating page code", () => {

@@ -1,8 +1,8 @@
-name = "Vivaldi"
+name = 'Vivaldi'
 
 [on.js]
 file = 'chrome.js'
 args = ['/Applications/Vivaldi.app']
 
 [[import]]
-file = "base.toml"
+file = 'base.toml'

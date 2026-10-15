@@ -1,8 +1,8 @@
-name = "Brave"
+name = 'Brave'
 
 [on.js]
-file = "chrome.js"
+file = 'chrome.js'
 args = ['/Applications/Brave.app']
 
 [[import]]
-file = "base.toml"
+file = 'base.toml'

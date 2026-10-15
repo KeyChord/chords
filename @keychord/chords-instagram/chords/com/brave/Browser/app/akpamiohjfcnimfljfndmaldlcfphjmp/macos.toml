@@ -1,29 +1,29 @@
-name = "Instagram"
+name = 'Instagram'
 
 [on.instagram]
 file = 'instagram.js'
 
 [chords]
-'?g' = { name = "Goto" }
-'gh' = { name = "Goto: Home", '@input:instagram' = ['HOME'] }
-'gr' = { name = "Goto: Reels", '@input:instagram' = ['REELS'] }
-'gm' = { name = "Goto: Messages", '@input:instagram' = ['MESSAGES'] }
-'gs' = { name = "Goto: Search", '@input:instagram' = ['SEARCH'] }
-'gc' = { name = "Goto: Create", '@input:instagram' = ['CREATE'] }
-'gp' = { name = "Goto: Profile", '@input:instagram' = ['PROFILE'] }
+'?g' = { name = 'Goto' }
+'gh' = { name = 'Goto: Home', '@input:instagram' = ['HOME'] }
+'gr' = { name = 'Goto: Reels', '@input:instagram' = ['REELS'] }
+'gm' = { name = 'Goto: Messages', '@input:instagram' = ['MESSAGES'] }
+'gs' = { name = 'Goto: Search', '@input:instagram' = ['SEARCH'] }
+'gc' = { name = 'Goto: Create', '@input:instagram' = ['CREATE'] }
+'gp' = { name = 'Goto: Profile', '@input:instagram' = ['PROFILE'] }
 
-'?h' = { name = "Home" }
-'?hs' = { name = "Home: Stories" }
+'?h' = { name = 'Home' }
+'?hs' = { name = 'Home: Stories' }
 
-'?hs.' = { name = "Home: Stories > Click" }
-'hs.(\d+)' = { name = "Home: Stories > Click @ #", '@input:instagram' = ['STORY', '$1'] }
+'?hs.' = { name = 'Home: Stories > Click' }
+'hs.(\d+)' = { name = 'Home: Stories > Click @ #', '@input:instagram' = ['STORY', '$1'] }
 
-'?hsr' = { name = "Home: Stories > Reply" }
-'hsr(\d+)' = { name = "Home: Stories > Reply @ #", '@input:instagram' = ['STORY_REPLY', '$1'] }
+'?hsr' = { name = 'Home: Stories > Reply' }
+'hsr(\d+)' = { name = 'Home: Stories > Reply @ #', '@input:instagram' = ['STORY_REPLY', '$1'] }
 
-'?p' = { name = "Profile" }
-'?pa' = { name = "Profile: Avatar" }
-'pa.' = { name = "Profile: Avatar > Click", '@input:instagram' = ['AVATAR'] }
-'?pan' = { name = "Profile: Avatar > Note" }
-'pan' = { name = "Profile: Avatar > Note", '@input:instagram' = ['NOTE'] }
-'panx' = { name = "Profile: Avatar > Note > Close", '@input:instagram' = ['CLOSE_NOTE'] }
+'?p' = { name = 'Profile' }
+'?pa' = { name = 'Profile: Avatar' }
+'pa.' = { name = 'Profile: Avatar > Click', '@input:instagram' = ['AVATAR'] }
+'?pan' = { name = 'Profile: Avatar > Note' }
+'pan' = { name = 'Profile: Avatar > Note', '@input:instagram' = ['NOTE'] }
+'panx' = { name = 'Profile: Avatar > Note > Close', '@input:instagram' = ['CLOSE_NOTE'] }

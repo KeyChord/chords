@@ -1,17 +1,17 @@
-name = "Mouse"
+name = 'Mouse'
 
 [on.click]
 file = 'click.js'
 
 [chords]
-'?.' = { name = "Click" }
+'?.' = { name = 'Click' }
 
-'?..' = { name = "Double Click" }
-'?.,' = { name = "Right Click" }
-'?.;' = { name = "Middle Click" }
-'?.-' = { name = "Drag" }
-'?.,-' = { name = "Right Drag" }
-'?.;-' = { name = "Middle Drag" }
-'?.=' = { name = "Move Mouse" }
-'?./' = { name = "Global Mouse" }
-'.([.,;=/0-9-].*)' = { name = "Mouse", '@input:click' = ['$1', 'command'] }
+'?..' = { name = 'Double Click' }
+'?.,' = { name = 'Right Click' }
+'?.;' = { name = 'Middle Click' }
+'?.-' = { name = 'Drag' }
+'?.,-' = { name = 'Right Drag' }
+'?.;-' = { name = 'Middle Drag' }
+'?.=' = { name = 'Move Mouse' }
+'?./' = { name = 'Global Mouse' }
+'.([.,;=/0-9-].*)' = { name = 'Mouse', '@input:click' = ['$1', 'COMMAND'] }

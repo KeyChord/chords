@@ -205,9 +205,9 @@ private func resizeWindow(_ window: AXUIElement, to target: CGSize, at origin: C
 
 @MainActor
 private func runWindowAction(bundleId: String?, action: String, request: String) async throws {
-    guard ["size", "position", "frame", "preset"].contains(action) else { throw WindowError("Unknown window action") }
+    guard ["SIZE", "POSITION", "FRAME", "PRESET"].contains(action) else { throw WindowError("Unknown window action") }
     let dimensions = try JSONDecoder().decode(Dimensions.self, from: Data(request.utf8))
-    guard dimensions.width != nil || dimensions.height != nil || dimensions.preset != nil || (action == "frame" && dimensions.left != nil && dimensions.top != nil) else {
+    guard dimensions.width != nil || dimensions.height != nil || dimensions.preset != nil || (action == "FRAME" && dimensions.left != nil && dimensions.top != nil) else {
         throw WindowError("Expected window dimensions")
     }
     guard AXIsProcessTrusted() else { throw WindowError("Accessibility permission is required to manage windows") }
@@ -228,11 +228,11 @@ private func runWindowAction(bundleId: String?, action: String, request: String)
         throw WindowError("Could not read the target window's bounds")
     }
     let screen = try screenBounds(for: CGRect(origin: position, size: size))
-    if action == "preset" {
+    if action == "PRESET" {
         guard let preset = dimensions.preset, let frame = windowPresetFrame(preset, window: CGRect(origin: position, size: size), screen: screen) else {
             throw WindowError("Unknown window preset")
         }
-        let resizing = ["horizontal", "vertical", "fill"].contains(preset)
+        let resizing = ["HORIZONTAL", "VERTICAL", "FILL"].contains(preset)
         try requireSettable(window, kAXPositionAttribute)
         if resizing { try requireSettable(window, kAXSizeAttribute) }
         position = frame.origin
@@ -244,7 +244,7 @@ private func runWindowAction(bundleId: String?, action: String, request: String)
     }
     let horizontal = try dimensions.width?.resolve(screen.width)
     let vertical = try dimensions.height?.resolve(screen.height)
-    if action == "frame" {
+    if action == "FRAME" {
         guard let left = dimensions.left, let top = dimensions.top else { throw WindowError("Expected left and top offsets") }
         size = CGSize(width: horizontal ?? size.width, height: vertical ?? size.height)
         guard size.width > 0, size.height > 0 else { throw WindowError("Window sizes must be positive") }
@@ -262,10 +262,10 @@ private func runWindowAction(bundleId: String?, action: String, request: String)
         else { try await verifyPosition(window, expected: position) }
         return
     }
-    let name = action == "size" ? kAXSizeAttribute : kAXPositionAttribute
+    let name = action == "SIZE" ? kAXSizeAttribute : kAXPositionAttribute
     try requireSettable(window, name)
     let value: AXValue?
-    if action == "size" {
+    if action == "SIZE" {
         size = CGSize(width: horizontal ?? size.width, height: vertical ?? size.height)
         guard size.width > 0, size.height > 0 else { throw WindowError("Window sizes must be positive") }
         try await resizeWindow(window, to: size, at: position, screen: screen)

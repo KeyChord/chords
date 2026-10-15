@@ -18,6 +18,8 @@ type Virtual = {
   name: string;
   resolution: string;
   connected: boolean;
+  requestedResolution?: string;
+  hiDPI?: boolean;
   mirror?: string;
 };
 
@@ -47,6 +49,8 @@ function betterDisplay() {
         tagID: String(next++),
         name: value("virtualScreenName")!,
         resolution: value("resolutionList")!,
+        requestedResolution: value("resolutionList")!,
+        hiDPI: true,
         connected: false,
       });
       return "";
@@ -84,12 +88,23 @@ function betterDisplay() {
     if (!entry) throw missing();
     if (operation === "get") {
       if (args.includes("--resolution")) return entry.resolution;
-      if (args.includes("--connected")) return entry.connected ? "on" : "off";
+      if (args.includes("--hiDPI")) return entry.hiDPI ? "on,on" : "off,off";
+      if (args.includes("--connected")) return entry.connected ? "on,on" : "off,off";
       if (args.includes("--mirror"))
         return entry.connected && entry.mirror === value("targetUUID") ? "on" : "off";
     }
     if (operation === "set") {
-      if (value("connected")) entry.connected = value("connected") === "on";
+      if (value("connected")) {
+        entry.connected = value("connected") === "on";
+        // Match the real 720x864 failure: reconnect initially selects the
+        // doubled LoDPI desktop, despite the requested HiDPI mode existing.
+        if (entry.connected && entry.requestedResolution === "720x864") {
+          entry.resolution = "1440x1728";
+          entry.hiDPI = false;
+        }
+      }
+      if (value("resolution")) entry.resolution = value("resolution")!;
+      if (value("hiDPI")) entry.hiDPI = value("hiDPI") === "on";
       if (value("mirror") === "on") entry.mirror = value("targetUUID");
       return "";
     }
@@ -184,27 +199,41 @@ test("switching from a custom mirror to a native mode removes only this display'
   expect(state.screens.map((entry) => entry.tagID)).toEqual(["10", "11"]);
 });
 
-test("a failed replacement removes the new screen, restores the previous mirror, and allows another command", async () => {
+test("a small virtual desktop explicitly selects HiDPI instead of its doubled startup mode", async () => {
   const state = betterDisplay();
-  const handler = createMonitorHandler(state.command);
-  await handler("1440x1728");
-  const previous = state.screens[2];
-  const original = state.command.getMockImplementation()!;
-  let fail = true;
-  state.command.mockImplementation(async (args) => {
-    if (fail && args.includes("--mirror=on") && !args.includes(`--tagID=${previous.tagID}`)) {
-      fail = false;
-      throw new Error("Mirroring unavailable");
-    }
-    return original(args);
-  });
-  await expect(handler("2000x200")).rejects.toThrow("Mirroring unavailable");
-  expect(state.resolution()).toBe("1440x1728");
-  expect(state.screens).toHaveLength(3);
-  expect(state.screens[2]).toBe(previous);
-  await handler("1920x1200");
-  expect(state.resolution()).toBe("1920x1200");
+  await createMonitorHandler(state.command)("720x864");
+  expect(state.resolution()).toBe("720x864");
+  expect(state.screens[2].hiDPI).toBe(true);
+  const selection = state.command.mock.calls.find(([args]) =>
+    args.includes("--resolution=720x864"),
+  )![0];
+  expect(selection).toContain("--hiDPI=on");
 });
+
+test.each(["1440x1728", "720x864"])(
+  "a failed replacement restores %s, including its mode after reconnection",
+  async (previousResolution) => {
+    const state = betterDisplay();
+    const handler = createMonitorHandler(state.command);
+    await handler(previousResolution);
+    const previous = state.screens[2];
+    const original = state.command.getMockImplementation()!;
+    let fail = true;
+    state.command.mockImplementation(async (args) => {
+      if (fail && args.includes("--mirror=on") && !args.includes(`--tagID=${previous.tagID}`)) {
+        fail = false;
+        throw new Error("Mirroring unavailable");
+      }
+      return original(args);
+    });
+    await expect(handler("2000x200")).rejects.toThrow("Mirroring unavailable");
+    expect(state.resolution()).toBe(previousResolution);
+    expect(state.screens).toHaveLength(3);
+    expect(state.screens[2]).toBe(previous);
+    await handler("1920x1200");
+    expect(state.resolution()).toBe("1920x1200");
+  },
+);
 
 test("service failures are not interpreted as a missing virtual screen", async () => {
   const state = betterDisplay();

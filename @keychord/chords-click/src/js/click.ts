@@ -36,13 +36,13 @@ export async function clickPoints(
               y: point.y - y,
               expectedBounds: { x, y, width, height },
             };
-      const drag = point.click?.endsWith("drag");
-      if (drag || point.click === "move") {
+      const drag = point.click?.endsWith("DRAG");
+      if (drag || point.click === "MOVE") {
         usedMouse = true;
         const button =
-          point.click === "right-drag"
+          point.click === "RIGHT_DRAG"
             ? "right"
-            : point.click === "middle-drag"
+            : point.click === "MIDDLE_DRAG"
               ? "middle"
               : "left";
         if (drag && held !== button) {
@@ -59,9 +59,11 @@ export async function clickPoints(
         const options = {
           ...target,
           moveCursor: true,
-          ...(point.click === "right" || point.click === "middle" ? { button: point.click } : {}),
-          ...(point.click === "double" ? { clickCount: 2 as const } : {}),
-          ...(point.click === "long" ? { pressDurationMs: 500 } : {}),
+          ...(point.click === "RIGHT" || point.click === "MIDDLE"
+            ? { button: point.click === "RIGHT" ? ("right" as const) : ("middle" as const) }
+            : {}),
+          ...(point.click === "DOUBLE" ? { clickCount: 2 as const } : {}),
+          ...(point.click === "LONG" ? { pressDurationMs: 500 } : {}),
         };
         if (windowId === undefined) {
           const { moveCursor: _, ...globalOptions } = options;
@@ -106,25 +108,25 @@ export default function buildClickHandler(bundleId?: string) {
   return function click(
     this: ClickHandlerContext | void,
     sequence: string,
-    defaultClick: Exclude<ClickKind, "long"> | "command" = "left",
+    defaultClick: Exclude<ClickKind, "LONG"> | "COMMAND" = "LEFT",
   ): Promise<void> {
     // Capture the invocation context before waiting for a previous sequence to finish.
     const appId = bundleId ?? this?.focusedAppId;
     let positions: ReturnType<typeof parseClickSequence>;
     let global = false;
     try {
-      if (defaultClick === "command") {
+      if (defaultClick === "COMMAND") {
         ({ positions, global } = parseMouseCommand(sequence));
       } else if (
         ![
-          "left",
-          "right",
-          "middle",
-          "double",
-          "drag",
-          "right-drag",
-          "middle-drag",
-          "move",
+          "LEFT",
+          "RIGHT",
+          "MIDDLE",
+          "DOUBLE",
+          "DRAG",
+          "RIGHT_DRAG",
+          "MIDDLE_DRAG",
+          "MOVE",
         ].includes(defaultClick)
       ) {
         throw new TypeError("Unknown default click type");

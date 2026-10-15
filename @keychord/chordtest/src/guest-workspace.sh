@@ -9,7 +9,11 @@ rsync -a --delete --exclude=node_modules --exclude=.git --exclude=.jj '/Volumes/
 ln -sfn "$HOME/chords-workspace" "$HOME/chords"
 
 cd "$HOME/chords-workspace"
-vp install --frozen-lockfile
+# The root postinstall loads @keychord/config before its sibling dependencies
+# exist in a fresh VM. Install both dependency trees before running that hook.
+vp install --frozen-lockfile --ignore-scripts
 cd "$HOME/config"
 vp install --frozen-lockfile
 vp pack
+cd "$HOME/chords-workspace"
+vp run workflows:build
