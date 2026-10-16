@@ -1,5 +1,7 @@
 import AppKit
+import AXorcistRuntime
 import ApplicationServices
+import ChordNodeSupport
 import Foundation
 import NodeAPI
 
@@ -9,7 +11,10 @@ private struct WhatsAppError: Error, CustomStringConvertible {
 }
 
 private struct Request: Decodable, Sendable {
-    enum Kind: String, Decodable, Sendable { case menu = "MENU", element = "ELEMENT", chat = "CHAT", grid = "GRID" }
+    enum Kind: String, Decodable, Sendable {
+        case menu = "MENU", element = "ELEMENT", chat = "CHAT", grid = "GRID"
+        case device = "DEVICE", dismissPopover = "DISMISS_POPOVER"
+    }
     let kind: Kind
     let scope: String?
     let identifiers: [String]?
@@ -40,16 +45,10 @@ private struct Selector: Decodable, Sendable {
     },
 ])
 
+// Keep AXChildren order: numbered chats and palette positions follow the displayed order.
 @MainActor
-private func attribute(_ element: AXUIElement, _ name: String) -> CFTypeRef? {
-    var value: CFTypeRef?
-    AXUIElementCopyAttributeValue(element, name as CFString, &value)
-    return value
-}
-
-@MainActor
-private func children(_ element: AXUIElement) -> [AXUIElement] {
-    attribute(element, kAXChildrenAttribute) as? [AXUIElement] ?? []
+private func children(_ element: Element) -> [Element] {
+    (element.attribute(Attribute<[AXUIElement]>(kAXChildrenAttribute)) ?? []).map(Element.init)
 }
 
 // WhatsApp prefixes menu identifiers and titles with direction markers.
@@ -63,17 +62,17 @@ private func clean(_ value: String) -> String {
 }
 
 @MainActor
-private func find(_ root: AXUIElement, matching: @MainActor (AXUIElement) -> Bool) throws -> [AXUIElement] {
-    var results: [AXUIElement] = []
-    var visited: [AXUIElement] = []
-    @MainActor func walk(_ element: AXUIElement, depth: Int) throws {
+private func find(_ root: Element, matching: @MainActor (Element) -> Bool) throws -> [Element] {
+    var results: [Element] = []
+    var visited: [Element] = []
+    @MainActor func walk(_ element: Element, depth: Int) throws {
         guard depth < 30 else { return }
-        for seen in visited { if CFEqual(seen, element) { return } }
+        guard !visited.contains(element) else { return }
         guard visited.count < 5000 else { throw WhatsAppError("accessibility tree is too large") }
         visited.append(element)
         if matching(element) { results.append(element) }
         // Action discovery never needs message history.
-        if clean(attribute(element, kAXIdentifierAttribute) as? String ?? "") == "ChatMessagesTableView" { return }
+        if clean(element.identifier() ?? "") == "ChatMessagesTableView" { return }
         for child in children(element) { try walk(child, depth: depth + 1) }
     }
     try walk(root, depth: 0)
@@ -81,20 +80,29 @@ private func find(_ root: AXUIElement, matching: @MainActor (AXUIElement) -> Boo
 }
 
 @MainActor
-private func select(_ root: AXUIElement, request: Request) throws -> AXUIElement? {
+private func select(_ root: Element, request: Request) throws -> Element? {
     let matches = try find(root) { element in
-        let identifier = clean(attribute(element, kAXIdentifierAttribute) as? String ?? "")
-        let title = clean(attribute(element, kAXTitleAttribute) as? String ?? "")
-        let description = clean(attribute(element, kAXDescriptionAttribute) as? String ?? "")
-        if let role = request.role, attribute(element, kAXRoleAttribute) as? String != role { return false }
+        let identifier = clean(element.identifier() ?? "")
+        let title = clean(element.title() ?? "")
+        let description = clean(element.descriptionText() ?? "")
+        if let role = request.role, element.role() != role { return false }
         return request.identifiers?.contains(identifier) == true
             || (request.titlePrefix.map { title.hasPrefix($0) } ?? false)
             || (request.description.map { description == $0 || description.hasPrefix($0 + ",") || title == $0 || title.hasPrefix($0 + ",") } ?? false)
             || (request.descriptionPrefix.map { description.hasPrefix($0) || title.hasPrefix($0) } ?? false)
     }
-    let enabled = matches.filter { (attribute($0, kAXEnabledAttribute) as? Bool) != false }
+    let enabled = matches.filter { ($0.isEnabled()) != false }
     let label = request.identifiers?.joined(separator: "/") ?? request.titlePrefix ?? request.description ?? "control"
     guard !matches.isEmpty else { return nil }
+    if let index = request.index {
+        guard index > 0, index <= matches.count else { throw WhatsAppError("\(label) #\(index) is unavailable") }
+        let windows = matches.compactMap { $0.attribute(Attribute<AXUIElement>(kAXWindowAttribute)).map(Element.init) }
+        guard windows.count == matches.count, let window = windows.first,
+              windows.allSatisfy({ $0 == window }) else { throw WhatsAppError("\(label) is ambiguous across windows") }
+        let target = matches[index - 1]
+        guard target.isEnabled() != false else { throw WhatsAppError("\(label) #\(index) is disabled") }
+        return target
+    }
     guard !enabled.isEmpty else { throw WhatsAppError("\(label) is disabled in the current context") }
     guard enabled.count == 1 else { throw WhatsAppError("\(label) is ambiguous (\(enabled.count) controls)") }
     return enabled[0]
@@ -130,14 +138,14 @@ private func activate(_ bundleId: String) async throws -> NSRunningApplication {
 }
 
 @MainActor
-private func contains(_ application: AXUIElement, selectors: [Selector]) throws -> Bool {
+private func contains(_ application: Element, selectors: [Selector]) throws -> Bool {
     for selector in selectors {
         let matches = try find(application) { element in
-            if let role = selector.role, attribute(element, kAXRoleAttribute) as? String != role { return false }
-            let identifier = clean(attribute(element, kAXIdentifierAttribute) as? String ?? "")
-            let description = clean(attribute(element, kAXDescriptionAttribute) as? String ?? "")
-            let title = clean(attribute(element, kAXTitleAttribute) as? String ?? "")
-            let value = clean(attribute(element, kAXValueAttribute) as? String ?? "")
+            if let role = selector.role, element.role() != role { return false }
+            let identifier = clean(element.identifier() ?? "")
+            let description = clean(element.descriptionText() ?? "")
+            let title = clean(element.title() ?? "")
+            let value = clean(element.attribute(Attribute<String>(kAXValueAttribute)) ?? "")
             return selector.identifiers?.contains(identifier) == true || (selector.description.map { description == $0 || title == $0 || value == $0 } ?? false)
         }
         if !matches.isEmpty { return true }
@@ -146,39 +154,34 @@ private func contains(_ application: AXUIElement, selectors: [Selector]) throws 
 }
 
 @MainActor
-private func frame(_ element: AXUIElement) throws -> CGRect {
-    guard let position = attribute(element, kAXPositionAttribute), CFGetTypeID(position) == AXValueGetTypeID(),
-          let size = attribute(element, kAXSizeAttribute), CFGetTypeID(size) == AXValueGetTypeID() else { throw WhatsAppError("control has no accessible bounds") }
-    var origin = CGPoint.zero
-    var extent = CGSize.zero
-    guard AXValueGetValue(unsafeDowncast(position, to: AXValue.self), .cgPoint, &origin),
-          AXValueGetValue(unsafeDowncast(size, to: AXValue.self), .cgSize, &extent),
-          origin.x.isFinite, origin.y.isFinite, extent.width.isFinite, extent.height.isFinite,
-          extent.width > 0, extent.height > 0 else { throw WhatsAppError("control is not visible") }
-    return CGRect(origin: origin, size: extent)
+private func frame(_ element: Element) throws -> CGRect {
+    guard let frame = element.frame() else { throw WhatsAppError("control has no accessible bounds") }
+    guard frame.origin.x.isFinite, frame.origin.y.isFinite, frame.width.isFinite, frame.height.isFinite,
+          frame.width > 0, frame.height > 0 else { throw WhatsAppError("control is not visible") }
+    return frame
 }
 
 @MainActor
-private func gridControl(_ application: AXUIElement, request: Request) throws -> AXUIElement? {
+private func gridControl(_ application: Element, request: Request) throws -> Element? {
     guard let row = request.row, let column = request.column, (1...9).contains(row), (1...9).contains(column) else {
         throw WhatsAppError("palette position must be row,column (1–9)")
     }
     // Palette buttons have a value describing the colour/image. Navigation
     // buttons can share the label, but do not have a value.
     let controls = try find(application) {
-        attribute($0, kAXRoleAttribute) as? String == kAXButtonRole
-            && (clean(attribute($0, kAXDescriptionAttribute) as? String ?? "") == request.description
-                || clean(attribute($0, kAXTitleAttribute) as? String ?? "") == request.description)
-            && !clean(attribute($0, kAXValueAttribute) as? String ?? "").isEmpty
+        $0.role() == kAXButtonRole
+            && (clean($0.descriptionText() ?? "") == request.description
+                || clean($0.title() ?? "") == request.description)
+            && !clean($0.attribute(Attribute<String>(kAXValueAttribute)) ?? "").isEmpty
     }
     if controls.isEmpty { return nil }
-    let windows = controls.compactMap { attribute($0, kAXWindowAttribute) }
-    guard let window = windows.first, windows.allSatisfy({ CFEqual($0, window) }) else { throw WhatsAppError("palette is ambiguous across windows") }
+    let windows = controls.compactMap { $0.attribute(Attribute<AXUIElement>(kAXWindowAttribute)).map(Element.init) }
+    guard let window = windows.first, windows.allSatisfy({ $0 == window }) else { throw WhatsAppError("palette is ambiguous across windows") }
     let positioned = try controls.map { ($0, try frame($0)) }.sorted {
         if $0.1.midY != $1.1.midY { return $0.1.midY < $1.1.midY }
         return $0.1.midX < $1.1.midX
     }
-    var rows: [[(AXUIElement, CGRect)]] = []
+    var rows: [[(Element, CGRect)]] = []
     for control in positioned {
         if let last = rows.last, abs(last[0].1.midY - control.1.midY) <= 2 {
             rows[rows.count - 1].append(control)
@@ -186,61 +189,106 @@ private func gridControl(_ application: AXUIElement, request: Request) throws ->
     }
     guard rows.count >= row, rows[row - 1].count >= column else { throw WhatsAppError("palette row \(row), column \(column) is unavailable") }
     let target = rows[row - 1].sorted { $0.1.midX < $1.1.midX }[column - 1].0
-    guard (attribute(target, kAXEnabledAttribute) as? Bool) != false else { throw WhatsAppError("palette control is disabled") }
+    guard (target.isEnabled()) != false else { throw WhatsAppError("palette control is disabled") }
+    return target
+}
+
+private let deviceSections = ["Camera", "Microphone", "Speaker"]
+
+@MainActor
+private func label(_ element: Element) -> String {
+    [element.descriptionText(), element.title(), element.attribute(Attribute<String>(kAXValueAttribute))]
+        .compactMap { $0.map(clean) }.first { !$0.isEmpty } ?? ""
+}
+
+@MainActor
+private func deviceControl(_ application: Element, request: Request) throws -> Element? {
+    guard let section = request.description, deviceSections.contains(section),
+          let index = request.index, index > 0 else { throw WhatsAppError("invalid device choice") }
+    let popovers = try find(application) { $0.role() == "AXPopover" }
+    var choices: [[Element]] = []
+    for popover in popovers {
+        let elements = try find(popover) { _ in true }
+        var currentSection: String?
+        var controls: [Element] = []
+        for element in elements {
+            if element.role() == "AXHeading" {
+                // Catalyst headings can carry their label on a child heading/text.
+                currentSection = try find(element) { deviceSections.contains(label($0)) }.first.map(label)
+            } else if currentSection == section, element.role() == kAXStaticTextRole,
+                      !label(element).isEmpty, !deviceSections.contains(label(element)) {
+                controls.append(element)
+            }
+        }
+        if !controls.isEmpty { choices.append(controls) }
+    }
+    guard !choices.isEmpty else { return nil }
+    guard choices.count == 1 else { throw WhatsAppError("\(section) choices are ambiguous across popovers") }
+    guard index <= choices[0].count else { throw WhatsAppError("\(section) #\(index) is unavailable") }
+    let target = choices[0][index - 1]
+    guard target.isEnabled() != false else { throw WhatsAppError("\(section) #\(index) is disabled") }
     return target
 }
 
 @MainActor
 private func perform(bundleId: String, requests: [Request]) async throws -> String {
-    guard AXIsProcessTrusted() else { throw WhatsAppError("Chord needs Accessibility permission") }
+    guard AXPermissionHelpers.hasAccessibilityPermissions() else { throw WhatsAppError("Chord needs Accessibility permission") }
     let app = try await activate(bundleId)
-    let application = AXUIElementCreateApplication(app.processIdentifier)
-    AXUIElementSetMessagingTimeout(application, 2)
+    let application = AXApp(app).element
+    application.setMessagingTimeout(2)
     for (index, request) in requests.enumerated() {
         let deadline = Date(timeIntervalSinceNow: 2)
-        var target: AXUIElement?
-        while target == nil {
+        var target: Element?
+        search: while target == nil {
             // Navigation animations can finish after AXPress returns. Recheck
             // page guards while waiting so a newly opened page can skip a step.
             if let selectors = request.onlyIfAny, try !contains(application, selectors: selectors) { break }
             if let selectors = request.unlessAny, try contains(application, selectors: selectors) { break }
             if let identifier = request.unlessIdentifier,
-               !(try find(application) { clean(attribute($0, kAXIdentifierAttribute) as? String ?? "") == identifier }).isEmpty { break }
+               !(try find(application) { clean($0.identifier() ?? "") == identifier }).isEmpty { break }
             guard !app.isTerminated else { throw WhatsAppError("application exited during the action") }
             switch request.kind {
+            case .dismissPopover:
+                let popovers = try find(application) { $0.role() == "AXPopover" }.filter {
+                    try contains($0, selectors: deviceSections.map { Selector(identifiers: nil, description: $0, role: nil) })
+                }
+                guard popovers.count <= 1 else { throw WhatsAppError("multiple call device popovers are open") }
+                target = popovers.first
+                if target == nil { break search }
             case .menu:
-                if let value = attribute(application, kAXMenuBarAttribute), CFGetTypeID(value) == AXUIElementGetTypeID() {
-                    let bar = unsafeDowncast(value, to: AXUIElement.self)
+                if let bar = application.menuBar() {
                     guard let scope = request.scope else { throw WhatsAppError("missing menu scope") }
-                    let menus = children(bar).filter { clean(attribute($0, kAXIdentifierAttribute) as? String ?? "") == scope }
+                    let menus = children(bar).filter { clean($0.identifier() ?? "") == scope }
                     if menus.count == 1 { target = try select(menus[0], request: request) }
                 }
             case .element:
                 if let scope = request.scope {
-                    let roots = try find(application) { clean(attribute($0, kAXIdentifierAttribute) as? String ?? "") == scope }
+                    let roots = try find(application) { clean($0.identifier() ?? "") == scope }
                     guard roots.count <= 1 else { throw WhatsAppError("ambiguous UI scope \(scope)") }
                     if let root = roots.first {
-                        if request.scopeParent == true, let parent = attribute(root, kAXParentAttribute), CFGetTypeID(parent) == AXUIElementGetTypeID() {
-                            target = try select(unsafeDowncast(parent, to: AXUIElement.self), request: request)
+                        if request.scopeParent == true, let parent = root.parent() {
+                            target = try select(parent, request: request)
                         } else { target = try select(root, request: request) }
                     }
                 } else { target = try select(application, request: request) }
             case .chat:
-                guard let index = request.index, (1...9).contains(index) else { throw WhatsAppError("chat index must be between 1 and 9") }
-                let tables = try find(application) { clean(attribute($0, kAXIdentifierAttribute) as? String ?? "") == "ChatListView_TableView" }
+                guard let index = request.index, index > 0 else { throw WhatsAppError("chat index must be positive") }
+                let tables = try find(application) { clean($0.identifier() ?? "") == "ChatListView_TableView" }
                 guard tables.count <= 1 else { throw WhatsAppError("multiple chat lists are open") }
                 if let table = tables.first {
                     // Catalyst exposes loaded chat rows as direct buttons. Filter/archive
                     // cells are containers and must not shift the numbered chat positions.
                     let rows = children(table).filter {
-                        attribute($0, kAXRoleAttribute) as? String == kAXButtonRole
-                            && !clean(attribute($0, kAXIdentifierAttribute) as? String ?? "").hasPrefix("ChatListView_")
+                        $0.role() == kAXButtonRole
+                            && !clean($0.identifier() ?? "").hasPrefix("ChatListView_")
                     }
                     guard rows.count >= index else { throw WhatsAppError("chat #\(index) is not loaded; scroll the chat list into view") }
                     target = rows[index - 1]
                 }
             case .grid:
                 target = try gridControl(application, request: request)
+            case .device:
+                target = try deviceControl(application, request: request)
             }
             if target == nil {
                 guard Date() < deadline else {
@@ -251,24 +299,30 @@ private func perform(bundleId: String, requests: [Request]) async throws -> Stri
             }
         }
         guard let target else { continue }
-        var actions: CFArray?
-        AXUIElementCopyActionNames(target, &actions)
-        if request.click == true || (actions as? [String])?.contains(kAXPressAction) != true {
+        if request.kind == .dismissPopover {
+            guard target.isActionSupported(kAXCancelAction) else { throw WhatsAppError("device popover cannot be dismissed; close it first") }
+            try target.performAction(kAXCancelAction)
+            continue
+        }
+        if request.click == true || !target.isActionSupported(kAXPressAction) {
             guard request.kind != .menu, index == requests.count - 1 else { throw WhatsAppError("control has no press action") }
             return try clickTarget(target, processId: app.processIdentifier)
         }
         // Never retry a dispatched press: AX cannotComplete can mean the callback
         // ran even though its reply timed out.
-        let error = AXUIElementPerformAction(target, kAXPressAction as CFString)
-        guard error == .success else { throw WhatsAppError("control invocation failed (AX \(error.rawValue))") }
+        do {
+            try target.performAction(.press)
+        } catch let error as AccessibilitySystemError {
+            throw WhatsAppError("control invocation failed (AX \(error.axError.rawValue))")
+        }
     }
     return ""
 }
 
 @MainActor
-private func clickTarget(_ element: AXUIElement, processId: pid_t) throws -> String {
-    guard let window = attribute(element, kAXWindowAttribute), CFGetTypeID(window) == AXUIElementGetTypeID() else { throw WhatsAppError("control has no containing window") }
-    let bounds = try frame(unsafeDowncast(window, to: AXUIElement.self))
+private func clickTarget(_ element: Element, processId: pid_t) throws -> String {
+    guard let window = element.attribute(Attribute<AXUIElement>(kAXWindowAttribute)).map(Element.init) else { throw WhatsAppError("control has no containing window") }
+    let bounds = try frame(window)
     let control = try frame(element)
     let point = CGPoint(x: control.midX, y: control.midY)
     guard point.x.isFinite, point.y.isFinite, bounds.contains(point) else { throw WhatsAppError("control is outside the visible window; scroll it into view") }

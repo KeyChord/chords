@@ -35,7 +35,10 @@ test("all existing executable chords go through the WhatsApp handler", async () 
   );
   expect(definitions.on).toEqual({ whatsapp: { file: "whatsapp.js" } });
   const handler = buildWhatsAppHandler();
-  const bindings = Object.entries(definitions.chords).filter(([chord]) => !chord.startsWith("?"));
+  const bindings = Object.entries(definitions.chords).filter(
+    ([chord, binding]) =>
+      !chord.startsWith("?") && Object.keys(binding as object).some((key) => key !== "name"),
+  );
   expect(bindings.map(([chord]) => chord).sort()).toEqual(
     cases.map((scenario) => scenario.chord).sort(),
   );
@@ -60,7 +63,7 @@ test.each(cases)(
     expect(perform).toHaveBeenCalled();
     for (const [app, json] of perform.mock.calls) {
       expect(app).toBe("net.whatsapp.WhatsApp");
-      expect(JSON.parse(json)[0].kind).toMatch(/^(MENU|ELEMENT|CHAT|GRID)$/);
+      expect(JSON.parse(json)[0].kind).toMatch(/^(MENU|ELEMENT|CHAT|GRID|DEVICE|DISMISS_POPOVER)$/);
     }
   },
 );
@@ -121,10 +124,12 @@ test("commands wait for completion and continue after a rejected action", async 
   expect(perform).toHaveBeenCalledTimes(2);
 });
 
-test.each([undefined, 0, 10, -1, 1.5, "01", "1junk"])(
+test.each([undefined, 0, -1, 1.5, "01", "1junk", "9007199254740992", Infinity, NaN])(
   "invalid chat index %s performs no action",
   async (index) => {
-    await expect(buildWhatsAppHandler()("CHAT_SWITCH", index)).rejects.toThrow("between 1 and 9");
+    await expect(buildWhatsAppHandler()("CHAT_SWITCH", index)).rejects.toThrow(
+      "positive safe integer",
+    );
     expect(perform).not.toHaveBeenCalled();
   },
 );
@@ -132,13 +137,28 @@ test.each([undefined, 0, 10, -1, 1.5, "01", "1junk"])(
 test("chat index validation and unknown actions never poison the queue", async () => {
   const handler = buildWhatsAppHandler();
   await expect(handler("toString" as WhatsAppAction)).rejects.toThrow("Unknown WhatsApp action");
-  for (let index = 1; index <= 9; index++) {
+  for (const index of [1, 9, 10, 12, 123, Number.MAX_SAFE_INTEGER]) {
     await handler("CHAT_SWITCH", String(index));
     expect(JSON.parse(perform.mock.lastCall![1]).at(-1)).toEqual({
       kind: "CHAT",
       index,
     });
   }
+});
+
+test.each([
+  "CALL_CAMERA_SELECT",
+  "CALL_MICROPHONE_SELECT",
+  "CALL_SPEAKER_SELECT",
+  "CALL_REACTION_SELECT",
+] as const)("%s rejects invalid choices before opening any controls", async (action) => {
+  const handler = buildWhatsAppHandler();
+  for (const position of [undefined, 0, -1, 1.5, "01", "2junk", "9007199254740992"]) {
+    await expect(handler(action, position)).rejects.toThrow("positive safe integer");
+  }
+  expect(perform).not.toHaveBeenCalled();
+  await handler(action, "12");
+  expect(JSON.parse(perform.mock.lastCall![1])[0].index).toBe(12);
 });
 
 test("Profile and Mute navigate to UI controls without key events", async () => {

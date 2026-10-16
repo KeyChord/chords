@@ -11,5 +11,9 @@
     "@keychord/tsconfig": "catalog:",
     "@types/bun": "latest"
   },
-  "packageManager": "pnpm@12.11.2"
+  "packageManager": "pnpm@12.11.2",
+  "dependencies": {
+    "p-wait-for": "^6.0.0",
+    "uuid": "^14.0.3"
+  }
 }

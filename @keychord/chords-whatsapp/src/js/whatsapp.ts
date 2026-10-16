@@ -3,7 +3,7 @@ import { click, getAppWindows, type WindowBounds } from "chord";
 
 type Selector = { identifiers?: string[]; description?: string; role?: string };
 type Request = {
-  kind: "MENU" | "ELEMENT" | "CHAT" | "GRID";
+  kind: "MENU" | "ELEMENT" | "CHAT" | "GRID" | "DEVICE" | "DISMISS_POPOVER";
   scope?: string;
   identifiers?: string[];
   titlePrefix?: string;
@@ -34,6 +34,34 @@ const element = (identifier: string, role?: string): Request => ({
   identifiers: [identifier],
   ...(role ? { role } : {}),
 });
+const callButton = (description: string): Request => ({
+  kind: "ELEMENT",
+  description,
+  role: "AXButton",
+  click: true,
+});
+const reactionButtons = "ReactionsTray_ReactionButton";
+const reactions: Request[] = [
+  { kind: "DISMISS_POPOVER" },
+  { ...callButton("reaction"), unlessIdentifier: reactionButtons },
+];
+function devicePath(section: "Camera" | "Microphone" | "Speaker", index: number): Request[] {
+  const unlessAny = [{ description: section }];
+  return [
+    { kind: "DISMISS_POPOVER", unlessAny },
+    {
+      ...callButton(section === "Camera" ? "Video device selection" : "Audio device selection"),
+      unlessAny,
+    },
+    { kind: "DEVICE", description: section, index },
+  ];
+}
+function positiveIndex(value: number | string | undefined, label: string): number {
+  if (!/^[1-9]\d*$/.test(String(value)) || !Number.isSafeInteger(Number(value))) {
+    throw new TypeError(`WhatsApp ${label} must be a positive safe integer`);
+  }
+  return Number(value);
+}
 const info: Request = {
   ...menu(chat, "contact_info", "group_info"),
   unlessIdentifier: "contact-info-view-content-stack-view",
@@ -153,6 +181,14 @@ const actions = {
   CHAT_SEARCH: menu(chat, "search_chat"),
   CHAT_VIDEO_CALL: menu(chat, "video_call"),
   CHAT_VOICE_CALL: menu(chat, "voice_call"),
+  CHAT_OPEN_WINDOW: [
+    {
+      ...element("NavigationBar_MoreButton", "AXButton"),
+      click: true,
+      unlessAny: [{ description: "Open in new window", role: "AXMenuItem" }],
+    },
+    { kind: "ELEMENT", description: "Open in new window", role: "AXMenuItem" },
+  ],
   CHAT_NEW: menu(file, "new_chat"),
   CHAT_PIN: menu(chat, "pin", "unpin"),
   CHAT_ARCHIVE: menu(chat, "archive", "unarchive"),
@@ -186,6 +222,11 @@ const actions = {
   CALL_PARTICIPANTS: menu(call, "show_participants", "hide_participants"),
   CALL_END: menu(call, "end_call"),
   CALL_ALWAYS_ON_TOP: menu(call, "always_on_top"),
+  CALL_DECLINE: element("CallUI_DeclineButton", "AXButton"),
+  CALL_ACCEPT: element("CallUI_AcceptButton", "AXButton"),
+  CALL_REACTIONS: reactions,
+  CALL_ADD_PEOPLE: callButton("Add people"),
+  CALL_CHAT: callButton("Chat"),
   INPUT_EMOJI: menu(chat, "send_emoji"),
   INPUT_GIF: menu(chat, "send_gifs"),
   INPUT_STICKER: menu(chat, "send_stickers"),
@@ -197,6 +238,10 @@ const actions = {
 export type WhatsAppAction =
   | keyof typeof actions
   | "CHAT_SWITCH"
+  | "CALL_CAMERA_SELECT"
+  | "CALL_MICROPHONE_SELECT"
+  | "CALL_SPEAKER_SELECT"
+  | "CALL_REACTION_SELECT"
   | "CHAT_INFO_THEME_BUBBLE_SELECT"
   | "CHAT_INFO_THEME_WALLPAPER_SELECT";
 
@@ -205,14 +250,49 @@ export default function buildWhatsAppHandler(bundleId = "net.whatsapp.WhatsApp")
   return function whatsapp(action: WhatsAppAction, index?: number | string): Promise<void> {
     let request: Request | Request[];
     if (action === "CHAT_SWITCH") {
-      if (!/^[1-9]$/.test(String(index))) {
-        return Promise.reject(new TypeError("WhatsApp chat index must be between 1 and 9"));
+      let position: number;
+      try {
+        position = positiveIndex(index, "chat index");
+      } catch (error) {
+        return Promise.reject(error);
       }
       request = [
         menu("com.apple.menu.application", "open_main_window"),
         menu(view, "chats"),
-        { kind: "CHAT", index: Number(index) },
+        { kind: "CHAT", index: position },
       ];
+    } else if (
+      action === "CALL_CAMERA_SELECT" ||
+      action === "CALL_MICROPHONE_SELECT" ||
+      action === "CALL_SPEAKER_SELECT" ||
+      action === "CALL_REACTION_SELECT"
+    ) {
+      let position: number;
+      try {
+        position = positiveIndex(index, "call choice");
+      } catch (error) {
+        return Promise.reject(error);
+      }
+      request =
+        action === "CALL_REACTION_SELECT"
+          ? [
+              ...reactions,
+              {
+                ...element(reactionButtons, "AXButton"),
+                identifiers: [reactionButtons, "ReactionsTray_PlusSign"],
+                scope: "Calling_Window",
+                index: position,
+                click: true,
+              },
+            ]
+          : devicePath(
+              action === "CALL_CAMERA_SELECT"
+                ? "Camera"
+                : action === "CALL_MICROPHONE_SELECT"
+                  ? "Microphone"
+                  : "Speaker",
+              position,
+            );
     } else if (
       action === "CHAT_INFO_THEME_BUBBLE_SELECT" ||
       action === "CHAT_INFO_THEME_WALLPAPER_SELECT"

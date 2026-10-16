@@ -1,0 +1,16 @@
+name = 'macOS Monitors'
+
+[on.monitor]
+file = 'monitor.js'
+
+[chords]
+# Monitors (focus a display without moving windows)
+'?/m' = { name = 'Monitors' }
+'?/m"#"' = { name = 'Monitor: Focus #' }
+'/m([1-9]\d*)' = { name = 'Monitor: Focus $1', '@input:monitor' = ['$1'] }
+'/m[' = { name = 'Monitor: Previous', '@input:monitor' = ['PREVIOUS'] }
+'/m]' = { name = 'Monitor: Next', '@input:monitor' = ['NEXT'] }
+'/ml' = { name = 'Monitor: Left', '@input:monitor' = ['LEFT'] }
+'/mr' = { name = 'Monitor: Right', '@input:monitor' = ['RIGHT'] }
+'/mt' = { name = 'Monitor: Top', '@input:monitor' = ['UP'] }
+'/mb' = { name = 'Monitor: Bottom', '@input:monitor' = ['DOWN'] }

@@ -7,6 +7,8 @@ projects:
   chords-web: "@keychord/chords-web"
   chords-com.apple: "@keychord/chords-com.apple"
   chords-dock: "@keychord/chords-dock"
+  chords-windows: "@keychord/chords-windows"
+  chords-monitors: "@keychord/chords-monitors"
 
 vcs:
   defaultBranch: main

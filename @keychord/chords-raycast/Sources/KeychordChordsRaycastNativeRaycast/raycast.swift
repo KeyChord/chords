@@ -1,59 +1,50 @@
 import AppKit
+import Algorithms
+import AXorcistRuntime
 import ApplicationServices
+import ChordNodeSupport
 import Foundation
 import NodeAPI
 
 #NodeModule(exports: [
     "readState": try NodeFunction { () throws -> NodePromise in
-        try runOnMainQueue { try encode(snapshot().state) }
+        try mainActorPromise { try encode(snapshot().state) }
     },
     "setSearch": try NodeFunction { (query: String, remainingMs: Double) throws -> NodePromise in
         let deadline = ProcessInfo.processInfo.systemUptime + remainingMs / 1000
-        return try runOnMainQueue {
+        return try mainActorPromise {
             let current = try snapshot(deadline: deadline)
             let input = try current.searchInput()
             try checkDeadline(deadline)
             // WebKit's accessibility setter dispatches the input change as one edit.
-            let error = AXUIElementSetAttributeValue(input, kAXValueAttribute as CFString, query as CFString)
-            guard error == .success else { throw RaycastError.accessibility("set search text", error) }
+            do {
+                try input.setValue(query)
+            } catch let error as AccessibilitySystemError {
+                throw RaycastError.accessibility("set search text", error.axError)
+            }
             return ""
         }
     },
     "returnToRoot": try NodeFunction { (fingerprint: String, remainingMs: Double) throws -> NodePromise in
         let deadline = ProcessInfo.processInfo.systemUptime + remainingMs / 1000
-        return try runOnMainQueue {
+        return try mainActorPromise {
             let current = try snapshot(deadline: deadline)
             _ = try current.focusedElement()
             guard current.state.navigationFingerprint == fingerprint, let back = current.backAction else { return "false" }
             try checkDeadline(deadline)
-            let error = AXUIElementPerformAction(back, kAXPressAction as CFString)
-            switch error {
-            case .success, .cannotComplete: return "true"
-            case .invalidUIElement: return "false"
-            default: throw RaycastError.accessibility("return to Root Search", error)
-            }
+            return try press(back, operation: "return to Root Search") ? "true" : "false"
         }
     },
     "activateSearch": try NodeFunction { (query: String, fingerprint: String, remainingMs: Double) throws -> NodePromise in
         let deadline = ProcessInfo.processInfo.systemUptime + remainingMs / 1000
-        return try runOnMainQueue {
+        return try mainActorPromise {
             let current = try snapshot(deadline: deadline)
             _ = try current.searchInput()
             guard current.state.value == query else { throw RaycastError.queryChanged }
             guard !current.state.busy, current.state.fingerprint == fingerprint,
                   let action = current.primaryAction else { return "false" }
             try checkDeadline(deadline)
-            let error = AXUIElementPerformAction(action, kAXPressAction as CFString)
-            switch error {
-            case .success, .cannotComplete:
-                // A callback can run despite cannotComplete. The JS caller observes
-                // the outcome and never repeats a potentially dispatched action.
-                return "true"
-            case .invalidUIElement:
-                return "false"
-            default:
-                throw RaycastError.accessibility("activate the primary result", error)
-            }
+            return try press(action, operation: "activate the primary result") ? "true" : "false"
         }
     },
 ])
@@ -77,19 +68,19 @@ private struct State: Encodable {
 private struct Snapshot {
     var state: State
     var processId: pid_t?
-    var input: AXUIElement?
-    var primaryAction: AXUIElement?
-    var backAction: AXUIElement?
+    var input: Element?
+    var primaryAction: Element?
+    var backAction: Element?
 
     @MainActor
-    func focusedElement() throws -> AXUIElement {
+    func focusedElement() throws -> Element {
         guard state.bundleId == bundleId, state.focused, let input, let processId,
               try ownsKeyboardFocus(input, processId: processId) else { throw RaycastError.searchNotFocused }
         return input
     }
 
     @MainActor
-    func searchInput() throws -> AXUIElement {
+    func searchInput() throws -> Element {
         let input = try focusedElement()
         let label = (state.placeholder?.isEmpty == false ? state.placeholder : state.description) ?? ""
         guard state.bundleId == bundleId, state.focused,
@@ -129,34 +120,33 @@ private enum RaycastError: Error, CustomStringConvertible {
     }
 }
 
-// Complete each MainActor operation on its originating JS queue. NodeSwift's
-// default async executor cannot identify the environment when several addons load.
-@NodeActor
-private func runOnMainQueue(_ operation: @escaping @MainActor @Sendable () throws -> String) throws -> NodePromise {
-    let deferred = try NodePromise.Deferred()
-    let queue = try NodeAsyncQueue(label: "chord.raycast-search").handle()
-    Task { @MainActor in
-        let result = Result { try operation() }
-        do {
-            try queue.queue.run { [queue] in
-                _ = queue
-                try deferred(result.map { $0 as NodeValueConvertible })
-            }
-        } catch {
-            NSLog("Chord Raycast completion queue unavailable: %@", String(describing: error))
-        }
-    }
-    return deferred.promise
-}
-
 private func encode<T: Encodable>(_ value: T) throws -> String {
     String(decoding: try JSONEncoder().encode(value), as: UTF8.self)
 }
 
 @MainActor
-private func attribute(_ element: AXUIElement, _ name: String) throws -> CFTypeRef? {
+private func press(_ element: Element, operation: String) throws -> Bool {
+    do {
+        try element.performAction(.press)
+        return true
+    } catch let error as AccessibilitySystemError {
+        switch error.axError {
+        case .cannotComplete:
+            // A callback can run despite a timeout. JS observes the outcome
+            // without repeating an action that may already have been dispatched.
+            return true
+        case .invalidUIElement: return false
+        default: throw RaycastError.accessibility(operation, error.axError)
+        }
+    }
+}
+
+// AXorcist's optional getters erase AX errors. Keep this read to distinguish
+// revoked permission/unexpected failures from transient WebKit proxy disappearance.
+@MainActor
+private func attribute(_ element: Element, _ name: String) throws -> CFTypeRef? {
     var value: CFTypeRef?
-    let error = AXUIElementCopyAttributeValue(element, name as CFString, &value)
+    let error = AXUIElementCopyAttributeValue(element.underlyingElement, name as CFString, &value)
     switch error {
     case .success: return value
     case .noValue, .attributeUnsupported, .invalidUIElement, .cannotComplete: return nil
@@ -166,44 +156,39 @@ private func attribute(_ element: AXUIElement, _ name: String) throws -> CFTypeR
 }
 
 @MainActor
-private func elementAttribute(_ element: AXUIElement, _ name: String) throws -> AXUIElement? {
+private func elementAttribute(_ element: Element, _ name: String) throws -> Element? {
     guard let value = try attribute(element, name), CFGetTypeID(value) == AXUIElementGetTypeID() else { return nil }
-    return unsafeDowncast(value, to: AXUIElement.self)
+    return Element(unsafeDowncast(value, to: AXUIElement.self))
 }
 
 @MainActor
-private func ownsKeyboardFocus(_ input: AXUIElement, processId: pid_t) throws -> Bool {
+private func ownsKeyboardFocus(_ input: Element, processId: pid_t) throws -> Bool {
     guard try attribute(input, kAXFocusedAttribute) as? Bool == true else { return false }
-    let system = AXUIElementCreateSystemWide()
-    AXUIElementSetMessagingTimeout(system, 0.1)
+    let system = Element.systemWide()
+    system.setMessagingTimeout(0.1)
     if let application = try elementAttribute(system, kAXFocusedApplicationAttribute) {
-        var pid: pid_t = 0
-        if AXUIElementGetPid(application, &pid) == .success, pid == processId { return true }
+        if application.pid() == processId { return true }
     }
-    if let focused = try elementAttribute(system, kAXFocusedUIElementAttribute), CFEqual(focused, input) { return true }
+    if let focused = try elementAttribute(system, kAXFocusedUIElementAttribute), focused == input { return true }
     // WebKit exposes different proxy elements through the app and system paths.
     // Its app-scoped focused field plus the foreground app establishes ownership.
     return NSWorkspace.shared.frontmostApplication?.processIdentifier == processId
 }
 
 @MainActor
-private func labels(_ element: AXUIElement) throws -> [String] {
-    var result: [String] = []
-    for name in [kAXTitleAttribute, kAXDescriptionAttribute, kAXValueAttribute] {
-        if let text = try attribute(element, name) as? String, !text.isEmpty, !result.contains(text) {
-            result.append(text)
-        }
-    }
-    return result
+private func labels(_ element: Element) throws -> [String] {
+    let texts = try [kAXTitleAttribute, kAXDescriptionAttribute, kAXValueAttribute]
+        .compactMap { try attribute(element, $0) as? String }
+    return Array(texts.filter { !$0.isEmpty }.uniqued())
 }
 
 private struct Tree {
     var texts: [String] = []
     var busy = false
-    var results: AXUIElement?
-    var primaryAction: AXUIElement?
+    var results: Element?
+    var primaryAction: Element?
     var actionLabel: String?
-    var backAction: AXUIElement?
+    var backAction: Element?
     var complete = true
 }
 
@@ -213,18 +198,16 @@ private func checkDeadline(_ deadline: TimeInterval) throws {
 }
 
 @MainActor
-private func scan(_ root: AXUIElement, findControls: Bool, deadline: TimeInterval) throws -> Tree {
+private func scan(_ root: Element, findControls: Bool, deadline: TimeInterval) throws -> Tree {
     var tree = Tree()
-    var stack: [(AXUIElement, Int)] = [(root, 0)]
-    var visited: [AXUIElement] = []
+    var stack: [(Element, Int)] = [(root, 0)]
+    var visited = Set<Element>()
     while let (element, depth) = stack.popLast() {
         try checkDeadline(deadline)
-        // AX hash values are not element identities; distinct elements can share
-        // a hash. Use CFEqual so a collision cannot hide results or the action.
-        guard !visited.contains(where: { CFEqual($0, element) }) else { continue }
-        visited.append(element)
+        // Element equality uses CFEqual, including when two AX hashes collide.
+        guard visited.insert(element).inserted else { continue }
         guard visited.count <= 512, depth <= 32 else { throw RaycastError.treeTooLarge }
-        AXUIElementSetMessagingTimeout(element, 0.1)
+        element.setMessagingTimeout(0.1)
         let text = try labels(element)
         let role = try attribute(element, kAXRoleAttribute) as? String
         if role == nil { tree.complete = false }
@@ -238,15 +221,13 @@ private func scan(_ root: AXUIElement, findControls: Bool, deadline: TimeInterva
             }
             if role == "AXButton", text.contains(where: { $0.contains("↵") }),
                try attribute(element, kAXEnabledAttribute) as? Bool != false {
-                var actions: CFArray?
-                let error = AXUIElementCopyActionNames(element, &actions)
-                if error == .success, (actions as? [String])?.contains(kAXPressAction) == true {
+                if element.isActionSupported(kAXPressAction) {
                     tree.primaryAction = element
                     tree.actionLabel = text.joined(separator: " ")
                 }
             }
         }
-        let children = try attribute(element, kAXChildrenAttribute) as? [AXUIElement] ?? []
+        let children = (try attribute(element, kAXChildrenAttribute) as? [AXUIElement] ?? []).map(Element.init)
         // Preserve displayed result order in the fingerprint.
         stack += children.reversed().map { ($0, depth + 1) }
     }
@@ -257,7 +238,7 @@ private func scan(_ root: AXUIElement, findControls: Bool, deadline: TimeInterva
 private func snapshot(deadline: TimeInterval? = nil) throws -> Snapshot {
     let deadline = min(deadline ?? .infinity, ProcessInfo.processInfo.systemUptime + 1)
     try checkDeadline(deadline)
-    guard AXIsProcessTrusted() else { throw RaycastError.accessibilityDenied }
+    guard AXPermissionHelpers.hasAccessibilityPermissions() else { throw RaycastError.accessibilityDenied }
     let frontmost = NSWorkspace.shared.frontmostApplication
     var current = Snapshot(state: State(bundleId: frontmost?.bundleIdentifier,
                                        frontmostBundleId: frontmost?.bundleIdentifier))
@@ -266,10 +247,10 @@ private func snapshot(deadline: TimeInterval? = nil) throws -> Snapshot {
     // then establish ownership through the system-wide focused AX element.
     guard let app = NSRunningApplication.runningApplications(withBundleIdentifier: bundleId).first else { return current }
     current.processId = app.processIdentifier
-    let application = AXUIElementCreateApplication(app.processIdentifier)
-    AXUIElementSetMessagingTimeout(application, 0.1)
+    let application = AXApp(app).element
+    application.setMessagingTimeout(0.1)
     if let input = try elementAttribute(application, kAXFocusedUIElementAttribute) {
-        AXUIElementSetMessagingTimeout(input, 0.1)
+        input.setMessagingTimeout(0.1)
         current.input = input
         current.state.role = try attribute(input, kAXRoleAttribute) as? String
         current.state.placeholder = try attribute(input, kAXPlaceholderValueAttribute) as? String

@@ -1,12 +1,13 @@
 {
-  "originHash" : "f745991637bb0fc16e0f38f96dd4d632a8a11a870c5d560c120fcb5220669222",
+  "originHash" : "15cd11ee62a2dadb44a0fa8b7006769fecb8821c1b7457e397cfaaab15695549",
   "pins" : [
     {
       "identity" : "axorcist",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/openclaw/AXorcist.git",
       "state" : {
-        "revision" : "aa07d72fbb1861b56f5833b4cff8d9101c8dfbb3"
+        "revision" : "eaf808877546228ee4b0a4e260083a9b938e567f",
+        "version" : "0.1.10"
       }
     },
     {
@@ -19,6 +20,15 @@
       }
     },
     {
+      "identity" : "config",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/KeyChord/config.git",
+      "state" : {
+        "revision" : "ef2372c0dc58d84d02abd6f9011af6ada14006a7",
+        "version" : "0.0.10"
+      }
+    },
+    {
       "identity" : "node-swift",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/kabiroberai/node-swift.git",
@@ -28,12 +38,30 @@
       }
     },
     {
+      "identity" : "swift-algorithms",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-algorithms.git",
+      "state" : {
+        "revision" : "87e50f483c54e6efd60e885f7f5aa946cee68023",
+        "version" : "1.2.1"
+      }
+    },
+    {
       "identity" : "swift-log",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-log.git",
       "state" : {
         "revision" : "9c6fb14227f55d8f711ce3847dc2f419fb0ecacb",
         "version" : "1.15.1"
+      }
+    },
+    {
+      "identity" : "swift-numerics",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-numerics.git",
+      "state" : {
+        "revision" : "0c0290ff6b24942dadb83a929ffaaa1481df04a2",
+        "version" : "1.1.1"
       }
     },
     {

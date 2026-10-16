@@ -2,7 +2,7 @@
 
 Set the resolution of the display containing the pointer with BetterDisplay.
 Enable this package in Chord's monorepo package selection, then reload chords.
-This package owns `/ms`; `chords-dock` continues to provide monitor focusing.
+This package owns `/ms`; `chords-monitors` provides monitor focusing.
 
 | Chord          | Result                                                          |
 | -------------- | --------------------------------------------------------------- |

@@ -13,7 +13,7 @@
     "@keychord/chordtest": "workspace:*",
     "@keychord/config": "catalog:",
     "@keychord/tsconfig": "catalog:",
-    "@types/bun": "^1.4.2"
+    "@types/bun": "^1.4.3"
   },
   "packageManager": "pnpm@12.11.2"
 }

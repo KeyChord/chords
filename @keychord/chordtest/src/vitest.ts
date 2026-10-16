@@ -36,7 +36,8 @@ export function chordTestRuntime() {
   return {
     plugins: [plugin],
     test: {
-      exclude: [...configDefaults.exclude, "**/*.vm.test.ts"],
+      // SwiftPM checkouts under .build/ (including KeyChord/config's own tests) are not package tests.
+      exclude: [...configDefaults.exclude, "**/*.vm.test.ts", "**/.build/**"],
       alias: { chord: fileURLToPath(new URL("./chord.ts", import.meta.url)) },
       setupFiles: [fileURLToPath(new URL("./vitest-setup.ts", import.meta.url))],
     },

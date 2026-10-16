@@ -17,10 +17,10 @@ function exists(path) {
   }
 }
 //#endregion
-//#region ../../node_modules/.pnpm/ansi-regex@6.2.2/node_modules/ansi-regex/index.js
+//#region ../../node_modules/.pnpm/ansi-regex@6.4.0/node_modules/ansi-regex/index.js
 function ansiRegex({ onlyFirst = false } = {}) {
   return new RegExp(
-    `(?:\\u001B\\][\\s\\S]*?(?:\\u0007|\\u001B\\u005C|\\u009C))|[\\u001B\\u009B][[\\]()#;?]*(?:\\d{1,4}(?:[;:]\\d{0,4})*)?[\\dA-PR-TZcf-nq-uy=><~]`,
+    `(?:(?:\\u001B\\]|\\u009D)[^\\u0007\\u001B\\u009C\\u009D]*(?:\\u0007|\\u001B\\u005C|\\u009C))|[\\u001B\\u009B][[\\]()#;?]*(?:\\d{1,4}(?:[;:]\\d{0,4})*)?[\\dA-PR-TZcf-nq-uy=><~]`,
     onlyFirst ? void 0 : "g",
   );
 }

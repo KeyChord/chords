@@ -21,7 +21,7 @@
     "@keychord/tsconfig": "catalog:",
     "@types/bun": "latest",
     "@types/js-yaml": "latest",
-    "@types/node": "26.5.0"
+    "@types/node": "26.6.5"
   },
   "packageManager": "pnpm@12.11.2"
 }

@@ -12,7 +12,7 @@
     "desm": "latest",
     "get-port": "latest",
     "jquery-as-string": "latest",
-    "ky": "^1.14.3",
+    "ky": "^2.2.0",
     "outdent": "latest"
   },
   "devDependencies": {

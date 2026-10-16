@@ -13,8 +13,8 @@ export function runSafariJavaScript(source: string): void {
   addon.runJavaScript(source);
 }
 
-function openDeveloperSettingsPane(): void {
-  addon.openDeveloperSettings();
+async function openDeveloperSettingsPane(): Promise<void> {
+  await addon.openDeveloperSettings();
 }
 
 async function readBooleanDefault(domain: string, key: string): Promise<boolean> {
@@ -88,7 +88,7 @@ export default async function buildSafariHandler() {
         await runCommand(["open", "-a", "Safari"]);
       }
 
-      openDeveloperSettingsPane();
+      await openDeveloperSettingsPane();
       return;
     }
 

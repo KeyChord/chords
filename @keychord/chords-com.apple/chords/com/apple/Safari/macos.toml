@@ -8,9 +8,6 @@ args = ['Safari']
 file = 'safari.js'
 
 [chords]
-# `b` for Browser. Meant to be overriden.
-'/b' = { name = 'Browser (Safari)', shell = 'open -a Safari' }
-
 '?w' = { name = 'Window' }
 wn = { name = 'Window: New', shortcut = 'cmd+n' }
 wp = { name = 'Window: Private', shortcut = 'cmd+shift+n' }

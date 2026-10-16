@@ -7,7 +7,7 @@ var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
 var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __commonJSMin = (cb, mod) => () => (mod || cb((mod = { exports: {} }).exports, mod), mod.exports);
+var __commonJSMin = (cb, mod) => () => (mod || (cb((mod = { exports: {} }).exports, mod), cb = null), mod.exports);
 var __copyProps = (to, from, except, desc) => {
 	if (from && typeof from === "object" || typeof from === "function") for (var keys = __getOwnPropNames(from), i = 0, n = keys.length, key; i < n; i++) {
 		key = keys[i];
@@ -18,7 +18,7 @@ var __copyProps = (to, from, except, desc) => {
 	}
 	return to;
 };
-var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", {
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(isNodeMode || !mod || !mod.__esModule || !__hasOwnProp.call(mod, "default") ? __defProp(target, "default", {
 	value: mod,
 	enumerable: true
 }) : target, mod));
@@ -26,7 +26,7 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 //#region src/js/safari.ts
 var import__keychord_native_safari = /* @__PURE__ */ __toESM((/* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const nativeRequire = createRequire(import.meta.url);
-	const nativeFiles = { "darwin-arm64": new URL("native/aarch64-apple-darwin/safari/safari-c968d20c13fb.node", import.meta.url).href };
+	const nativeFiles = { "darwin-arm64": new URL("native/aarch64-apple-darwin/safari/safari-f6ebe30693e3.node", import.meta.url).href };
 	const nativeTarget = process.platform + "-" + process.arch;
 	const nativeFile = nativeFiles[nativeTarget];
 	if (!nativeFile) throw new Error("[chord-native] safari has no addon for " + nativeTarget);
@@ -36,8 +36,8 @@ const safariDomain = "com.apple.Safari";
 function runSafariJavaScript(source) {
 	import__keychord_native_safari.default.runJavaScript(source);
 }
-function openDeveloperSettingsPane() {
-	import__keychord_native_safari.default.openDeveloperSettings();
+async function openDeveloperSettingsPane() {
+	await import__keychord_native_safari.default.openDeveloperSettings();
 }
 async function readBooleanDefault(domain, key) {
 	const result = await runCommand([
@@ -119,7 +119,7 @@ async function buildSafariHandler() {
 					"Safari"
 				]);
 			}
-			openDeveloperSettingsPane();
+			await openDeveloperSettingsPane();
 			return;
 		}
 		runSafariJavaScript("document.title;");

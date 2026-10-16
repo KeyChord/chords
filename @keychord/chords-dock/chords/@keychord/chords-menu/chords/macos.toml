@@ -129,23 +129,141 @@ file = 'visibility.js'
 # Window-menu actions
 '?=w' = { name = 'Window Menu' }
 '=w' = { name = 'Window Menu', '@input:menu' = ['BY_PATH', ['Window']] }
-'=wl' = { name = 'Window Menu: Left', '@input:menu' = ['BY_PATH', ['Window','Move & Resize','Left']] }
-'=wr' = { name = 'Window Menu: Right', '@input:menu' = ['BY_PATH', ['Window','Move & Resize','Right']] }
-'=wt' = { name = 'Window Menu: Top', '@input:menu' = ['BY_PATH', ['Window','Move & Resize','Top']] }
-'=wb' = { name = 'Window Menu: Bottom', '@input:menu' = ['BY_PATH', ['Window','Move & Resize','Bottom']] }
-'=wtl' = { name = 'Window Menu: Top Left', '@input:menu' = ['BY_PATH', ['Window','Move & Resize','Top Left']] }
-'=wtr' = { name = 'Window Menu: Top Right', '@input:menu' = ['BY_PATH', ['Window','Move & Resize','Top Right']] }
-'=wbl' = { name = 'Window Menu: Bottom Left', '@input:menu' = ['BY_PATH', ['Window','Move & Resize','Bottom Left']] }
-'=wbr' = { name = 'Window Menu: Bottom Right', '@input:menu' = ['BY_PATH', ['Window','Move & Resize','Bottom Right']] }
-'=wlr' = { name = 'Window Menu: Left & Right', '@input:menu' = ['BY_PATH', ['Window','Move & Resize','Left & Right']] }
-'=wrl' = { name = 'Window Menu: Right & Left', '@input:menu' = ['BY_PATH', ['Window','Move & Resize','Right & Left']] }
-'=wtb' = { name = 'Window Menu: Top & Bottom', '@input:menu' = ['BY_PATH', ['Window','Move & Resize','Top & Bottom']] }
-'=wbt' = { name = 'Window Menu: Bottom & Top', '@input:menu' = ['BY_PATH', ['Window','Move & Resize','Bottom & Top']] }
-'=wq' = { name = 'Window Menu: Quarters', '@input:menu' = ['BY_PATH', ['Window','Move & Resize','Quarters']] }
-'=ws[' = { name = 'Window Menu: Return to Previous Size', '@input:menu' = ['BY_PATH', ['Window','Move & Resize','Return to Previous Size']] }
-'=wz' = { name = 'Window Menu: Zoom', '@input:menu' = ['BY_PATH', ['Window','Zoom']] }
-'=wf' = { name = 'Window Menu: Fill', '@input:menu' = ['BY_PATH', ['Window','Fill']] }
-'=wc' = { name = 'Window Menu: Center', '@input:menu' = ['BY_PATH', ['Window','Center']] }
-'=wfl' = { name = 'Window Menu: Left of Screen', '@input:menu' = ['BY_PATH', ['Window','Full Screen Tile','Left of Screen']] }
-'=wfr' = { name = 'Window Menu: Right of Screen', '@input:menu' = ['BY_PATH', ['Window','Full Screen Tile','Right of Screen']] }
-'=waf' = { name = 'Window Menu: Bring All to Front', '@input:menu' = ['BY_PATH', ['Window','Bring All to Front']] }
+'=wl' = { name = 'Window Menu: Left', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Window',
+    'Move & Resize',
+    'Left',
+  ],
+] }
+'=wr' = { name = 'Window Menu: Right', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Window',
+    'Move & Resize',
+    'Right',
+  ],
+] }
+'=wt' = { name = 'Window Menu: Top', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Window',
+    'Move & Resize',
+    'Top',
+  ],
+] }
+'=wb' = { name = 'Window Menu: Bottom', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Window',
+    'Move & Resize',
+    'Bottom',
+  ],
+] }
+'=wtl' = { name = 'Window Menu: Top Left', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Window',
+    'Move & Resize',
+    'Top Left',
+  ],
+] }
+'=wtr' = { name = 'Window Menu: Top Right', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Window',
+    'Move & Resize',
+    'Top Right',
+  ],
+] }
+'=wbl' = { name = 'Window Menu: Bottom Left', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Window',
+    'Move & Resize',
+    'Bottom Left',
+  ],
+] }
+'=wbr' = { name = 'Window Menu: Bottom Right', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Window',
+    'Move & Resize',
+    'Bottom Right',
+  ],
+] }
+'=wlr' = { name = 'Window Menu: Left & Right', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Window',
+    'Move & Resize',
+    'Left & Right',
+  ],
+] }
+'=wrl' = { name = 'Window Menu: Right & Left', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Window',
+    'Move & Resize',
+    'Right & Left',
+  ],
+] }
+'=wtb' = { name = 'Window Menu: Top & Bottom', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Window',
+    'Move & Resize',
+    'Top & Bottom',
+  ],
+] }
+'=wbt' = { name = 'Window Menu: Bottom & Top', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Window',
+    'Move & Resize',
+    'Bottom & Top',
+  ],
+] }
+'=wq' = { name = 'Window Menu: Quarters', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Window',
+    'Move & Resize',
+    'Quarters',
+  ],
+] }
+'=ws[' = { name = 'Window Menu: Return to Previous Size', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Window',
+    'Move & Resize',
+    'Return to Previous Size',
+  ],
+] }
+'=wz' = { name = 'Window Menu: Zoom', '@input:menu' = ['BY_PATH', ['Window', 'Zoom']] }
+'=wf' = { name = 'Window Menu: Fill', '@input:menu' = ['BY_PATH', ['Window', 'Fill']] }
+'=wc' = { name = 'Window Menu: Center', '@input:menu' = ['BY_PATH', ['Window', 'Center']] }
+'=wfl' = { name = 'Window Menu: Left of Screen', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Window',
+    'Full Screen Tile',
+    'Left of Screen',
+  ],
+] }
+'=wfr' = { name = 'Window Menu: Right of Screen', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Window',
+    'Full Screen Tile',
+    'Right of Screen',
+  ],
+] }
+'=waf' = { name = 'Window Menu: Bring All to Front', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Window',
+    'Bring All to Front',
+  ],
+] }

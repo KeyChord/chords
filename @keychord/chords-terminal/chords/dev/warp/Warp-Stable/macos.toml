@@ -9,9 +9,6 @@ file = 'warp.js'
 args = []
 
 [chords]
-# TODO: this should not be hardcoded here
-'/w' = { name = 'Warp', command = 'Open Warp', shell = '''open -a 'Warp'''' }
-
 # Warp Essentials
 # lcp = { name = 'Launch Configuration Palette', '@input:command' = [
 #   'workspace:toggle_launch_config_palette',

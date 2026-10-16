@@ -77,23 +77,23 @@ for (; trayCount < 200; trayCount++) {
   try {
     await runMenuBarAction({ scope: "TRAY", index: trayCount, steps: "" }, app);
   } catch (error) {
-    assert.match(String(error), /could not find tray menu bar item at index/);
+    assert.match(String(error), /could not find tray menu bar item at index/i);
     break;
   }
 }
 assert.ok(trayCount > 0 && trayCount < 200);
 await assert.rejects(
   runMenuBarAction({ scope: "TRAY", index: -trayCount - 1, steps: "" }, app),
-  /could not find tray menu bar item/,
+  /could not find tray menu bar item/i,
 );
 await assert.rejects(
   buildTrayHandler()("HOVER", -trayCount - 1),
-  /could not find tray menu bar item/,
+  /could not find tray menu bar item/i,
 );
-await assert.rejects(buildTrayHandler()("HOVER", trayCount), /could not find tray menu bar item/);
+await assert.rejects(buildTrayHandler()("HOVER", trayCount), /could not find tray menu bar item/i);
 await assert.rejects(
   runMenuBarAction({ scope: "MENU", index: menus.length, steps: "" }, app),
-  /could not find menu menu bar item/,
+  /could not find menu menu bar item/i,
 );
 assert.deepEqual(await hover(trayCount + "r[[[["), firstTray);
 

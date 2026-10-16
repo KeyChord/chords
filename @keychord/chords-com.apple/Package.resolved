@@ -1,6 +1,33 @@
 {
-  "originHash" : "398b4787dfced88d1cd5c9edf4871c7a646ba23fea0579cfa3f0632c60e23199",
+  "originHash" : "de55e2a54e0731264062e4384e9fe9ef219a78f6b1b0d7ff4e896880f3b371ba",
   "pins" : [
+    {
+      "identity" : "axorcist",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/openclaw/AXorcist.git",
+      "state" : {
+        "revision" : "eaf808877546228ee4b0a4e260083a9b938e567f",
+        "version" : "0.1.10"
+      }
+    },
+    {
+      "identity" : "commander",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/steipete/Commander.git",
+      "state" : {
+        "revision" : "bd219c4ee9032fee3e009856f81fcc6ec09a85f4",
+        "version" : "0.2.4"
+      }
+    },
+    {
+      "identity" : "config",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/KeyChord/config.git",
+      "state" : {
+        "revision" : "ef2372c0dc58d84d02abd6f9011af6ada14006a7",
+        "version" : "0.0.10"
+      }
+    },
     {
       "identity" : "node-swift",
       "kind" : "remoteSourceControl",
@@ -8,6 +35,32 @@
       "state" : {
         "revision" : "9a476d2602923bced1afc302ee27250c7b4d197d",
         "version" : "1.5.1"
+      }
+    },
+    {
+      "identity" : "swift-argument-parser",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-argument-parser.git",
+      "state" : {
+        "revision" : "6a52f3251125d74daf04fcbd5e6f08a75d074382",
+        "version" : "1.8.2"
+      }
+    },
+    {
+      "identity" : "swift-log",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-log.git",
+      "state" : {
+        "revision" : "9c6fb14227f55d8f711ce3847dc2f419fb0ecacb",
+        "version" : "1.15.1"
+      }
+    },
+    {
+      "identity" : "swift-scripting-bridge",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/rhx/swift-scripting-bridge.git",
+      "state" : {
+        "revision" : "1934001eaccb2fe15fb8dbf71b570b8805432326"
       }
     },
     {

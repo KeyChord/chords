@@ -9,8 +9,9 @@
 // back to its originating JS queue; the desktop app and Chord CLI service the main run loop.
 
 import AppKit
-import AXorcist
+import AXorcistRuntime
 import ApplicationServices
+import ChordNodeSupport
 import CoreGraphics
 import Foundation
 import NodeAPI
@@ -317,8 +318,7 @@ private func children(of element: Element) -> [Element] {
 
 @MainActor
 private func windows(of application: Element) -> [Element] {
-    let windows = application.attribute(Attribute<[AXUIElement]>(kAXWindowsAttribute)) ?? []
-    return windows.map(Element.init)
+    application.windows() ?? []
 }
 
 @MainActor
@@ -364,7 +364,7 @@ private func press(_ element: Element, name: String) async throws {
 private func menuBarItem(identifiers: [String]) -> Element? {
     let owners = ["com.apple.controlcenter", "com.apple.MenuBarAgent", "com.apple.systemuiserver"]
         .flatMap { NSRunningApplication.runningApplications(withBundleIdentifier: $0) }
-        .map { Element(AXUIElementCreateApplication($0.processIdentifier)) }
+        .map { AXApp($0).element }
     let roots = owners.flatMap { owner in
         // Menu bars are not always included in the application's AXChildren.
         [kAXMenuBarAttribute, kAXExtrasMenuBarAttribute].compactMap { name in
@@ -376,7 +376,7 @@ private func menuBarItem(identifiers: [String]) -> Element? {
 
 @MainActor
 private func runSystemTrayAction(_ item: SystemTrayItem, toggle: Bool) async throws {
-    guard AXIsProcessTrusted() else { throw TrayError.accessibilityPermissionRequired }
+    guard AXPermissionHelpers.hasAccessibilityPermissions() else { throw TrayError.accessibilityPermissionRequired }
     if item == .wifi && toggle {
         try await runControlCenterAction(section: .wifi, action: .toggle)
     } else if let element = menuBarItem(identifiers: item.identifiers) {
@@ -491,8 +491,8 @@ private func adjust(_ slider: Element, increase: Bool) async throws {
         return
     }
     // Some Control Center sliders expose read-only AXValue, but provide adjacent +/- buttons.
-    if let parent = slider.attribute(Attribute<AXUIElement>(kAXParentAttribute)) {
-        let siblings = children(of: Element(parent))
+    if let parent = slider.parent() {
+        let siblings = children(of: parent)
         if let index = siblings.firstIndex(of: slider) {
             let neighbor = increase
                 ? siblings.dropFirst(index + 1).first
@@ -503,24 +503,24 @@ private func adjust(_ slider: Element, increase: Bool) async throws {
             }
         }
     }
-    guard let value = (slider.value() as? NSNumber)?.doubleValue,
-          let minimum = (slider.minValue() as? NSNumber)?.doubleValue,
-          let maximum = (slider.maxValue() as? NSNumber)?.doubleValue,
+    guard let value = slider.attribute(Attribute<NSNumber>(kAXValueAttribute))?.doubleValue,
+          let minimum = slider.attribute(Attribute<NSNumber>(kAXMinValueAttribute))?.doubleValue,
+          let maximum = slider.attribute(Attribute<NSNumber>(kAXMaxValueAttribute))?.doubleValue,
           value.isFinite, minimum.isFinite, maximum.isFinite, maximum > minimum
     else { throw TrayError.invalidSliderValue }
-    let increment = (slider.valueIncrement() as? NSNumber)?.doubleValue ?? (maximum - minimum) / 16
+    let increment = slider.attribute(Attribute<NSNumber>(kAXValueIncrementAttribute))?.doubleValue ?? (maximum - minimum) / 16
     guard increment.isFinite, increment > 0 else { throw TrayError.invalidSliderValue }
     let next = min(maximum, max(minimum, value + (increase ? increment : -increment)))
-    try slider.setAttributeValue(NSNumber(value: next), forAttribute: kAXValueAttribute)
+    try slider.setAttributeValue(next, forAttribute: kAXValueAttribute)
 }
 
 @MainActor
 private func runControlCenterAction(section: ControlCenterSection?, action: ControlCenterAction) async throws {
-    guard AXIsProcessTrusted() else { throw TrayError.accessibilityPermissionRequired }
+    guard AXPermissionHelpers.hasAccessibilityPermissions() else { throw TrayError.accessibilityPermissionRequired }
     guard let app = NSRunningApplication.runningApplications(withBundleIdentifier: "com.apple.controlcenter").first else {
         throw TrayError.controlNotFound("Control Center application")
     }
-    let application = Element(AXUIElementCreateApplication(app.processIdentifier))
+    let application = AXApp(app).element
     guard let section else {
         try await openControlCenter(application)
         return

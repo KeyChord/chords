@@ -4,8 +4,6 @@ name = 'System Preferences'
 file = 'systempreferences.js'
 
 [chords]
-'/,' = { name = 'System Preferences', shell = 'open -b com.apple.systempreferences' }
-
 '?g' = { name = 'Goto' }
 'gaa' = { name = 'Goto: Apple Account', shell = '''open 'x-apple.systempreferences:com.apple.systempreferences.AppleIDSettings'''' }
 'gwi' = { name = 'Goto: Wi-fi', shell = '''open 'x-apple.systempreferences:com.apple.wifi-settings-extension'''' }

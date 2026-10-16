@@ -1,0 +1,15 @@
+{
+  "name": "@keychord/chords-windows",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KeyChord/chords-windows"
+  },
+  "type": "module",
+  "devDependencies": {
+    "@keychord/chordtest": "workspace:*",
+    "@keychord/config": "catalog:",
+    "@keychord/tsconfig": "catalog:",
+    "@types/bun": "latest"
+  },
+  "packageManager": "pnpm@12.11.2"
+}

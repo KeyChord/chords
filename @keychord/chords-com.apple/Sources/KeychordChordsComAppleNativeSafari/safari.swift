@@ -2,12 +2,16 @@
 //
 // The add-on sends Safari's `do JavaScript` Apple event directly and uses the Accessibility API
 // to open Safari Settings at its Developer pane. No `osascript` helper process is involved.
+// Browser interfaces are generated from SafariBrowser.sdef by swift-scripting-bridge.
 
 import AppKit
+import AXorcistRuntime
 import ApplicationServices
 import Carbon
+import ChordNodeSupport
 import Foundation
 import NodeAPI
+import ScriptingBridge
 
 private let safariBundleIdentifier = "com.apple.Safari"
 
@@ -50,11 +54,8 @@ private enum SafariError: Error, CustomStringConvertible {
         }
         return try NodeUndefined()
     },
-    "openDeveloperSettings": try NodeFunction { () throws in
-        try autoreleasepool {
-            try openDeveloperSettings()
-        }
-        return try NodeUndefined()
+    "openDeveloperSettings": try NodeFunction { () throws -> NodePromise in
+        try mainActorPromise { try await openDeveloperSettings() }
     },
 ])
 
@@ -70,28 +71,15 @@ private func describe(_ error: Error) -> String {
 
 // MARK: - Safari Apple event
 
-private let safariEventClass = AEEventClass(0x73667269) // 'sfri'
-private let doJavaScriptEvent = AEEventID(0x646F6A73) // 'dojs'
-private let inParameter = AEKeyword(0x64636E6D) // 'dcnm'
-private let windowClass = DescType(0x6377696E) // 'cwin'
-private let currentTabProperty = DescType(0x63546162) // 'cTab'
+// Scripting Bridge reports Apple-event failures through its delegate. Capture them
+// so they become ordinary Swift/JavaScript errors instead of Objective-C exceptions.
+private final class ScriptingErrors: NSObject, SBApplicationDelegate {
+    var error: Error?
 
-private func objectSpecifier(
-    desiredClass: DescType,
-    container: NSAppleEventDescriptor?,
-    keyForm: DescType,
-    keyData: NSAppleEventDescriptor
-) throws -> NSAppleEventDescriptor {
-    let record = NSAppleEventDescriptor.record()
-    record.setDescriptor(NSAppleEventDescriptor(typeCode: desiredClass), forKeyword: AEKeyword(keyAEDesiredClass))
-    record.setDescriptor(NSAppleEventDescriptor(typeCode: keyForm), forKeyword: AEKeyword(keyAEKeyForm))
-    record.setDescriptor(keyData, forKeyword: AEKeyword(keyAEKeyData))
-    record.setDescriptor(container ?? NSAppleEventDescriptor.null(), forKeyword: AEKeyword(keyAEContainer))
-
-    guard let descriptor = record.coerce(toDescriptorType: DescType(typeObjectSpecifier)) else {
-        throw SafariError.appleEvent("could not create an object specifier")
+    func eventDidFail(_ event: UnsafePointer<AppleEvent>, withError error: Error) -> Any? {
+        if self.error == nil { self.error = error }
+        return nil
     }
-    return descriptor
 }
 
 private func runJavaScript(_ source: String) throws {
@@ -99,72 +87,46 @@ private func runJavaScript(_ source: String) throws {
         throw SafariError.invalidJavaScript
     }
 
-    let frontWindow = try objectSpecifier(
-        desiredClass: windowClass,
-        container: nil,
-        keyForm: DescType(formAbsolutePosition),
-        keyData: NSAppleEventDescriptor(int32: 1)
-    )
-    let currentTab = try objectSpecifier(
-        desiredClass: DescType(typeProperty),
-        container: frontWindow,
-        keyForm: DescType(formPropertyID),
-        keyData: NSAppleEventDescriptor(typeCode: currentTabProperty)
-    )
-    let target = NSAppleEventDescriptor(bundleIdentifier: safariBundleIdentifier)
-    let event = NSAppleEventDescriptor(
-        eventClass: safariEventClass,
-        eventID: doJavaScriptEvent,
-        targetDescriptor: target,
-        returnID: AEReturnID(kAutoGenerateReturnID),
-        transactionID: AETransactionID(kAnyTransactionID)
-    )
-    event.setParam(NSAppleEventDescriptor(string: source), forKeyword: AEKeyword(keyDirectObject))
-    event.setParam(currentTab, forKeyword: inParameter)
-
-    let reply: NSAppleEventDescriptor
-    do {
-        reply = try event.sendEvent(options: [.waitForReply], timeout: 60)
-    } catch {
-        throw SafariError.appleEvent(describe(error))
+    guard let application = SBApplication(bundleIdentifier: safariBundleIdentifier) else {
+        throw SafariError.appleEvent("could not create Safari's scripting interface")
     }
-
-    let errorNumber = reply.paramDescriptor(forKeyword: AEKeyword(keyErrorNumber))?.int32Value ?? 0
-    if errorNumber != 0 {
-        let message = reply.paramDescriptor(forKeyword: AEKeyword(keyErrorString))?.stringValue
-            ?? "error \(errorNumber)"
-        throw SafariError.appleEvent(message)
+    let errors = ScriptingErrors()
+    let previousDelegate = application.delegate
+    let previousTimeout = application.timeout
+    application.delegate = errors
+    application.timeout = 60 * 60 // Apple-event timeouts are in ticks (60 per second).
+    defer {
+        application.delegate = previousDelegate
+        application.timeout = previousTimeout
     }
-
-    let result = reply.paramDescriptor(forKeyword: AEKeyword(keyDirectObject))?.stringValue ?? ""
-    print("The title of the page is: \(result)")
+    let safari: SafariBrowser.Application = application
+    let tab = safari.windows.first?.currentTabViewItem
+    if let error = errors.error { throw SafariError.appleEvent(describe(error)) }
+    guard let tab else { throw SafariError.appleEvent("Safari has no current tab") }
+    let result = safari.doJavaScript(source, in: tab)
+    if let error = errors.error { throw SafariError.appleEvent(describe(error)) }
+    print("The title of the page is: \(result as? String ?? "")")
 }
 
 // MARK: - Safari Developer settings
 
-private func waitBriefly(_ interval: TimeInterval) {
-    if Thread.isMainThread {
-        RunLoop.main.run(until: Date(timeIntervalSinceNow: interval))
-    } else {
-        Thread.sleep(forTimeInterval: interval)
-    }
-}
-
+@MainActor
 private func runningSafari() -> NSRunningApplication? {
     NSRunningApplication.runningApplications(withBundleIdentifier: safariBundleIdentifier).first
 }
 
-private func activateSafari() throws -> NSRunningApplication {
+@MainActor
+private func activateSafari() async throws -> NSRunningApplication {
     var safari = runningSafari()
     if safari == nil {
         guard let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: safariBundleIdentifier) else {
             throw SafariError.safariNotFound
         }
-        NSWorkspace.shared.openApplication(at: url, configuration: NSWorkspace.OpenConfiguration())
+        NSWorkspace.shared.openApplication(at: url, configuration: NSWorkspace.OpenConfiguration(), completionHandler: nil)
 
         let deadline = Date(timeIntervalSinceNow: 5)
         while safari == nil && Date() < deadline {
-            waitBriefly(0.05)
+            try await Task.sleep(for: .milliseconds(50))
             safari = runningSafari()
         }
     }
@@ -176,7 +138,7 @@ private func activateSafari() throws -> NSRunningApplication {
     safari.activate()
     let deadline = Date(timeIntervalSinceNow: 2)
     while !safari.isActive && Date() < deadline {
-        waitBriefly(0.02)
+        try await Task.sleep(for: .milliseconds(20))
     }
     return safari
 }
@@ -196,49 +158,23 @@ private func pressCommandComma(processIdentifier: pid_t) throws {
     keyUp.postToPid(processIdentifier)
 }
 
-private func axValue(_ element: AXUIElement, _ attribute: String) -> AnyObject? {
-    var value: CFTypeRef?
-    guard AXUIElementCopyAttributeValue(element, attribute as CFString, &value) == .success else {
-        return nil
-    }
-    return value
-}
-
-private func axElement(_ element: AXUIElement, _ attribute: String) -> AXUIElement? {
-    guard let value = axValue(element, attribute), CFGetTypeID(value) == AXUIElementGetTypeID() else {
-        return nil
-    }
-    return (value as! AXUIElement)
-}
-
-private func axChildren(_ element: AXUIElement, _ attribute: String = kAXChildrenAttribute) -> [AXUIElement] {
-    guard let values = axValue(element, attribute) as? [AnyObject] else {
-        return []
-    }
-    return values.compactMap { value in
-        CFGetTypeID(value) == AXUIElementGetTypeID() ? (value as! AXUIElement) : nil
+@MainActor
+private func hasDeveloperLabel(_ element: Element) -> Bool {
+    [element.title(), element.descriptionText(), element.identifier()].contains {
+        $0?.localizedCaseInsensitiveCompare("Developer") == .orderedSame
     }
 }
 
-private func axString(_ element: AXUIElement, _ attribute: String) -> String? {
-    axValue(element, attribute) as? String
-}
-
-private func hasDeveloperLabel(_ element: AXUIElement) -> Bool {
-    [kAXTitleAttribute, kAXDescriptionAttribute, kAXIdentifierAttribute].contains { attribute in
-        axString(element, attribute)?.localizedCaseInsensitiveCompare("Developer") == .orderedSame
-    }
-}
-
-private func findDeveloperButton(_ element: AXUIElement, depth: Int = 0) -> AXUIElement? {
+@MainActor
+private func findDeveloperButton(_ element: Element, depth: Int = 0) -> Element? {
     guard depth <= 8 else {
         return nil
     }
 
-    if axString(element, kAXRoleAttribute) == kAXButtonRole, hasDeveloperLabel(element) {
+    if element.role() == kAXButtonRole, hasDeveloperLabel(element) {
         return element
     }
-    for child in axChildren(element) {
+    for child in (element.attribute(Attribute<[AXUIElement]>(kAXChildrenAttribute)) ?? []).map(Element.init) {
         if let button = findDeveloperButton(child, depth: depth + 1) {
             return button
         }
@@ -246,14 +182,15 @@ private func findDeveloperButton(_ element: AXUIElement, depth: Int = 0) -> AXUI
     return nil
 }
 
-private func findToolbars(_ element: AXUIElement, depth: Int = 0) -> [AXUIElement] {
+@MainActor
+private func findToolbars(_ element: Element, depth: Int = 0) -> [Element] {
     guard depth <= 6 else {
         return []
     }
 
-    var toolbars: [AXUIElement] = []
-    for child in axChildren(element) {
-        if axString(child, kAXRoleAttribute) == kAXToolbarRole {
+    var toolbars: [Element] = []
+    for child in (element.attribute(Attribute<[AXUIElement]>(kAXChildrenAttribute)) ?? []).map(Element.init) {
+        if child.role() == kAXToolbarRole {
             toolbars.append(child)
         } else {
             toolbars.append(contentsOf: findToolbars(child, depth: depth + 1))
@@ -262,13 +199,14 @@ private func findToolbars(_ element: AXUIElement, depth: Int = 0) -> [AXUIElemen
     return toolbars
 }
 
-private func developerButton(in application: AXUIElement) -> AXUIElement? {
-    var windows: [AXUIElement] = []
-    if let focused = axElement(application, kAXFocusedWindowAttribute) {
+@MainActor
+private func developerButton(in application: Element) -> Element? {
+    var windows: [Element] = []
+    if let focused = application.focusedWindow() {
         windows.append(focused)
     }
-    for window in axChildren(application, kAXWindowsAttribute)
-        where !windows.contains(where: { CFEqual($0, window) })
+    for window in application.windows() ?? []
+        where !windows.contains(window)
     {
         windows.append(window)
     }
@@ -283,29 +221,31 @@ private func developerButton(in application: AXUIElement) -> AXUIElement? {
     return nil
 }
 
-private func openDeveloperSettings() throws {
-    guard AXIsProcessTrusted() else {
+@MainActor
+private func openDeveloperSettings() async throws {
+    guard AXPermissionHelpers.hasAccessibilityPermissions() else {
         throw SafariError.accessibilityPermissionRequired
     }
 
-    let safari = try activateSafari()
+    let safari = try await activateSafari()
     try pressCommandComma(processIdentifier: safari.processIdentifier)
 
-    let application = AXUIElementCreateApplication(safari.processIdentifier)
+    let application = AXApp(safari).element
     let deadline = Date(timeIntervalSinceNow: 10)
-    var button: AXUIElement?
+    var button: Element?
     while button == nil && Date() < deadline {
         button = developerButton(in: application)
         if button == nil {
-            waitBriefly(0.1)
+            try await Task.sleep(for: .milliseconds(100))
         }
     }
 
     guard let button else {
         throw SafariError.developerButtonNotFound
     }
-    let result = AXUIElementPerformAction(button, kAXPressAction as CFString)
-    guard result == .success else {
-        throw SafariError.accessibility("Developer AXPress returned \(result.rawValue)")
+    do {
+        try button.performAction(.press)
+    } catch let error as AccessibilitySystemError {
+        throw SafariError.accessibility("Developer AXPress returned \(error.axError.rawValue)")
     }
 }

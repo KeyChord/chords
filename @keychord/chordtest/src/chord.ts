@@ -62,8 +62,8 @@ export const onAppLaunch = vi.fn(
 export const onAppTerminate = vi.fn((_bundleId: string, _callback: () => void): (() => void) =>
   unconfigured("onAppTerminate"),
 );
-export const runSudoCommand = vi.fn(
-  async (_program: string, _args: string[]): Promise<void> => unconfigured("runSudoCommand"),
+export const runSudoCommand = vi.fn(async (_program: string, _args: string[]): Promise<void> =>
+  unconfigured("runSudoCommand"),
 );
 
 export class Applescript {

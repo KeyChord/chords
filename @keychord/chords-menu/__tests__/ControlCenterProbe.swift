@@ -1,4 +1,6 @@
 // Read live accessibility evidence for the VM-only Bun UI tests.
+// Use the system API directly so this probe checks AXorcist-backed production
+// behavior independently, including attribute decoding and geometry.
 import AppKit
 import ApplicationServices
 

@@ -1,4 +1,8 @@
+import pWaitFor from "p-wait-for";
+import { v4 as uuidv4 } from "uuid";
+
 type Command = (args: string[]) => Promise<string>;
+// macOS display UUIDs do not necessarily carry RFC version and variant bits.
 const uuidPattern = "[0-9A-Fa-f]{8}(?:-[0-9A-Fa-f]{4}){3}-[0-9A-Fa-f]{12}";
 const managedName = new RegExp(`^Chord /ms (${uuidPattern}) [1-9]\\d*x[1-9]\\d* ${uuidPattern}$`);
 const uuid = new RegExp(`^${uuidPattern}$`);
@@ -120,20 +124,28 @@ async function waitFor(
   args: string[],
   expected: string | RegExp,
 ): Promise<string> {
-  const deadline = Date.now() + 5_000;
   let actual: string | undefined;
-  do {
-    actual = await optional(command, args);
-    if (actual !== undefined) actual = singleValue(actual);
-    if (
-      actual !== undefined &&
-      (typeof expected === "string" ? actual === expected : expected.test(actual))
-    ) {
-      return actual;
-    }
-    await new Promise((resolve) => setTimeout(resolve, 100));
-  } while (Date.now() < deadline);
-  throw new Error(`BetterDisplay did not apply ${expected} (reported ${actual ?? "unavailable"})`);
+  return pWaitFor(
+    async () => {
+      actual = await optional(command, args);
+      if (actual !== undefined) actual = singleValue(actual);
+      return actual !== undefined &&
+        (typeof expected === "string" ? actual === expected : expected.test(actual))
+        ? pWaitFor.resolveWith(actual)
+        : false;
+    },
+    {
+      interval: 100,
+      timeout: {
+        milliseconds: 5_000,
+        fallback: () => {
+          throw new Error(
+            `BetterDisplay did not apply ${expected} (reported ${actual ?? "unavailable"})`,
+          );
+        },
+      },
+    },
+  );
 }
 
 const screen = (tagID: string) => ["--type=VirtualScreen", `--tagID=${tagID}`];
@@ -200,7 +212,7 @@ async function setResolution(command: Command, resolution: string): Promise<void
         }
         // Only definitions with our reserved name format are ever removed. A new screen
         // leaves the previous definition available for rollback until the switch succeeds.
-        created = `Chord /ms ${target} ${resolution} ${crypto.randomUUID()}`;
+        created = `Chord /ms ${target} ${resolution} ${uuidv4()}`;
         const virtual = ["--type=VirtualScreen", `--name=${created}`];
         await command([
           "create",

@@ -7,7 +7,7 @@ var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
 var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __commonJSMin = (cb, mod) => () => (mod || cb((mod = { exports: {} }).exports, mod), mod.exports);
+var __commonJSMin = (cb, mod) => () => (mod || (cb((mod = { exports: {} }).exports, mod), cb = null), mod.exports);
 var __copyProps = (to, from, except, desc) => {
 	if (from && typeof from === "object" || typeof from === "function") for (var keys = __getOwnPropNames(from), i = 0, n = keys.length, key; i < n; i++) {
 		key = keys[i];
@@ -18,7 +18,7 @@ var __copyProps = (to, from, except, desc) => {
 	}
 	return to;
 };
-var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", {
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(isNodeMode || !mod || !mod.__esModule || !__hasOwnProp.call(mod, "default") ? __defProp(target, "default", {
 	value: mod,
 	enumerable: true
 }) : target, mod));
@@ -26,7 +26,7 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 //#region src/js/menu.ts
 var import__keychord_native_menu = /* @__PURE__ */ __toESM((/* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const nativeRequire = createRequire(import.meta.url);
-	const nativeFiles = { "darwin-arm64": new URL("native/aarch64-apple-darwin/menu/menu-952e35ea9b83.node", import.meta.url).href };
+	const nativeFiles = { "darwin-arm64": new URL("native/aarch64-apple-darwin/menu/menu-b2303b2313a2.node", import.meta.url).href };
 	const nativeTarget = process.platform + "-" + process.arch;
 	const nativeFile = nativeFiles[nativeTarget];
 	if (!nativeFile) throw new Error("[chord-native] menu has no addon for " + nativeTarget);
@@ -34,7 +34,7 @@ var import__keychord_native_menu = /* @__PURE__ */ __toESM((/* @__PURE__ */ __co
 })))(), 1);
 async function runMenuAction(processName, action, value) {
 	if (action === "BY_PATH") {
-		if (!Array.isArray(value) || value.length < 1 || value.some((component) => typeof component !== "string" || component.trim().length === 0)) throw new TypeError("\"by-path\" expects at least one non-empty string component");
+		if (!Array.isArray(value) || value.length < 1 || value.some((component) => typeof component !== "string" || component.trim().length === 0)) throw new TypeError("\"BY_PATH\" expects at least one non-empty string component");
 		return import__keychord_native_menu.default.runMenuAction(processName, action, JSON.stringify(value));
 	}
 	if (action === "SEARCH" && (typeof value !== "string" || !value.trim())) throw new TypeError("\"search\" expects non-empty text");

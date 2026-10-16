@@ -10,7 +10,8 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/kabiroberai/node-swift.git", exact: "1.5.1"),
-        .package(url: "https://github.com/openclaw/AXorcist.git", revision: "aa07d72fbb1861b56f5833b4cff8d9101c8dfbb3"),
+        .package(url: "https://github.com/apple/swift-algorithms.git", exact: "1.2.1"),
+        .package(url: "https://github.com/KeyChord/config.git", exact: "0.0.10"),
     ],
     targets: [
         .target(
@@ -18,7 +19,9 @@ let package = Package(
             dependencies: [
                 .product(name: "NodeAPI", package: "node-swift"),
                 .product(name: "NodeModuleSupport", package: "node-swift"),
-                .product(name: "AXorcist", package: "AXorcist"),
+                .product(name: "Algorithms", package: "swift-algorithms"),
+                .product(name: "AXorcistRuntime", package: "config"),
+                .product(name: "ChordNodeSupport", package: "config"),
             ]
         ),
     ],

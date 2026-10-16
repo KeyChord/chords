@@ -1,0 +1,4 @@
+name = 'Terminal'
+
+[chords]
+'/w' = { name = 'Warp', command = 'Open Warp', shell = '''open -a 'Warp'''' }

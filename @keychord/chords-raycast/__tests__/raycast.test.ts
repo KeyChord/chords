@@ -61,10 +61,7 @@ afterEach(() => {
 });
 
 test("// captures the entire query and loads the TypeScript handler's generated module", () => {
-  const source = readFileSync(
-    new URL("../chords/com/raycast/macos/macos.toml", import.meta.url),
-    "utf8",
-  );
+  const source = readFileSync(new URL("../chords/macos.toml", import.meta.url), "utf8");
   expect(source).toMatch(/\[on\.raycast\]\s+file = 'raycast\.js'/);
   const binding = source.match(/^'([^']+)' = .*'@input:raycast' = \['(\$1)'\]/m);
   expect(binding).not.toBeNull();

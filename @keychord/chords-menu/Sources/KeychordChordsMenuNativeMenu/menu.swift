@@ -10,8 +10,9 @@
 // both the desktop app and the updated Chord CLI service the main run loop.
 
 import AppKit
-import AXorcist
+import AXorcistRuntime
 import ApplicationServices
+import ChordNodeSupport
 import Foundation
 import NodeAPI
 
@@ -426,7 +427,7 @@ public func runMenuAction(processName: String?, action: String, value: String) a
     }
     log("Frontmost process: \(target.localizedName ?? "<unknown>")")
 
-    let application = Element(AXUIElementCreateApplication(target.processIdentifier))
+    let application = AXApp(target).element
     guard let menuBar = application.menuBar() else {
         throw MenuError.accessibility("menuBars[0]")
     }

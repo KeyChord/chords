@@ -151,7 +151,7 @@ test("the BetterDisplay package owns /ms, including exactly one reset binding", 
       ),
     );
   const definition = parse(new URL("../chords/macos.toml", import.meta.url));
-  const dock = parse(new URL("../../chords-dock/chords/macos.toml", import.meta.url));
+  const monitors = parse(new URL("../../chords-monitors/chords/macos.toml", import.meta.url));
   expect(definition.on.monitor.file).toBe("monitor.js");
   for (const input of ["/ms1440x1728", "/ms0"]) {
     const matches = Object.entries(definition.chords).filter(
@@ -160,8 +160,8 @@ test("the BetterDisplay package owns /ms, including exactly one reset binding", 
     );
     expect(matches).toHaveLength(1);
   }
-  expect(dock.chords["/ms(.+)"]).toBeUndefined();
-  expect(dock.chords["?/ms"]).toBeUndefined();
+  expect(monitors.chords["/ms(.+)"]).toBeUndefined();
+  expect(monitors.chords["?/ms"]).toBeUndefined();
 });
 
 test("available modes use the physical display and current dimensions are a no-op", async () => {

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- The browser objects used by this addon, from Chromium's scripting.sdef.
+     Keep the input local so builds do not require an installed browser. -->
+<dictionary>
+  <suite name="Standard Suite" code="core">
+    <class name="application" code="capp">
+      <element type="window"/>
+    </class>
+    <class name="window" code="cwin">
+      <element type="tab"/>
+      <property name="active tab" code="acTa" type="tab" access="r">
+        <cocoa key="activeTab"/>
+      </property>
+    </class>
+    <class name="tab" code="CrTb"/>
+  </suite>
+</dictionary>

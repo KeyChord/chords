@@ -2,7 +2,9 @@
 // geometry and connection state. Device coordinates exclude its toolbar and bezel.
 // Mouse input is shared through Rust's `chord.click`.
 import AppKit
+import AXorcistRuntime
 import ApplicationServices
+import ChordNodeSupport
 import CoreGraphics
 import Foundation
 import NodeAPI
@@ -50,74 +52,51 @@ private struct WindowBounds: Codable, Equatable {
         try mainActorPromise {
             let decoded = try JSONDecoder().decode(ScreenBounds.self, from: Data(request.utf8))
             try validateScreenBounds(decoded)
-            return nil
         }
     },
 ])
 
-private func axValue(_ element: AXUIElement, _ attribute: String) -> CFTypeRef? {
-    var value: CFTypeRef?
-    guard AXUIElementCopyAttributeValue(element, attribute as CFString, &value) == .success else {
-        return nil
-    }
-    return value
-}
-
-private func axChildren(_ element: AXUIElement, attribute: String = kAXChildrenAttribute) -> [AXUIElement] {
-    guard let values = axValue(element, attribute) as? [AXUIElement] else { return [] }
-    return values
-}
-
-private func screenWindow(_ application: AXUIElement) throws -> AXUIElement {
+@MainActor
+private func screenWindow(_ application: Element) throws -> Element {
     // Settings and connection dialogs also belong to this process. Select only the phone window.
-    guard let window = axChildren(application, attribute: kAXWindowsAttribute).first(where: {
-        axValue($0, kAXIdentifierAttribute) as? String == "iphone-mirroring-main"
+    guard let window = (application.windows() ?? []).first(where: {
+        $0.identifier() == "iphone-mirroring-main"
     }) else {
         throw MirroringError("Could not find the mirrored iPhone window; open iPhone Mirroring and connect your iPhone")
     }
     return window
 }
 
-private func bounds(of window: AXUIElement) throws -> ScreenBounds {
-    guard
-        let rawPosition = axValue(window, kAXPositionAttribute),
-        let rawSize = axValue(window, kAXSizeAttribute),
-        CFGetTypeID(rawPosition) == AXValueGetTypeID(),
-        CFGetTypeID(rawSize) == AXValueGetTypeID()
-    else {
+@MainActor
+private func bounds(of window: Element) throws -> ScreenBounds {
+    guard let position = window.position(), let size = window.size() else {
         throw MirroringError("Could not read the mirrored iPhone screen bounds")
-    }
-    var position = CGPoint.zero
-    var size = CGSize.zero
-    guard
-        AXValueGetValue(rawPosition as! AXValue, .cgPoint, &position),
-        AXValueGetValue(rawSize as! AXValue, .cgSize, &size)
-    else {
-        throw MirroringError("Could not decode the mirrored iPhone screen bounds")
     }
     let result = ScreenBounds(x: position.x, y: position.y, width: size.width, height: size.height)
     guard result.isValid else { throw MirroringError("The mirrored iPhone screen has invalid bounds") }
     return result
 }
 
-private func hasConnectionOverlay(_ element: AXUIElement, depth: Int = 0) -> Bool {
+@MainActor
+private func hasConnectionOverlay(_ element: Element, depth: Int = 0) -> Bool {
     guard depth < 10 else { return false }
-    let role = axValue(element, kAXRoleAttribute) as? String
+    let role = element.role()
     if role == kAXToolbarRole { return false }
     // The live phone stream is opaque to AX. Paused, timed-out and connection screens
     // contain native text. Detect those without depending on their localized wording.
     if role == kAXStaticTextRole || role == kAXTextFieldRole || role == kAXSheetRole { return true }
-    return axChildren(element).contains { hasConnectionOverlay($0, depth: depth + 1) }
+    return (element.attribute(Attribute<[AXUIElement]>(kAXChildrenAttribute)) ?? []).map(Element.init).contains { hasConnectionOverlay($0, depth: depth + 1) }
 }
 
-private func mirroringApplication() throws -> (NSRunningApplication, AXUIElement) {
-    guard AXIsProcessTrusted() else {
+@MainActor
+private func mirroringApplication() throws -> (NSRunningApplication, Element) {
+    guard AXPermissionHelpers.hasAccessibilityPermissions() else {
         throw MirroringError("Accessibility permission is required to click the mirrored iPhone screen")
     }
     guard let app = NSRunningApplication.runningApplications(withBundleIdentifier: mirroringBundleID).first else {
         throw MirroringError("Open iPhone Mirroring and connect your iPhone before clicking")
     }
-    return (app, AXUIElementCreateApplication(app.processIdentifier))
+    return (app, AXApp(app).element)
 }
 
 @MainActor
@@ -131,7 +110,8 @@ private func getScreenBounds() throws -> String {
     return String(decoding: try JSONEncoder().encode(screen), as: UTF8.self)
 }
 
-private func screenBounds(_ element: AXUIElement, processIdentifier: pid_t) throws -> ScreenBounds {
+@MainActor
+private func screenBounds(_ element: Element, processIdentifier: pid_t) throws -> ScreenBounds {
     let screen = try bounds(of: element)
     guard let windows = CGWindowListCopyWindowInfo(.optionOnScreenOnly, kCGNullWindowID) as? [[String: Any]] else {
         throw MirroringError("Could not enumerate the mirrored iPhone window")

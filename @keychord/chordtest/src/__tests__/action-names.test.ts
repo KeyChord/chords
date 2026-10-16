@@ -29,7 +29,7 @@ test("chord dispatch uses SCREAMING_SNAKE_CASE for internal action identifiers",
             if (typeof args[1] === "string" && !/^[-0-9$]/.test(args[1])) record(1);
             if (args[2]) record(2);
           }
-          if (handler === "monitor" && file.startsWith("@keychord/chords-dock/")) {
+          if (handler === "monitor" && file.startsWith("@keychord/chords-monitors/")) {
             if (typeof args[0] === "string" && !/^[-0-9$]/.test(args[0])) record(0);
             if (args[1]) record(1);
           }

@@ -3,7 +3,7 @@
 Chord package for the native macOS WhatsApp app (`net.whatsapp.WhatsApp`), moved
 from [leonsilicon/chords](https://github.com/leonsilicon/chords).
 
-Includes all 79 chat, Contact Info, theme, chat switching, view, call, input,
+Includes chat, Contact Info, theme, chat switching, view, call, input,
 and zoom bindings. All chords call `src/js/whatsapp.ts`, backed by the Swift addon in
 `Sources/KeychordChordsWhatsAppNativeWhatsapp`. Each action targets
 `net.whatsapp.WhatsApp`, launching and bringing it forward before acting. Actions
@@ -19,7 +19,22 @@ Controls without an accessibility press action use Chord's window-targeted click
 API, with the element's accessibility bounds and a fresh matching app window.
 If the window moves or cannot be matched uniquely, the action fails.
 
-Numbered chat switching presses the numbered loaded row in the main chat list.
+`co` opens the current chat in a separate window through its toolbar's More
+menu. The menu item has a dynamic identifier, so it uses the English label
+“Open in new window”. A chat must already be open.
+
+Voice call controls use `vv` for video/camera toggle, `vm` for mic toggle,
+`vr` for the reaction tray, `vs` for screenshare, `va` to add people,
+`vc` for the chat toggle, and `vx` to end the call. `vv2`, `vm2`, and `vs2`
+select the second camera, microphone, and speaker in the device menus;
+`vr12` sends the twelfth reaction, and the following position opens the custom
+reaction picker. Choices start at 1 and follow accessibility
+order within each section/tray. The reaction tray is reused when already open;
+switching device menus dismisses the previous device popover first. Add people
+and screenshare open WhatsApp's own picker for further selection.
+
+`c(\d+)` switches to any positive numbered loaded row in the main chat list,
+including positions beyond 9 (for example, `c12`).
 Scroll the desired rows into view first; filter and archive controls do not
 count as chats. Mute opens Chat Info and presses its Mute button. Profile opens
 Settings and presses the profile cell. No action sends keyboard shortcuts.

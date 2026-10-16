@@ -1,6 +1,6 @@
 import { generateSyntheticKeybinds } from "#/utils/keybinds.ts";
 import { expand } from "brace-expansion";
-import yaml from "js-yaml";
+import { dump, load } from "js-yaml";
 import { tap, type BuilderThis } from "chord";
 
 function extractCommands(chords: Record<string, any>): string[] {
@@ -32,7 +32,7 @@ export default async function buildWarpHandler(this: BuilderThis) {
   const keybindingsPath = `${Bun.env.HOME}/.warp/keybindings.yaml`;
   let keybindings: Record<string, string> = {};
   if (await Bun.file(keybindingsPath).exists()) {
-    const yml = yaml.load(await Bun.file(keybindingsPath).text());
+    const yml = load(await Bun.file(keybindingsPath).text());
     if (typeof yml === "object" && yml !== null) {
       keybindings = yml as Record<string, string>;
     }
@@ -43,7 +43,7 @@ export default async function buildWarpHandler(this: BuilderThis) {
     const keybind = syntheticKeybinds[cmd]!.replaceAll("+", "-");
     keybindings[cmd] = keybind;
   }
-  await Bun.write(keybindingsPath, "---\n" + yaml.dump(keybindings));
+  await Bun.write(keybindingsPath, "---\n" + dump(keybindings));
 
   return function command(cmd: string): boolean {
     const keybind = keybindings[cmd];

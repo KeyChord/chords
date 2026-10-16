@@ -1,5 +1,5 @@
 {
-  "originHash" : "bfb6793e05daeba3e918b9157bd3caa2e055e4df213f8c4aa2fdf2736935b78c",
+  "originHash" : "b23ccbb621689a539085ad5580d813699352fecd48ae743bb51332d53f912506",
   "pins" : [
     {
       "identity" : "node-swift",
@@ -8,6 +8,23 @@
       "state" : {
         "revision" : "9a476d2602923bced1afc302ee27250c7b4d197d",
         "version" : "1.5.1"
+      }
+    },
+    {
+      "identity" : "swift-argument-parser",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-argument-parser.git",
+      "state" : {
+        "revision" : "6a52f3251125d74daf04fcbd5e6f08a75d074382",
+        "version" : "1.8.2"
+      }
+    },
+    {
+      "identity" : "swift-scripting-bridge",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/rhx/swift-scripting-bridge.git",
+      "state" : {
+        "revision" : "1934001eaccb2fe15fb8dbf71b570b8805432326"
       }
     },
     {

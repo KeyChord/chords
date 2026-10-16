@@ -1,0 +1,15 @@
+{
+  "name": "@keychord/chords-monitors",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KeyChord/chords-monitors"
+  },
+  "type": "module",
+  "devDependencies": {
+    "@keychord/chordtest": "workspace:*",
+    "@keychord/config": "catalog:",
+    "@keychord/tsconfig": "catalog:",
+    "@types/bun": "latest"
+  },
+  "packageManager": "pnpm@12.11.2"
+}

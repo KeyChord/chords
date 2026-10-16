@@ -1,0 +1,7 @@
+name = 'Raycast'
+
+[on.raycast]
+file = 'raycast.js'
+
+[chords]
+'//(.*)' = { name = 'Raycast: Search $1', '@input:raycast' = ['$1'] }

@@ -1,0 +1,9 @@
+name = 'macOS'
+
+[chords]
+# Default browser and terminal launchers can be overridden by other packages.
+'/b' = { name = 'Browser (Safari)', shell = 'open -a Safari' }
+'/t' = { name = 'Terminal', shell = 'open -a Terminal' }
+'/ai' = { name = 'Accessibility Inspector' }
+'/am' = { name = 'Activity Monitor', shell = '''open -a 'Activity Monitor'''' }
+'/,' = { name = 'System Preferences', shell = 'open -b com.apple.systempreferences' }

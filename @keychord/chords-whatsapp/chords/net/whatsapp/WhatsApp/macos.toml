@@ -8,18 +8,19 @@ file = 'whatsapp.js'
 '?c' = { name = 'Chat' }
 'cq' = { name = 'Chat: Quit', '@input:whatsapp' = ['CHAT_CLOSE'] }
 'cb' = { name = 'Chat: Block', '@input:whatsapp' = ['CHAT_BLOCK'] }
-'cs' = { name = 'Chat: Search', '@input:whatsapp' = ['CHAT_SEARCH'] }
-'cvi' = { name = 'Chat: Video Call', '@input:whatsapp' = ['CHAT_VIDEO_CALL'] }
-'cvo' = { name = 'Chat: Voice Call', '@input:whatsapp' = ['CHAT_VOICE_CALL'] }
+'c/' = { name = 'Chat: Search', '@input:whatsapp' = ['CHAT_SEARCH'] }
+'cv' = { name = 'Chat: Video (Call)', '@input:whatsapp' = ['CHAT_VIDEO_CALL'] }
+'ca' = { name = 'Chat: Audio (Call)', '@input:whatsapp' = ['CHAT_VOICE_CALL'] }
+'co' = { name = 'Chat: Open (in new window)', '@input:whatsapp' = ['CHAT_OPEN_WINDOW'] }
 'cn' = { name = 'Chat: New', '@input:whatsapp' = ['CHAT_NEW'] }
 'cp' = { name = 'Chat: Pin', '@input:whatsapp' = ['CHAT_PIN'] }
-'ca' = { name = 'Chat: Archive', '@input:whatsapp' = ['CHAT_ARCHIVE'] }
+'ch' = { name = 'Chat: Hide (Archive)', '@input:whatsapp' = ['CHAT_ARCHIVE'] }
 'cm' = { name = 'Chat: Mute', '@input:whatsapp' = ['CHAT_MUTE'] }
 'cm8' = { name = 'Chat: Mute 8 Hours', '@input:whatsapp' = ['CHAT_MUTE_8_HOURS'] }
 'cmw' = { name = 'Chat: Mute 1 Week', '@input:whatsapp' = ['CHAT_MUTE_1_WEEK'] }
 'cu' = { name = 'Chat: Unread', '@input:whatsapp' = ['CHAT_UNREAD'] }
-'cv' = { name = 'Chat: Previous', '@input:whatsapp' = ['CHAT_PREVIOUS'] }
-'cx' = { name = 'Chat: Next', '@input:whatsapp' = ['CHAT_NEXT'] }
+'c[' = { name = 'Chat: Previous', '@input:whatsapp' = ['CHAT_PREVIOUS'] }
+'c]' = { name = 'Chat: Next', '@input:whatsapp' = ['CHAT_NEXT'] }
 'ce' = { name = 'Chat: Export', '@input:whatsapp' = ['CHAT_EXPORT'] }
 'cc' = { name = 'Chat: Clear', '@input:whatsapp' = ['CHAT_CLEAR'] }
 'cd' = { name = 'Chat: Delete', '@input:whatsapp' = ['CHAT_DELETE'] }
@@ -27,8 +28,8 @@ file = 'whatsapp.js'
 '?ci' = { name = 'Contact Info' }
 'ci' = { name = 'Contact Info', '@input:whatsapp' = ['CHAT_INFO'] }
 
-'cia' = { name = 'Contact Info > Avatar', '@input:whatsapp' = ['CHAT_INFO_AVATAR'] }
-'cip' = { name = 'Contact Info > Phone (Voice)', '@input:whatsapp' = ['CHAT_INFO_VOICE'] }
+'cii' = { name = 'Contact Info > Image (Avatar)', '@input:whatsapp' = ['CHAT_INFO_AVATAR'] }
+'cia' = { name = 'Contact Info > Audio (Call)', '@input:whatsapp' = ['CHAT_INFO_VOICE'] }
 'civ' = { name = 'Contact Info > Video', '@input:whatsapp' = ['CHAT_INFO_VIDEO'] }
 'ci/' = { name = 'Contact Info > Search', '@input:whatsapp' = ['CHAT_INFO_SEARCH'] }
 
@@ -89,37 +90,38 @@ file = 'whatsapp.js'
 'cib' = { name = 'Contact Info: Block', '@input:whatsapp' = ['CHAT_INFO_BLOCK'] }
 'cir' = { name = 'Contact Info: Report', '@input:whatsapp' = ['CHAT_INFO_REPORT'] }
 
-'?c"1-9"' = { name = 'Chat: Switch to Chat #' }
-'c1' = { name = 'Chat 1', '@input:whatsapp' = ['CHAT_SWITCH', 1] }
-'c2' = { name = 'Chat 2', '@input:whatsapp' = ['CHAT_SWITCH', 2] }
-'c3' = { name = 'Chat 3', '@input:whatsapp' = ['CHAT_SWITCH', 3] }
-'c4' = { name = 'Chat 4', '@input:whatsapp' = ['CHAT_SWITCH', 4] }
-'c5' = { name = 'Chat 5', '@input:whatsapp' = ['CHAT_SWITCH', 5] }
-'c6' = { name = 'Chat 6', '@input:whatsapp' = ['CHAT_SWITCH', 6] }
-'c7' = { name = 'Chat 7', '@input:whatsapp' = ['CHAT_SWITCH', 7] }
-'c8' = { name = 'Chat 8', '@input:whatsapp' = ['CHAT_SWITCH', 8] }
-'c9' = { name = 'Chat 9', '@input:whatsapp' = ['CHAT_SWITCH', 9] }
+'c(\d+)' = { name = 'Chat: Switch to Chat #', '@input:whatsapp' = ['CHAT_SWITCH', '$1'] }
 
-'?v' = { name = 'View' }
-'vc' = { name = 'View: Chats', '@input:whatsapp' = ['VIEW_CHATS'] }
-'vk' = { name = 'View: Kalls (Calls)', '@input:whatsapp' = ['VIEW_CALLS'] }
-'vu' = { name = 'View: Updates', '@input:whatsapp' = ['VIEW_UPDATES'] }
-'va' = { name = 'View: Archived', '@input:whatsapp' = ['VIEW_ARCHIVED'] }
-'vs' = { name = 'View: Starred', '@input:whatsapp' = ['VIEW_STARRED'] }
-'v,' = { name = 'View: Settings', '@input:whatsapp' = ['VIEW_SETTINGS'] }
+'?g' = { name = 'Goto' }
+'gc' = { name = 'Goto: Chats', '@input:whatsapp' = ['VIEW_CHATS'] }
+'gch' = { name = 'Goto: Chats > Hidden (Archived)', '@input:whatsapp' = ['VIEW_ARCHIVED'] }
+'gca' = { name = 'Goto: Chats > All' }
+'gcu' = { name = 'Goto: Chats > Unread' }
+'gcf' = { name = 'Goto: Chats > Favourites' }
+'gcg' = { name = 'Goto: Chats > Groups' }
+'gu' = { name = 'Goto: Updates', '@input:whatsapp' = ['VIEW_UPDATES'] }
+'gs' = { name = 'Goto: Servers (Communities)' }
+'gp' = { name = 'Goto: Phone (Calls)', '@input:whatsapp' = ['VIEW_CALLS'] }
+'ga' = { name = 'Goto: AI' }
+'gm' = { name = 'Goto: Media' }
+'gms' = { name = 'Goto: More > Starred' }
+'g,' = { name = 'Goto: Settings', '@input:whatsapp' = ['VIEW_SETTINGS'] }
 
-'?p' = { name = 'Phone (Call)' }
-'pn' = { name = 'Phone: New', '@input:whatsapp' = ['CALL_NEW'] }
-'pg' = { name = 'Phone: Group Call', '@input:whatsapp' = ['CALL_NEW_GROUP'] }
-'pl' = { name = 'Phone: Link', '@input:whatsapp' = ['CALL_LINK'] }
-'pc' = { name = 'Phone: Camera Toggle', '@input:whatsapp' = ['CALL_CAMERA'] }
-'pm' = { name = 'Phone: Mic Toggle', '@input:whatsapp' = ['CALL_MICROPHONE'] }
-'pr' = { name = 'Phone: React', '@input:whatsapp' = ['CALL_REACT'] }
-'ph' = { name = 'Phone: Hand Raise', '@input:whatsapp' = ['CALL_HAND'] }
-'ps' = { name = 'Phone: Screen Share', '@input:whatsapp' = ['CALL_SCREEN_SHARE'] }
-'pp' = { name = 'Phone: Participants', '@input:whatsapp' = ['CALL_PARTICIPANTS'] }
-'pe' = { name = 'Phone: End', '@input:whatsapp' = ['CALL_END'] }
-'pt' = { name = 'Phone: Top Always', '@input:whatsapp' = ['CALL_ALWAYS_ON_TOP'] }
+'?v' = { name = "Voicechat (Call)" }
+'vv' = { name = 'Voicechat: Video (Toggle)', '@input:whatsapp' = ['CALL_CAMERA'] }
+'vv(\d+)' = { name = 'Voicechat: Video (Camera) @ #', '@input:whatsapp' = [
+  'CALL_CAMERA_SELECT',
+  '$1',
+] }
+'vm' = { name = 'Voicechat: Mic (Toggle)', '@input:whatsapp' = ['CALL_MICROPHONE'] }
+'vm(\d+)' = { name = 'Voicechat: Mic @ #', '@input:whatsapp' = ['CALL_MICROPHONE_SELECT', '$1'] }
+'vs(\d+)' = { name = 'Voicechat: Speaker @ #', '@input:whatsapp' = ['CALL_SPEAKER_SELECT', '$1'] }
+'vr' = { name = 'Voicechat: React', '@input:whatsapp' = ['CALL_REACTIONS'] }
+'vr(\d+)' = { name = 'Voicechat: React @ #', '@input:whatsapp' = ['CALL_REACTION_SELECT', '$1'] }
+'vs' = { name = 'Voicechat: Screenshare', '@input:whatsapp' = ['CALL_SCREEN_SHARE'] }
+'va' = { name = 'Voicechat: Add (People)', '@input:whatsapp' = ['CALL_ADD_PEOPLE'] }
+'vc' = { name = 'Voicechat: Chat (Toggle)', '@input:whatsapp' = ['CALL_CHAT'] }
+'vx' = { name = 'Voicechat: X (End Call)', '@input:whatsapp' = ['CALL_END'] }
 
 '?i' = { name = 'Input' }
 'ie' = { name = 'Input: Emoji', '@input:whatsapp' = ['INPUT_EMOJI'] }
@@ -130,3 +132,16 @@ file = 'whatsapp.js'
 'zi' = { name = 'Zoom In', '@input:whatsapp' = ['ZOOM_IN'] }
 'zo' = { name = 'Zoom Out', '@input:whatsapp' = ['ZOOM_OUT'] }
 'zr' = { name = 'Zoom Reset', '@input:whatsapp' = ['ZOOM_RESET'] }
+
+'?p' = { name = "Profile" }
+'pf' = { name = "Profile > Favourites" }
+'ps' = { name = "Profile > Starred" }
+'ph' = { name = "Profile > History (Chat)" }
+'pa' = { name = "Profile > Account" }
+'pp' = { name = "Profile > Privacy" }
+'pc' = { name = "Profile > Chats" }
+'pap' = { name = "Profile > Appearance" }
+'pn' = { name = "Profile > Notifications" }
+'pag' = { name = "Profile > Agents" }
+'psd' = { name = "Profile > Storage & Data" }
+'phf' = { name = "Profile > Help & Feedback" }

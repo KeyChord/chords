@@ -1,4 +1,4 @@
-// swift-tools-version: 6.0
+// swift-tools-version: 6.1
 //
 // NodeSwift addon for the `@keychord/chords-web` chord package.
 //
@@ -19,6 +19,8 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/kabiroberai/node-swift.git", exact: "1.5.1"),
+        // The next upstream revision declares a SystemEventsScripting target without sources.
+        .package(url: "https://github.com/rhx/swift-scripting-bridge.git", revision: "1934001eaccb2fe15fb8dbf71b570b8805432326"),
     ],
     targets: [
         .target(
@@ -26,7 +28,8 @@ let package = Package(
             dependencies: [
                 .product(name: "NodeAPI", package: "node-swift"),
                 .product(name: "NodeModuleSupport", package: "node-swift"),
-            ]
+            ],
+            plugins: [.plugin(name: "GenerateScriptingInterface", package: "swift-scripting-bridge")]
         ),
     ],
     swiftLanguageModes: [.v5]

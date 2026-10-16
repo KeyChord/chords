@@ -1,0 +1,4 @@
+name = 'Finder'
+
+[chords]
+'/f' = { name = 'Finder', shell = 'open -a Finder' }

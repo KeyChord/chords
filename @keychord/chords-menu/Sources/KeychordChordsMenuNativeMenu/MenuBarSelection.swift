@@ -1,5 +1,6 @@
 import AppKit
-import AXorcist
+import Algorithms
+import AXorcistRuntime
 import ApplicationServices
 import CoreGraphics
 
@@ -25,7 +26,7 @@ struct MenuBarSelection: Sendable {
 
     @MainActor
     func run(focusedAppId: String?) async throws {
-        guard AXIsProcessTrusted() else { throw TrayError.accessibilityPermissionRequired }
+        guard AXPermissionHelpers.hasAccessibilityPermissions() else { throw TrayError.accessibilityPermissionRequired }
         let bounds = CGDisplayBounds(CGMainDisplayID())
         var menus: [TrayElement] = []
         if scope == .menu {
@@ -45,7 +46,7 @@ struct MenuBarSelection: Sendable {
                     try await Task.sleep(for: .milliseconds(20))
                 }
             }
-            let app = Element(AXUIElementCreateApplication(target.processIdentifier))
+            let app = AXApp(target).element
             guard let menuBar = app.menuBar() else { throw TrayError.controlNotFound("application menu bar") }
             menus = visibleMenuBarItems(in: menuBar, bounds: bounds)
             guard !menus.isEmpty else { throw TrayError.controlNotFound("application menu bar items") }
@@ -54,7 +55,7 @@ struct MenuBarSelection: Sendable {
         var extras: [TrayElement] = []
         if scope == .tray {
             for app in NSWorkspace.shared.runningApplications {
-                let owner = Element(AXUIElementCreateApplication(app.processIdentifier))
+                let owner = AXApp(app).element
                 var attributes = [kAXExtrasMenuBarAttribute]
                 // These agents expose status items through AXMenuBar on some macOS versions.
                 if ["com.apple.controlcenter", "com.apple.MenuBarAgent", "com.apple.systemuiserver"].contains(app.bundleIdentifier ?? "") {
@@ -68,9 +69,8 @@ struct MenuBarSelection: Sendable {
             }
         }
         // The same status item may be exposed by more than one system agent.
-        var seen = Set<CGFloat>()
         let items = (menus + extras).sorted { $0.frame.minX < $1.frame.minX }
-            .filter { seen.insert($0.frame.minX).inserted }
+            .uniqued(on: \.frame.minX)
         var offset = index < 0 ? items.count + index : index
         guard items.indices.contains(offset) else {
             throw TrayError.controlNotFound("\(scope.rawValue) menu bar item at index \(index); found \(items.count) items")
@@ -106,7 +106,7 @@ private func visibleMenuBarItems(in bar: Element, bounds: CGRect) -> [TrayElemen
 
 @MainActor
 func runNotchAction() async throws {
-    guard AXIsProcessTrusted() else { throw TrayError.accessibilityPermissionRequired }
+    guard AXPermissionHelpers.hasAccessibilityPermissions() else { throw TrayError.accessibilityPermissionRequired }
     let displayID = CGMainDisplayID()
     guard let screen = NSScreen.screens.first(where: {
         ($0.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber)?.uint32Value == displayID

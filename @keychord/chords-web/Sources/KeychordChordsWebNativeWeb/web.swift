@@ -2,12 +2,14 @@
 //
 // The implementation sends the browser's `execute javascript` Apple event directly to the active
 // tab of its front window. No `osascript` helper process is involved.
+// Browser object interfaces are generated from Chromium.sdef by swift-scripting-bridge.
 
 import AppKit
 import Carbon
 import CoreFoundation
 import Foundation
 import NodeAPI
+import ScriptingBridge
 
 private let supportedBrowserNames: Set<String> = [
     "Google Chrome",
@@ -54,38 +56,23 @@ private func describe(_ error: Error) -> String {
 
 // MARK: - Browser Apple event
 
-private let executeJavaScriptEventClass = AEEventClass(0x4372_5375) // 'CrSu'
-private let executeJavaScriptEvent = AEEventID(0x4578_4A61) // 'ExJa'
-private let javaScriptParameter = AEKeyword(0x4A76_5363) // 'JvSc'
-private let windowClass = DescType(0x6377_696E) // 'cwin'
-private let activeTabProperty = DescType(0x6163_5461) // 'acTa'
+// Scripting Bridge reports Apple-event failures through its delegate. Capture them
+// so they become ordinary Swift/JavaScript errors instead of Objective-C exceptions.
+private final class ScriptingErrors: NSObject, SBApplicationDelegate {
+    var error: Error?
 
-private func objectSpecifier(
-    desiredClass: DescType,
-    container: NSAppleEventDescriptor?,
-    keyForm: DescType,
-    keyData: NSAppleEventDescriptor
-) throws -> NSAppleEventDescriptor {
-    let record = NSAppleEventDescriptor.record()
-    record.setDescriptor(
-        NSAppleEventDescriptor(typeCode: desiredClass),
-        forKeyword: AEKeyword(keyAEDesiredClass)
-    )
-    record.setDescriptor(
-        NSAppleEventDescriptor(typeCode: keyForm),
-        forKeyword: AEKeyword(keyAEKeyForm)
-    )
-    record.setDescriptor(keyData, forKeyword: AEKeyword(keyAEKeyData))
-    record.setDescriptor(
-        container ?? NSAppleEventDescriptor.null(),
-        forKeyword: AEKeyword(keyAEContainer)
-    )
-
-    guard let descriptor = record.coerce(toDescriptorType: DescType(typeObjectSpecifier)) else {
-        throw WebError.appleEvent("could not create an object specifier")
+    func eventDidFail(_ event: UnsafePointer<AppleEvent>, withError error: Error) -> Any? {
+        if self.error == nil { self.error = error }
+        return nil
     }
-    return descriptor
 }
+
+// The generator does not handle commands whose direct parameter is their receiver.
+// This is the tab selector emitted by Apple's sdp for Chromium's scripting dictionary.
+@objc private protocol JavaScriptTab {
+    @objc optional func executeJavascript(_ source: String) -> Any?
+}
+extension SBObject: JavaScriptTab {}
 
 private func displayUnsupportedBrowser(_ name: String) {
     var responseFlags: CFOptionFlags = 0
@@ -122,44 +109,28 @@ private func runJavaScript(_ source: String) throws {
         throw WebError.browserHasNoBundleIdentifier(browserName)
     }
 
-    let frontWindow = try objectSpecifier(
-        desiredClass: windowClass,
-        container: nil,
-        keyForm: DescType(formAbsolutePosition),
-        keyData: NSAppleEventDescriptor(int32: 1)
-    )
-    let activeTab = try objectSpecifier(
-        desiredClass: DescType(typeProperty),
-        container: frontWindow,
-        keyForm: DescType(formPropertyID),
-        keyData: NSAppleEventDescriptor(typeCode: activeTabProperty)
-    )
-    let target = NSAppleEventDescriptor(bundleIdentifier: bundleIdentifier)
-    let event = NSAppleEventDescriptor(
-        eventClass: executeJavaScriptEventClass,
-        eventID: executeJavaScriptEvent,
-        targetDescriptor: target,
-        returnID: AEReturnID(kAutoGenerateReturnID),
-        transactionID: AETransactionID(kAnyTransactionID)
-    )
-    event.setParam(activeTab, forKeyword: AEKeyword(keyDirectObject))
-    event.setParam(NSAppleEventDescriptor(string: source), forKeyword: javaScriptParameter)
-
-    let reply: NSAppleEventDescriptor
-    do {
-        reply = try event.sendEvent(options: [.waitForReply], timeout: 60)
-    } catch {
-        throw WebError.appleEvent(describe(error))
+    guard let application = SBApplication(bundleIdentifier: bundleIdentifier) else {
+        throw WebError.appleEvent("could not create the browser scripting interface")
     }
-
-    let errorNumber = reply.paramDescriptor(forKeyword: AEKeyword(keyErrorNumber))?.int32Value ?? 0
-    if errorNumber != 0 {
-        let message = reply.paramDescriptor(forKeyword: AEKeyword(keyErrorString))?.stringValue
-            ?? "error \(errorNumber)"
-        throw WebError.appleEvent(message)
+    let errors = ScriptingErrors()
+    let previousDelegate = application.delegate
+    let previousTimeout = application.timeout
+    application.delegate = errors
+    application.timeout = 60 * 60 // Apple-event timeouts are in ticks (60 per second).
+    defer {
+        application.delegate = previousDelegate
+        application.timeout = previousTimeout
     }
-
-    if let result = reply.paramDescriptor(forKeyword: AEKeyword(keyDirectObject)) {
-        print(result.stringValue ?? result.description)
+    let scripting: Chromium.Application = application
+    let tab = scripting.windows.first?.activeTab
+    if let error = errors.error { throw WebError.appleEvent(describe(error)) }
+    guard let tab else { throw WebError.appleEvent("the browser has no active tab") }
+    guard let scriptableTab = tab as? JavaScriptTab, let execute = scriptableTab.executeJavascript else {
+        throw WebError.appleEvent("the browser tab cannot execute JavaScript")
+    }
+    let result = execute(source)
+    if let error = errors.error { throw WebError.appleEvent(describe(error)) }
+    if let result {
+        print(result)
     }
 }

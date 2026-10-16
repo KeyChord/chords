@@ -1,5 +1,5 @@
 // Vite+ also calls this helper under Node from native build hooks.
-import { copyFile, mkdir, mkdtemp, rename, rm } from "node:fs/promises";
+import { copyFile, mkdir, mkdtemp, rename, rm, stat } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { build } from "node-swift";
 
@@ -21,6 +21,8 @@ export async function buildNativeAddon(options: {
     product,
     static: false,
     napi: 8,
+    // Tests inspect SwiftPM's Modules/ and module maps when compiling queue probes.
+    builder: { type: "swiftpm", settings: ["--build-system", "native"] },
   });
   return stageNativeAddon(binary, outputDirectory, name);
 }
@@ -34,8 +36,21 @@ export async function stageNativeAddon(binary: string, outputDirectory: string, 
   const staged = await mkdtemp(join(outputDirectory, ".stage-"));
   try {
     await copyFile(binary, join(staged, `${name}.node`));
-    await copyFile(join(dirname(binary), "libNodeAPI.dylib"), join(staged, "libNodeAPI.dylib"));
-    await rename(join(staged, "libNodeAPI.dylib"), join(outputDirectory, "libNodeAPI.dylib"));
+    const runtimes = ["libNodeAPI.dylib"];
+    const accessibilityRuntime = "libAXorcistRuntime.dylib";
+    if (
+      await stat(join(dirname(binary), accessibilityRuntime)).catch((error) => {
+        if (error.code === "ENOENT") return undefined;
+        throw error;
+      })
+    )
+      runtimes.push(accessibilityRuntime);
+    for (const runtime of runtimes) {
+      await copyFile(join(dirname(binary), runtime), join(staged, runtime));
+    }
+    for (const runtime of runtimes) {
+      await rename(join(staged, runtime), join(outputDirectory, runtime));
+    }
     await rename(join(staged, `${name}.node`), addon);
   } finally {
     await rm(staged, { recursive: true, force: true });

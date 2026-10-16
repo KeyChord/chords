@@ -20,20 +20,12 @@ test.skipIf(process.platform !== "darwin")(
       new URL("../node_modules/.cache/chord/native/swiftpm", import.meta.url),
     );
     const build = join(swiftpm, "debug");
+    // The shipped helper, from the KeyChord/config release the package resolved.
+    const helper = join(swiftpm, "checkouts/config/swift/ChordNodeSupport/MainActorPromise.swift");
     const binaries: string[] = [];
-    for (const [index, module] of modules.entries()) {
+    for (const module of modules) {
       const sources = join(scratch, "Sources", module);
       await mkdir(sources, { recursive: true });
-      const helper =
-        index === 0
-          ? new URL(
-              "../Sources/KeychordChordsMenuNativeMenu/MainActorPromise.swift",
-              import.meta.url,
-            )
-          : new URL(
-              "../../chords-menu/Sources/KeychordChordsMenuNativeMenu/MainActorPromise.swift",
-              import.meta.url,
-            );
       await Bun.write(join(sources, "MainActorPromise.swift"), Bun.file(helper));
       await Bun.write(
         join(sources, "Probe.swift"),

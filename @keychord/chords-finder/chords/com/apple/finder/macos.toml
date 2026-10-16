@@ -1,8 +1,6 @@
 name = 'Finder'
 
 [chords]
-'/f' = { name = 'Finder', shell = 'open -a Finder' }
-
 '?g' = { name = 'Goto' }
 gr = { name = 'Goto Recents', shortcut = 'cmd+shift+f' }
 gx = { name = 'Goto Docx', shortcut = 'cmd+shift+o' }

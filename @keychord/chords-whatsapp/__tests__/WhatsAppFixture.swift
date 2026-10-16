@@ -23,18 +23,26 @@ final class PaletteButton: NSButton {
 }
 
 @MainActor
+final class DevicePopover: NSView {
+    var dismiss: (() -> Void)?
+    override func accessibilityPerformCancel() -> Bool { dismiss?(); return true }
+}
+
+@MainActor
 final class Fixture: NSObject, NSApplicationDelegate {
     var window: NSWindow!
+    var chatWindow: NSWindow?
     var phase = "MAIN"
     var request = 0
     var sequence = 0
     var timer: Timer?
+    var chatVisible = false
     let output = ProcessInfo.processInfo.environment["CHORD_FIXTURE_OUTPUT"]!
 
     func record(_ action: String) {
         sequence += 1
         let active = NSWorkspace.shared.frontmostApplication?.processIdentifier == ProcessInfo.processInfo.processIdentifier
-        let data = try! JSONSerialization.data(withJSONObject: ["action": action, "active": active, "phase": phase, "request": request, "sequence": sequence])
+        let data = try! JSONSerialization.data(withJSONObject: ["action": action, "active": active, "phase": phase, "request": request, "sequence": sequence, "chatVisible": chatVisible, "chatWindowOpen": chatWindow?.isVisible == true])
         try! data.write(to: URL(fileURLWithPath: output), options: .atomic)
     }
 
@@ -46,6 +54,20 @@ final class Fixture: NSObject, NSApplicationDelegate {
         case "info_theme": showTheme()
         case "theme_bubble": showBubble()
         case "theme_wallpaper": showWallpaper()
+        case "NavigationBar_MoreButton":
+            let menu = NSMenu()
+            let item = NSMenuItem(title: "\u{200E}Open in new window", action: #selector(openChatWindow(_:)), keyEquivalent: "")
+            item.identifier = NSUserInterfaceItemIdentifier("com.apple.action.dynamic.\(UUID())")
+            item.target = self
+            menu.addItem(item)
+            DispatchQueue.main.async { [weak self] in
+                menu.popUp(positioning: nil, at: NSPoint(x: 700, y: 530), in: self?.window.contentView)
+            }
+        case "camera_open": showDevices(camera: true)
+        case "audio_open": showDevices(camera: false)
+        case "reactions_open": showReactions()
+        case "call_chat": chatVisible.toggle()
+        case "CallUI_DeclineButton", "CallUI_AcceptButton": showCall()
         case "bubble_more":
             let menu = NSMenu()
             let reset = NSMenuItem(title: "Localized reset", action: #selector(menuAction(_:)), keyEquivalent: "")
@@ -75,7 +97,20 @@ final class Fixture: NSObject, NSApplicationDelegate {
         invoke(id)
     }
 
-    @objc func buttonAction(_ sender: NSButton) { invoke(sender.identifier!.rawValue) }
+    @objc func buttonAction(_ sender: NSButton) {
+        let id = sender.identifier!.rawValue
+        if id == "ReactionsTray_ReactionButton" { showCall(); record("reaction_\(sender.tag)") }
+        else { invoke(id) }
+    }
+
+    @objc func openChatWindow(_ sender: NSMenuItem) {
+        let chat = NSWindow(contentRect: NSRect(x: 120, y: 120, width: 500, height: 500), styleMask: [.titled, .closable], backing: .buffered, defer: false)
+        chat.isReleasedWhenClosed = false
+        chat.title = "Fixture Chat"
+        chat.makeKeyAndOrderFront(nil)
+        chatWindow = chat
+        record("open_chat_window")
+    }
 
     func group(_ id: String, frame: NSRect, parent: NSView) -> NSView {
         let view = NSView(frame: frame)
@@ -86,11 +121,13 @@ final class Fixture: NSObject, NSApplicationDelegate {
         return view
     }
 
-    func button(_ id: String, _ label: String, frame: NSRect, parent: NSView) {
+    @discardableResult
+    func button(_ id: String, _ label: String, frame: NSRect, parent: NSView) -> NSButton {
         let button = NSButton(title: label, target: self, action: #selector(buttonAction(_:)))
         button.identifier = NSUserInterfaceItemIdentifier(id)
         button.frame = frame
         parent.addSubview(button)
+        return button
     }
 
     func root(_ phase: String, heading: String? = nil) -> NSView {
@@ -112,16 +149,71 @@ final class Fixture: NSObject, NSApplicationDelegate {
         let view = root("MAIN")
         button("SidebarButton_Archived", "Localized Archived", frame: NSRect(x: 20, y: 530, width: 220, height: 30), parent: view)
         button("SidebarButton_Starred", "Localized Starred", frame: NSRect(x: 270, y: 530, width: 220, height: 30), parent: view)
+        button("TabBarButton_More", "More", frame: NSRect(x: 510, y: 530, width: 160, height: 30), parent: view)
+        button("NavigationBar_MoreButton", "More", frame: NSRect(x: 700, y: 530, width: 160, height: 30), parent: view)
         let list = group("ChatListView_TableView", frame: NSRect(x: 20, y: 80, width: 300, height: 420), parent: view)
         _ = group("ChatListView_chipButtonsCell", frame: NSRect(x: 0, y: 390, width: 300, height: 25), parent: list)
         _ = group("ChatListView_archiveCell", frame: NSRect(x: 0, y: 360, width: 300, height: 25), parent: list)
-        for index in 1...9 { button("chat_\(index)", "Fixture Chat \(index)", frame: NSRect(x: 0, y: 350 - index * 32, width: 250, height: 28), parent: list) }
+        for index in 1...12 { button("chat_\(index)", "Fixture Chat \(index)", frame: NSRect(x: 0, y: 350 - index * 26, width: 250, height: 24), parent: list) }
     }
 
     func showSettings() {
         let view = root("SETTINGS")
         let duplicate = group("SettingsView_ProfileCell", frame: NSRect(x: 20, y: 400, width: 300, height: 50), parent: view)
         button("SettingsView_ProfileCell", "Localized Profile", frame: duplicate.bounds, parent: duplicate)
+    }
+
+    func showIncomingCall() {
+        let view = root("INCOMING_CALL")
+        button("CallUI_DeclineButton", "hang up", frame: NSRect(x: 100, y: 100, width: 200, height: 100), parent: view)
+        button("CallUI_AcceptButton", "\u{200E}Accept call", frame: NSRect(x: 500, y: 100, width: 200, height: 100), parent: view)
+    }
+
+    func showCall() {
+        let view = root("CALL")
+        view.identifier = NSUserInterfaceItemIdentifier("Calling_Window")
+        view.setAccessibilityElement(true)
+        view.setAccessibilityRole(.group)
+        for (index, item) in [("camera_open", "Video device selection"), ("audio_open", "Audio device selection"), ("reactions_open", "reaction"), ("add_people", "Add people"), ("call_chat", "Chat")].enumerated() {
+            button(item.0, item.1, frame: NSRect(x: 20 + index * 170, y: 20, width: 160, height: 40), parent: view)
+        }
+    }
+
+    func showDevices(camera: Bool) {
+        showCall()
+        let view = window.contentView!
+        let popover = DevicePopover(frame: NSRect(x: 200, y: 100, width: 480, height: 480))
+        popover.setAccessibilityElement(true)
+        popover.setAccessibilityRole(NSAccessibility.Role(rawValue: "AXPopover"))
+        popover.dismiss = { [weak self] in self?.showCall() }
+        view.addSubview(popover)
+        for (sectionIndex, section) in (camera ? ["Camera"] : ["Microphone", "Speaker"]).enumerated() {
+            let heading = group("device_heading_\(section)", frame: NSRect(x: 10, y: 420 - sectionIndex * 220, width: 450, height: 30), parent: popover)
+            heading.setAccessibilityRole(NSAccessibility.Role(rawValue: "AXHeading"))
+            // Match the empty outer heading used by Catalyst's camera/mic menus.
+            let text = NSTextField(labelWithString: section)
+            text.frame = heading.bounds
+            if section == "Speaker" { text.setAccessibilityRole(NSAccessibility.Role(rawValue: "AXHeading")); text.setAccessibilityLabel(section) }
+            heading.addSubview(text)
+            for index in 1...3 {
+                let control = "\(section.lowercased())_\(index)"
+                let text = ClickableText(label: "\(index == 1 ? "✓, " : "")Fixture \(section) \(index)", frame: NSRect(x: 20, y: 420 - sectionIndex * 220 - index * 45, width: 420, height: 35)) { [weak self] in
+                    self?.showCall()
+                    self?.record(control)
+                }
+                popover.addSubview(text)
+            }
+        }
+    }
+
+    func showReactions() {
+        showCall()
+        let view = window.contentView!
+        let emoji = ["👍", "❤️", "😂", "😮", "😢", "🙏", "👏", "🥰", "🥹", "😭", "🔥", "🤣"]
+        for (index, label) in emoji.enumerated() {
+            button("ReactionsTray_ReactionButton", label, frame: NSRect(x: 20 + (index % 6) * 130, y: 400 - (index / 6) * 100, width: 100, height: 80), parent: view).tag = index + 1
+        }
+        button("ReactionsTray_PlusSign", "Add custom reaction", frame: NSRect(x: 800, y: 300, width: 80, height: 80), parent: view)
     }
 
     func showInfo() {
@@ -229,8 +321,17 @@ final class Fixture: NSObject, NSApplicationDelegate {
                       let request = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
                       let token = request["token"] as? Int, token != self.request else { return }
                 self.request = token
-                self.menus(mode: request["mode"] as? String ?? "DEFAULT")
-                self.showMain()
+                self.chatWindow?.close()
+                self.chatWindow = nil
+                let mode = request["mode"] as? String ?? "DEFAULT"
+                self.menus(mode: mode)
+                self.chatVisible = false
+                if mode == "INCOMING_CALL" { self.showIncomingCall() }
+                else if mode == "CALL_CAMERA_OPEN" { self.showDevices(camera: true) }
+                else if mode == "CALL_AUDIO_OPEN" { self.showDevices(camera: false) }
+                else if mode == "CALL_REACTIONS_OPEN" { self.showReactions() }
+                else if mode == "CALL" { self.showCall() }
+                else { self.showMain() }
                 self.record("READY")
             }
         }

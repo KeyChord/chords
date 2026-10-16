@@ -2,6 +2,12 @@
 
 Prefer Bun APIs over `node:*` in Chord handlers and Bun scripts. Use `Bun.file` / `Bun.write` for file contents and copies, `Bun.spawn` / `Bun.spawnSync` for subprocesses, and Bun's URL helpers. Keep Node APIs for operations without a Bun equivalent or code that must run under Node, including Vite+ configuration and tests. Preserve failure handling, timeouts, permissions, and locking semantics.
 
+# Chord locations
+
+Define symbol-prefixed global chords and their hints in each package's root
+`chords/macos.toml`, alongside any handlers they use. Application-specific
+alphanumeric chords belong in the nested application/bundle-ID folders.
+
 # Action identifiers
 
 Use `SCREAMING_SNAKE_CASE` for string constants that identify internal actions
@@ -119,4 +125,5 @@ For GitHub Actions, consider using [`voidzero-dev/setup-vp`](https://github.com/
 
 - [ ] Run `vp install` after pulling remote changes and before getting started.
 - [ ] Run `vp check` and `vp test` to validate changes.
+
 <!--VITE PLUS END-->

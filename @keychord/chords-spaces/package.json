@@ -1,0 +1,13 @@
+{
+  "name": "@keychord/chords-spaces",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KeyChord/chords-spaces"
+  },
+  "type": "module",
+  "devDependencies": {
+    "@keychord/chordtest": "workspace:*",
+    "@keychord/config": "catalog:"
+  },
+  "packageManager": "pnpm@12.11.2"
+}

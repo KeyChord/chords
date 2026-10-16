@@ -1,0 +1,8 @@
+{
+  "extends": "../chordtest/tsconfig.json",
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": false
+  },
+  "include": ["src", "__tests__", "vite.config.ts"]
+}

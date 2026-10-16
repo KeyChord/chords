@@ -20,7 +20,7 @@ Letter queries exclude the Apple menu.
 `=wq` for Quarters, `=ws[` for Return to Previous Size, `=wz` for Zoom, `=wf` for Fill,
 `=wc` for Center, `=wfl`/`=wfr` for full-screen tiling, and `=waf` for Bring All to Front.
 They invoke exact Window-menu paths. Availability and labels depend on the application
-and macOS language. Native alignment/stretch commands live under `/w` in `chords-dock`.
+and macOS language. Native alignment/stretch commands live under `/w` in `chords-windows`.
 
 Tray selection uses `=<index>` from the left and `=-<index>` from the right, starting
 at 1. Typing previews by moving the pointer; `.` clicks and `,` right-clicks. The last
@@ -87,7 +87,7 @@ The existing `ITEM` / `HOVER` API continues to address tray icons only.
 
 The unified addon is built from `Sources/KeychordChordsMenuNativeMenu` and exposes
 `runMenuAction`, `runMenuBarAction`, and `runTrayAction`. All handlers import `menu.node`;
-the build packages it and `libNodeAPI.dylib` beside the JavaScript, including when
+the build packages it, `libNodeAPI.dylib`, and `libAXorcistRuntime.dylib` beside the JavaScript, including when
 vendored into other chord packages. Requires macOS 14+, Accessibility access, and a
 Chord CLI with main-run-loop support.
 

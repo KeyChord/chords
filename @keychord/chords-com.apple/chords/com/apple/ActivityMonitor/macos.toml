@@ -4,8 +4,6 @@ name = 'Activity Monitor'
 file = '@keychord/chords-menu/js/menu.js'
 
 [chords]
-'/am' = { name = 'Activity Monitor', shell = '''open -a 'Activity Monitor'''' }
-
 '?v' = { name = 'View' }
 va = { name = 'View: All Processes', '@input:menu' = ['BY_PATH', ['View', 'All Processes']] }
 vh = { name = 'View: Hierarchially, All Processes', '@input:menu' = [
