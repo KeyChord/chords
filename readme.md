@@ -57,7 +57,7 @@ root file.
 
 In the default chord package, these are the categories assigned to the global chords (which must start with a non-alphanumeric character). If you want to define your own custom global chord which doesn't fit into any of the following categories, you should prefer the `,` prefix.
 
-`,` User-Defined Chords\
+`,` User-Defined Global Chords\
 `/` Global General-Purpose/Custom Commands\
 `=` Menu / Tray / System Shortcuts\
 `.` Mouse / Keyboard (e.g. modifiers)\
