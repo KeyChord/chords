@@ -5,16 +5,17 @@
     "url": "https://github.com/KeyChord/chords-betterdisplay"
   },
   "type": "module",
-  "devDependencies": {
-    "@keychord/chordtest": "workspace:*",
-    "@keychord/config": "catalog:",
-    "@keychord/tsconfig": "catalog:",
-    "@types/bun": "latest"
-  },
-  "packageManager": "pnpm@12.11.2",
   "dependencies": {
     "p-wait-for": "^6.0.0",
     "uuid": "^14.0.3",
     "validator": "^13.15.35"
-  }
+  },
+  "devDependencies": {
+    "@keychord/chordtest": "workspace:*",
+    "@keychord/config": "catalog:",
+    "@keychord/tsconfig": "catalog:",
+    "@types/bun": "latest",
+    "@types/validator": "^13.15.10"
+  },
+  "packageManager": "pnpm@12.11.2"
 }

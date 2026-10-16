@@ -2,8 +2,17 @@ import * as chord from "chord";
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterEach, expect, test, vi } from "vite-plus/test";
+import { afterEach, expect, mock, test } from "bun:test";
 import { createModuleNamespace } from "../module-namespace";
+import {
+  advanceTimersByTimeAsync,
+  mocked,
+  runAllTimersAsync,
+  useFakeTimers,
+  useRealTimers,
+  waitFor,
+} from "../test";
+import { callAddon } from "./fixtures/native-handler";
 
 const temporary: string[] = [];
 function fixturePackage() {
@@ -12,9 +21,10 @@ function fixturePackage() {
   writeFileSync(join(root, "package.json"), "{}");
   return root;
 }
-afterEach(() =>
-  temporary.splice(0).forEach((root) => rmSync(root, { recursive: true, force: true })),
-);
+afterEach(() => {
+  useRealTimers();
+  temporary.splice(0).forEach((root) => rmSync(root, { recursive: true, force: true }));
+});
 
 test("the preloaded module exposes the native host API and rejects unconfigured actions", async () => {
   for (const name of [
@@ -38,9 +48,10 @@ test("the preloaded module exposes the native host API and rejects unconfigured 
 });
 
 test("callers can configure the imported native exports without production injection", async () => {
-  vi.mocked(chord.click).mockResolvedValue(undefined);
+  mocked(chord.click).mockResolvedValue(undefined);
   await chord.click({ windowId: 123, x: 10, y: 20 });
-  expect(chord.click).toHaveBeenCalledExactlyOnceWith({ windowId: 123, x: 10, y: 20 });
+  expect(chord.click).toHaveBeenCalledTimes(1);
+  expect(chord.click).toHaveBeenCalledWith({ windowId: 123, x: 10, y: 20 });
 });
 
 test("the preload resets native mocks between tests", async () => {
@@ -54,6 +65,37 @@ test("loaded modules receive package-bound import.meta helpers", () => {
     join(import.meta.dirname, "..", "..", "package.json"),
   );
   expect(meta.chord.resolveNative("menu")).toMatch(/\/target\/[^/]+\/menu\/menu\.node$/);
+});
+
+test("relative native imports throw until a test mocks them with the same specifier", () => {
+  expect(() => callAddon()).toThrow("Mock native .node imports");
+  mock.module("./fixtures/probe.node", () => ({ default: { probe: () => "mocked" } }));
+  expect(callAddon()).toBe("mocked");
+});
+
+test("fake timers flush promise callbacks between timers, like vitest's", async () => {
+  useFakeTimers();
+  const events: string[] = [];
+  setTimeout(async () => {
+    await Promise.resolve();
+    events.push("first");
+    setTimeout(() => events.push("second"), 10);
+  }, 10);
+  await advanceTimersByTimeAsync(20);
+  expect(events).toEqual(["first", "second"]);
+  setTimeout(() => events.push("last"), 1_000_000);
+  await runAllTimersAsync();
+  expect(events.at(-1)).toBe("last");
+});
+
+test("waitFor retries until the callback stops throwing, advancing fake timers", async () => {
+  useFakeTimers();
+  let ready = false;
+  setTimeout(() => (ready = true), 200);
+  await waitFor(() => {
+    if (!ready) throw new Error("not ready");
+  });
+  expect(ready).toBe(true);
 });
 
 test("native modules and package files resolve relative to the caller's package", () => {

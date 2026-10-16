@@ -338,7 +338,9 @@ test("a service error during resolution polling propagates and restores the nati
       ? Promise.reject(new Error("CLI connection lost"))
       : original(args),
   );
-  await expect(createMonitorHandler(state.command)("1920x1200")).rejects.toThrow("CLI connection lost");
+  await expect(createMonitorHandler(state.command)("1920x1200")).rejects.toThrow(
+    "CLI connection lost",
+  );
   expect(state.resolution()).toBe("1728x1117");
 });
 
