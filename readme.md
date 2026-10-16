@@ -66,7 +66,7 @@ In the default chord package, these are the categories assigned to the global ch
 
 > `'` is reserved for pass-through input (can appear anywhere in a chord)\
 > `\` is reserved for escape characters (can appear anywhere in a chord)\
-> `` ` `` isn't reserved, but is conventionally used for "config" (e.g. `` 3`d=1`/w] ``)
+> `` ` `` isn't reserved, but is conventionally used for "config" (e.g. `` 3`d2,i1`/w] `` waits 200 ms, then closes three tabs 100 ms apart)
 
 ## Conventions
 
