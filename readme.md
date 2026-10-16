@@ -64,8 +64,9 @@ In the default chord package, these are the categories assigned to the global ch
 `.` Mouse / Keyboard (e.g. modifiers)\
 `;` Web
 
-> `'` is reserved for pass-through input\
-> `\` is reserved for escape characters
+> `'` is reserved for pass-through input (can appear anywhere in a chord)\
+> `\` is reserved for escape characters (can appear anywhere in a chord)\
+> `` ` `` isn't reserved, but is conventionally used for "config" (e.g. `` 3`d=1`/w] ``)
 
 ## Conventions
 
