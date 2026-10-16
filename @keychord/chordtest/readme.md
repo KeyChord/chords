@@ -35,21 +35,28 @@ Use an image digest for repeatable image overrides. Give a different image its o
 
 The base image needs a Swift compiler supporting the tested package's Swift tools version and a logged-in GUI session; Cirrus Labs images enable automatic login. VM graphics cannot reproduce all physical-display capabilities. Tests should assert an explicit unavailable-control error for absent controls, and reserve hardware-specific behavior checks for a dedicated physical test Mac.
 
-`@keychord/config` includes the Vitest runtime by default:
+Unit tests run with `bun test`, like Chord's handlers run under Bun. Each package preloads the
+test runtime in `bunfig.toml` and runs `bun test --isolate` (`vp run test`), so every test file
+gets a fresh global and module registry:
 
-```ts
-import { config } from "@keychord/config";
-
-export default config();
+```toml
+[test]
+preload = ["@keychord/chordtest/preload"]
 ```
 
-Custom Vite+ configs can use `chordTestRuntime()` from `@keychord/chordtest/vitest` directly.
-It supplies the runtime plugin, `chord` alias, setup file, and VM test exclusion.
 Handlers use ordinary `import { click } from "chord"`; tests configure the preloaded export
-with `vi.mocked(click).mockResolvedValue(undefined)` or `mockRejectedValue(...)`.
+with `mocked(click).mockResolvedValue(undefined)` or `mockRejectedValue(...)`.
 Unconfigured host actions fail explicitly, and Chord mocks reset before each test.
-The runtime also supplies package-bound `import.meta.chord` path helpers, including vendored
-native module paths. Production builds keep the real host import and do not include the test module.
+Relative `.node` imports load a stub; tests replace it with
+`mock.module("../src/js/menu.node", () => ({ default: addon }))`, using the same specifier the
+handler imports, and calls into an unmocked addon throw. The runtime also supplies package-bound
+`import.meta.chord` path helpers, including vendored native module paths. Production builds keep
+the real host import and do not include the test module.
+
+`@keychord/chordtest/test` adds what `bun:test` lacks: `useFakeTimers` with
+`advanceTimersByTimeAsync` / `runAllTimersAsync` (vitest's fake-timer semantics), `waitFor`,
+`stubGlobal` / `unstubAllGlobals`, and `mocked`. Spy on `Bun` methods with `spyOn(Bun, "spawn")`
+rather than replacing the global.
 The Rust helper and `chord bun` CLI checks remain integration tests of the real native implementation.
 
 Helpers exported from this package:

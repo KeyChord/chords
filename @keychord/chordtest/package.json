@@ -14,8 +14,7 @@
     "./macos": "./src/macos.ts",
     "./patterns": "./src/patterns.ts",
     "./preload": "./src/preload.ts",
-    "./test": "./src/test.ts",
-    "./vitest": "./src/vitest.ts"
+    "./test": "./src/test.ts"
   },
   "scripts": {
     "test": "bun test --isolate",

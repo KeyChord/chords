@@ -333,14 +333,21 @@ test("resolution polling retries missing and conflicting values before accepting
 test("a service error during resolution polling propagates and restores the native mode", async () => {
   const state = betterDisplay();
   const original = state.command.getMockImplementation()!;
-  state.command.mockImplementation((args) =>
-    args[0] === "get" && args.includes("--resolution") && state.resolution() === "1920x1200"
-      ? Promise.reject(new Error("CLI connection lost"))
-      : original(args),
-  );
-  await expect(createMonitorHandler(state.command)("1920x1200")).rejects.toThrow(
-    "CLI connection lost",
-  );
+  const failure = new Error("CLI connection lost");
+  let failed = false;
+  state.command.mockImplementation((args) => {
+    if (
+      !failed &&
+      args[0] === "get" &&
+      args.includes("--resolution") &&
+      state.resolution() === "1920x1200"
+    ) {
+      failed = true;
+      return Promise.reject(failure);
+    }
+    return original(args);
+  });
+  await expect(createMonitorHandler(state.command)("1920x1200")).rejects.toBe(failure);
   expect(state.resolution()).toBe("1728x1117");
 });
 
