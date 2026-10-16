@@ -74,6 +74,9 @@ for (const scenario of cases) {
   if (scenario.action === "CHAT_INFO_UNBLOCK") {
     assert.equal((await Bun.file(output).json()).blocked, false);
   }
+  if (scenario.action === "GROUP_MEMBER_REMOVE") {
+    assert.deepEqual((await Bun.file(output).json()).removedMembers, [2]);
+  }
   if (scenario.action === "CHAT_OPEN_WINDOW") {
     assert.equal((await Bun.file(output).json()).chatWindowOpen, true);
   }
@@ -140,7 +143,9 @@ console.log(
 if (scope === "VOICE") process.exit(0);
 
 // Each view has different fixture rows, so using the main list's position
-// instead of the chosen filter would select a different chat.
+// instead of the chosen filter would select a different chat. As in WhatsApp,
+// the fixture applies a filter 75 ms after its chip is pressed, and filtered
+// positions open through ⌘1–⌘9 and Next Chat (⇧⌘]).
 for (const [action, filter, index, selectedChat, unavailable] of [
   ["VIEW_CHATS", "ALL", 12, 12, 13],
   ["VIEW_ARCHIVED", "ARCHIVED", 2, 11, 3],
@@ -158,7 +163,10 @@ for (const [action, filter, index, selectedChat, unavailable] of [
   const state = await Bun.file(output).json();
   assert.equal(state.chatFilter, filter);
   assert.equal(state.selectedChat, selectedChat);
-  await assert.rejects(handler(action, String(unavailable)), /not loaded/);
+  await assert.rejects(
+    handler(action, String(unavailable)),
+    action === "VIEW_CHATS" || action === "VIEW_ARCHIVED" ? /not loaded/ : /unavailable/,
+  );
   assert.equal((await Bun.file(output).json()).selectedChat, selectedChat);
   assert.equal((await Bun.file(output).json()).chatFilter, filter);
 }
@@ -180,6 +188,49 @@ await handler("GROUP_MEMBER_CHANGES");
 await recorded("Group_Info_Member_Changes");
 await handler("GROUP_DESCRIPTION");
 await recorded("group-description-row");
+
+// Info exposes only on-screen rows, and its navigation bar covers the top
+// rows. Controls are paged to from either direction and pressed only once a
+// hit test reaches them.
+await reset();
+await handler("CHAT_INFO_REPORT");
+await recorded("info_report");
+assert.ok((await Bun.file(output).json()).listOffset > 0);
+await handler("CHAT_INFO_THEME");
+await recorded("info_theme");
+await reset("INFO_COVERED");
+const covered = (await Bun.file(output).json()).listOffset;
+await handler("CHAT_INFO_GROUP_ADD");
+await recorded("info_group_add");
+assert.ok((await Bun.file(output).json()).listOffset < covered, "pressed a covered row");
+
+// Members are numbered from You (#1) across pages, skipping the action rows.
+for (const index of [2, 9, 12]) {
+  await reset("GROUP");
+  await handler("GROUP_MEMBER_SELECT", String(index));
+  await recorded(`member_options_${index}`);
+}
+await reset("GROUP");
+await assert.rejects(handler("GROUP_MEMBER_SELECT", "1"), /no member options/);
+assert.notEqual((await Bun.file(output).json()).action, "member_you");
+await assert.rejects(handler("GROUP_MEMBER_SELECT", "13"), /not listed/);
+await assert.rejects(handler("GROUP_MEMBER_INFO"), /Group member options/);
+// Choosing another member closes the open options instead of reopening Info.
+await handler("GROUP_MEMBER_SELECT", "3");
+await recorded("member_options_3");
+await handler("GROUP_MEMBER_SELECT", "5");
+await recorded("member_options_5");
+await handler("GROUP_MEMBER_ADMIN");
+await recorded("member_admin_5");
+await handler("GROUP_MEMBER_SELECT", "5");
+await recorded("member_options_5");
+await handler("GROUP_MEMBER_ADMIN");
+await recorded("member_dismiss_admin_5");
+await handler("GROUP_MEMBER_SELECT", "4");
+await recorded("member_options_4");
+await handler("GROUP_MEMBER_REMOVE");
+await recorded("member_removed_4");
+assert.deepEqual((await Bun.file(output).json()).removedMembers, [4]);
 await reset("GROUP_PERMISSIONS_HIDDEN");
 await handler("GROUP_PERMISSIONS");
 await recorded("group_permissions");

@@ -51,18 +51,33 @@ final class DevicePopover: NSView {
     override func accessibilityPerformCancel() -> Bool { dismiss?(); return true }
 }
 
+// Group Info action rows (Add members, Invite via link) expose an empty value;
+// member rows expose none.
+@MainActor
+final class ActionRowButton: NSButton {
+    override func accessibilityValue() -> Any? { "" }
+}
+
+@MainActor
+final class MemberButton: NSButton {
+    override func accessibilityValue() -> Any? { nil }
+}
+
 @MainActor
 final class ScrollAccessibility: NSObject {
-    weak var view: PagedView?
-    init(_ view: PagedView) { self.view = view }
+    weak var view: ListView?
+    init(_ view: ListView) { self.view = view }
     override func accessibilityIsIgnored() -> Bool { false }
     override func accessibilityAttributeNames() -> [NSAccessibility.Attribute] {
-        [.role, .children, .parent, .window, .topLevelUIElement, .enabled]
+        [.role, .children, .parent, .window, .topLevelUIElement, .enabled, .position, .size]
     }
     override func accessibilityAttributeValue(_ attribute: NSAccessibility.Attribute) -> Any? {
         switch attribute {
         case .role: return NSAccessibility.Role.group.rawValue
-        case .children: return view?.subviews ?? []
+        // Like WhatsApp's table, the list has bounds (Cocoa screen coordinates).
+        case .position: return view.map { NSValue(point: NSAccessibility.screenRect(fromView: $0, rect: $0.bounds).origin) }
+        case .size: return view.map { NSValue(size: $0.bounds.size) }
+        case .children: return view?.exposedRows ?? []
         case .parent: return view
         case .window, .topLevelUIElement: return view?.window
         case .enabled: return true
@@ -70,22 +85,76 @@ final class ScrollAccessibility: NSObject {
         }
     }
     override func accessibilityActionNames() -> [NSAccessibility.Action] {
-        [NSAccessibility.Action(rawValue: "AXScrollUp"), NSAccessibility.Action(rawValue: "AXScrollDown")]
+        guard let view else { return [] }
+        return (view.canScroll(down: false) ? [NSAccessibility.Action(rawValue: "AXScrollUpByPage")] : [])
+            + (view.canScroll(down: true) ? [NSAccessibility.Action(rawValue: "AXScrollDownByPage")] : [])
     }
     override func accessibilityPerformAction(_ action: NSAccessibility.Action) {
-        let page = action.rawValue == "AXScrollUp" ? 0 : 1
-        DispatchQueue.main.async { [weak self] in self?.view?.changePage?(page) }
+        let down = action.rawValue == "AXScrollDownByPage"
+        guard down || action.rawValue == "AXScrollUpByPage" else { return }
+        // WhatsApp animates the page and posts no notification when it lands.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) { [weak self] in self?.view?.page(down: down) }
     }
 }
 
-// AppKit's modern NSView bridge only dispatches its predefined actions. A
-// legacy accessibility object models Catalyst's AXScrollUp/AXScrollDown names.
+// Models a Catalyst table in WhatsApp 26.38.74: only rows intersecting the
+// viewport are exposed, except the pinned table header, and a row that leaves
+// and returns is a new element. Page actions are offered only while that
+// direction can scroll, and a page moves the viewport height less an overlap.
+// AppKit's modern NSView bridge only dispatches its predefined actions, so a
+// legacy accessibility object carries the page actions.
 @MainActor
-final class PagedView: NSView {
-    var page = 0
-    var changePage: ((Int) -> Void)?
+final class ListView: NSView {
+    struct Row {
+        var height: CGFloat = 43
+        var gap: CGFloat = 0
+        var pinned = false
+        let make: () -> NSView
+    }
+    override var isFlipped: Bool { true }
+    // An open action sheet hides the list from accessibility, as in WhatsApp.
+    var modal = false
+    private(set) var offset: CGFloat = 0
+    private var made: [Int: NSView] = [:]
     private lazy var scrollAccessibility = ScrollAccessibility(self)
-    override func accessibilityChildren() -> [Any]? { [scrollAccessibility] }
+    var rows: [Row] = [] {
+        didSet {
+            made.values.forEach { $0.removeFromSuperview() }
+            made = [:]
+            offset = 0
+            layoutRows()
+        }
+    }
+    var exposedRows: [NSView] { subviews.sorted { $0.frame.minY < $1.frame.minY } }
+    private var contentHeight: CGFloat { rows.reduce(0) { $0 + $1.gap + $1.height } }
+    override func accessibilityChildren() -> [Any]? { modal ? [] : [scrollAccessibility] }
+    func canScroll(down: Bool) -> Bool { down ? offset < contentHeight - bounds.height - 0.5 : offset > 0.5 }
+    func page(down: Bool) { scroll(to: offset + (down ? 1 : -1) * (bounds.height - 40)) }
+    func scroll(to target: CGFloat) {
+        offset = max(0, min(target, contentHeight - bounds.height))
+        layoutRows()
+    }
+    func top(of index: Int) -> CGFloat {
+        rows[...index].reduce(0) { $0 + $1.gap + $1.height } - rows[index].height
+    }
+    func layoutRows() {
+        var y: CGFloat = 0
+        for (index, row) in rows.enumerated() {
+            y += row.gap
+            let frame = NSRect(x: 0, y: y - offset, width: bounds.width, height: row.height)
+            y += row.height
+            if row.pinned || (frame.maxY > 0 && frame.minY < bounds.height) {
+                let view = made[index] ?? row.make()
+                made[index] = view
+                view.frame = frame
+                // As in WhatsApp, rows belong to the element with the page actions.
+                view.setAccessibilityParent(scrollAccessibility)
+                if view.superview !== self { addSubview(view) }
+            } else if let view = made.removeValue(forKey: index) {
+                view.removeFromSuperview()
+            }
+        }
+    }
 }
 
 @MainActor
@@ -102,15 +171,22 @@ final class Fixture: NSObject, NSApplicationDelegate {
     var permissionsMode = ""
     var selectedChat = 0
     var chatFilter = "ALL"
+    var chatRows: [Int] = []
+    var chatPosition = 0
     var unblockImmediately = false
     var blocked = false
     var reported = false
+    weak var list: ListView?
+    var membersHeadingRow = 0
+    var coveredRow = 0
+    var admins: Set<Int> = []
+    var removedMembers: Set<Int> = []
     let output = ProcessInfo.processInfo.environment["CHORD_FIXTURE_OUTPUT"]!
 
     func record(_ action: String) {
         sequence += 1
         let active = NSWorkspace.shared.frontmostApplication?.processIdentifier == ProcessInfo.processInfo.processIdentifier
-        let data = try! JSONSerialization.data(withJSONObject: ["action": action, "active": active, "phase": phase, "request": request, "sequence": sequence, "chatVisible": chatVisible, "chatWindowOpen": chatWindow?.isVisible == true, "selectedChat": selectedChat, "chatFilter": chatFilter, "blocked": blocked, "reported": reported])
+        let data = try! JSONSerialization.data(withJSONObject: ["action": action, "active": active, "phase": phase, "request": request, "sequence": sequence, "chatVisible": chatVisible, "chatWindowOpen": chatWindow?.isVisible == true, "selectedChat": selectedChat, "chatFilter": chatFilter, "blocked": blocked, "reported": reported, "admins": admins.sorted(), "removedMembers": removedMembers.sorted(), "listOffset": list?.offset ?? 0])
         try! data.write(to: URL(fileURLWithPath: output), options: .atomic)
     }
 
@@ -122,7 +198,8 @@ final class Fixture: NSObject, NSApplicationDelegate {
         case "new_group": showGroupPicker()
         case "group_next": showGroupSetup()
         case "group_back": showGroupPicker()
-        case "group_members": showGroupInfo(page: 1)
+        case "group_members":
+            if let list { list.scroll(to: list.top(of: membersHeadingRow)) }
         case "group_permissions":
             _ = root("GROUP_PERMISSIONS", heading: permissionsMode == "GROUP_PERMISSIONS_WRONG_PAGE" ? "Advanced chat privacy" : "Group permissions")
         case "info_block": showBlockDialog()
@@ -136,10 +213,18 @@ final class Fixture: NSObject, NSApplicationDelegate {
         case "unblock_confirmed": blocked = false; showInfo()
         case "open_main_window", "chats": showMain()
         case "SidebarButton_Archived": showMain("ARCHIVED")
-        case "filter_all": showMain("ALL")
-        case "filter_unread": showMain("UNREAD")
-        case "filter_favourites": showMain("FAVOURITES")
-        case "filter_groups": showMain("GROUPS")
+        case "filter_all", "filter_unread", "filter_favourites", "filter_groups":
+            // WhatsApp applies a filter about 75 ms after the chip's AXPress returns,
+            // selecting the chip and reloading the list together, then posts layout
+            // changes. A handler that does not wait acts on the previous list.
+            let filter = String(id.dropFirst("filter_".count)).uppercased()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.075) { [weak self] in
+                guard let self else { return }
+                self.showMain(filter)
+                NSAccessibility.post(element: self.window!, notification: .layoutChanged)
+                self.record(id)
+            }
+            return
         case "info_theme": showTheme()
         case "theme_bubble": showBubble()
         case "theme_wallpaper": showWallpaper()
@@ -192,7 +277,36 @@ final class Fixture: NSObject, NSApplicationDelegate {
         let id = sender.identifier!.rawValue
         if id == "ReactionsTray_ReactionButton" { showCall(); record("reaction_\(sender.tag)") }
         else if id.hasPrefix("ParticipantPicker_") { record("group_member_\(sender.tag)") }
+        else if id.hasPrefix("member_") { memberAction(id, member: sender.tag) }
         else { invoke(id) }
+    }
+
+    func memberAction(_ id: String, member: Int) {
+        switch id {
+        case "member_row":
+            showMemberOptions(member)
+            record("member_options_\(member)")
+        case "member_info":
+            closeActionSheet()
+            record("member_info_\(member)")
+        case "member_admin":
+            closeActionSheet()
+            let dismissed = admins.remove(member) != nil
+            if !dismissed { admins.insert(member) }
+            record(dismissed ? "member_dismiss_admin_\(member)" : "member_admin_\(member)")
+        case "member_remove":
+            closeActionSheet()
+            record("member_remove_\(member)")
+            // WhatsApp closes the options before presenting the confirmation.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+                self?.showActionSheet("Remove Fixture Member \(member) from this group?", [("member_remove_confirmed", "Remove")], member: member, closed: "member_remove_cancelled")
+            }
+        case "member_remove_confirmed":
+            removedMembers.insert(member)
+            showGroupInfo()
+            record("member_removed_\(member)")
+        default: record(id)
+        }
     }
 
     @objc func openChatWindow(_ sender: NSMenuItem) {
@@ -251,6 +365,7 @@ final class Fixture: NSObject, NSApplicationDelegate {
         let chips = group("ChatListView_chipButtonsCell", frame: NSRect(x: 0, y: 390, width: 300, height: 25), parent: list)
         for (index, label) in ["All", "Unread", "Favourites", "Groups"].enumerated() {
             button("filter_\(label.lowercased())", label, frame: NSRect(x: index * 75, y: 0, width: 70, height: 25), parent: chips)
+                .setAccessibilitySelected(label.uppercased() == filter)
         }
         _ = group("ChatListView_archiveCell", frame: NSRect(x: 0, y: 360, width: 300, height: 25), parent: list)
         let rows: [Int]
@@ -261,6 +376,9 @@ final class Fixture: NSObject, NSApplicationDelegate {
         case "GROUPS": rows = [3, 7, 10]
         default: rows = Array(1...12)
         }
+        // As in WhatsApp, reloading the list clears the selected row.
+        chatRows = rows
+        chatPosition = 0
         for (position, index) in rows.enumerated() {
             let frame = NSRect(x: 0, y: 350 - (position + 1) * 26, width: 250, height: 24)
             if index == 12 {
@@ -271,29 +389,82 @@ final class Fixture: NSObject, NSApplicationDelegate {
         }
     }
 
-    func paged(_ parent: NSView, page: Int, change: @escaping (Int) -> Void) -> NSView {
-        let view = PagedView(frame: parent.bounds)
-        view.page = page
-        view.changePage = change
+    // WhatsApp's ⌘1–⌘9 select a row of the current filter from its list data, and
+    // Next Chat (⇧⌘]) the row after the selected one. Positions past the list do nothing.
+    func chatShortcut(_ code: UInt16, _ flags: NSEvent.ModifierFlags) -> Bool {
+        let digits: [UInt16: Int] = [0x12: 1, 0x13: 2, 0x14: 3, 0x15: 4, 0x17: 5, 0x16: 6, 0x1A: 7, 0x1C: 8, 0x19: 9]
+        guard phase == "MAIN", flags.contains(.command) else { return false }
+        if let position = digits[code], !flags.contains(.shift) {
+            guard position <= chatRows.count else { return true }
+            chatPosition = position
+        } else if code == 0x1E, flags.contains(.shift) {
+            guard chatPosition > 0, chatPosition < chatRows.count else { return true }
+            chatPosition += 1
+        } else { return false }
+        invoke("chat_\(chatRows[chatPosition - 1])")
+        return true
+    }
+
+    // A table below a translucent navigation bar that covers its top rows.
+    func table(_ parent: NSView, frame: NSRect) -> ListView {
+        let view = ListView(frame: frame)
         view.setAccessibilityElement(true)
         view.setAccessibilityRole(.group)
         parent.addSubview(view)
+        let bar = group("navigation_bar_overlay", frame: NSRect(x: frame.minX, y: frame.maxY - 30, width: frame.width, height: 30), parent: parent)
+        bar.setAccessibilityLabel("Navigation bar")
+        list = view
         return view
     }
 
-    func showSettings(page: Int = 0) {
+    // Catalyst wraps each table cell's control in a group. ListView sets the
+    // row's frame; controls fill the row's height.
+    func cell(_ control: @escaping (NSView) -> Void) -> () -> NSView {
+        {
+            let row = NSView()
+            row.setAccessibilityElement(true)
+            row.setAccessibilityRole(.group)
+            control(row)
+            return row
+        }
+    }
+
+    enum RowButton { case plain, action, member }
+
+    func buttonRow(_ id: String, _ label: String, height: CGFloat = 43, gap: CGFloat = 0, kind: RowButton = .plain, tag: Int = 0) -> ListView.Row {
+        ListView.Row(height: height, gap: gap, make: cell { row in
+            let action = #selector(Fixture.buttonAction(_:))
+            let control: NSButton = switch kind {
+            case .plain: NSButton(title: label, target: self, action: action)
+            case .action: ActionRowButton(title: label, target: self, action: action)
+            case .member: MemberButton(title: label, target: self, action: action)
+            }
+            control.identifier = NSUserInterfaceItemIdentifier(id)
+            control.frame = NSRect(x: 10, y: 0, width: 580, height: height)
+            control.tag = tag
+            row.addSubview(control)
+        })
+    }
+
+    func textRow(_ id: String, _ label: String, gap: CGFloat = 0) -> ListView.Row {
+        ListView.Row(gap: gap, make: cell { row in
+            let text = ClickableText(label: label, frame: NSRect(x: 10, y: 0, width: 580, height: 43)) { self.invoke(id) }
+            text.identifier = NSUserInterfaceItemIdentifier(id)
+            row.addSubview(text)
+        })
+    }
+
+    func showSettings() {
         let view = root("SETTINGS")
         let nav = group("settings_navigation", frame: NSRect(x: 0, y: 575, width: 900, height: 40), parent: view)
         button("SettingsView_CloseButton", "Close", frame: NSRect(x: 0, y: 0, width: 80, height: 30), parent: nav)
-        let list = paged(view, page: page) { [weak self] in self?.showSettings(page: $0) }
-        let duplicate = group("SettingsView_ProfileCell", frame: NSRect(x: 20, y: 500, width: 300, height: 50), parent: list)
-        button("SettingsView_ProfileCell", "Localized Profile", frame: duplicate.bounds, parent: duplicate)
-        let entries = page == 0
-            ? [("SettingsView_FavoritesCell", "Favourites"), ("SettingsView_StarredMessagesCell", "Starred"), ("settings_history", "Chat history"), ("SettingsView_AccountsCell", "Account"), ("SettingsView_PrivacyCell", "Privacy"), ("SettingsView_ChatsCell", "Chats"), ("SettingsView_AppearanceCell", "Appearance"), ("SettingsView_NotificationsCell", "Notifications"), ("SettingsView_AgentsCell", "Agents")]
-            : [("SettingsView_DataAndStorageUsageCell", "Storage and data"), ("SettingsView_HelpCell", "Help and feedback")]
-        for (index, item) in entries.enumerated() {
-            button(item.0, item.1, frame: NSRect(x: 20, y: 450 - index * 45, width: 350, height: 35), parent: list)
-        }
+        let list = table(view, frame: NSRect(x: 20, y: 60, width: 600, height: 300))
+        let profile = ListView.Row(height: 50, make: cell { row in
+            row.identifier = NSUserInterfaceItemIdentifier("SettingsView_ProfileCell")
+            self.button("SettingsView_ProfileCell", "Localized Profile", frame: NSRect(x: 10, y: 0, width: 580, height: 50), parent: row)
+        })
+        let entries = [("SettingsView_FavoritesCell", "Favourites"), ("SettingsView_StarredMessagesCell", "Starred"), ("settings_history", "Chat history"), ("SettingsView_AccountsCell", "Account"), ("SettingsView_PrivacyCell", "Privacy"), ("SettingsView_ChatsCell", "Chats"), ("SettingsView_AppearanceCell", "Appearance"), ("SettingsView_NotificationsCell", "Notifications"), ("SettingsView_AgentsCell", "Agents"), ("SettingsView_DataAndStorageUsageCell", "Storage and data"), ("SettingsView_HelpCell", "Help and feedback")]
+        list.rows = [profile] + entries.map { buttonRow($0.0, $0.1, height: 45) }
     }
 
     func showGroupPicker() {
@@ -413,23 +584,50 @@ final class Fixture: NSObject, NSApplicationDelegate {
         }
     }
 
+    // WhatsApp's action sheets are popovers. The title sits alone in nested
+    // groups, so its parent holds none of the sheet's buttons.
+    func showActionSheet(_ title: String, _ buttons: [(String, String)], member: Int = 0, closed: String) {
+        guard let view = window.contentView else { return }
+        closeActionSheet()
+        list?.modal = true
+        let sheet = DevicePopover(frame: NSRect(x: 250, y: 150, width: 400, height: 300))
+        sheet.identifier = NSUserInterfaceItemIdentifier("fixture_action_sheet")
+        sheet.setAccessibilityElement(true)
+        sheet.setAccessibilityRole(NSAccessibility.Role(rawValue: "AXPopover"))
+        sheet.dismiss = { [weak self] in
+            self?.closeActionSheet()
+            self?.record(closed)
+        }
+        view.addSubview(sheet)
+        let content = group("action_sheet_content", frame: sheet.bounds, parent: sheet)
+        let outer = group("action_sheet_title_container", frame: NSRect(x: 0, y: 240, width: 400, height: 60), parent: content)
+        let inner = group("action_sheet_title_group", frame: outer.bounds, parent: outer)
+        let label = NSTextField(labelWithString: title)
+        label.identifier = NSUserInterfaceItemIdentifier("ActionSheet_TitleLabel")
+        label.setAccessibilityRole(NSAccessibility.Role(rawValue: "AXHeading"))
+        label.frame = inner.bounds
+        inner.addSubview(label)
+        let actions = group("action_sheet_actions", frame: NSRect(x: 0, y: 0, width: 400, height: 230), parent: content)
+        for (index, item) in buttons.enumerated() {
+            button(item.0, item.1, frame: NSRect(x: 20, y: 180 - index * 50, width: 360, height: 40), parent: actions).tag = member
+        }
+    }
+
+    func closeActionSheet() {
+        window.contentView?.subviews.filter { $0.identifier?.rawValue == "fixture_action_sheet" }.forEach { $0.removeFromSuperview() }
+        list?.modal = false
+    }
+
     func showBlockDialog() {
-        let view = root("BLOCK_DIALOG")
-        let title = NSTextField(labelWithString: "Block “Fixture Contact”?")
-        title.identifier = NSUserInterfaceItemIdentifier("ActionSheet_TitleLabel")
-        title.frame = NSRect(x: 20, y: 500, width: 600, height: 40)
-        view.addSubview(title)
-        button("block_confirmed", "Block", frame: NSRect(x: 20, y: 400, width: 250, height: 40), parent: view)
-        button("block_report_confirmed", "Block and report", frame: NSRect(x: 20, y: 300, width: 250, height: 40), parent: view)
+        showActionSheet("Block “Fixture Contact”?", [("block_report_confirmed", "Block and report"), ("block_confirmed", "Block")], closed: "block_cancelled")
     }
 
     func showUnblockDialog() {
-        let view = root("UNBLOCK_DIALOG")
-        let title = NSTextField(labelWithString: "Unblock “Fixture Contact”?")
-        title.identifier = NSUserInterfaceItemIdentifier("ActionSheet_TitleLabel")
-        title.frame = NSRect(x: 20, y: 500, width: 600, height: 40)
-        view.addSubview(title)
-        button("unblock_confirmed", "Unblock", frame: NSRect(x: 20, y: 400, width: 250, height: 40), parent: view)
+        showActionSheet("Unblock “Fixture Contact”?", [("unblock_confirmed", "Unblock")], closed: "unblock_cancelled")
+    }
+
+    func showMemberOptions(_ member: Int) {
+        showActionSheet("Fixture Member \(member)", [("member_info", "Info"), ("member_admin", admins.contains(member) ? "Dismiss as admin" : "Make group admin"), ("member_remove", "Remove from group")], member: member, closed: "member_options_closed")
     }
 
     func showIncomingCall() {
@@ -485,46 +683,73 @@ final class Fixture: NSObject, NSApplicationDelegate {
         button("ReactionsTray_PlusSign", "Add custom reaction", frame: NSRect(x: 800, y: 300, width: 80, height: 80), parent: view)
     }
 
+    // The table header stays exposed while scrolled off screen, like WhatsApp's.
+    func infoHeader(_ build: @escaping (NSView) -> Void) -> ListView.Row {
+        ListView.Row(height: 100, pinned: true) {
+            let header = NSView()
+            header.identifier = NSUserInterfaceItemIdentifier("contact-info-view-content-stack-view")
+            header.setAccessibilityElement(true)
+            header.setAccessibilityRole(.group)
+            build(header)
+            return header
+        }
+    }
+
     func showInfo() {
         if groupMode { showGroupInfo(); return }
         let view = root("INFO")
         button("info_close", "close", frame: NSRect(x: 800, y: 580, width: 80, height: 30), parent: view)
-        let header = group("contact-info-view-content-stack-view", frame: NSRect(x: 10, y: 500, width: 860, height: 100), parent: view)
-        button("contact-info-header-profile-image", "Profile picture", frame: NSRect(x: 0, y: 40, width: 200, height: 30), parent: header)
-        for (index, pair) in [("info_audio", "Audio call"), ("info_video", "Video call"), ("info_search", "Search")].enumerated() {
-            button(pair.0, pair.1, frame: NSRect(x: index * 230, y: 0, width: 220, height: 30), parent: header)
+        let list = table(view, frame: NSRect(x: 10, y: 60, width: 860, height: 250))
+        let downloads = ListView.Row(make: cell { row in
+            row.addSubview(ClickableText(label: "Save to Downloads, Default", frame: NSRect(x: 10, y: 0, width: 400, height: 43)) {})
+            self.button("info_downloads", "More options", frame: NSRect(x: 420, y: 5, width: 160, height: 33), parent: row)
+        })
+        func shared(_ id: String, _ label: String) -> ListView.Row {
+            ListView.Row(make: cell { row in
+                row.identifier = NSUserInterfaceItemIdentifier(id)
+                self.button(id, label, frame: NSRect(x: 10, y: 0, width: 580, height: 43), parent: row)
+            })
         }
-        let rows: [(String, String, Bool)] = [
-            ("info_gallery", "Media, links and docs, 53", true), ("info_starred", "Starred, None", true),
-            ("mute_dialog", "Mute, No", false), ("mute_status", "Mute status notifications, Yes", false),
-            ("info_theme", "Chat theme", true), ("info_downloads", "More options", false),
-            ("info_disappearing", "Disappearing messages, Off", true), ("info_privacy", "Advanced chat privacy", false),
-            ("info_encryption", "Encryption", false), ("info_details", "Contact details", false),
-            ("info_group_create", "Create group with Fixture Contact", false), ("info_group_add", "Add to group", false),
-            ("Share_Contact", "Share contact", false), ("Contact_Info_Favorite_Action", "Add to Favourites", false),
-            ("info_export", "Export chat", false), ("info_clear", "Clear chat", false),
-            (blocked ? "info_unblock" : "info_block", blocked ? "Unblock Fixture Contact" : "Block Fixture Contact", false), ("info_report", "Report Fixture Contact", false),
+        list.rows = [
+            infoHeader { header in
+                self.button("contact-info-header-profile-image", "Profile picture", frame: NSRect(x: 0, y: 45, width: 200, height: 25), parent: header)
+                for (index, pair) in [("info_audio", "Audio call"), ("info_video", "Video call"), ("info_search", "Search")].enumerated() {
+                    self.button(pair.0, pair.1, frame: NSRect(x: index * 230, y: 5, width: 220, height: 30), parent: header)
+                }
+            },
+            textRow("info_gallery", "Media, links and docs, 53"), textRow("info_starred", "Starred, None"),
+            buttonRow("mute_dialog", "Mute, No", gap: 18), buttonRow("mute_status", "Mute status notifications, Yes"),
+            textRow("info_theme", "Chat theme"), downloads,
+            textRow("info_disappearing", "Disappearing messages, Off", gap: 18), buttonRow("info_privacy", "Advanced chat privacy"),
+            buttonRow("info_encryption", "Encryption"), buttonRow("info_details", "Contact details", gap: 18),
+            buttonRow("info_group_create", "Create group with Fixture Contact", gap: 18),
         ]
-        for (index, row) in rows.enumerated() {
-            let frame = NSRect(x: 10 + (index % 3) * 290, y: 440 - (index / 3) * 55, width: 270, height: 40)
-            if row.2 {
-                let text = ClickableText(label: row.1, frame: frame) { [weak self] in self?.invoke(row.0) }
-                text.identifier = NSUserInterfaceItemIdentifier(row.0)
-                view.addSubview(text)
-            } else { button(row.0, row.1, frame: frame, parent: view) }
-        }
+        // Far enough from the end to be scrolled under the navigation bar.
+        coveredRow = list.rows.count
+        list.rows += [
+            buttonRow("info_group_add", "Add to group"),
+            shared("Share_Contact", "Share contact"), shared("Contact_Info_Favorite_Action", "Add to Favourites"),
+            buttonRow("info_export", "Export chat"), buttonRow("info_clear", "Clear chat"),
+            buttonRow(blocked ? "info_unblock" : "info_block", blocked ? "Unblock Fixture Contact" : "Block Fixture Contact", gap: 18),
+            buttonRow("info_report", "Report Fixture Contact"),
+        ]
     }
 
-    func showGroupInfo(page: Int = 0) {
+    func showGroupInfo() {
         let view = root("GROUP_INFO")
         button("info_close", "close", frame: NSRect(x: 10, y: 580, width: 80, height: 30), parent: view)
         button("NavigationBar_GroupInfoQRButton", "Invite via link or QR code", frame: NSRect(x: 600, y: 580, width: 280, height: 30), parent: view)
-        let list = paged(view, page: page) { [weak self] in self?.showGroupInfo(page: $0) }
-        let header = group("contact-info-view-content-stack-view", frame: NSRect(x: 10, y: 500, width: 860, height: 70), parent: list)
-        button("group_add", "Add", frame: NSRect(x: 10, y: 30, width: 200, height: 30), parent: header)
-        let members = button("group_members", "2 members", frame: NSRect(x: 300, y: 30, width: 200, height: 30), parent: header)
-        members.setAccessibilityRole(.link)
+        let header = infoHeader { header in
+            self.button("group_add", "Add", frame: NSRect(x: 10, y: 5, width: 200, height: 30), parent: header)
+            let members = self.button("group_members", "\(12 - self.removedMembers.count) members", frame: NSRect(x: 300, y: 45, width: 200, height: 25), parent: header)
+            members.setAccessibilityRole(.link)
+        }
         if !permissionsMode.isEmpty {
+            // Fixed geometry for the inaccessible Group permissions row.
+            let list = group("group_info_rows", frame: NSRect(x: 0, y: 0, width: 900, height: 620), parent: view)
+            let headerView = header.make()
+            headerView.frame = NSRect(x: 10, y: 480, width: 860, height: 100)
+            list.addSubview(headerView)
             button("group_mute", "Mute, No", frame: NSRect(x: 20, y: 430, width: 500, height: 44), parent: list)
             button("group_notify", "Notify for, All", frame: NSRect(x: 20, y: 386, width: 500, height: 44), parent: list)
             list.addSubview(ClickableText(label: "Disappearing messages, Off", frame: NSRect(x: 20, y: 310, width: 500, height: permissionsMode == "GROUP_PERMISSIONS_BAD_LAYOUT" ? 20 : 44)) { [weak self] in self?.invoke("info_disappearing") })
@@ -539,12 +764,46 @@ final class Fixture: NSObject, NSApplicationDelegate {
             button("group_similar", "Create a similar group, Start with the same members", frame: NSRect(x: 20, y: 106, width: 500, height: 44), parent: list)
             return
         }
-        let entries = page == 0
-            ? [("group-description-row", "Add group description"), ("group_notify", "Notify for, All")]
-            : [("Group_Info_Member_Changes", "View member changes"), ("group_exit", "Exit group"), ("group_report", "Report group"), ("group_similar", "Create a similar group, Start with the same members"), ("group_permissions", "Group permissions")]
-        for (index, item) in entries.enumerated() {
-            button(item.0, item.1, frame: NSRect(x: 20, y: 440 - index * 60, width: 500, height: 40), parent: list)
+        let list = table(view, frame: NSRect(x: 10, y: 60, width: 860, height: 250))
+        // The member section spans several pages: its heading row holds a search
+        // button, action rows precede the members, and a gap ends the section.
+        let membersHeading = ListView.Row(height: 39, gap: 18, make: {
+            let row = NSView()
+            row.setAccessibilityElement(true)
+            row.setAccessibilityRole(NSAccessibility.Role(rawValue: "AXHeading"))
+            let text = NSTextField(labelWithString: "\(12 - self.removedMembers.count) members")
+            text.frame = NSRect(x: 10, y: 5, width: 300, height: 25)
+            row.addSubview(text)
+            self.button("group_member_search", "Search", frame: NSRect(x: 520, y: 5, width: 60, height: 28), parent: row)
+            return row
+        })
+        let you = ListView.Row(make: cell { row in
+            row.addSubview(ClickableText(label: "You, Admin, Add member tag", frame: NSRect(x: 10, y: 0, width: 580, height: 43)) { self.record("member_you") })
+        })
+        let members = (2...12).filter { !removedMembers.contains($0) }.map {
+            buttonRow("member_row", "Fixture Member \($0)\(admins.contains($0) ? ", Admin" : "")", kind: .member, tag: $0)
         }
+        var rows = [
+            header,
+            buttonRow("group-description-row", "Add group description"),
+            textRow("info_gallery", "Media, links and docs, None", gap: 18),
+            buttonRow("group_mute", "Mute, No", gap: 18), buttonRow("group_notify", "Notify for, All"),
+            textRow("info_theme", "Chat theme"),
+            textRow("info_disappearing", "Disappearing messages, Off", gap: 18),
+            buttonRow("group_permissions", "Group permissions"),
+            buttonRow("group_similar", "Create a similar group, Start with the same members", height: 48, gap: 18),
+        ]
+        membersHeadingRow = rows.count
+        rows += [
+            membersHeading,
+            buttonRow("group_add_members", "Add members", height: 49, kind: .action),
+            buttonRow("group_invite", "Invite via link or QR code", height: 49, kind: .action),
+            you,
+        ] + members + [
+            buttonRow("Group_Info_Member_Changes", "View member changes", height: 45, gap: 18),
+            buttonRow("group_exit", "Exit group", gap: 18), buttonRow("group_report", "Report group"),
+        ]
+        list.rows = rows
     }
 
     func showTheme() {
@@ -614,6 +873,11 @@ final class Fixture: NSObject, NSApplicationDelegate {
         window.title = "WhatsApp Chord Fixture"
         menus(mode: "DEFAULT")
         showMain()
+        NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
+            let (code, flags) = (event.keyCode, event.modifierFlags)
+            let handled = MainActor.assumeIsolated { self?.chatShortcut(code, flags) ?? false }
+            return handled ? nil : event
+        }
         window.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
         record("READY")
@@ -638,7 +902,9 @@ final class Fixture: NSObject, NSApplicationDelegate {
                 self.menus(mode: mode)
                 self.chatVisible = false
                 self.permissionsMode = mode.hasPrefix("GROUP_PERMISSIONS_") ? mode : ""
-                self.groupMode = mode == "GROUP" || !self.permissionsMode.isEmpty
+                self.groupMode = mode == "GROUP" || mode == "GROUP_MEMBER_OPTIONS" || !self.permissionsMode.isEmpty
+                self.admins = []
+                self.removedMembers = []
                 self.selectedChat = 0
                 self.blocked = mode.hasPrefix("UNBLOCK")
                 self.reported = false
@@ -651,7 +917,13 @@ final class Fixture: NSObject, NSApplicationDelegate {
                 else if mode == "CALL" { self.showCall() }
                 else if mode == "GROUP_SETUP" { self.showGroupSetup() }
                 else if mode == "GROUP_PICKER" { self.showGroupPicker() }
-                else if mode == "BLOCK_DIALOG" { self.showBlockDialog() }
+                else if mode == "BLOCK_DIALOG" { self.showInfo(); self.showBlockDialog() }
+                else if mode == "GROUP_MEMBER_OPTIONS" { self.showGroupInfo(); self.showMemberOptions(2) }
+                else if mode == "INFO_COVERED" {
+                    // Add to group sits under the translucent navigation bar.
+                    self.showInfo()
+                    if let list = self.list { list.scroll(to: list.top(of: self.coveredRow) - 5) }
+                }
                 else { self.showMain() }
                 self.record("READY")
             }

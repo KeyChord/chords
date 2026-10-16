@@ -45,6 +45,7 @@ test("every non-hint chord is implemented and covered", async () => {
 test.each([
   ["ci(\\d+)", "ci12", "12"],
   ["cgc.(\\d+)", "cgc.12", "12"],
+  ["igm.(\\d+)", "igm.12", "12"],
   ["gc(\\d+)", "gc12", "12"],
   ["gch(\\d+)", "gch12", "12"],
   ["gca(\\d+)", "gca12", "12"],
@@ -67,7 +68,7 @@ test.each(cases)(
     for (const [app, json] of perform.mock.calls) {
       expect(app).toBe("net.whatsapp.WhatsApp");
       expect(JSON.parse(json)[0].kind).toMatch(
-        /^(MENU|ELEMENT|CHAT|PARTICIPANT|GRID|DEVICE|DISMISS_POPOVER|GROUP_PERMISSIONS|VERIFY)$/,
+        /^(MENU|ELEMENT|CHAT|PARTICIPANT|MEMBER|GRID|DEVICE|DISMISS_POPOVER|GROUP_PERMISSIONS|VERIFY|FILTER|FILTER_SELECTED|OPEN_CHAT)$/,
       );
     }
   },
@@ -182,56 +183,73 @@ test("numbered chat info selects its chat before opening the info dialog", async
 });
 
 test.each([
-  ["VIEW_CHATS", { kind: "MENU", scope: "com.apple.menu.view", identifiers: ["chats"] }],
-  ["VIEW_ARCHIVED", { kind: "ELEMENT", identifiers: ["SidebarButton_Archived"] }],
-  ["VIEW_CHATS_ALL", { kind: "ELEMENT", description: "All" }],
-  ["VIEW_CHATS_UNREAD", { kind: "ELEMENT", description: "Unread" }],
-  ["VIEW_CHATS_FAVOURITES", { kind: "ELEMENT", description: "Favourites" }],
-  ["VIEW_CHATS_GROUPS", { kind: "ELEMENT", description: "Groups" }],
-] as const)("%s opens its view before selecting a numbered chat", async (action, destination) => {
-  const handler = buildWhatsAppHandler();
-  for (const index of [1, 12]) {
+  ["VIEW_CHATS", { kind: "MENU", scope: "com.apple.menu.view", identifiers: ["chats"] }, "CHAT"],
+  ["VIEW_ARCHIVED", { kind: "ELEMENT", identifiers: ["SidebarButton_Archived"] }, "CHAT"],
+  ["VIEW_CHATS_ALL", { kind: "FILTER_SELECTED", description: "All" }, "OPEN_CHAT"],
+  ["VIEW_CHATS_UNREAD", { kind: "FILTER_SELECTED", description: "Unread" }, "OPEN_CHAT"],
+  ["VIEW_CHATS_FAVOURITES", { kind: "FILTER_SELECTED", description: "Favourites" }, "OPEN_CHAT"],
+  ["VIEW_CHATS_GROUPS", { kind: "FILTER_SELECTED", description: "Groups" }, "OPEN_CHAT"],
+] as const)(
+  "%s opens its view before selecting a numbered chat",
+  async (action, destination, kind) => {
+    const handler = buildWhatsAppHandler();
+    for (const index of [1, 12]) {
+      perform.mockClear();
+      await handler(action, String(index));
+      const steps = perform.mock.calls.flatMap(([, json]) => JSON.parse(json));
+      expect(steps[0]).toMatchObject({
+        kind: "ELEMENT",
+        scope: "contact-info-view-content-stack-view",
+        description: "close",
+      });
+      expect(steps[1]).toEqual({
+        kind: "MENU",
+        scope: "com.apple.menu.application",
+        identifiers: ["open_main_window"],
+      });
+      expect(steps.at(-2)).toMatchObject(destination);
+      expect(steps.at(-1)).toEqual({ kind, index });
+    }
     perform.mockClear();
-    await handler(action, String(index));
-    const steps = perform.mock.calls.flatMap(([, json]) => JSON.parse(json));
-    expect(steps[0]).toMatchObject({
-      kind: "ELEMENT",
-      scope: "contact-info-view-content-stack-view",
-      description: "close",
-    });
-    expect(steps[1]).toEqual({
-      kind: "MENU",
-      scope: "com.apple.menu.application",
-      identifiers: ["open_main_window"],
-    });
-    expect(steps.at(-2)).toMatchObject(destination);
-    expect(steps.at(-1)).toEqual({ kind: "CHAT", index });
-  }
-  perform.mockClear();
-  for (const index of [0, -1, 1.5, "00", "01", "1junk", "9007199254740992", Infinity, NaN]) {
-    await expect(handler(action, index)).rejects.toThrow("positive safe integer");
-  }
-  expect(perform).not.toHaveBeenCalled();
+    for (const index of [0, -1, 1.5, "00", "01", "1junk", "9007199254740992", Infinity, NaN]) {
+      await expect(handler(action, index)).rejects.toThrow("positive safe integer");
+    }
+    expect(perform).not.toHaveBeenCalled();
+  },
+);
+
+test("a filter presses its chip, then waits for the chip to be selected", async () => {
+  await buildWhatsAppHandler()("VIEW_CHATS_GROUPS");
+  expect(perform.mock.calls.flatMap(([, json]) => JSON.parse(json))).toEqual([
+    { kind: "MENU", scope: "com.apple.menu.application", identifiers: ["open_main_window"] },
+    { kind: "MENU", scope: "com.apple.menu.view", identifiers: ["chats"] },
+    { kind: "FILTER", description: "Groups" },
+    { kind: "FILTER_SELECTED", description: "Groups" },
+  ]);
 });
 
-test("a numbered group waits for the Groups filter before selecting its chat", async () => {
-  let filtered!: () => void;
+test("a numbered group opens its chat only after the Groups filter is selected", async () => {
+  let selected!: () => void;
   perform
+    .mockResolvedValueOnce("")
     .mockResolvedValueOnce("")
     .mockResolvedValueOnce("")
     .mockResolvedValueOnce("")
     .mockImplementationOnce(
       () =>
         new Promise<string>((resolve) => {
-          filtered = () => resolve("");
+          selected = () => resolve("");
         }),
     );
   const pending = buildWhatsAppHandler()("VIEW_CHATS_GROUPS", "1");
-  await waitFor(() => expect(perform).toHaveBeenCalledTimes(4));
-  expect(JSON.parse(perform.mock.lastCall![1])[0]).toMatchObject({ description: "Groups" });
-  filtered();
+  await waitFor(() => expect(perform).toHaveBeenCalledTimes(5));
+  expect(JSON.parse(perform.mock.lastCall![1])).toEqual([
+    { kind: "FILTER_SELECTED", description: "Groups" },
+  ]);
+  selected();
   await pending;
-  expect(JSON.parse(perform.mock.lastCall![1])).toEqual([{ kind: "CHAT", index: 1 }]);
+  expect(perform).toHaveBeenCalledTimes(6);
+  expect(JSON.parse(perform.mock.lastCall![1])).toEqual([{ kind: "OPEN_CHAT", index: 1 }]);
 });
 
 test.each([
@@ -242,18 +260,107 @@ test.each([
   "%s invokes only its named confirmation in the action sheet",
   async (action, description) => {
     await buildWhatsAppHandler()(action);
-    expect(JSON.parse(perform.mock.lastCall![1])[0]).toMatchObject({
+    const steps = perform.mock.calls.flatMap(([, json]) => JSON.parse(json));
+    // The sheet title's parent holds only the title; its popover holds the buttons.
+    expect(steps.at(-1)).toMatchObject({
       kind: "ELEMENT",
       scope: "ActionSheet_TitleLabel",
-      scopeParent: true,
+      scopeAncestorRole: "AXPopover",
       description,
       role: "AXButton",
     });
-    expect(JSON.parse(perform.mock.lastCall![1])[0].optional).toBe(
-      action === "CHAT_INFO_UNBLOCK" ? true : undefined,
-    );
+    expect(steps.at(-1).scopeParent).toBeUndefined();
+    expect(steps.at(-1).optional).toBe(action === "CHAT_INFO_UNBLOCK" ? true : undefined);
+    // Pressing the Info row scrolls it into view so its sheet can open.
+    expect(steps.at(-2)).toMatchObject({
+      scope: "contact-info-view-content-stack-view",
+      scopeParent: true,
+      scroll: true,
+    });
   },
 );
+
+test.each([
+  "CHAT_INFO_THEME",
+  "CHAT_INFO_AVATAR",
+  "CHAT_INFO_SHARE_CONTACT",
+  "CHAT_INFO_FAVOURITE",
+  "CHAT_INFO_GALLERY",
+  "CHAT_INFO_PRIVACY",
+  "CHAT_INFO_REPORT",
+  "CHAT_MUTE",
+  "GROUP_MEMBERS",
+  "GROUP_PERMISSIONS",
+] as const)("%s finds its Info row anywhere in the list", async (action) => {
+  await buildWhatsAppHandler()(action);
+  const steps = perform.mock.calls.flatMap(([, json]) => JSON.parse(json));
+  expect(steps).toContainEqual(
+    expect.objectContaining({
+      scope: "contact-info-view-content-stack-view",
+      scopeParent: true,
+      scroll: true,
+    }),
+  );
+});
+
+test("a numbered group member closes an open action sheet before it is counted", async () => {
+  await buildWhatsAppHandler()("GROUP_MEMBER_SELECT", "12");
+  expect(perform.mock.calls.flatMap(([, json]) => JSON.parse(json))).toEqual([
+    expect.objectContaining({
+      kind: "MENU",
+      identifiers: ["contact_info", "group_info"],
+      unlessIdentifier: "contact-info-view-content-stack-view",
+      unlessAny: [{ identifiers: ["ActionSheet_TitleLabel"] }],
+    }),
+    { kind: "DISMISS_POPOVER", scope: "ActionSheet_TitleLabel", scopeAncestorRole: "AXPopover" },
+    {
+      kind: "MEMBER",
+      scope: "contact-info-view-content-stack-view",
+      scopeParent: true,
+      scroll: true,
+      index: 12,
+    },
+  ]);
+});
+
+test("invalid group member positions never open Info or a member's options", async () => {
+  const handler = buildWhatsAppHandler();
+  for (const index of [undefined, 0, -1, 1.5, "01", "12junk", "9007199254740992"]) {
+    await expect(handler("GROUP_MEMBER_SELECT", index)).rejects.toThrow("positive safe integer");
+  }
+  expect(perform).not.toHaveBeenCalled();
+});
+
+test.each([
+  ["GROUP_MEMBER_INFO", { description: "Info" }],
+  ["GROUP_MEMBER_ADMIN", { descriptions: ["Make group admin", "Dismiss as admin"] }],
+  ["GROUP_MEMBER_REMOVE", { description: "Remove from group" }],
+] as const)("%s presses only inside the open member options", async (action, control) => {
+  await buildWhatsAppHandler()(action);
+  const steps = perform.mock.calls.flatMap(([, json]) => JSON.parse(json));
+  expect(steps[0]).toEqual({
+    kind: "ELEMENT",
+    scope: "ActionSheet_TitleLabel",
+    scopeAncestorRole: "AXPopover",
+    role: "AXButton",
+    missing: "Group member options (open them with igm.<number>)",
+    ...control,
+  });
+  // Removing confirms WhatsApp's follow-up sheet; the other options do not confirm.
+  expect(steps.slice(1)).toEqual(
+    action === "GROUP_MEMBER_REMOVE"
+      ? [
+          {
+            kind: "ELEMENT",
+            scope: "ActionSheet_TitleLabel",
+            scopeAncestorRole: "AXPopover",
+            description: "Remove",
+            role: "AXButton",
+          },
+        ]
+      : [],
+  );
+});
 
 test("chat index validation and unknown actions never poison the queue", async () => {
   const handler = buildWhatsAppHandler();

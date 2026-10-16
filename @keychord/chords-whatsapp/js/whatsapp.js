@@ -27,7 +27,7 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 //#region src/js/whatsapp.ts
 var import__keychord_native_whatsapp = /* @__PURE__ */ __toESM((/* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const nativeRequire = createRequire(import.meta.url);
-	const nativeFiles = { "darwin-arm64": new URL("native/aarch64-apple-darwin/whatsapp/whatsapp-1deaacd5b65d.node", import.meta.url).href };
+	const nativeFiles = { "darwin-arm64": new URL("native/aarch64-apple-darwin/whatsapp/whatsapp-7b2238c9a17b.node", import.meta.url).href };
 	const nativeTarget = process.platform + "-" + process.arch;
 	const nativeFile = nativeFiles[nativeTarget];
 	if (!nativeFile) throw new Error("[chord-native] whatsapp has no addon for " + nativeTarget);
@@ -87,18 +87,22 @@ const info = {
 const closeInfo = {
 	kind: "ELEMENT",
 	scope: "contact-info-view-content-stack-view",
-	scopeAncestor: 2,
+	scopeAncestorRole: "AXWindow",
 	description: "close",
 	role: "AXButton",
 	onlyIfAny: [{ identifiers: ["contact-info-view-content-stack-view"] }]
 };
-const infoControl = (description, role) => [info, {
+const infoRow = (request) => ({
 	kind: "ELEMENT",
 	scope: "contact-info-view-content-stack-view",
 	scopeParent: true,
+	scroll: true,
+	...request
+});
+const infoControl = (description, role) => [info, infoRow({
 	description,
 	...role ? { role } : {}
-}];
+})];
 const heading = (description) => ({
 	description,
 	role: "AXHeading"
@@ -108,13 +112,25 @@ const newGroup = {
 	...menu(file, "new_group"),
 	unlessAny: [{ identifiers: [participantPicker] }, heading("New group")]
 };
-const groupControl = (request) => [info, {
+const groupControl = (request) => [info, infoRow(request)];
+const actionSheet = {
+	scope: "ActionSheet_TitleLabel",
+	scopeAncestorRole: "AXPopover"
+};
+const actionSheetOpen = { identifiers: ["ActionSheet_TitleLabel"] };
+const actionSheetButton = (description) => ({
 	kind: "ELEMENT",
-	scope: "contact-info-view-content-stack-view",
-	scopeParent: true,
-	scroll: true,
+	...actionSheet,
+	description,
+	role: "AXButton"
+});
+const memberOption = (request) => ({
+	kind: "ELEMENT",
+	...actionSheet,
+	role: "AXButton",
+	missing: "Group member options (open them with igm.<number>)",
 	...request
-}];
+});
 const blockDialog = [{
 	description: "Block",
 	role: "AXButton"
@@ -128,19 +144,13 @@ const blockContact = (description) => [
 		unlessAny: blockDialog
 	},
 	{
-		...groupControl({
+		...infoRow({
 			descriptionPrefix: "Block ",
 			role: "AXButton"
-		})[1],
+		}),
 		unlessAny: blockDialog
 	},
-	{
-		kind: "ELEMENT",
-		scope: "ActionSheet_TitleLabel",
-		scopeParent: true,
-		description,
-		role: "AXButton"
-	}
+	actionSheetButton(description)
 ];
 const settingsControl = (request) => [{
 	...menu("com.apple.menu.application", "settings"),
@@ -157,10 +167,12 @@ const chatFilter = (description) => [
 	menu("com.apple.menu.application", "open_main_window"),
 	menu(view, "chats"),
 	{
-		kind: "ELEMENT",
-		scope: "ChatListView_chipButtonsCell",
-		description,
-		role: "AXButton"
+		kind: "FILTER",
+		description
+	},
+	{
+		kind: "FILTER_SELECTED",
+		description
 	}
 ];
 const sidebar = (request) => [menu("com.apple.menu.application", "open_main_window"), {
@@ -201,7 +213,7 @@ function themePath(destination) {
 const actions = {
 	CHAT_CLOSE: menu(chat, "close_chat"),
 	CHAT_INFO: info,
-	CHAT_INFO_AVATAR: [info, element("contact-info-header-profile-image", "AXButton")],
+	CHAT_INFO_AVATAR: [info, infoRow({ identifiers: ["contact-info-header-profile-image"] })],
 	CHAT_INFO_VOICE: infoControl("Audio call", "AXButton"),
 	CHAT_INFO_VIDEO: infoControl("Video call", "AXButton"),
 	CHAT_INFO_SEARCH: infoControl("Search", "AXButton"),
@@ -236,16 +248,19 @@ const actions = {
 	CHAT_INFO_PRIVACY: infoControl("Advanced chat privacy"),
 	CHAT_INFO_ENCRYPTION: infoControl("Encryption"),
 	CHAT_INFO_CONTACT_DETAILS: infoControl("Contact details"),
-	CHAT_INFO_GROUP_CREATE: [info, {
-		kind: "ELEMENT",
-		scope: "contact-info-view-content-stack-view",
-		scopeParent: true,
+	CHAT_INFO_GROUP_CREATE: groupControl({
 		descriptionPrefix: "Create group with ",
 		role: "AXButton"
-	}],
+	}),
 	CHAT_INFO_GROUP_ADD: infoControl("Add to group", "AXButton"),
-	CHAT_INFO_SHARE_CONTACT: [info, element("Share_Contact", "AXButton")],
-	CHAT_INFO_FAVOURITE: [info, element("Contact_Info_Favorite_Action", "AXButton")],
+	CHAT_INFO_SHARE_CONTACT: groupControl({
+		identifiers: ["Share_Contact"],
+		role: "AXButton"
+	}),
+	CHAT_INFO_FAVOURITE: groupControl({
+		identifiers: ["Contact_Info_Favorite_Action"],
+		role: "AXButton"
+	}),
 	CHAT_INFO_EXPORT: infoControl("Export chat", "AXButton"),
 	CHAT_INFO_CLEAR: infoControl("Clear chat", "AXButton"),
 	CHAT_INFO_BLOCK: blockContact("Block"),
@@ -259,31 +274,24 @@ const actions = {
 			}]
 		},
 		{
-			...groupControl({
+			...infoRow({
 				descriptionPrefix: "Unblock ",
 				role: "AXButton"
-			})[1],
+			}),
 			unlessAny: [{
 				description: "Unblock",
 				role: "AXButton"
 			}]
 		},
 		{
-			kind: "ELEMENT",
-			scope: "ActionSheet_TitleLabel",
-			scopeParent: true,
-			description: "Unblock",
-			role: "AXButton",
+			...actionSheetButton("Unblock"),
 			optional: true
 		}
 	],
-	CHAT_INFO_REPORT: [info, {
-		kind: "ELEMENT",
-		scope: "contact-info-view-content-stack-view",
-		scopeParent: true,
+	CHAT_INFO_REPORT: groupControl({
 		descriptionPrefix: "Report ",
 		role: "AXButton"
-	}],
+	}),
 	CHAT_BLOCK: {
 		kind: "MENU",
 		scope: chat,
@@ -379,11 +387,10 @@ const actions = {
 			unlessAny: [heading("Group permissions"), heading("Group settings")]
 		},
 		{
-			...groupControl({
+			...infoRow({
 				kind: "GROUP_PERMISSIONS",
-				descriptions: ["Group permissions", "Group settings"],
-				role: "AXButton"
-			})[1],
+				descriptions: ["Group permissions", "Group settings"]
+			}),
 			unlessAny: [heading("Group permissions"), heading("Group settings")]
 		},
 		{
@@ -396,6 +403,9 @@ const actions = {
 		description: "Notify for",
 		role: "AXButton"
 	}),
+	GROUP_MEMBER_INFO: memberOption({ description: "Info" }),
+	GROUP_MEMBER_ADMIN: memberOption({ descriptions: ["Make group admin", "Dismiss as admin"] }),
+	GROUP_MEMBER_REMOVE: [memberOption({ description: "Remove from group" }), actionSheetButton("Remove")],
 	GROUP_QR: [info, element("NavigationBar_GroupInfoQRButton", "AXButton")],
 	CALL_NEW: menu(file, "new_call..."),
 	CALL_NEW_GROUP: menu(file, "new_group_call"),
@@ -435,6 +445,27 @@ function buildWhatsAppHandler(bundleId = "net.whatsapp.WhatsApp") {
 				kind: "PARTICIPANT",
 				index: position
 			}];
+		} else if (action === "GROUP_MEMBER_SELECT") {
+			let position;
+			try {
+				position = positiveIndex(index, "group member index");
+			} catch (error) {
+				return Promise.reject(error);
+			}
+			request = [
+				{
+					...info,
+					unlessAny: [actionSheetOpen]
+				},
+				{
+					kind: "DISMISS_POPOVER",
+					...actionSheet
+				},
+				infoRow({
+					kind: "MEMBER",
+					index: position
+				})
+			];
 		} else if (action === "CHAT_SWITCH" || action === "CHAT_INFO_AT") {
 			let position;
 			try {
@@ -460,12 +491,13 @@ function buildWhatsAppHandler(bundleId = "net.whatsapp.WhatsApp") {
 				return Promise.reject(error);
 			}
 			const destination = actions[action];
+			const filtered = action !== "VIEW_CHATS" && action !== "VIEW_ARCHIVED";
 			request = [
 				closeInfo,
-				...action === "VIEW_CHATS" || action === "VIEW_ARCHIVED" ? [menu("com.apple.menu.application", "open_main_window")] : [],
+				...filtered ? [] : [menu("com.apple.menu.application", "open_main_window")],
 				...Array.isArray(destination) ? destination : [destination],
 				{
-					kind: "CHAT",
+					kind: filtered ? "OPEN_CHAT" : "CHAT",
 					index: position
 				}
 			];

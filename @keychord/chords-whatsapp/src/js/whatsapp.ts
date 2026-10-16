@@ -8,11 +8,15 @@ type Request = {
     | "ELEMENT"
     | "CHAT"
     | "PARTICIPANT"
+    | "MEMBER"
     | "GRID"
     | "DEVICE"
     | "DISMISS_POPOVER"
     | "GROUP_PERMISSIONS"
-    | "VERIFY";
+    | "VERIFY"
+    | "FILTER"
+    | "FILTER_SELECTED"
+    | "OPEN_CHAT";
   scope?: string;
   identifiers?: string[];
   titlePrefix?: string;
@@ -25,8 +29,10 @@ type Request = {
   onlyIfAny?: Selector[];
   scopeParent?: boolean;
   scopeAncestor?: number;
+  scopeAncestorRole?: string;
   scroll?: boolean;
   optional?: boolean;
+  missing?: string;
   role?: string;
   index?: number;
   row?: number;
@@ -80,23 +86,28 @@ const info: Request = {
   ...menu(chat, "contact_info", "group_info"),
   unlessIdentifier: "contact-info-view-content-stack-view",
 };
+// Info's close button is in a navigation bar beside the list, several groups up.
 const closeInfo: Request = {
   kind: "ELEMENT",
   scope: "contact-info-view-content-stack-view",
-  scopeAncestor: 2,
+  scopeAncestorRole: "AXWindow",
   description: "close",
   role: "AXButton",
   onlyIfAny: [{ identifiers: ["contact-info-view-content-stack-view"] }],
 };
+// Info is a table that exposes only its on-screen rows. The native step pages
+// through it and scrolls each control into view: WhatsApp presses by tapping the
+// control's activation point, which does nothing off screen.
+const infoRow = (request: Partial<Request>): Request => ({
+  kind: "ELEMENT",
+  scope: "contact-info-view-content-stack-view",
+  scopeParent: true,
+  scroll: true,
+  ...request,
+});
 const infoControl = (description: string, role?: string): Request[] => [
   info,
-  {
-    kind: "ELEMENT",
-    scope: "contact-info-view-content-stack-view",
-    scopeParent: true,
-    description,
-    ...(role ? { role } : {}),
-  },
+  infoRow({ description, ...(role ? { role } : {}) }),
 ];
 const heading = (description: string): Selector => ({ description, role: "AXHeading" });
 const participantPicker = "ParticipantPicker_TableView";
@@ -104,33 +115,32 @@ const newGroup: Request = {
   ...menu(file, "new_group"),
   unlessAny: [{ identifiers: [participantPicker] }, heading("New group")],
 };
-const groupControl = (request: Partial<Request>): Request[] => [
-  info,
-  {
-    kind: "ELEMENT",
-    scope: "contact-info-view-content-stack-view",
-    scopeParent: true,
-    scroll: true,
-    ...request,
-  },
-];
+const groupControl = (request: Partial<Request>): Request[] => [info, infoRow(request)];
+// Member options and confirmations are action sheets: popovers whose title has
+// this identifier. Its parent holds only the title, so scope to the popover.
+const actionSheet = { scope: "ActionSheet_TitleLabel", scopeAncestorRole: "AXPopover" };
+const actionSheetOpen: Selector = { identifiers: ["ActionSheet_TitleLabel"] };
+const actionSheetButton = (description: string): Request => ({
+  kind: "ELEMENT",
+  ...actionSheet,
+  description,
+  role: "AXButton",
+});
+const memberOption = (request: Partial<Request>): Request => ({
+  kind: "ELEMENT",
+  ...actionSheet,
+  role: "AXButton",
+  missing: "Group member options (open them with igm.<number>)",
+  ...request,
+});
 const blockDialog: Selector[] = [
   { description: "Block", role: "AXButton" },
   { description: "Block and report", role: "AXButton" },
 ];
 const blockContact = (description: "Block" | "Block and report"): Request[] => [
   { ...info, unlessAny: blockDialog },
-  {
-    ...groupControl({ descriptionPrefix: "Block ", role: "AXButton" })[1],
-    unlessAny: blockDialog,
-  },
-  {
-    kind: "ELEMENT",
-    scope: "ActionSheet_TitleLabel",
-    scopeParent: true,
-    description,
-    role: "AXButton",
-  },
+  { ...infoRow({ descriptionPrefix: "Block ", role: "AXButton" }), unlessAny: blockDialog },
+  actionSheetButton(description),
 ];
 const settingsControl = (request: Partial<Request>): Request[] => [
   {
@@ -146,10 +156,14 @@ const settingsControl = (request: Partial<Request>): Request[] => [
     ...request,
   },
 ];
+// WhatsApp applies a filter about 75 ms after its chip is pressed. FILTER presses
+// the chip unless it is already selected (pressing it again deselects it), and
+// FILTER_SELECTED waits until the chip is selected.
 const chatFilter = (description: string): Request[] => [
   menu("com.apple.menu.application", "open_main_window"),
   menu(view, "chats"),
-  { kind: "ELEMENT", scope: "ChatListView_chipButtonsCell", description, role: "AXButton" },
+  { kind: "FILTER", description },
+  { kind: "FILTER_SELECTED", description },
 ];
 const sidebar = (request: Partial<Request>): Request[] => [
   menu("com.apple.menu.application", "open_main_window"),
@@ -192,7 +206,8 @@ function themePath(destination?: "BUBBLE" | "WALLPAPER"): Request[] {
 const actions = {
   CHAT_CLOSE: menu(chat, "close_chat"),
   CHAT_INFO: info,
-  CHAT_INFO_AVATAR: [info, element("contact-info-header-profile-image", "AXButton")],
+  // A group's avatar is an image, a contact's a button.
+  CHAT_INFO_AVATAR: [info, infoRow({ identifiers: ["contact-info-header-profile-image"] })],
   CHAT_INFO_VOICE: infoControl("Audio call", "AXButton"),
   CHAT_INFO_VIDEO: infoControl("Video call", "AXButton"),
   CHAT_INFO_SEARCH: infoControl("Search", "AXButton"),
@@ -220,19 +235,16 @@ const actions = {
   CHAT_INFO_PRIVACY: infoControl("Advanced chat privacy"),
   CHAT_INFO_ENCRYPTION: infoControl("Encryption"),
   CHAT_INFO_CONTACT_DETAILS: infoControl("Contact details"),
-  CHAT_INFO_GROUP_CREATE: [
-    info,
-    {
-      kind: "ELEMENT",
-      scope: "contact-info-view-content-stack-view",
-      scopeParent: true,
-      descriptionPrefix: "Create group with ",
-      role: "AXButton",
-    },
-  ],
+  CHAT_INFO_GROUP_CREATE: groupControl({
+    descriptionPrefix: "Create group with ",
+    role: "AXButton",
+  }),
   CHAT_INFO_GROUP_ADD: infoControl("Add to group", "AXButton"),
-  CHAT_INFO_SHARE_CONTACT: [info, element("Share_Contact", "AXButton")],
-  CHAT_INFO_FAVOURITE: [info, element("Contact_Info_Favorite_Action", "AXButton")],
+  CHAT_INFO_SHARE_CONTACT: groupControl({ identifiers: ["Share_Contact"], role: "AXButton" }),
+  CHAT_INFO_FAVOURITE: groupControl({
+    identifiers: ["Contact_Info_Favorite_Action"],
+    role: "AXButton",
+  }),
   CHAT_INFO_EXPORT: infoControl("Export chat", "AXButton"),
   CHAT_INFO_CLEAR: infoControl("Clear chat", "AXButton"),
   CHAT_INFO_BLOCK: blockContact("Block"),
@@ -240,28 +252,12 @@ const actions = {
   CHAT_INFO_UNBLOCK: [
     { ...info, unlessAny: [{ description: "Unblock", role: "AXButton" }] },
     {
-      ...groupControl({ descriptionPrefix: "Unblock ", role: "AXButton" })[1],
+      ...infoRow({ descriptionPrefix: "Unblock ", role: "AXButton" }),
       unlessAny: [{ description: "Unblock", role: "AXButton" }],
     },
-    {
-      kind: "ELEMENT",
-      scope: "ActionSheet_TitleLabel",
-      scopeParent: true,
-      description: "Unblock",
-      role: "AXButton",
-      optional: true,
-    },
+    { ...actionSheetButton("Unblock"), optional: true },
   ],
-  CHAT_INFO_REPORT: [
-    info,
-    {
-      kind: "ELEMENT",
-      scope: "contact-info-view-content-stack-view",
-      scopeParent: true,
-      descriptionPrefix: "Report ",
-      role: "AXButton",
-    },
-  ],
+  CHAT_INFO_REPORT: groupControl({ descriptionPrefix: "Report ", role: "AXButton" }),
   CHAT_BLOCK: { kind: "MENU", scope: chat, titlePrefix: "Block" },
   CHAT_SEARCH: menu(chat, "search_chat"),
   CHAT_VIDEO_CALL: menu(chat, "video_call"),
@@ -328,11 +324,11 @@ const actions = {
   GROUP_PERMISSIONS: [
     { ...info, unlessAny: [heading("Group permissions"), heading("Group settings")] },
     {
-      ...groupControl({
+      // WhatsApp 26.38.74 exposes this row as text while it is on screen.
+      ...infoRow({
         kind: "GROUP_PERMISSIONS",
         descriptions: ["Group permissions", "Group settings"],
-        role: "AXButton",
-      })[1],
+      }),
       unlessAny: [heading("Group permissions"), heading("Group settings")],
     },
     {
@@ -342,6 +338,12 @@ const actions = {
     },
   ],
   GROUP_NOTIFY: groupControl({ description: "Notify for", role: "AXButton" }),
+  GROUP_MEMBER_INFO: memberOption({ description: "Info" }),
+  GROUP_MEMBER_ADMIN: memberOption({ descriptions: ["Make group admin", "Dismiss as admin"] }),
+  GROUP_MEMBER_REMOVE: [
+    memberOption({ description: "Remove from group" }),
+    actionSheetButton("Remove"),
+  ],
   GROUP_QR: [info, element("NavigationBar_GroupInfoQRButton", "AXButton")],
   CALL_NEW: menu(file, "new_call..."),
   CALL_NEW_GROUP: menu(file, "new_group_call"),
@@ -372,6 +374,7 @@ export type WhatsAppAction =
   | "CHAT_SWITCH"
   | "CHAT_INFO_AT"
   | "CHAT_GROUP_SELECT"
+  | "GROUP_MEMBER_SELECT"
   | "CALL_CAMERA_SELECT"
   | "CALL_MICROPHONE_SELECT"
   | "CALL_SPEAKER_SELECT"
@@ -391,6 +394,20 @@ export default function buildWhatsAppHandler(bundleId = "net.whatsapp.WhatsApp")
         return Promise.reject(error);
       }
       request = [newGroup, { kind: "PARTICIPANT", index: position }];
+    } else if (action === "GROUP_MEMBER_SELECT") {
+      let position: number;
+      try {
+        position = positiveIndex(index, "group member index");
+      } catch (error) {
+        return Promise.reject(error);
+      }
+      // An open action sheet hides Group Info from accessibility; close it instead
+      // of reopening Info, then press the numbered member to show its options.
+      request = [
+        { ...info, unlessAny: [actionSheetOpen] },
+        { kind: "DISMISS_POPOVER", ...actionSheet },
+        infoRow({ kind: "MEMBER", index: position }),
+      ];
     } else if (action === "CHAT_SWITCH" || action === "CHAT_INFO_AT") {
       let position: number;
       try {
@@ -421,13 +438,15 @@ export default function buildWhatsAppHandler(bundleId = "net.whatsapp.WhatsApp")
         return Promise.reject(error);
       }
       const destination = actions[action];
+      const filtered = action !== "VIEW_CHATS" && action !== "VIEW_ARCHIVED";
       request = [
         closeInfo,
-        ...(action === "VIEW_CHATS" || action === "VIEW_ARCHIVED"
-          ? [menu("com.apple.menu.application", "open_main_window")]
-          : []),
+        ...(filtered ? [] : [menu("com.apple.menu.application", "open_main_window")]),
         ...(Array.isArray(destination) ? destination : [destination]),
-        { kind: "CHAT", index: position },
+        // WhatsApp ignores row taps while a filter reload animates, and exposes the
+        // new rows only after layout. OPEN_CHAT selects the position from WhatsApp's
+        // filtered list with its chat shortcuts instead.
+        { kind: filtered ? "OPEN_CHAT" : "CHAT", index: position },
       ];
     } else if (
       action === "CALL_CAMERA_SELECT" ||

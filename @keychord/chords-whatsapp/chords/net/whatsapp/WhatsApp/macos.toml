@@ -51,6 +51,17 @@ file = 'whatsapp.js'
 'igd' = { name = 'Info [Group] > Description (Add)', '@input:whatsapp' = ['GROUP_DESCRIPTION'] }
 'igm' = { name = 'Info [Group] > Members', '@input:whatsapp' = ['GROUP_MEMBERS'] }
 'igmc' = { name = 'Info [Group] > Member Changes', '@input:whatsapp' = ['GROUP_MEMBER_CHANGES'] }
+'igm.(\d+)' = { name = 'Info [Group] > Member @ # (Options)', '@input:whatsapp' = [
+  'GROUP_MEMBER_SELECT',
+  '$1',
+] }
+'igmi' = { name = 'Info [Group] > Member > Info', '@input:whatsapp' = ['GROUP_MEMBER_INFO'] }
+'igma' = { name = 'Info [Group] > Member > Admin (Make / Dismiss)', '@input:whatsapp' = [
+  'GROUP_MEMBER_ADMIN',
+] }
+'igmr' = { name = 'Info [Group] > Member > Remove (Confirmed)', '@input:whatsapp' = [
+  'GROUP_MEMBER_REMOVE',
+] }
 'ige' = { name = 'Info [Group] > Exit', '@input:whatsapp' = ['GROUP_EXIT'] }
 'igr' = { name = 'Info [Group] > Report', '@input:whatsapp' = ['GROUP_REPORT'] }
 'igcs' = { name = 'Info [Group] > Create Similar', '@input:whatsapp' = ['GROUP_CREATE_SIMILAR'] }

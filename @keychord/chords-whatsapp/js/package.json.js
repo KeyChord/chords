@@ -149,6 +149,22 @@ var chords = { "net": { "whatsapp": { "WhatsApp": { "macos.toml": {
 			"name": "Info [Group] > Member Changes",
 			"@input:whatsapp": ["GROUP_MEMBER_CHANGES"]
 		},
+		"igm.(\\d+)": {
+			"name": "Info [Group] > Member @ # (Options)",
+			"@input:whatsapp": ["GROUP_MEMBER_SELECT", "$1"]
+		},
+		"igmi": {
+			"name": "Info [Group] > Member > Info",
+			"@input:whatsapp": ["GROUP_MEMBER_INFO"]
+		},
+		"igma": {
+			"name": "Info [Group] > Member > Admin (Make / Dismiss)",
+			"@input:whatsapp": ["GROUP_MEMBER_ADMIN"]
+		},
+		"igmr": {
+			"name": "Info [Group] > Member > Remove (Confirmed)",
+			"@input:whatsapp": ["GROUP_MEMBER_REMOVE"]
+		},
 		"ige": {
 			"name": "Info [Group] > Exit",
 			"@input:whatsapp": ["GROUP_EXIT"]
