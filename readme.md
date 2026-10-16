@@ -55,14 +55,14 @@ handlers they use. Keep application-specific alphanumeric chords in nested
 application/bundle-ID folders. Package builds reject global chords outside the
 root file.
 
-In the default chord package, these are the categories assigned to the global chords (which must start with a non-alphanumeric character). If you want to define your own custom global chord which doesn't fit into any of the following categories, it's recommended to use one of the remaining symbols (`` ` ``, `[`, `]`, but NOT `'` or `\` since they're reserved).
+In the default chord package, these are the categories assigned to the global chords (which must start with a non-alphanumeric character). If you want to define your own custom global chord which doesn't fit into any of the following categories, you should prefer the `,` prefix.
 
-`,` Free\
+`,` User-Defined Chords\
 `/` Global General-Purpose/Custom Commands\
-`-` Menu Bar/Menus\
-`=` Tray / System Shortcuts\
+`=` Menu / Tray / System Shortcuts\
 `.` Mouse / Keyboard (e.g. modifiers)\
-`;` Web
+`;` Web\
+`[`, `]` Global Navigation
 
 > `'` is reserved for pass-through input (can appear anywhere in a chord)\
 > `\` is reserved for escape characters (can appear anywhere in a chord)\
