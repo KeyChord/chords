@@ -87,17 +87,53 @@ async function pointerDisplay(command) {
 	if (targets.size !== 1 || names.split(",").some((name) => !managedName.test(name))) throw new Error("Move the pointer to a physical display or a virtual screen created by /ms");
 	return [...targets][0];
 }
+function singleValue(output) {
+	const values = output.split(",").map((value) => value.trim());
+	return values.every((value) => value === values[0]) ? values[0] : output;
+}
 async function waitFor(command, args, expected) {
 	const deadline = Date.now() + 5e3;
 	let actual;
 	do {
 		actual = await optional(command, args);
-		if (actual === expected) return;
+		if (actual !== void 0) actual = singleValue(actual);
+		if (actual !== void 0 && (typeof expected === "string" ? actual === expected : expected.test(actual))) return actual;
 		await new Promise((resolve) => setTimeout(resolve, 100));
 	} while (Date.now() < deadline);
 	throw new Error(`BetterDisplay did not apply ${expected} (reported ${actual ?? "unavailable"})`);
 }
 const screen = (tagID) => ["--type=VirtualScreen", `--tagID=${tagID}`];
+async function selectVirtualResolution(command, virtual, resolution) {
+	await waitFor(command, [
+		"get",
+		...virtual,
+		"--connected"
+	], "on");
+	if (await waitFor(command, [
+		"get",
+		...virtual,
+		"--resolution"
+	], /^[1-9]\d*x[1-9]\d*$/) !== resolution || singleValue(await command([
+		"get",
+		...virtual,
+		"--hiDPI"
+	])) !== "on") await command([
+		"set",
+		...virtual,
+		`--resolution=${resolution}`,
+		"--hiDPI=on"
+	]);
+	await waitFor(command, [
+		"get",
+		...virtual,
+		"--resolution"
+	], resolution);
+	await waitFor(command, [
+		"get",
+		...virtual,
+		"--hiDPI"
+	], "on");
+}
 async function setResolution(command, resolution) {
 	const target = await pointerDisplay(command);
 	const display = ["--type=Display", `--UUID=${target}`];
@@ -171,11 +207,7 @@ async function setResolution(command, resolution) {
 					...virtual,
 					"--connected=on"
 				]);
-				await waitFor(command, [
-					"get",
-					...virtual,
-					"--resolution"
-				], resolution);
+				await selectVirtualResolution(command, virtual, resolution);
 				await command([
 					"set",
 					...virtual,
@@ -226,11 +258,7 @@ async function setResolution(command, resolution) {
 				...screen(entry.tagID),
 				"--connected=on"
 			]));
-			await restore(() => waitFor(command, [
-				"get",
-				...screen(entry.tagID),
-				"--resolution"
-			], entry.resolution));
+			await restore(() => selectVirtualResolution(command, screen(entry.tagID), entry.resolution));
 			await restore(() => command([
 				"set",
 				...screen(entry.tagID),

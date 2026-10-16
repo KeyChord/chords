@@ -9,16 +9,16 @@ let menuDelay: number;
 let shareDelay: number;
 let omitted: string[];
 const actions: [SpotifyTrackAction, string][] = [
-  ["remove", "Remove from this playlist"],
-  ["queue", "Add to queue"],
-  ["exclude", "Exclude from your taste profile"],
-  ["jam", "Start a Jam"],
-  ["song-radio", "Go to song radio"],
-  ["artist", "Go to artist"],
-  ["album", "Go to album"],
-  ["credits", "View credits"],
-  ["copy-link", "Copy link to Song"],
-  ["embed", "Embed track"],
+  ["REMOVE", "Remove from this playlist"],
+  ["QUEUE", "Add to queue"],
+  ["EXCLUDE", "Exclude from your taste profile"],
+  ["JAM", "Start a Jam"],
+  ["SONG_RADIO", "Go to song radio"],
+  ["ARTIST", "Go to artist"],
+  ["ALBUM", "Go to album"],
+  ["CREDITS", "View credits"],
+  ["COPY_LINK", "Copy link to Song"],
+  ["EMBED", "Embed track"],
 ];
 
 function menu(index: number, submenu = false) {
@@ -26,7 +26,7 @@ function menu(index: number, submenu = false) {
   root.setAttribute("role", "menu");
   root.setAttribute("data-depth", submenu ? "1" : "0");
   const labels = actions
-    .filter(([action]) => submenu === ["copy-link", "embed"].includes(action))
+    .filter(([action]) => submenu === ["COPY_LINK", "EMBED"].includes(action))
     .map(([, label]) => label);
   if (!submenu)
     labels.push("Remove download", "Remove from queue", "Include in your taste profile", "Share");
@@ -95,7 +95,7 @@ async function run(action: SpotifyTrackAction, index: string | number = "5") {
 }
 
 test("More opens the numbered track menu without performing any menu action", async () => {
-  expect(await run("more")).toEqual({ ok: true });
+  expect(await run("MORE")).toEqual({ ok: true });
   expect(opened).toEqual([5]);
   expect(clicks).toEqual([]);
   expect(window.document.querySelector('[role="menu"]')).not.toBeNull();
@@ -108,7 +108,7 @@ test.each(actions)("%s acts only on the numbered playlist track", async (action,
 });
 
 test("virtualized rows use absolute playlist numbers, rather than their DOM position", async () => {
-  expect(await run("more", "1")).toEqual({
+  expect(await run("MORE", "1")).toEqual({
     ok: false,
     error: "Playlist track #1 is not loaded. Scroll it into view first.",
   });
@@ -120,7 +120,7 @@ test("the sidebar and recommendations cannot satisfy a missing playlist row", as
   recommendation.innerHTML =
     '<div role="row" aria-rowindex="2"><div data-testid="tracklist-row"><button data-testid="more-button"></button></div></div>';
   window.document.querySelector("main")!.append(recommendation);
-  expect((await run("remove", "1")).ok).toBe(false);
+  expect((await run("REMOVE", "1")).ok).toBe(false);
   expect(clicks).toEqual([]);
   expect(opened).toEqual([]);
 });
@@ -129,7 +129,7 @@ test.each(["main", '[data-testid="playlist-page"]', '[data-testid="track-list"]'
   "requires the playlist screen (%s missing)",
   async (selector) => {
     window.document.querySelector(selector)!.remove();
-    expect(await run("more")).toEqual({
+    expect(await run("MORE")).toEqual({
       ok: false,
       error: "Open a Spotify playlist before using playlist chords.",
     });
@@ -139,7 +139,7 @@ test.each(["main", '[data-testid="playlist-page"]', '[data-testid="track-list"]'
 
 test("a hidden playlist is not modified", async () => {
   window.document.querySelector<HTMLElement>("main")!.style.display = "none";
-  expect((await run("more")).ok).toBe(false);
+  expect((await run("MORE")).ok).toBe(false);
   expect(opened).toEqual([]);
 });
 
@@ -157,7 +157,7 @@ test.each([
   0,
   Number.MAX_SAFE_INTEGER + 1,
 ])("rejects invalid track number %s before generating page code", (index) => {
-  expect(() => buildSpotifyJavaScript("remove", index)).toThrow("positive safe integer");
+  expect(() => buildSpotifyJavaScript("REMOVE", index)).toThrow("positive safe integer");
 });
 
 test("unknown actions fail before generating page code", () => {
@@ -172,7 +172,7 @@ test.each([
   "https://example.com",
 ])("unrelated pages are not modified (%s)", async (url) => {
   window.location.href = url;
-  expect(await run("remove")).toEqual({
+  expect(await run("REMOVE")).toEqual({
     ok: false,
     error: "The selected page is not the Spotify desktop app.",
   });
@@ -181,15 +181,15 @@ test.each([
 
 test("a previous track menu is dismissed before acting on another track", async () => {
   window.document.body.append(menu(99));
-  expect(await run("queue", "5")).toEqual({ ok: true });
+  expect(await run("QUEUE", "5")).toEqual({ ok: true });
   expect(clicks).toEqual(["5:Add to queue"]);
   expect(window.document.querySelectorAll('[role="menu"]')).toHaveLength(1);
 });
 
 test("a previous Share submenu is dismissed along with its root menu", async () => {
-  await run("copy-link", "5");
+  await run("COPY_LINK", "5");
   clicks.length = 0;
-  expect(await run("queue", "6")).toEqual({ ok: true });
+  expect(await run("QUEUE", "6")).toEqual({ ok: true });
   expect(clicks).toEqual(["6:Add to queue"]);
   expect(window.document.querySelectorAll('[role="menu"]')).toHaveLength(1);
 });
@@ -198,7 +198,7 @@ test("menus that cannot be dismissed prevent acting on another track", async () 
   const stuck = window.document.createElement("ul");
   stuck.setAttribute("role", "menu");
   window.document.body.append(stuck);
-  expect(await run("remove")).toEqual({
+  expect(await run("REMOVE")).toEqual({
     ok: false,
     error: "Could not dismiss the previous Spotify menu.",
   });
@@ -207,7 +207,7 @@ test("menus that cannot be dismissed prevent acting on another track", async () 
 
 test("asynchronously rendered track and Share menus are awaited", async () => {
   menuDelay = shareDelay = 20;
-  expect(await run("embed")).toEqual({ ok: true });
+  expect(await run("EMBED")).toEqual({ ok: true });
   expect(clicks).toEqual(["5:Embed track"]);
 });
 
@@ -216,7 +216,7 @@ test("a menu that never opens reports failure", async () => {
     '[data-testid="tracklist-row"] [data-testid="more-button"]',
   )!;
   button.replaceWith(button.cloneNode(true));
-  expect(await run("queue")).toEqual({
+  expect(await run("QUEUE")).toEqual({
     ok: false,
     error: "Spotify did not open the menu for playlist track #5.",
   });
@@ -249,7 +249,7 @@ test.each(["disabled", "aria-disabled", "hidden", "display", "visibility", "miss
         button.remove();
         break;
     }
-    expect(await run("more")).toEqual({
+    expect(await run("MORE")).toEqual({
       ok: false,
       error: "The More action is unavailable for playlist track #5.",
     });
@@ -265,7 +265,7 @@ test.each(actions)("missing %s never clicks another menu item", async (action, l
 
 test("an unavailable Share parent fails without clicking a root action", async () => {
   omitted = ["Share"];
-  expect(await run("copy-link")).toEqual({
+  expect(await run("COPY_LINK")).toEqual({
     ok: false,
     error: "The Share action is unavailable for playlist track #5.",
   });
@@ -288,7 +288,7 @@ test.each(["Remove from Liked Songs", "Remove from your Liked Songs", "Remove fr
         (item) => item.textContent === "Remove from this playlist",
       )!.textContent = label;
     });
-    expect(await run("remove")).toEqual({ ok: true });
+    expect(await run("REMOVE")).toEqual({ ok: true });
     expect(clicks).toEqual(["5:Remove from this playlist"]);
   },
 );
@@ -302,7 +302,7 @@ test("disabled menu actions do not report success", async () => {
       .find((item) => item.textContent === "Add to queue")!
       .setAttribute("aria-disabled", "true");
   });
-  expect(await run("queue")).toEqual({
+  expect(await run("QUEUE")).toEqual({
     ok: false,
     error: "The Add to queue action is unavailable for playlist track #5.",
   });
@@ -321,7 +321,7 @@ test("Remove prefers the current playlist even when unlike appears first in the 
     unlike.addEventListener("click", () => clicks.push("unliked"));
     root.prepend(unlike);
   });
-  expect(await run("remove")).toEqual({ ok: true });
+  expect(await run("REMOVE")).toEqual({ ok: true });
   expect(clicks).toEqual(["5:Remove from this playlist"]);
 });
 
@@ -334,7 +334,7 @@ test("a playlist without removal permission does not fall back to unliking the t
       (item) => item.textContent === "Remove from this playlist",
     )!.textContent = "Remove from Liked Songs";
   });
-  expect((await run("remove")).ok).toBe(false);
+  expect((await run("REMOVE")).ok).toBe(false);
   expect(clicks).toEqual([]);
 });
 
@@ -349,7 +349,7 @@ test.each(["disabled", "aria-disabled", "hidden"])(
         .find((item) => item.textContent === "Share")!
         .setAttribute(attribute, attribute === "aria-disabled" ? "true" : "");
     });
-    expect((await run("embed")).ok).toBe(false);
+    expect((await run("EMBED")).ok).toBe(false);
     expect(clicks).toEqual([]);
   },
 );

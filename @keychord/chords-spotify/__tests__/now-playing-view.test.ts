@@ -9,10 +9,10 @@ let state: "hidden" | "sidebar" | "expanded";
 let commit: (next: typeof state) => void;
 let stalled: boolean;
 const views = [
-  ["np-artwork", "artwork", "Show artwork"],
-  ["np-canvas", "canvas", "Show Canvas"],
-  ["np-artist-image", "hero", "Show artist image"],
-  ["np-lyrics", "lyrics", "Show lyrics"],
+  ["NP_ARTWORK", "artwork", "Show artwork"],
+  ["NP_CANVAS", "canvas", "Show Canvas"],
+  ["NP_ARTIST_IMAGE", "hero", "Show artist image"],
+  ["NP_LYRICS", "lyrics", "Show lyrics"],
 ] as const;
 
 beforeEach(() => {
@@ -93,13 +93,13 @@ async function run(action: SpotifyNowPlayingAction): Promise<{ ok: boolean; erro
 
 test("Toggle hides and reveals the panel even though the hidden sidebar stays mounted", async () => {
   for (const expected of ["hidden", "sidebar", "hidden"]) {
-    expect(await run("np-toggle")).toEqual({ ok: true });
+    expect(await run("NP_TOGGLE")).toEqual({ ok: true });
     expect(state).toBe(expected);
   }
   expect(clicks).toEqual(["hide", "show", "hide"]);
 });
 
-test.each(["np-toggle", "np-hide"] as const)(
+test.each(["NP_TOGGLE", "NP_HIDE"] as const)(
   "%s hides an expanded view completely",
   async (action) => {
     commit("expanded");
@@ -110,27 +110,27 @@ test.each(["np-toggle", "np-hide"] as const)(
 );
 
 test("Hide remains hidden when repeated", async () => {
-  expect(await run("np-hide")).toEqual({ ok: true });
-  expect(await run("np-hide")).toEqual({ ok: true });
+  expect(await run("NP_HIDE")).toEqual({ ok: true });
+  expect(await run("NP_HIDE")).toEqual({ ok: true });
   expect(state).toBe("hidden");
   expect(clicks).toEqual(["hide"]);
 });
 
 test("Expand reveals a hidden panel and keeps it expanded on repeated calls", async () => {
   commit("hidden");
-  expect(await run("np-expand")).toEqual({ ok: true });
-  expect(await run("np-expand")).toEqual({ ok: true });
+  expect(await run("NP_EXPAND")).toEqual({ ok: true });
+  expect(await run("NP_EXPAND")).toEqual({ ok: true });
   expect(state).toBe("expanded");
   expect(clicks).toEqual(["show", "expand"]);
 });
 
 test("Minimize keeps the sidebar open and leaves a hidden view hidden", async () => {
   commit("expanded");
-  expect(await run("np-minimize")).toEqual({ ok: true });
+  expect(await run("NP_MINIMIZE")).toEqual({ ok: true });
   expect(state).toBe("sidebar");
-  expect(await run("np-minimize")).toEqual({ ok: true });
+  expect(await run("NP_MINIMIZE")).toEqual({ ok: true });
   commit("hidden");
-  expect(await run("np-minimize")).toEqual({ ok: true });
+  expect(await run("NP_MINIMIZE")).toEqual({ ok: true });
   expect(state).toBe("hidden");
   expect(clicks).toEqual(["minimize"]);
 });
@@ -152,8 +152,8 @@ test.each(views)(
 test("a cover button supports versions without the edge Show / header Hide controls", async () => {
   window.document.querySelector('button[aria-label="Show Now Playing view"]')!.remove();
   window.document.querySelector('button[aria-label="Hide Now Playing view"]')!.remove();
-  expect(await run("np-hide")).toEqual({ ok: true });
-  expect(await run("np-expand")).toEqual({ ok: true });
+  expect(await run("NP_HIDE")).toEqual({ ok: true });
+  expect(await run("NP_EXPAND")).toEqual({ ok: true });
   expect(state).toBe("expanded");
   expect(clicks).toEqual(["cover", "cover", "expand"]);
 });
@@ -165,7 +165,7 @@ test.each(["disabled", "aria-disabled", "hidden", "missing"])(
     const radio = window.document.querySelector('[value="canvas"]')!;
     if (reason === "missing") radio.remove();
     else radio.setAttribute(reason, reason === "aria-disabled" ? "true" : "");
-    expect((await run("np-canvas")).error).toContain("Canvas control is unavailable");
+    expect((await run("NP_CANVAS")).error).toContain("Canvas control is unavailable");
     expect(clicks).toEqual([]);
   },
 );
@@ -173,19 +173,19 @@ test.each(["disabled", "aria-disabled", "hidden", "missing"])(
 test("hidden radio groups and unrelated lyrics controls cannot satisfy a view command", async () => {
   commit("expanded");
   window.document.querySelector('[role="radiogroup"]')!.setAttribute("aria-hidden", "true");
-  expect((await run("np-lyrics")).error).toContain("Lyrics control is unavailable");
+  expect((await run("NP_LYRICS")).error).toContain("Lyrics control is unavailable");
   expect(clicks).toEqual([]);
 });
 
 test("a missing Expand control never enters native full screen", async () => {
   window.document.querySelector('button[aria-label="Expand Now Playing view"]')!.remove();
-  expect((await run("np-expand")).error).toContain("Expand control is unavailable");
+  expect((await run("NP_EXPAND")).error).toContain("Expand control is unavailable");
   expect(clicks).toEqual([]);
 });
 
 test("a stalled expansion reports failure instead of success", async () => {
   stalled = true;
-  expect(await run("np-expand")).toEqual({
+  expect(await run("NP_EXPAND")).toEqual({
     ok: false,
     error: "Spotify did not expand the Now Playing view.",
   });
@@ -195,7 +195,7 @@ test("a stalled expansion reports failure instead of success", async () => {
 test("a stalled view selection reports failure instead of success", async () => {
   commit("expanded");
   stalled = true;
-  expect(await run("np-artwork")).toEqual({
+  expect(await run("NP_ARTWORK")).toEqual({
     ok: false,
     error: "Spotify did not select Artwork in the Now Playing view.",
   });
@@ -203,8 +203,8 @@ test("a stalled view selection reports failure instead of success", async () => 
 
 test("unrelated renderers and unknown actions are rejected", async () => {
   window.happyDOM.setURL("https://open.spotify.com");
-  expect((await run("np-toggle")).error).toBe("The selected page is not the Spotify desktop app.");
-  expect(() => buildSpotifyJavaScript("np-unknown" as SpotifyNowPlayingAction)).toThrow(
+  expect((await run("NP_TOGGLE")).error).toBe("The selected page is not the Spotify desktop app.");
+  expect(() => buildSpotifyJavaScript("NP_UNKNOWN" as SpotifyNowPlayingAction)).toThrow(
     "Unknown Spotify action",
   );
   expect(clicks).toEqual([]);

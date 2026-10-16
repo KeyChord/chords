@@ -1,4 +1,4 @@
-name = "YouTube"
+name = 'YouTube'
 
 [on.youtube]
 file = 'youtube.js'
@@ -6,17 +6,17 @@ file = 'youtube.js'
 [chords]
 
 # Video Commands
-'?v' = { name = "Video" }
-'?vs' = { name = "Video: Scrub" }
-'vs(\d+)' = { name = "Video: Scrub (to second)", '@input:youtube' = ['seek', '$1'] }
-'vp' = { name = "Video: Play", '@input:youtube' = ['play'] }
-'vh' = { name = "Video: Halt", '@input:youtube' = ['pause'] }
-'vm' = { name = "Video: Mute", '@input:youtube' = ['mute'] }
-'va' = { name = "Video: Autoplay", '@input:youtube' = ['autoplay'] }
-'vc' = { name = "Video: Closed Captions", '@input:youtube' = ['captions'] }
-'v,' = { name = "Video: Settings", '@input:youtube' = ['settings'] }
-'vt' = { name = "Video: Theater Mode", '@input:youtube' = ['theater'] }
-'vf' = { name = "Video: Fullscreen", '@input:youtube' = ['fullscreen'] }
+'?v' = { name = 'Video' }
+'?vs' = { name = 'Video: Scrub' }
+'vs(\d+)' = { name = 'Video: Scrub (to second)', '@input:youtube' = ['SEEK', '$1'] }
+'vp' = { name = 'Video: Play', '@input:youtube' = ['PLAY'] }
+'vh' = { name = 'Video: Halt', '@input:youtube' = ['PAUSE'] }
+'vm' = { name = 'Video: Mute', '@input:youtube' = ['MUTE'] }
+'va' = { name = 'Video: Autoplay', '@input:youtube' = ['AUTOPLAY'] }
+'vc' = { name = 'Video: Closed Captions', '@input:youtube' = ['CAPTIONS'] }
+'v,' = { name = 'Video: Settings', '@input:youtube' = ['SETTINGS'] }
+'vt' = { name = 'Video: Theater Mode', '@input:youtube' = ['THEATER'] }
+'vf' = { name = 'Video: Fullscreen', '@input:youtube' = ['FULLSCREEN'] }
 
 # Global Commands
-'js' = { name = "Search", '@input:youtube' = ['search'] }
+'js' = { name = 'Search', '@input:youtube' = ['SEARCH'] }

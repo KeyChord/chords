@@ -6,7 +6,7 @@ export const syncMirrorsCommand = defineCommand({
     name: "_sync-mirrors",
     description: "Sync package mirrors using the configured environment; CI enables pushes.",
   },
-  run() {
-    syncMirrors();
+  async run() {
+    await syncMirrors();
   },
 });

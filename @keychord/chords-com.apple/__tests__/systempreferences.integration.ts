@@ -25,9 +25,9 @@ try {
     const mode = definition.chords[chord]["@input:appearance"]![0];
     appearance(mode);
     await waitFor(async () => {
-      if (library.symbols.SLSGetAppearanceThemeSwitchesAutomatically() !== (mode === "auto"))
+      if (library.symbols.SLSGetAppearanceThemeSwitchesAutomatically() !== (mode === "AUTO"))
         return undefined;
-      if (mode !== "auto" && library.symbols.SLSGetAppearanceThemeLegacy() !== (mode === "dark"))
+      if (mode !== "AUTO" && library.symbols.SLSGetAppearanceThemeLegacy() !== (mode === "DARK"))
         return undefined;
       return true;
     });
@@ -37,17 +37,17 @@ try {
     const automatic = /<key>AppleInterfaceStyleSwitchesAutomatically<\/key>\s*<true\s*\/>/.test(
       persisted.stdout,
     );
-    assert.equal(automatic, mode === "auto");
-    if (mode !== "auto") {
+    assert.equal(automatic, mode === "AUTO");
+    if (mode !== "AUTO") {
       const dark = /<key>AppleInterfaceStyle<\/key>\s*<string>Dark<\/string>/.test(
         persisted.stdout,
       );
-      assert.equal(dark, mode === "dark");
+      assert.equal(dark, mode === "DARK");
     }
   }
 } finally {
-  appearance(originalDark ? "dark" : "light");
-  if (originalAuto) appearance("auto");
+  appearance(originalDark ? "DARK" : "LIGHT");
+  if (originalAuto) appearance("AUTO");
   library.close();
 }
 console.log("systempreferences-appearance-ok");

@@ -77,38 +77,38 @@ test("all TOML chords dispatch their intended Spotify action and argument", asyn
   expect(bindings.chords["?bs"]).toEqual({ name: "Bar: Shuffle / Scrub" });
   expect(bindings.chords["?np"]).toEqual({ name: "Now Playing" });
   const expected = {
-    gls: "liked-songs",
-    pm5: "more",
-    pr5: "remove",
-    pa5: "queue",
-    pe5: "exclude",
-    psj5: "jam",
-    pgsr5: "song-radio",
-    pgar5: "artist",
-    pgal5: "album",
-    pvc5: "credits",
-    psc5: "copy-link",
-    pse5: "embed",
-    "b[": "bar-previous",
-    "b]": "bar-next",
-    bp: "bar-play",
-    bh: "bar-halt",
-    br: "bar-repeat",
-    bl: "bar-lyrics",
-    bq: "bar-queue",
-    bc: "bar-connect",
-    bm: "bar-miniplayer",
-    bf: "bar-fullscreen",
-    bs: "bar-shuffle",
-    bs37: "bar-scrub",
-    npv: "np-toggle",
-    npx: "np-hide",
-    npf: "np-expand",
-    npm: "np-minimize",
-    npa: "np-artwork",
-    npc: "np-canvas",
-    npi: "np-artist-image",
-    npl: "np-lyrics",
+    gls: "LIKED_SONGS",
+    pm5: "MORE",
+    pr5: "REMOVE",
+    pa5: "QUEUE",
+    pe5: "EXCLUDE",
+    psj5: "JAM",
+    pgsr5: "SONG_RADIO",
+    pgar5: "ARTIST",
+    pgal5: "ALBUM",
+    pvc5: "CREDITS",
+    psc5: "COPY_LINK",
+    pse5: "EMBED",
+    "b[": "BAR_PREVIOUS",
+    "b]": "BAR_NEXT",
+    bp: "BAR_PLAY",
+    bh: "BAR_HALT",
+    br: "BAR_REPEAT",
+    bl: "BAR_LYRICS",
+    bq: "BAR_QUEUE",
+    bc: "BAR_CONNECT",
+    bm: "BAR_MINIPLAYER",
+    bf: "BAR_FULLSCREEN",
+    bs: "BAR_SHUFFLE",
+    bs37: "BAR_SCRUB",
+    npv: "NP_TOGGLE",
+    npx: "NP_HIDE",
+    npf: "NP_EXPAND",
+    npm: "NP_MINIMIZE",
+    npa: "NP_ARTWORK",
+    npc: "NP_CANVAS",
+    npi: "NP_ARTIST_IMAGE",
+    npl: "NP_LYRICS",
   };
   // Chord treats ordinary key sequences literally; only parenthesized groups are regex.
   const matches = (pattern: string, chord: string) =>
@@ -144,7 +144,7 @@ test("all TOML chords dispatch their intended Spotify action and argument", asyn
 });
 
 test("supports a configured debugging port", async () => {
-  await buildHandler(9333)("more", "1");
+  await buildHandler(9333)("MORE", "1");
   expect(configureSpotifyDebugging).toHaveBeenCalledExactlyOnceWith(9333);
   expect(fetchMock.mock.calls[0][0]).toBe("http://127.0.0.1:9333/json/list");
 });
@@ -163,12 +163,12 @@ test("chords wait for Spotify setup and only configure it once", async () => {
     }),
   );
   const handler = buildHandler();
-  const pending = handler("more", "1");
+  const pending = handler("MORE", "1");
   await Promise.resolve();
   expect(fetchMock).not.toHaveBeenCalled();
   finishSetup();
   await expect(pending).resolves.toBe(true);
-  await expect(handler("queue", "2")).resolves.toBe(true);
+  await expect(handler("QUEUE", "2")).resolves.toBe(true);
   expect(configureSpotifyDebugging).toHaveBeenCalledExactlyOnceWith(9223);
 });
 
@@ -177,15 +177,15 @@ test("a setup failure is reported without blocking future chords", async () => {
   const log = vi.spyOn(console, "error").mockImplementation(() => undefined);
   vi.mocked(configureSpotifyDebugging).mockRejectedValueOnce(error);
   const handler = buildHandler();
-  await expect(handler("more", "1")).rejects.toThrow("Permission denied");
+  await expect(handler("MORE", "1")).rejects.toThrow("Permission denied");
   expect(log).toHaveBeenCalledWith("Could not enable Spotify debugging:", error);
   expect(fetchMock).not.toHaveBeenCalled();
-  await expect(handler("queue", "2")).resolves.toBe(true);
+  await expect(handler("QUEUE", "2")).resolves.toBe(true);
 });
 
 test("invalid track numbers and actions never contact Spotify", async () => {
-  await expect(buildHandler()("remove", "0")).rejects.toThrow("positive safe integer");
-  await expect(buildHandler()("unknown" as "remove", "1")).rejects.toThrow(
+  await expect(buildHandler()("REMOVE", "0")).rejects.toThrow("positive safe integer");
+  await expect(buildHandler()("unknown" as "REMOVE", "1")).rejects.toThrow(
     "Unknown Spotify action",
   );
   expect(fetchMock).not.toHaveBeenCalled();
@@ -193,14 +193,14 @@ test("invalid track numbers and actions never contact Spotify", async () => {
 
 test("invalid scrub times never contact Spotify", async () => {
   for (const seconds of [undefined, "", "-1", "1.5", "1);alert(1)//", Infinity]) {
-    await expect(buildHandler()("bar-scrub", seconds)).rejects.toThrow("non-negative safe integer");
+    await expect(buildHandler()("BAR_SCRUB", seconds)).rejects.toThrow("non-negative safe integer");
   }
   expect(fetchMock).not.toHaveBeenCalled();
 });
 
 test("unavailable debugging gives Spotify setup instructions", async () => {
   fetchMock.mockRejectedValue(new Error("Connection refused"));
-  await expect(buildHandler()("more", "1")).rejects.toThrow("--remote-debugging-port=9223");
+  await expect(buildHandler()("MORE", "1")).rejects.toThrow("--remote-debugging-port=9223");
 });
 
 test.each([
@@ -208,7 +208,7 @@ test.each([
   { ok: true, json: async () => ({ unexpected: true }) },
 ])("invalid discovery responses give setup instructions", async (response) => {
   fetchMock.mockResolvedValue(response);
-  await expect(buildHandler()("more", "1")).rejects.toThrow("chords-spotify README");
+  await expect(buildHandler()("MORE", "1")).rejects.toThrow("chords-spotify README");
 });
 
 test("web players, unrelated pages, workers, and lookalike domains are excluded", async () => {
@@ -223,7 +223,7 @@ test("web players, unrelated pages, workers, and lookalike domains are excluded"
       { type: "page", url: target().url },
     ],
   });
-  await expect(buildHandler()("more", "1")).rejects.toThrow("Open the Spotify desktop app");
+  await expect(buildHandler()("MORE", "1")).rejects.toThrow("Open the Spotify desktop app");
   expect(sockets).toHaveLength(0);
 });
 
@@ -240,7 +240,7 @@ test("several Spotify pages route only to the focused one", async () => {
       },
     },
   });
-  await buildHandler()("credits", "5");
+  await buildHandler()("CREDITS", "5");
   expect(sockets.map((socket) => socket.url)).toEqual([
     "ws://first",
     "ws://focused",
@@ -255,7 +255,7 @@ test("multiple unfocused pages do not receive an action", async () => {
     json: async () => [target(), target(undefined, "ws://second")],
   });
   replies = () => ({ id: 1, result: { result: { value: false } } });
-  await expect(buildHandler()("remove", "1")).rejects.toThrow("Focus the Spotify app");
+  await expect(buildHandler()("REMOVE", "1")).rejects.toThrow("Focus the Spotify app");
   expect(
     sockets.every((socket) =>
       socket.requests.every((request) => request.params.expression === "document.hasFocus()"),
@@ -269,9 +269,9 @@ test("page failures propagate and the next chord still runs", async () => {
     id: 1,
     result: { result: { value: '{"ok":false,"error":"Track is unavailable"}' } },
   });
-  await expect(handler("queue", "1")).rejects.toThrow("Track is unavailable");
+  await expect(handler("QUEUE", "1")).rejects.toThrow("Track is unavailable");
   replies = () => ({ id: 1, result: { result: { value: '{"ok":true}' } } });
-  await expect(handler("more", "2")).resolves.toBe(true);
+  await expect(handler("MORE", "2")).resolves.toBe(true);
 });
 
 test.each([
@@ -287,7 +287,7 @@ test.each([
   ],
 ])("protocol errors close the socket and propagate", async (reply, message) => {
   replies = () => reply;
-  await expect(buildHandler()("more", "1")).rejects.toThrow(message as string);
+  await expect(buildHandler()("MORE", "1")).rejects.toThrow(message as string);
   expect(sockets[0].close).toHaveBeenCalledOnce();
 });
 
@@ -295,7 +295,7 @@ test.each(["error", "close"])("socket %s events close the socket and reject", as
   replies = () => {
     queueMicrotask(() => (event === "error" ? sockets[0].onerror?.() : sockets[0].onclose?.()));
   };
-  await expect(buildHandler()("more", "1")).rejects.toThrow(
+  await expect(buildHandler()("MORE", "1")).rejects.toThrow(
     event === "error" ? "Could not connect" : "closed before",
   );
   expect(sockets[0].close).toHaveBeenCalledOnce();
@@ -305,14 +305,14 @@ test("malformed protocol messages reject and clean up", async () => {
   replies = () => {
     queueMicrotask(() => sockets[0].onmessage?.({ data: "invalid JSON" }));
   };
-  await expect(buildHandler()("more", "1")).rejects.toThrow();
+  await expect(buildHandler()("MORE", "1")).rejects.toThrow();
   expect(sockets[0].close).toHaveBeenCalledOnce();
 });
 
 test("a stalled runtime times out and closes its socket", async () => {
   vi.useFakeTimers();
   replies = () => undefined;
-  const assertion = expect(buildHandler()("more", "1")).rejects.toThrow("did not respond");
+  const assertion = expect(buildHandler()("MORE", "1")).rejects.toThrow("did not respond");
   await vi.advanceTimersByTimeAsync(5000);
   await assertion;
   expect(sockets[0].close).toHaveBeenCalledOnce();
@@ -321,34 +321,34 @@ test("a stalled runtime times out and closes its socket", async () => {
 test("overlapping chords wait for the previous menu action to finish", async () => {
   replies = () => undefined;
   const handler = buildHandler();
-  const first = handler("queue", "1");
-  const second = handler("remove", "2");
+  const first = handler("QUEUE", "1");
+  const second = handler("REMOVE", "2");
   await vi.waitFor(() => expect(sockets).toHaveLength(1));
   const result = { data: JSON.stringify({ id: 1, result: { result: { value: '{"ok":true}' } } }) };
   sockets[0].onmessage?.(result);
   await first;
   await vi.waitFor(() => expect(sockets).toHaveLength(2));
-  expect(sockets[1].requests[0].params.expression).toBe(buildSpotifyJavaScript("remove", "2"));
+  expect(sockets[1].requests[0].params.expression).toBe(buildSpotifyJavaScript("REMOVE", "2"));
   sockets[1].onmessage?.(result);
   await second;
 });
 
 test("Liked Songs uses the configured renderer and reports missing debugging", async () => {
   fetchMock.mockRejectedValue(new Error("Connection refused"));
-  await expect(buildHandler(9333)("liked-songs")).rejects.toThrow("--remote-debugging-port=9333");
+  await expect(buildHandler(9333)("LIKED_SONGS")).rejects.toThrow("--remote-debugging-port=9333");
 });
 
 test("the next playlist chord waits for Liked Songs navigation to finish", async () => {
   replies = () => undefined;
   const handler = buildHandler();
-  const first = handler("liked-songs");
-  const second = handler("more", "1");
+  const first = handler("LIKED_SONGS");
+  const second = handler("MORE", "1");
   await vi.waitFor(() => expect(sockets).toHaveLength(1));
   const result = { data: JSON.stringify({ id: 1, result: { result: { value: '{"ok":true}' } } }) };
   sockets[0].onmessage?.(result);
   await first;
   await vi.waitFor(() => expect(sockets).toHaveLength(2));
-  expect(sockets[1].requests[0].params.expression).toBe(buildSpotifyJavaScript("more", "1"));
+  expect(sockets[1].requests[0].params.expression).toBe(buildSpotifyJavaScript("MORE", "1"));
   sockets[1].onmessage?.(result);
   await second;
 });

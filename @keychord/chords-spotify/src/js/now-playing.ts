@@ -1,16 +1,16 @@
 export type SpotifyBarAction =
-  | "bar-previous"
-  | "bar-next"
-  | "bar-play"
-  | "bar-halt"
-  | "bar-repeat"
-  | "bar-lyrics"
-  | "bar-queue"
-  | "bar-connect"
-  | "bar-miniplayer"
-  | "bar-fullscreen"
-  | "bar-shuffle"
-  | "bar-scrub";
+  | "BAR_PREVIOUS"
+  | "BAR_NEXT"
+  | "BAR_PLAY"
+  | "BAR_HALT"
+  | "BAR_REPEAT"
+  | "BAR_LYRICS"
+  | "BAR_QUEUE"
+  | "BAR_CONNECT"
+  | "BAR_MINIPLAYER"
+  | "BAR_FULLSCREEN"
+  | "BAR_SHUFFLE"
+  | "BAR_SCRUB";
 
 // Serialized into Spotify's renderer; keep every dependency inside this function.
 function runInPage(action: SpotifyBarAction, seconds?: number): string {
@@ -49,7 +49,7 @@ function runInPage(action: SpotifyBarAction, seconds?: number): string {
     const find = (selector: string) =>
       [...bar.querySelectorAll<HTMLElement>(selector)].find(visible);
 
-    if (action === "bar-scrub") {
+    if (action === "BAR_SCRUB") {
       const progress = available(find('[data-testid="playback-progressbar"]'), "Scrub");
       const range = available(
         progress.querySelector<HTMLInputElement>('input[type="range"]') ?? undefined,
@@ -83,24 +83,24 @@ function runInPage(action: SpotifyBarAction, seconds?: number): string {
       };
       slider.dispatchEvent(new PointerEvent("pointerdown", { ...event, buttons: 1 }));
       slider.dispatchEvent(new PointerEvent("pointerup", { ...event, buttons: 0 }));
-    } else if (action === "bar-play" || action === "bar-halt") {
+    } else if (action === "BAR_PLAY" || action === "BAR_HALT") {
       const button = available(find('[data-testid="control-button-playpause"]'), "Play / Halt");
       const state = button.getAttribute("aria-label");
       if (state !== "Play" && state !== "Pause") {
         throw new Error("Could not determine Spotify's playback state.");
       }
-      if (state === (action === "bar-play" ? "Play" : "Pause")) button.click();
+      if (state === (action === "BAR_PLAY" ? "Play" : "Pause")) button.click();
     } else {
       const controls = {
-        "bar-previous": ['[data-testid="control-button-skip-back"]', "Previous"],
-        "bar-next": ['[data-testid="control-button-skip-forward"]', "Next"],
-        "bar-repeat": ['[data-testid="control-button-repeat"]', "Repeat"],
-        "bar-lyrics": ['[data-testid="lyrics-button"]', "Lyrics"],
-        "bar-queue": ['[data-testid="control-button-queue"]', "Queue"],
-        "bar-connect": ['button[aria-label="Connect to a device"]', "Connect"],
-        "bar-miniplayer": ['[data-testid="pip-toggle-button"]', "Miniplayer"],
-        "bar-fullscreen": ['[data-testid="fullscreen-mode-button"]', "Fullscreen"],
-        "bar-shuffle": [
+        BAR_PREVIOUS: ['[data-testid="control-button-skip-back"]', "Previous"],
+        BAR_NEXT: ['[data-testid="control-button-skip-forward"]', "Next"],
+        BAR_REPEAT: ['[data-testid="control-button-repeat"]', "Repeat"],
+        BAR_LYRICS: ['[data-testid="lyrics-button"]', "Lyrics"],
+        BAR_QUEUE: ['[data-testid="control-button-queue"]', "Queue"],
+        BAR_CONNECT: ['button[aria-label="Connect to a device"]', "Connect"],
+        BAR_MINIPLAYER: ['[data-testid="pip-toggle-button"]', "Miniplayer"],
+        BAR_FULLSCREEN: ['[data-testid="fullscreen-mode-button"]', "Fullscreen"],
+        BAR_SHUFFLE: [
           '[data-testid="control-button-shuffle"], button[aria-label*="shuffle" i]',
           "Shuffle",
         ],
@@ -120,24 +120,24 @@ export function buildSpotifyBarJavaScript(
 ): string {
   if (
     ![
-      "bar-previous",
-      "bar-next",
-      "bar-play",
-      "bar-halt",
-      "bar-repeat",
-      "bar-lyrics",
-      "bar-queue",
-      "bar-connect",
-      "bar-miniplayer",
-      "bar-fullscreen",
-      "bar-shuffle",
-      "bar-scrub",
+      "BAR_PREVIOUS",
+      "BAR_NEXT",
+      "BAR_PLAY",
+      "BAR_HALT",
+      "BAR_REPEAT",
+      "BAR_LYRICS",
+      "BAR_QUEUE",
+      "BAR_CONNECT",
+      "BAR_MINIPLAYER",
+      "BAR_FULLSCREEN",
+      "BAR_SHUFFLE",
+      "BAR_SCRUB",
     ].includes(action)
   ) {
     throw new Error(`Unknown Spotify action: ${action}`);
   }
   let target: number | undefined;
-  if (action === "bar-scrub") {
+  if (action === "BAR_SCRUB") {
     if (typeof seconds === "string" && !/^\d+$/.test(seconds)) {
       throw new Error("Scrub time must be a non-negative safe integer.");
     }

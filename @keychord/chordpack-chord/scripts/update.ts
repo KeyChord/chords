@@ -26,6 +26,10 @@ const packageConfigs: PackageConfig[] = [
     name: "@keychord/chords-com.apple",
     git: "https://github.com/KeyChord/chords-com.apple",
   },
+  {
+    name: "@keychord/chords-finder",
+    git: "https://github.com/KeyChord/chords-finder",
+  },
 ];
 
 async function updatePackageRevisions(): Promise<void> {

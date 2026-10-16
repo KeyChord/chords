@@ -1,4 +1,4 @@
-export type SpotifyNavigationAction = "liked-songs";
+export type SpotifyNavigationAction = "LIKED_SONGS";
 
 // Serialized into Spotify's renderer; keep every dependency inside this function.
 async function gotoLikedSongs(): Promise<string> {

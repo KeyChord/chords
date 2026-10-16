@@ -6,7 +6,9 @@ const runtime = chordTestRuntime();
 
 export default defineConfig({
   ...runtime,
-  fmt: {},
+  fmt: {
+    ignorePatterns: [".github/workflows/*.yml"],
+  },
   test: {
     ...runtime.test,
     // This package tests its native addon and TOML loader using Bun's runtime.

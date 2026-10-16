@@ -1,4 +1,4 @@
-export type WindowAction = "size" | "position" | "frame" | "preset";
+export type WindowAction = "SIZE" | "POSITION" | "FRAME" | "PRESET";
 export type WindowDimension = { value: number; unit: "divisor" | "fraction" | "pixels" };
 export type WindowDimensions = {
   width?: WindowDimension;
@@ -11,45 +11,45 @@ export type WindowDimensions = {
 
 /** Signed single-digit shorthand: negative sizes add whole display extents. */
 export function parseWindowDimensions(action: WindowAction, expression: string): WindowDimensions {
-  if (action === "preset") {
+  if (action === "PRESET") {
     if (
       ![
-        "left",
-        "right",
-        "top",
-        "bottom",
-        "top-left",
-        "top-right",
-        "bottom-left",
-        "bottom-right",
-        "horizontal",
-        "vertical",
-        "center",
-        "fill",
+        "LEFT",
+        "RIGHT",
+        "TOP",
+        "BOTTOM",
+        "TOP_LEFT",
+        "TOP_RIGHT",
+        "BOTTOM_LEFT",
+        "BOTTOM_RIGHT",
+        "HORIZONTAL",
+        "VERTICAL",
+        "CENTER",
+        "FILL",
       ].includes(expression)
     ) {
       throw new TypeError("Unknown window preset");
     }
     return { preset: expression };
   }
-  if (action !== "size" && action !== "position" && action !== "frame")
+  if (action !== "SIZE" && action !== "POSITION" && action !== "FRAME")
     throw new TypeError("Unknown window action");
   if (typeof expression !== "string") throw new TypeError("Expected window dimensions");
   let input = expression.trim();
-  const right = action === "position" && input.startsWith("r");
+  const right = action === "POSITION" && input.startsWith("r");
   if (right) input = input.slice(1);
-  const heightOnly = action !== "frame" && input.startsWith("h");
+  const heightOnly = action !== "FRAME" && input.startsWith("h");
   if (heightOnly) input = input.slice(1);
   if (right && heightOnly) throw new TypeError("Right-edge positioning needs a horizontal offset");
 
   const dimensions: WindowDimension[] = [];
   function dimension(token: string, unit: WindowDimension["unit"]): WindowDimension {
-    const kind = action === "frame" ? (dimensions.length < 2 ? "size" : "position") : action;
+    const kind = action === "FRAME" ? (dimensions.length < 2 ? "SIZE" : "POSITION") : action;
     const value = Number(token);
     if (
       !Number.isFinite(value) ||
       Math.abs(value) > Number.MAX_SAFE_INTEGER ||
-      (kind === "size" && (action === "frame" ? value < 0 : value <= 0)) ||
+      (kind === "SIZE" && (action === "FRAME" ? value < 0 : value <= 0)) ||
       (unit === "divisor" && (!value || !Number.isFinite(1 / value)))
     ) {
       throw new TypeError("Window dimensions must be finite; sizes must be positive");
@@ -58,7 +58,7 @@ export function parseWindowDimensions(action: WindowAction, expression: string):
   }
 
   if (input.includes("x")) {
-    if (action === "frame")
+    if (action === "FRAME")
       throw new TypeError("Combined window bounds use four shorthand dimensions");
     // An x after the first number selects pixels for both dimensions.
     const absolute = /^(-?(?:\d+(?:\.\d+)?|\.\d+))x(?:(-?(?:\d+(?:\.\d+)?|\.\d+))x?)?$/.exec(input);
@@ -71,22 +71,22 @@ export function parseWindowDimensions(action: WindowAction, expression: string):
     while (index < input.length) {
       token.lastIndex = index;
       const match = token.exec(input);
-      if (!match || dimensions.length === (action === "frame" ? 4 : 2))
+      if (!match || dimensions.length === (action === "FRAME" ? 4 : 2))
         throw new TypeError("Unexpected window dimension count or syntax");
       index = token.lastIndex;
       const amount = Number(match[1]);
-      const kind = action === "frame" ? (dimensions.length < 2 ? "size" : "position") : action;
+      const kind = action === "FRAME" ? (dimensions.length < 2 ? "SIZE" : "POSITION") : action;
       if (Object.is(amount, -0)) throw new TypeError("Negative zero is not a window dimension");
       const unit =
-        (action === "frame" && amount === 0) ||
-        (kind === "size" && amount < 0) ||
-        (kind === "position" && amount === 0)
+        (action === "FRAME" && amount === 0) ||
+        (kind === "SIZE" && amount < 0) ||
+        (kind === "POSITION" && amount === 0)
           ? "fraction"
           : "divisor";
-      dimensions.push(dimension(String(kind === "size" && amount < 0 ? 1 - amount : amount), unit));
+      dimensions.push(dimension(String(kind === "SIZE" && amount < 0 ? 1 - amount : amount), unit));
     }
   }
-  if (action === "frame") {
+  if (action === "FRAME") {
     if (dimensions.length !== 4) throw new TypeError("Expected width, height, left, and top");
     return {
       ...(dimensions[0].value === 0 ? {} : { width: dimensions[0] }),

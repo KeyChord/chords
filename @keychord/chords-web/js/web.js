@@ -174,17 +174,17 @@ function buildHandler() {
 function getJavascript(...args) {
 	const type = args[0];
 	switch (type) {
-		case "scroll": {
+		case "SCROLL": {
 			const direction = args[1];
 			return import_lib.default`
         window.scrollBy({
-          top: ${direction === "north" ? -100 : direction === "south" ? 100 : 0},
-          left: ${direction === "east" ? 100 : direction === "west" ? -100 : 0},
+          top: ${direction === "NORTH" ? -100 : direction === "SOUTH" ? 100 : 0},
+          left: ${direction === "EAST" ? 100 : direction === "WEST" ? -100 : 0},
           behavior: 'smooth'
         });
       `;
 		}
-		case "placeholder": {
+		case "PLACEHOLDER": {
 			const input = args[1];
 			if (input.endsWith(".")) return import_lib.default`
           $('input[placeholder="${input}" i]').focus();

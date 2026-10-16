@@ -15,7 +15,7 @@ test.skipIf(process.platform !== "darwin")(
     await mkdir(scratch, { recursive: true });
     // Reuse the real addon's bridge and compiler cache; avoid rebuilding
     // SwiftSyntax for fixtures. Register their N-API entrypoints directly.
-    await buildNative(join(scratch, "tray"), "debug");
+    await buildNative(join(scratch, "TRAY"), "debug");
     const swiftpm = Bun.fileURLToPath(
       new URL("../node_modules/.cache/chord/native/swiftpm", import.meta.url),
     );

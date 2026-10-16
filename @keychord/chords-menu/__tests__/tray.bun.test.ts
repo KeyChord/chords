@@ -40,8 +40,8 @@ const { chords: bindings } = Bun.TOML.parse(
     {
       name: string;
       "@input:tray"?: TrayAction;
-      "@keydown:select"?: ["keydown", string];
-      "@input:select"?: ["input", string];
+      "@keydown:select"?: ["KEYDOWN", string];
+      "@input:select"?: ["INPUT", string];
       "@input:visibility"?: [];
       "@input:menu"?: unknown;
       shortcut?: string;
@@ -59,9 +59,9 @@ async function dispatch(sequence: string, key = sequence.at(-1)!, repeat = false
   });
   expect(matches).toHaveLength(1);
   const { binding, capture } = matches[0];
-  expect(binding["@keydown:select"]).toEqual(["keydown", "$1"]);
-  expect(binding["@input:select"]).toEqual(["input", "$1"]);
-  await select.call({ event: { type: "keydown", key, repeat } }, "keydown", capture);
+  expect(binding["@keydown:select"]).toEqual(["KEYDOWN", "$1"]);
+  expect(binding["@input:select"]).toEqual(["INPUT", "$1"]);
+  await select.call({ event: { type: "keydown", key, repeat } }, "KEYDOWN", capture);
 }
 
 beforeEach(() => {
@@ -71,9 +71,9 @@ beforeEach(() => {
 
 test("bare indexes select tray icons and explicit menu/tray prefixes keep their scope", async () => {
   for (const [prefix, scope] of [
-    ["", "tray"],
-    ["[", "menu"],
-    ["]", "tray"],
+    ["", "TRAY"],
+    ["[", "MENU"],
+    ["]", "TRAY"],
   ]) {
     for (let index = 1; index <= 9; index++) {
       for (const fromEnd of [false, true]) {
@@ -82,9 +82,9 @@ test("bare indexes select tray icons and explicit menu/tray prefixes keep their 
           expect(nativeSelection).toHaveBeenLastCalledWith(
             undefined,
             scope,
-            String(fromEnd ? -index : scope === "tray" ? index - 1 : index),
+            String(fromEnd ? -index : scope === "TRAY" ? index - 1 : index),
             "",
-            rightClick ? "right" : "left",
+            rightClick ? "RIGHT" : "LEFT",
           );
         }
       }
@@ -95,35 +95,35 @@ test("bare indexes select tray icons and explicit menu/tray prefixes keep their 
 
 test("=78. previews 7, then 8, and clicks 8 once", async () => {
   for (const sequence of ["=7", "=78", "=78."]) await dispatch(sequence);
-  await select.call({ event: { type: "keydown", key: "CapsLock", repeat: false } }, "input", "78.");
+  await select.call({ event: { type: "keydown", key: "CapsLock", repeat: false } }, "INPUT", "78.");
   expect(nativeSelection.mock.calls).toEqual([
-    [undefined, "tray", "6", "", ""],
-    [undefined, "tray", "7", "", ""],
-    [undefined, "tray", "7", "", "left"],
+    [undefined, "TRAY", "6", "", ""],
+    [undefined, "TRAY", "7", "", ""],
+    [undefined, "TRAY", "7", "", "LEFT"],
   ]);
 });
 
 test("Apple is zero; l/r uses the full number and bracket steps keep the selected scope", async () => {
   for (const [sequence, scope, index, steps] of [
-    ["=0", "menu", "0", ""],
-    ["=[0", "menu", "0", ""],
-    ["=10l", "tray", "9", ""],
-    ["=10l]", "tray", "9", "]"],
-    ["=10l][", "tray", "9", "]["],
-    ["=10r", "tray", "-10", ""],
-    ["=10r]", "tray", "-10", "]"],
-    ["=10r[", "tray", "-10", "["],
-    ["=-78", "tray", "-8", ""],
-    ["=]1", "tray", "0", ""],
-    ["=]10l", "tray", "9", ""],
-    ["=]-1", "tray", "-1", ""],
-    ["=[-1", "menu", "-1", ""],
+    ["=0", "MENU", "0", ""],
+    ["=[0", "MENU", "0", ""],
+    ["=10l", "TRAY", "9", ""],
+    ["=10l]", "TRAY", "9", "]"],
+    ["=10l][", "TRAY", "9", "]["],
+    ["=10r", "TRAY", "-10", ""],
+    ["=10r]", "TRAY", "-10", "]"],
+    ["=10r[", "TRAY", "-10", "["],
+    ["=-78", "TRAY", "-8", ""],
+    ["=]1", "TRAY", "0", ""],
+    ["=]10l", "TRAY", "9", ""],
+    ["=]-1", "TRAY", "-1", ""],
+    ["=[-1", "MENU", "-1", ""],
   ]) {
     await dispatch(sequence);
     expect(nativeSelection).toHaveBeenLastCalledWith(undefined, scope, index, steps, "");
   }
   await dispatch("=0.");
-  expect(nativeSelection).toHaveBeenLastCalledWith(undefined, "menu", "0", "", "left");
+  expect(nativeSelection).toHaveBeenLastCalledWith(undefined, "MENU", "0", "", "LEFT");
 });
 
 test("Backspace restores a selection without clicking; repeat and modifier events cannot click", async () => {
@@ -135,22 +135,22 @@ test("Backspace restores a selection without clicking; repeat and modifier event
   await dispatch("=78", "Backspace");
   await dispatch("=7", "Backspace");
   expect(nativeSelection.mock.calls).toEqual([
-    [undefined, "tray", "7", "", ""],
-    [undefined, "tray", "6", "", ""],
+    [undefined, "TRAY", "7", "", ""],
+    [undefined, "TRAY", "6", "", ""],
   ]);
 });
 
 test("CLI completion clicks once and passes Chord's captured application", async () => {
-  await select.call({ event: null }, "input", "78");
+  await select.call({ event: null }, "INPUT", "78");
   expect(nativeSelection).not.toHaveBeenCalled();
-  await select.call({ event: null, focusedAppId: "dev.keychord.fixture" }, "input", "[2.");
+  await select.call({ event: null, focusedAppId: "dev.keychord.fixture" }, "INPUT", "[2.");
   expect(nativeSelection).toHaveBeenCalledTimes(1);
-  expect(nativeSelection).toHaveBeenCalledWith("dev.keychord.fixture", "menu", "2", "", "left");
+  expect(nativeSelection).toHaveBeenCalledWith("dev.keychord.fixture", "MENU", "2", "", "LEFT");
 });
 
 test("invalid full indexes cannot click; letters, notch, and named actions never match numeric selection", async () => {
   for (const sequence of ["-0.", "]0.", "10.", "0].", "9007199254740992l."]) {
-    await expect(select.call({ event: null }, "input", sequence)).rejects.toThrow(
+    await expect(select.call({ event: null }, "INPUT", sequence)).rejects.toThrow(
       "valid menu bar index",
     );
   }
@@ -175,16 +175,16 @@ test("invalid full indexes cannot click; letters, notch, and named actions never
     ).toBe(false);
   }
   expect(parseMenuBarSelection("1[.")).toMatchObject({
-    scope: "tray",
+    scope: "TRAY",
     index: 0,
     steps: "[",
-    clickType: "left",
+    clickType: "LEFT",
   });
   expect(parseMenuBarSelection("]1r].")).toMatchObject({
-    scope: "tray",
+    scope: "TRAY",
     index: -1,
     steps: "]",
-    clickType: "left",
+    clickType: "LEFT",
   });
 });
 

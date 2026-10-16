@@ -453,7 +453,7 @@ async function createChromiumHandler(appPath) {
 		await spawn$1(chromeRemoteInterfaceBinPath, [remoteDebuggingPort.toString()], { stdin: { string: code } });
 	}
 	return async function handler(action, code) {
-		if (action === "js") return handlerJs(code);
+		if (action === "JS") return handlerJs(code);
 		return false;
 	};
 }

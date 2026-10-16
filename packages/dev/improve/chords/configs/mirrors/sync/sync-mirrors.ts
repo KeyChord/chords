@@ -1,109 +1,122 @@
-import { statSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { mkdtempSync, rmSync, statSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { isAbsolute, join, relative, resolve } from "node:path";
 import { execaSync } from "@chord/com.npmjs.execa";
 import { listMirrors } from "@chord/dev.improve.chords.configs.mirrors.list";
 
-export function syncMirrors(env: NodeJS.ProcessEnv = process.env): void {
-  // BUILD_BASE, GITHUB_REF and GITHUB_ACTOR are required. CI enables pushes.
-  // Optional: API_TOKEN_GITHUB, SOURCE_DIR, COMMIT_MESSAGE, GITHUB_SHA,
-  // GITHUB_REPOSITORY, GITHUB_RUN_ID and DEFAULT_BRANCH.
+// Node also runs this CLI in GitHub Actions, so keep the Node filesystem APIs.
+export async function syncMirrors(
+  env: NodeJS.ProcessEnv = process.env,
+  request: typeof fetch = fetch,
+): Promise<void> {
   if (!env.BUILD_BASE) throw new Error("BUILD_BASE must be set");
   const base = resolve(env.BUILD_BASE);
   if (!statSync(base).isDirectory()) throw new Error(`${base} is not a directory`);
-  if (!env.GITHUB_REF?.startsWith("refs/heads/")) {
-    throw new Error(`Could not determine branch name from ${env.GITHUB_REF}`);
+  if (env.GITHUB_REF !== "refs/heads/main") {
+    throw new Error("Mirrors can only be synced from refs/heads/main");
   }
-  if (!env.GITHUB_ACTOR) throw new Error("GITHUB_ACTOR must be set");
-  const branch = env.GITHUB_REF.slice("refs/heads/".length);
-  // Validate every destination before creating any repositories.
+  if (env.CI && !env.API_TOKEN_GITHUB) throw new Error("API_TOKEN_GITHUB must be set in CI");
+
+  const source = resolve(env.SOURCE_DIR || process.cwd());
+  const prefix = relative(source, base).split("\\").join("/");
+  if (!prefix || prefix === ".." || prefix.startsWith("../") || isAbsolute(prefix)) {
+    throw new Error("BUILD_BASE must be inside SOURCE_DIR");
+  }
+  // Validate every destination before making any remote changes.
   const mirrors = listMirrors(base);
-  if (!mirrors.length) {
-    console.log("Nothing to do, no packages declare repository.url.");
-    return;
-  }
-
-  const sourceGit = execaSync({ cwd: env.SOURCE_DIR || process.cwd() });
-  const sha = env.GITHUB_SHA || "HEAD";
-  const message =
-    env.COMMIT_MESSAGE ||
-    `${sourceGit("git", ["show", "-s", "--format=%B", sha]).stdout}\n\nCommitted via a GitHub action: https://github.com/${env.GITHUB_REPOSITORY}/actions/runs/${env.GITHUB_RUN_ID}`;
+  const sourceGit = execaSync({ cwd: source, env });
+  const sha = sourceGit("git", [
+    "rev-parse",
+    "--verify",
+    `${env.GITHUB_SHA || "HEAD"}^{commit}`,
+  ]).stdout;
+  const message = sourceGit("git", ["show", "-s", "--format=%B", sha]).stdout;
   const author = sourceGit("git", ["show", "-s", "--format=%an <%ae>", sha]).stdout;
+  const authorDate = sourceGit("git", ["show", "-s", "--format=%aI", sha]).stdout;
+  const commitDate = sourceGit("git", ["show", "-s", "--format=%cI", sha]).stdout;
   const tags = sourceGit("git", ["tag", "--points-at", sha]).stdout.split("\n").filter(Boolean);
-  const commitMessage = `${message}\n\nCo-authored-by: ${env.GITHUB_ACTOR} <${env.GITHUB_ACTOR}@users.noreply.github.com>`;
-  const gitEnv: Record<string, string> = env.CI
-    ? {
-        GIT_AUTHOR_NAME: "improvebot",
-        GIT_AUTHOR_EMAIL: "improvebot@users.noreply.github.com",
-        GIT_COMMITTER_NAME: "improvebot",
-        GIT_COMMITTER_EMAIL: "improvebot@users.noreply.github.com",
-      }
-    : {};
-
+  // Exclude run IDs and wall-clock time so replaying the same source is idempotent.
+  const commitMessage = `${message}\n\nSource: https://github.com/KeyChord/chords/commit/${sha}`;
+  const gitEnv: NodeJS.ProcessEnv = {
+    ...env,
+    GIT_AUTHOR_DATE: authorDate,
+    GIT_COMMITTER_DATE: commitDate,
+    GIT_COMMITTER_NAME: "improvebot",
+    GIT_COMMITTER_EMAIL: "improvebot@users.noreply.github.com",
+  };
   if (env.API_TOKEN_GITHUB) {
-    // Git reads the auth header from the environment, keeping credentials out of
-    // command arguments, error messages and the package's on-disk git config.
+    // Keep credentials out of arguments, errors and on-disk Git configuration.
+    const index = Number(env.GIT_CONFIG_COUNT || process.env.GIT_CONFIG_COUNT || "0");
     const header = Buffer.from(`x-access-token:${env.API_TOKEN_GITHUB}`).toString("base64");
-    gitEnv.GIT_CONFIG_COUNT = "1";
-    gitEnv.GIT_CONFIG_KEY_0 = "http.https://github.com/.extraheader";
-    gitEnv.GIT_CONFIG_VALUE_0 = `AUTHORIZATION: basic ${header}`;
+    gitEnv.GIT_CONFIG_COUNT = String(index + 1);
+    gitEnv[`GIT_CONFIG_KEY_${index}`] = "http.https://github.com/.extraheader";
+    gitEnv[`GIT_CONFIG_VALUE_${index}`] = `AUTHORIZATION: basic ${header}`;
   }
 
+  const failures: string[] = [];
   for (const { name, url } of mirrors) {
-    console.log(`\nMirror: ${name}`);
-    const git = execaSync({ cwd: join(base, name), env: gitEnv });
+    console.log(`Mirror: ${name}${env.CI ? "" : " (dry run)"}`);
+    const scratch = mkdtempSync(join(tmpdir(), "chords-mirror-"));
     try {
-      git("git", ["init", "-b", branch, "."]);
-      git("git", ["remote", "add", "origin", url]);
-      git("git", ["ls-remote", "-h", "origin"]);
-      const fetch = (ref: string) =>
-        git(
-          "git",
-          [
-            "-c",
-            "protocol.version=2",
-            "fetch",
-            "--no-tags",
-            "--prune",
-            "--no-recurse-submodules",
-            "--depth=1",
-            "origin",
-            ref,
-          ],
-          { reject: false },
-        );
-      let forceCommit = false;
-      if (!fetch(branch).failed) {
-        git("git", ["reset", "--soft", "FETCH_HEAD"]);
-      } else {
-        forceCommit = true;
-        if (env.DEFAULT_BRANCH && !fetch(env.DEFAULT_BRANCH).failed) {
-          git("git", ["reset", "--soft", "FETCH_HEAD"]);
+      // Export committed files only, preserving modes and symlinks. Neither a local
+      // build nor mirror-only commits can leak into the authoritative snapshot.
+      const archive = sourceGit("git", ["archive", "--format=tar", `${sha}:${prefix}/${name}`], {
+        encoding: "buffer",
+      }).stdout;
+      const git = execaSync({ cwd: scratch, env: gitEnv });
+      git("tar", ["-xf", "-"], { input: archive });
+      git("git", ["init", "-b", "main", "."]);
+      git("git", ["add", "--force", "--all"]);
+      git("git", ["commit", "--allow-empty", `--author=${author}`, "-m", commitMessage]);
+      const tagRefs = tags
+        .filter((tag) => tag.startsWith(`${name}-js-v`))
+        .map((tag) => {
+          const version = tag.slice(`${name}-js-`.length);
+          git("git", ["tag", version, "-m", commitMessage]);
+          return `refs/tags/${version}:refs/tags/${version}`;
+        });
+      if (env.CI) {
+        const api = async (path: string, method = "GET", body?: unknown) => {
+          const response = await request(`https://api.github.com${path}`, {
+            method,
+            headers: {
+              Accept: "application/vnd.github+json",
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${env.API_TOKEN_GITHUB}`,
+              "X-GitHub-Api-Version": "2022-11-28",
+            },
+            body: body === undefined ? undefined : JSON.stringify(body),
+            signal: AbortSignal.timeout(30_000),
+          });
+          if (!response.ok && !(method === "GET" && response.status === 404)) {
+            throw new Error(`GitHub ${method} ${path} failed (${response.status})`);
+          }
+          return response;
+        };
+        const repo = `/repos/KeyChord/${name}`;
+        const settings = {
+          description: `Read-only mirror of KeyChord/chords/@keychord/${name}. Direct commits are overwritten; contribute to KeyChord/chords.`,
+          homepage: `https://github.com/KeyChord/chords/tree/main/@keychord/${name}`,
+          has_issues: false,
+          has_projects: false,
+          has_wiki: false,
+          has_discussions: false,
+        };
+        if ((await api(repo)).status === 404) {
+          await api("/orgs/KeyChord/repos", "POST", { name, private: false, ...settings });
         }
+        // The mirror is never a parent. Force replaces divergent or unrelated history.
+        git("git", ["push", "--force", url, "refs/heads/main:refs/heads/main", ...tagRefs]);
+        // An empty repository cannot select main as its default until after the push.
+        await api(repo, "PATCH", { ...settings, default_branch: "main" });
       }
-      git("git", ["add", "-A"]);
-      if (!forceCommit && !git("git", ["status", "--porcelain"]).stdout) {
-        console.log(`No changes, skipping ${name}`);
-        continue;
-      }
-      git("git", [
-        "commit",
-        ...(forceCommit ? ["--allow-empty"] : []),
-        `--author=${author}`,
-        "-m",
-        commitMessage,
-      ]);
-      if (env.CI) git("git", ["push", "origin", branch]);
-      console.log(`${url}/commit/${git("git", ["rev-parse", "HEAD"]).stdout}`);
-      for (const fullTag of tags) {
-        if (!fullTag.startsWith(`${name}-js-v`)) continue;
-        const tag = fullTag.slice(`${name}-js-`.length);
-        git("git", ["tag", tag, "-m", commitMessage]);
-        if (env.CI) git("git", ["push", "origin", tag]);
-      }
-      console.log(`Completed ${name}`);
+      console.log(`Completed ${name}: ${git("git", ["rev-parse", "HEAD"]).stdout}`);
     } catch (error) {
       console.error(`::error::Mirror ${name} failed`, error);
-      process.exitCode = 1;
+      failures.push(name);
+    } finally {
+      rmSync(scratch, { recursive: true, force: true });
     }
   }
+  if (failures.length) throw new Error(`Failed to sync mirrors: ${failures.join(", ")}`);
 }

@@ -1,8 +1,8 @@
-name = "BetterDisplay"
+name = 'BetterDisplay'
 
 [on.monitor]
 file = 'monitor.js'
 
 [chords]
-'?/ms' = { name = "Monitor: Size" }
-'/ms(.+)' = { name = "Monitor: Size (Set)", '@input:monitor' = ['$1'] }
+'?/ms' = { name = 'Monitor: Size' }
+'/ms(.+)' = { name = 'Monitor: Size (Set)', '@input:monitor' = ['$1'] }

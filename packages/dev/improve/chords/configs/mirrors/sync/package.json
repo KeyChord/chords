@@ -18,7 +18,8 @@
   },
   "devDependencies": {
     "@chord/com.npmjs.types__node": "workspace:*",
-    "@chord/com.npmjs.vite-plus": "workspace:*"
+    "@chord/com.npmjs.vite-plus": "workspace:*",
+    "@github-actions-workflow-ts/lib": "^2.6.1"
   },
   "engines": {
     "node": ">=22.18.0"

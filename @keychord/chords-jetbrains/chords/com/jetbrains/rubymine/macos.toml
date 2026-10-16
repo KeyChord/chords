@@ -1,6 +1,6 @@
-name = "RubyMine"
+name = 'RubyMine'
 
 [[import]]
-file = "base.toml"
+file = 'base.toml'
 [import.override.meta]
-'$execPath' = "/Applications/RubyMine.app/Contents/MacOS/rubymine"
+'$execPath' = '/Applications/RubyMine.app/Contents/MacOS/rubymine'

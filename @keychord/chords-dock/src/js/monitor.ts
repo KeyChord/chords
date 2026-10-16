@@ -14,16 +14,16 @@ export function parseMonitorResolution(expression: string): { width: number; hei
 
 export default function buildMonitorHandler() {
   let pending = Promise.resolve();
-  return function monitor(target: string, action: "focus" | "size" = "focus"): Promise<void> {
+  return function monitor(target: string, action: "FOCUS" | "SIZE" = "FOCUS"): Promise<void> {
     let operation: () => Promise<void>;
     try {
-      if (action === "size") {
+      if (action === "SIZE") {
         const { width, height } = parseMonitorResolution(target);
         operation = () => addon.setMonitorResolution(width, height);
-      } else if (action === "focus") {
+      } else if (action === "FOCUS") {
         if (
           typeof target !== "string" ||
-          !/^(?:[1-9]\d*|previous|next|left|right|up|down)$/.test(target) ||
+          !/^(?:[1-9]\d*|PREVIOUS|NEXT|LEFT|RIGHT|UP|DOWN)$/.test(target) ||
           (/^\d/.test(target) && !Number.isSafeInteger(Number(target)))
         ) {
           throw new TypeError("Expected a positive monitor number or direction");

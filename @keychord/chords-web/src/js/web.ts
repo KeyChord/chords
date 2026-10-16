@@ -8,12 +8,12 @@ import outdent from "outdent";
 import addon from "./web.node";
 
 type Args =
-  | [type: "placeholder", input: string]
-  | [type: "selection-start", input: string]
-  | [type: "selection-end", input: string]
-  | [type: "link", input: string]
-  | [type: "button", input: string]
-  | [type: "scroll", direction: "north" | "south" | "east" | "west"];
+  | [type: "PLACEHOLDER", input: string]
+  | [type: "SELECTION_START", input: string]
+  | [type: "SELECTION_END", input: string]
+  | [type: "LINK", input: string]
+  | [type: "BUTTON", input: string]
+  | [type: "SCROLL", direction: "NORTH" | "SOUTH" | "EAST" | "WEST"];
 
 export function runWebJavaScript(source: string): void {
   addon.runJavaScript(source);
@@ -32,18 +32,18 @@ export default function buildHandler() {
 function getJavascript(...args: Args): string {
   const type = args[0];
   switch (type) {
-    case "scroll": {
+    case "SCROLL": {
       const direction = args[1];
       return outdent`
         window.scrollBy({
-          top: ${direction === "north" ? -100 : direction === "south" ? 100 : 0},
-          left: ${direction === "east" ? 100 : direction === "west" ? -100 : 0},
+          top: ${direction === "NORTH" ? -100 : direction === "SOUTH" ? 100 : 0},
+          left: ${direction === "EAST" ? 100 : direction === "WEST" ? -100 : 0},
           behavior: 'smooth'
         });
       `;
     }
 
-    case "placeholder": {
+    case "PLACEHOLDER": {
       const input = args[1];
       if (input.endsWith(".")) {
         return outdent`

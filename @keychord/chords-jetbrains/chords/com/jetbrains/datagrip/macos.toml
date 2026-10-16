@@ -1,6 +1,6 @@
-name = "DataGrip"
+name = 'DataGrip'
 
 [[import]]
-file = "base.toml"
+file = 'base.toml'
 [import.override.meta]
-'$execPath' = "/Applications/DataGrip.app/Contents/MacOS/datagrip"
+'$execPath' = '/Applications/DataGrip.app/Contents/MacOS/datagrip'

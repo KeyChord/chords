@@ -65,9 +65,9 @@ await invoke("/wph-2", { x: screen.x + 200, y: screen.y - screen.height / 2 });
 await invoke("/wp-200x-100", { x: screen.x - 200, y: screen.y - 100 });
 await invoke("/wp00", { x: screen.x, y: screen.y });
 const before = await state();
-await assert.rejects(handler.call(context, "size", "200x0"));
+await assert.rejects(handler.call(context, "SIZE", "200x0"));
 await assert.rejects(
-  handler.call({ focusedAppId: "dev.keychord.nonexistent" }, "position", "r1"),
+  handler.call({ focusedAppId: "dev.keychord.nonexistent" }, "POSITION", "r1"),
   /not running/,
 );
 for (const key of ["x", "y", "width", "height"] as const)

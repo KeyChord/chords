@@ -23,7 +23,7 @@ test.each([
   ["200.5x100.25", { width: pixels(200.5), height: pixels(100.25) }],
   ["h200x", { height: pixels(200) }],
 ])("size %s preserves the supplied units and omitted dimension", (input, expected) => {
-  expect(parseWindowDimensions("size", input)).toEqual(expected);
+  expect(parseWindowDimensions("SIZE", input)).toEqual(expected);
 });
 
 test.each([
@@ -41,7 +41,7 @@ test.each([
   ["r200x", { width: pixels(200), right: true }],
   ["h0x", { height: pixels(0) }],
 ])("position %s handles signed offsets and anchors", (input, expected) => {
-  expect(parseWindowDimensions("position", input)).toEqual(expected);
+  expect(parseWindowDimensions("POSITION", input)).toEqual(expected);
 });
 
 test.each([
@@ -63,13 +63,13 @@ test.each([
   "-.5",
   "-0",
 ])("%s is rejected before any native action", (input) => {
-  for (const action of ["size", "position"] as const) {
+  for (const action of ["SIZE", "POSITION"] as const) {
     expect(() => parseWindowDimensions(action, input)).toThrow(TypeError);
   }
 });
 test.each(["0", ".0", "20", ".5", "-.5", "0x", "200x0", "h-200x", "r1"])(
   "invalid size %s is rejected",
-  (input) => expect(() => parseWindowDimensions("size", input)).toThrow(TypeError),
+  (input) => expect(() => parseWindowDimensions("SIZE", input)).toThrow(TypeError),
 );
 
 afterEach(() => {
@@ -131,23 +131,23 @@ test.each([
   ["0120", { height: divisor(1), left: divisor(2), top: fraction(0) }],
   ["1-1-24", { width: divisor(1), height: fraction(2), left: divisor(-2), top: divisor(4) }],
 ])("combined bounds %s preserve zero size axes and retain positional zeros", (input, expected) => {
-  expect(parseWindowDimensions("frame", input)).toEqual(expected);
+  expect(parseWindowDimensions("FRAME", input)).toEqual(expected);
 });
 
 test.each(["110", "11000", ".51100", "11x00", "00xx", "h1100"])(
   "invalid combined bounds %s never execute",
   (input) => {
-    expect(() => parseWindowDimensions("frame", input)).toThrow(TypeError);
+    expect(() => parseWindowDimensions("FRAME", input)).toThrow(TypeError);
   },
 );
 
 test.each([
-  ["/wsw2", "size", "2", { width: divisor(2) }],
-  ["/wsh1", "size", "1", { height: divisor(1) }],
-  ["/wsh200x", "size", "200x", { height: pixels(200) }],
-  ["/wpx-2", "position", "-2", { width: divisor(-2) }],
-  ["/wpy4", "position", "4", { height: divisor(4) }],
-  ["/wpy-200x", "position", "-200x", { height: pixels(-200) }],
+  ["/wsw2", "SIZE", "2", { width: divisor(2) }],
+  ["/wsh1", "SIZE", "1", { height: divisor(1) }],
+  ["/wsh200x", "SIZE", "200x", { height: pixels(200) }],
+  ["/wpx-2", "POSITION", "-2", { width: divisor(-2) }],
+  ["/wpy4", "POSITION", "4", { height: divisor(4) }],
+  ["/wpy-200x", "POSITION", "-200x", { height: pixels(-200) }],
 ])("named axis %s changes only its named field", async (input, action, expression, expected) => {
   const native = vi.fn().mockResolvedValue(undefined);
   vi.doMock("../src/js/window.node", () => ({ default: { runWindowAction: native } }));
@@ -165,10 +165,10 @@ test("invalid input never calls native code, and failed actions do not block the
   vi.doMock("../src/js/window.node", () => ({ default: { runWindowAction: native } }));
   const { default: buildWindowHandler } = await import("../src/js/window");
   const handler = buildWindowHandler();
-  await expect(handler("size", "200xgarbage")).rejects.toThrow(TypeError);
+  await expect(handler("SIZE", "200xgarbage")).rejects.toThrow(TypeError);
   expect(native).not.toHaveBeenCalled();
-  await expect(handler("size", "22")).rejects.toThrow("No window");
-  await handler("position", "r1");
+  await expect(handler("SIZE", "22")).rejects.toThrow("No window");
+  await handler("POSITION", "r1");
   expect(native).toHaveBeenCalledTimes(2);
 });
 
@@ -186,8 +186,8 @@ test("overlapping actions are serialized and keep their own application context"
   vi.doMock("../src/js/window.node", () => ({ default: { runWindowAction: native } }));
   const { default: buildWindowHandler } = await import("../src/js/window");
   const handler = buildWindowHandler();
-  const first = handler.call({ focusedAppId: "first" }, "size", "22");
-  const second = handler.call({ focusedAppId: "second" }, "position", "r1");
+  const first = handler.call({ focusedAppId: "first" }, "SIZE", "22");
+  const second = handler.call({ focusedAppId: "second" }, "POSITION", "r1");
   await vi.waitFor(() => expect(native).toHaveBeenCalledTimes(1));
   finish();
   await Promise.all([first, second]);
@@ -212,6 +212,6 @@ test("native snapping replaces the platform tiling shortcuts", () => {
     "/wf",
   ]) {
     expect(definition.chords[command].shortcut).toBeUndefined();
-    expect(definition.chords[command]["@input:window"]?.[0]).toBe("preset");
+    expect(definition.chords[command]["@input:window"]?.[0]).toBe("PRESET");
   }
 });

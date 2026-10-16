@@ -1,24 +1,24 @@
-name = "Modifier Keys"
+name = 'Modifier Keys'
 
 [on.keys]
 file = 'keys.js'
 
 [chords]
-'?.' = { name = "Click / Modifiers" }
+'?.' = { name = 'Click / Modifiers' }
 
 # The first modifier precedes one regular key; additional modifiers follow in any order.
 # Examples: .mv sends Command+V; .mvs sends Command+Shift+V; .mcsa sends Command+Shift+Alt+C.
-'?.m' = { name = "Meta (Command)" }
-'.(m.[acfms]*)' = { name = "Meta (Cmd) Combo", '@input:keys' = ['$1'] }
+'?.m' = { name = 'Meta (Command)' }
+'.(m.[acfms]*)' = { name = 'Meta (Cmd) Combo', '@input:keys' = ['$1'] }
 
-'?.c' = { name = "Control" }
-'.(c.[acfms]*)' = { name = "Control Combo", '@input:keys' = ['$1'] }
+'?.c' = { name = 'Control' }
+'.(c.[acfms]*)' = { name = 'Control Combo', '@input:keys' = ['$1'] }
 
-'?.a' = { name = "Alt (Option)" }
-'.(a.[acfms]*)' = { name = "Alt Combo", '@input:keys' = ['$1'] }
+'?.a' = { name = 'Alt (Option)' }
+'.(a.[acfms]*)' = { name = 'Alt Combo', '@input:keys' = ['$1'] }
 
-'?.f' = { name = "Fn" }
-'.(f.[acfms]*)' = { name = "Fn Combo", '@input:keys' = ['$1'] }
+'?.f' = { name = 'Fn' }
+'.(f.[acfms]*)' = { name = 'Fn Combo', '@input:keys' = ['$1'] }
 
-'?.s' = { name = "Shift" }
-'.(s.[acfms]*)' = { name = "Shift Combo", '@input:keys' = ['$1'] }
+'?.s' = { name = 'Shift' }
+'.(s.[acfms]*)' = { name = 'Shift Combo', '@input:keys' = ['$1'] }

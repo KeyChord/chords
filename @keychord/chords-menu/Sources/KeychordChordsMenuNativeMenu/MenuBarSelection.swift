@@ -5,7 +5,7 @@ import CoreGraphics
 
 /// Select within application menus or tray extras, keeping all steps inside that group.
 struct MenuBarSelection: Sendable {
-    enum Scope: String { case menu, tray }
+    enum Scope: String { case menu = "MENU", tray = "TRAY" }
     let scope: Scope
     let index: Int
     let steps: String

@@ -50,8 +50,8 @@ export default async function createChromiumHandler(this: ImportMeta, appPath: s
     });
   }
 
-  return async function handler(action: "js", code: string) {
-    if (action === "js") {
+  return async function handler(action: "JS", code: string) {
+    if (action === "JS") {
       return handlerJs(code);
     }
 

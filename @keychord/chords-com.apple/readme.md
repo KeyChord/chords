@@ -2,9 +2,10 @@
 
 Chord package for pre-installed macOS apps.
 
+Finder chords are provided by [`@keychord/chords-finder`](../chords-finder/readme.md).
+
 ## Apps
 
-- [Finder](./chords/com/apple/finder/macos.toml) (`com.apple.finder`)
 - [Safari](./chords/com/apple/safari/macos.toml) (`com.apple.safari`)
 - [Terminal](./chords/com/apple/Terminal/macos.toml) (`com.apple.Terminal`)
 - [Activity Monitor](./chords/com/apple/ActivityMonitor/macos.toml) (`com.apple.ActivityMonitor`)
@@ -22,51 +23,56 @@ The Bun handler calls SkyLight in-process and disables automatic switching when
 selecting Light or Dark. These private macOS APIs are resolved before applying a
 change; an unavailable API reports an error.
 
-## iPhone Mirroring clicks
+## iPhone Mirroring taps and hover
 
 For general clicks in the focused app, use `.` with
-[`@keychord/chords-click`](../chords-click/readme.md). The Mirroring-specific `t`
-handler imports the coordinate parser from `@keychord/chords-click/sequence`, shares
-the click routine, and adds connection checks.
+[`@keychord/chords-click`](../chords-click/readme.md). Mirroring uses `t` to tap
+and `h` to hover, followed by x/y coordinate pairs. Each axis has 36 positions in
+the order `0123456789abcdefghijklmnopqrstuvwxyz`: `0` is 0%, `z` is 100%, and
+each step is 1/35 of the screen. `t00` taps the top-left; `tzz` taps the bottom-right.
+`tii` taps about 51.4% across and down; `t00zz` taps both opposite corners.
 
-Use `t` followed by x/y pairs from the top left. Each bare digit is a coordinate
-in tenths: `t13` taps 10% across and 30% down, and `t1313` taps that position twice.
-`-` means 0%, `1`–`9` mean 10%–90%, and `0` means 100%.
+Coordinates span the full mirrored device screen, excluding the Mac toolbar and
+bezel. Tap targets are clamped two logical points inside the screen edges;
+interior coordinates retain their full-screen positions. Rounded corners are not adjusted.
+Geometry uses Mirroring's fixed chrome in logical Mac points: 38 at the top
+(toolbar plus margin) and 8 on the other edges. It does not depend on the
+toolbar's hover-only Accessibility elements or cached measurements. These insets
+match the current macOS Mirroring layout; an OS layout change requires updating them.
 
-Add `/` and one digit for mixed fractions: `1/2` means 12%, `9/5` means 95%,
-and `-/2` means 2%. `t91/2` taps (90%, 12%). Each `/` consumes exactly one digit
-as part of the preceding coordinate, so `t91/21/23/4` taps (90%, 12%), then
-(12%, 34%) without separators. `/0` adds zero to the coordinate.
+Use `h` with the same pairs to move without pressing: `h00zz` hovers at the two
+opposite corners. Hover uses raw device coordinates: `hzz` reaches the exact 100%
+boundary, with no inset or clipping adjustment. Hover releases any previously held drag first and rejects click,
+long-press and hold modifiers. Tap and hover sequences share a queue.
 
-Direction suffixes mark exact pixels: `20l`, `20r`, `20t`, and `20b` mean
-20 pixels from the left, right, top, and bottom respectively. `t20l5` taps
-x=20 pixels, y=50%; `t20b5` taps halfway across and 20 pixels above the bottom.
-Explicit directions can appear in either axis order. Exact values support decimals
-and use macOS logical points, independent of Retina scale. Pairs run together;
-pixel offsets consume the complete number before their direction suffix. Refine
-a shorthand coordinate with `/0` before a pixel amount to keep the numbers
-distinct: `t13/020l5` taps (10%, 30%), then (20px, 50%). `/` is exclusively a
-fractional suffix.
-Coordinates use the current mirroring window's position and size.
+For exact pixel offsets, prefix the amount and direction with `=`: `=20l`, `=20r`,
+`=20t`, and `=20b` mean 20 logical Mac points from the left, right, top and bottom.
+`t=20li` taps 20 points from the left at y=`i`; `h=20b=30r` hovers 30 points from
+the right and 20 above the bottom. Directions may appear in either axis order,
+and offsets support decimals. Bare `l/r/t/b` are ordinary base-36 coordinates.
 
-Prefix a pair with `,` for a long press: `t13,9228` taps (10%, 30%), holds
-(90%, 20%), then normally taps (20%, 80%). The hold lasts 500 ms, matching UIKit's
+`/` followed by one base-36 character refines a coordinate by that many 36ths of
+one step. `h/i` means exactly 50%: `(17 + 18/36) / 35`. Thus `th/ih/i` taps the
+exact center. Pairs and offsets run together without separators.
+
+Prefix a pair with `,` for a long press: `t00,zzii` taps the top-left, holds the
+bottom-right, then taps near the center. The hold lasts 500 ms, matching UIKit's
 [default long-press duration](https://developer.apple.com/documentation/uikit/uilongpressgesturerecognizer/minimumpressduration).
 `.` explicitly selects a normal tap.
 
-Use `t-1328` to press at (10%, 30%), drag to (20%, 80%), then release.
-`t-1328-` keeps the button held after the sequence; `t13-` holds at a single
-position. `t=55` moves to the center without pressing, or continues an already
-held drag and releases it. A trailing `-` on that movement keeps it held again.
+Use `t-00zz` to press at the top-left, drag to the bottom-right, then release.
+`t-00zz-` keeps the button held after the sequence; `tii-` holds near the center.
+`t.=ii` moves without pressing, or continues an already held drag and releases it.
+A trailing `-` on that movement keeps it held again.
 Within a sequence, `.-` starts a drag and `.=` moves without a new press.
 The shared runner releases held buttons on errors, including disconnection.
-An initial `-` now selects drag; use `0l` to start a normal tap at the left edge.
+An initial `-` selects drag. `-` is no longer a zero coordinate; use `0`.
 Global display input (`./`) belongs to the general mouse command, while taps
 continue to target the mirrored phone's screen.
 
-The five-tap example is `t20b5-53/07/00r20b65`: center/20 pixels above the bottom,
-left edge/halfway down, 30% across/70% down, right edge/20 pixels above the bottom,
-then 60% across/halfway down.
+The old `t=...` movement prefix is now reserved for pixel offsets; use `h...` for
+hover or `t.=...` to continue a drag. Decimal `t` sequences and fractional suffixes
+now use base 36. The general `.` mouse command retains its existing decimal syntax.
 
 The complete sequence is validated before clicking. The shared click runner waits
 500 ms between coordinate pairs, keeping drags held during the pause and allowing time for

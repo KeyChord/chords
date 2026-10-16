@@ -1,79 +1,132 @@
-name = "WhatsApp"
+name = 'WhatsApp'
 
-[on.menu]
-file = "menu.js"
-args = ["WhatsApp"]
-
-[on.menu-item]
-file = "menu.js"
-args = ["WhatsApp"]
+[on.whatsapp]
+file = 'whatsapp.js'
 
 [chords]
-'?c' = { name = "Chat" }
-cq = { name = "Chat: Quit", shortcut = "cmd+shift+w" }
-ci = { name = "Chat: Info", shortcut = "cmd+shift+i" }
-cb = { name = "Chat: Block", '@input:menu' = [
-  "by-letters",
-  "c",
-], '@input:menu-item' = [
-  "by-letters",
-  "block",
+
+'?c' = { name = 'Chat' }
+'cq' = { name = 'Chat: Quit', '@input:whatsapp' = ['CHAT_CLOSE'] }
+'cb' = { name = 'Chat: Block', '@input:whatsapp' = ['CHAT_BLOCK'] }
+'cs' = { name = 'Chat: Search', '@input:whatsapp' = ['CHAT_SEARCH'] }
+'cvi' = { name = 'Chat: Video Call', '@input:whatsapp' = ['CHAT_VIDEO_CALL'] }
+'cvo' = { name = 'Chat: Voice Call', '@input:whatsapp' = ['CHAT_VOICE_CALL'] }
+'cn' = { name = 'Chat: New', '@input:whatsapp' = ['CHAT_NEW'] }
+'cp' = { name = 'Chat: Pin', '@input:whatsapp' = ['CHAT_PIN'] }
+'ca' = { name = 'Chat: Archive', '@input:whatsapp' = ['CHAT_ARCHIVE'] }
+'cm' = { name = 'Chat: Mute', '@input:whatsapp' = ['CHAT_MUTE'] }
+'cm8' = { name = 'Chat: Mute 8 Hours', '@input:whatsapp' = ['CHAT_MUTE_8_HOURS'] }
+'cmw' = { name = 'Chat: Mute 1 Week', '@input:whatsapp' = ['CHAT_MUTE_1_WEEK'] }
+'cu' = { name = 'Chat: Unread', '@input:whatsapp' = ['CHAT_UNREAD'] }
+'cv' = { name = 'Chat: Previous', '@input:whatsapp' = ['CHAT_PREVIOUS'] }
+'cx' = { name = 'Chat: Next', '@input:whatsapp' = ['CHAT_NEXT'] }
+'ce' = { name = 'Chat: Export', '@input:whatsapp' = ['CHAT_EXPORT'] }
+'cc' = { name = 'Chat: Clear', '@input:whatsapp' = ['CHAT_CLEAR'] }
+'cd' = { name = 'Chat: Delete', '@input:whatsapp' = ['CHAT_DELETE'] }
+
+'?ci' = { name = 'Contact Info' }
+'ci' = { name = 'Contact Info', '@input:whatsapp' = ['CHAT_INFO'] }
+
+'cia' = { name = 'Contact Info > Avatar', '@input:whatsapp' = ['CHAT_INFO_AVATAR'] }
+'cip' = { name = 'Contact Info > Phone (Voice)', '@input:whatsapp' = ['CHAT_INFO_VOICE'] }
+'civ' = { name = 'Contact Info > Video', '@input:whatsapp' = ['CHAT_INFO_VIDEO'] }
+'ci/' = { name = 'Contact Info > Search', '@input:whatsapp' = ['CHAT_INFO_SEARCH'] }
+
+'cig' = { name = 'Contact Info > Gallery (Media, links and docs)', '@input:whatsapp' = [
+  'CHAT_INFO_GALLERY',
 ] }
-cs = { name = "Chat: Search", shortcut = "cmd+opt+f" }
-cvi = { name = "Chat: Video Call", '@input:menu' = ["by-path", ["Chat", "Video Call"]] }
-cvo = { name = "Chat: Voice Call", '@input:menu' = ["by-path", ["Chat", "Voice Call"]] }
-cn = { name = "Chat: New", shortcut = "cmd+shift+n" }
-cp = { name = "Chat: Pin", shortcut = "cmd+p" }
-ca = { name = "Chat: Archive", shortcut = "cmd+shift+a" }
-cm = { name = "Chat: Mute", shortcut = "cmd+shift+m" }
-cm8 = { name = "Chat: Mute 8 Hours", '@input:menu' = ["by-path", ["Chat", "8 hours"]] }
-cmw = { name = "Chat: Mute 1 Week", '@input:menu' = ["by-path", ["Chat", "1 week"]] }
-cu = { name = "Chat: Unread", shortcut = "cmd+shift+u" }
-cv = { name = "Chat: Previous", shortcut = "cmd+shift+[" }
-cx = { name = "Chat: Next", shortcut = "cmd+shift+]" }
-ce = { name = "Chat: Export", '@input:menu' = ["by-path", ["Chat", "Export chat"]] }
-cc = { name = "Chat: Clear", '@input:menu' = ["by-path", ["Chat", "Clear chat"]] }
-cd = { name = "Chat: Delete", shortcut = "cmd+shift+d" }
+'cis' = { name = 'Contact Info > Starred', '@input:whatsapp' = ['CHAT_INFO_STARRED'] }
 
-'?c"1-9"' = { name = "Chat: Switch to Chat #" }
-c1 = { name = "Chat 1", shortcut = "cmd+1" }
-c2 = { name = "Chat 2", shortcut = "cmd+2" }
-c3 = { name = "Chat 3", shortcut = "cmd+3" }
-c4 = { name = "Chat 4", shortcut = "cmd+4" }
-c5 = { name = "Chat 5", shortcut = "cmd+5" }
-c6 = { name = "Chat 6", shortcut = "cmd+6" }
-c7 = { name = "Chat 7", shortcut = "cmd+7" }
-c8 = { name = "Chat 8", shortcut = "cmd+8" }
-c9 = { name = "Chat 9", shortcut = "cmd+9" }
+'cim' = { name = 'Contact Info > Mute', '@input:whatsapp' = ['CHAT_MUTE'] }
+'cims' = { name = 'Contact Info > Mute status (notifications)', '@input:whatsapp' = [
+  'CHAT_INFO_MUTE_STATUS',
+] }
+'cit' = { name = 'Contact Info > Theme', '@input:whatsapp' = ['CHAT_INFO_THEME'] }
+'citb' = { name = 'Contact Info > Theme > Bubble', '@input:whatsapp' = ['CHAT_INFO_THEME_BUBBLE'] }
+'citb0' = { name = 'Contact Info > Theme > Bubble > Reset', '@input:whatsapp' = [
+  'CHAT_INFO_THEME_BUBBLE_RESET',
+] }
+'citb(\d,?\d)' = { name = 'Contact Info > Theme > Bubble @ Row, Column', '@input:whatsapp' = [
+  'CHAT_INFO_THEME_BUBBLE_SELECT',
+  '$1',
+] }
+'citw' = { name = 'Contact Info > Theme > Wallpaper', '@input:whatsapp' = [
+  'CHAT_INFO_THEME_WALLPAPER',
+] }
+'citw(\d,?\d)' = { name = 'Contact Info > Theme > Wallpaper @ Row, Column', '@input:whatsapp' = [
+  'CHAT_INFO_THEME_WALLPAPER_SELECT',
+  '$1',
+] }
+'citwp' = { name = 'Contact Info > Theme > Wallpaper > Photo', '@input:whatsapp' = [
+  'CHAT_INFO_THEME_WALLPAPER_PHOTO',
+] }
+'citwc' = { name = 'Contact Info > Theme > Wallpaper > Colour', '@input:whatsapp' = [
+  'CHAT_INFO_THEME_WALLPAPER_COLOUR',
+] }
+'cisd' = { name = 'Contact Info > Save (to) Downloads', '@input:whatsapp' = [
+  'CHAT_INFO_SAVE_DOWNLOADS',
+] }
 
-'?v' = { name = "View" }
-vc = { name = "View: Chats", shortcut = "ctrl+1" }
-vk = { name = "View: Kalls (Calls)", shortcut = "ctrl+2" }
-vu = { name = "View: Updates", shortcut = "ctrl+3" }
-va = { name = "View: Archived", shortcut = "ctrl+4" }
-vs = { name = "View: Starred", shortcut = "ctrl+5" }
-'v,' = { name = "View: Settings", shortcut = "ctrl+6" }
-vp = { name = "View: Profile", shortcut = "ctrl+p" }
+'cidm' = { name = 'Contact Info > Disappearing Messages', '@input:whatsapp' = [
+  'CHAT_INFO_DISAPPEARING_MESSAGES',
+] }
+'cipa' = { name = 'Contact Info > Privacy (Advanced)', '@input:whatsapp' = ['CHAT_INFO_PRIVACY'] }
+'cie' = { name = 'Contact Info > Encryption', '@input:whatsapp' = ['CHAT_INFO_ENCRYPTION'] }
 
-'?k' = { name = "Kall (Call)" }
-kn = { name = "Call: New", shortcut = "cmd+shift+c" }
-kg = { name = "Call: Group Call", shortcut = "cmd+shift+g" }
-kl = { name = "Call: Link", shortcut = "cmd+shift+l" }
-kc = { name = "Call: Camera Toggle", shortcut = "cmd+ctrl+v" }
-km = { name = "Call: Mic Toggle", shortcut = "cmd+ctrl+m" }
-kr = { name = "Call: React", shortcut = "cmd+ctrl+r" }
-kh = { name = "Call: Hand Raise", shortcut = "cmd+ctrl+h" }
-ks = { name = "Call: Screen Share", shortcut = "cmd+ctrl+s" }
-kp = { name = "Call: Participants", shortcut = "cmd+ctrl+p" }
-ke = { name = "Call: End", shortcut = "cmd+ctrl+w" }
-kt = { name = "Call: Top Always", shortcut = "cmd+ctrl+t" }
+'cicd' = { name = 'Contact Info > Contact Details', '@input:whatsapp' = [
+  'CHAT_INFO_CONTACT_DETAILS',
+] }
 
-'?i' = { name = "Input" }
-ie = { name = "Input: Emoji", shortcut = "cmd+e" }
-ig = { name = "Input: GIF", shortcut = "cmd+g" }
-is = { name = "Input: Sticker", shortcut = "cmd+g" }
+'?cig' = { name = 'Contact Info > Group' }
 
-'?z' = { name = "Zoom" }
-zi = { name = "Zoom In", shortcut = "cmd+plus" }
-zo = { name = "Zoom Out", shortcut = "cmd+minus" }
-zr = { name = "Zoom Reset", shortcut = "cmd+0" }
+'cigc' = { name = 'Contact Info > Group: Create', '@input:whatsapp' = ['CHAT_INFO_GROUP_CREATE'] }
+'ciga' = { name = 'Contact Info > Group: Add (to)', '@input:whatsapp' = ['CHAT_INFO_GROUP_ADD'] }
+
+'cisc' = { name = 'Contact Info: Share Contact', '@input:whatsapp' = ['CHAT_INFO_SHARE_CONTACT'] }
+'cif' = { name = 'Contact Info: Favourite', '@input:whatsapp' = ['CHAT_INFO_FAVOURITE'] }
+'ciec' = { name = 'Contact Info: Export Chat', '@input:whatsapp' = ['CHAT_INFO_EXPORT'] }
+'cicc' = { name = 'Contact Info: Clear Chat', '@input:whatsapp' = ['CHAT_INFO_CLEAR'] }
+'cib' = { name = 'Contact Info: Block', '@input:whatsapp' = ['CHAT_INFO_BLOCK'] }
+'cir' = { name = 'Contact Info: Report', '@input:whatsapp' = ['CHAT_INFO_REPORT'] }
+
+'?c"1-9"' = { name = 'Chat: Switch to Chat #' }
+'c1' = { name = 'Chat 1', '@input:whatsapp' = ['CHAT_SWITCH', 1] }
+'c2' = { name = 'Chat 2', '@input:whatsapp' = ['CHAT_SWITCH', 2] }
+'c3' = { name = 'Chat 3', '@input:whatsapp' = ['CHAT_SWITCH', 3] }
+'c4' = { name = 'Chat 4', '@input:whatsapp' = ['CHAT_SWITCH', 4] }
+'c5' = { name = 'Chat 5', '@input:whatsapp' = ['CHAT_SWITCH', 5] }
+'c6' = { name = 'Chat 6', '@input:whatsapp' = ['CHAT_SWITCH', 6] }
+'c7' = { name = 'Chat 7', '@input:whatsapp' = ['CHAT_SWITCH', 7] }
+'c8' = { name = 'Chat 8', '@input:whatsapp' = ['CHAT_SWITCH', 8] }
+'c9' = { name = 'Chat 9', '@input:whatsapp' = ['CHAT_SWITCH', 9] }
+
+'?v' = { name = 'View' }
+'vc' = { name = 'View: Chats', '@input:whatsapp' = ['VIEW_CHATS'] }
+'vk' = { name = 'View: Kalls (Calls)', '@input:whatsapp' = ['VIEW_CALLS'] }
+'vu' = { name = 'View: Updates', '@input:whatsapp' = ['VIEW_UPDATES'] }
+'va' = { name = 'View: Archived', '@input:whatsapp' = ['VIEW_ARCHIVED'] }
+'vs' = { name = 'View: Starred', '@input:whatsapp' = ['VIEW_STARRED'] }
+'v,' = { name = 'View: Settings', '@input:whatsapp' = ['VIEW_SETTINGS'] }
+
+'?p' = { name = 'Phone (Call)' }
+'pn' = { name = 'Phone: New', '@input:whatsapp' = ['CALL_NEW'] }
+'pg' = { name = 'Phone: Group Call', '@input:whatsapp' = ['CALL_NEW_GROUP'] }
+'pl' = { name = 'Phone: Link', '@input:whatsapp' = ['CALL_LINK'] }
+'pc' = { name = 'Phone: Camera Toggle', '@input:whatsapp' = ['CALL_CAMERA'] }
+'pm' = { name = 'Phone: Mic Toggle', '@input:whatsapp' = ['CALL_MICROPHONE'] }
+'pr' = { name = 'Phone: React', '@input:whatsapp' = ['CALL_REACT'] }
+'ph' = { name = 'Phone: Hand Raise', '@input:whatsapp' = ['CALL_HAND'] }
+'ps' = { name = 'Phone: Screen Share', '@input:whatsapp' = ['CALL_SCREEN_SHARE'] }
+'pp' = { name = 'Phone: Participants', '@input:whatsapp' = ['CALL_PARTICIPANTS'] }
+'pe' = { name = 'Phone: End', '@input:whatsapp' = ['CALL_END'] }
+'pt' = { name = 'Phone: Top Always', '@input:whatsapp' = ['CALL_ALWAYS_ON_TOP'] }
+
+'?i' = { name = 'Input' }
+'ie' = { name = 'Input: Emoji', '@input:whatsapp' = ['INPUT_EMOJI'] }
+'ig' = { name = 'Input: GIF', '@input:whatsapp' = ['INPUT_GIF'] }
+'is' = { name = 'Input: Sticker', '@input:whatsapp' = ['INPUT_STICKER'] }
+
+'?z' = { name = 'Zoom' }
+'zi' = { name = 'Zoom In', '@input:whatsapp' = ['ZOOM_IN'] }
+'zo' = { name = 'Zoom Out', '@input:whatsapp' = ['ZOOM_OUT'] }
+'zr' = { name = 'Zoom Reset', '@input:whatsapp' = ['ZOOM_RESET'] }

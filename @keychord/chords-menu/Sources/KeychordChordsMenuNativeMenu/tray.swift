@@ -16,8 +16,8 @@ import Foundation
 import NodeAPI
 
 enum TrayClickType: String {
-    case left
-    case right
+    case left = "LEFT"
+    case right = "RIGHT"
 
     /// CGEvent types for a click of this kind. AXorcist models the same mapping in
     /// `MouseButton.eventKinds`, but that property is internal to the module.
@@ -303,7 +303,7 @@ func activate(_ item: TrayElement, y: CGFloat, clickType: TrayClickType) async t
 
 @MainActor
 private func runTrayItemAction(trayIndex: Int, clickType: TrayClickType?) async throws {
-    let selection = try MenuBarSelection(scope: "tray", index: String(trayIndex), steps: "", clickType: clickType?.rawValue ?? "")
+    let selection = try MenuBarSelection(scope: "TRAY", index: String(trayIndex), steps: "", clickType: clickType?.rawValue ?? "")
     try await selection.run(focusedAppId: nil)
 }
 

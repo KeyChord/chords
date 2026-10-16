@@ -57,7 +57,7 @@ await invoke("/wpx2", [sx + sw / 2, sy + sh / 2, sw / 2, sh / 2]);
 await invoke("/wpy2", [sx + sw / 2, sy, sw / 2, sh / 2]);
 // Ordinary AppKit retains a visible strip when this small window would be fully offscreen.
 await assert.rejects(
-  handler.call({ focusedAppId: appId, input: "/wpx-1" }, "position", "-1"),
+  handler.call({ focusedAppId: appId, input: "/wpx-1" }, "POSITION", "-1"),
   /constrained.*requested/s,
 );
 await invoke("/wpx2", [sx + sw / 2, sy, sw / 2, sh / 2]);

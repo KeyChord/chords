@@ -42,14 +42,14 @@ const select = buildSelectionHandler();
 async function hover(sequence: string) {
   await select.call(
     { focusedAppId: app, event: { type: "keydown", key: sequence.at(-1)!, repeat: false } },
-    "keydown",
+    "KEYDOWN",
     sequence,
   );
   return cursor();
 }
 async function click(sequence: string, expected: string) {
   await Bun.write(output, "pending");
-  await select.call({ focusedAppId: app, event: null }, "input", sequence);
+  await select.call({ focusedAppId: app, event: null }, "INPUT", sequence);
   await waitFor(async () => ((await Bun.file(output).text()) === expected ? true : undefined));
 }
 
@@ -75,7 +75,7 @@ assert.ok(lastMenu.x < firstTray.x);
 let trayCount = 0;
 for (; trayCount < 200; trayCount++) {
   try {
-    await runMenuBarAction({ scope: "tray", index: trayCount, steps: "" }, app);
+    await runMenuBarAction({ scope: "TRAY", index: trayCount, steps: "" }, app);
   } catch (error) {
     assert.match(String(error), /could not find tray menu bar item at index/);
     break;
@@ -83,7 +83,7 @@ for (; trayCount < 200; trayCount++) {
 }
 assert.ok(trayCount > 0 && trayCount < 200);
 await assert.rejects(
-  runMenuBarAction({ scope: "tray", index: -trayCount - 1, steps: "" }, app),
+  runMenuBarAction({ scope: "TRAY", index: -trayCount - 1, steps: "" }, app),
   /could not find tray menu bar item/,
 );
 await assert.rejects(
@@ -92,7 +92,7 @@ await assert.rejects(
 );
 await assert.rejects(buildTrayHandler()("HOVER", trayCount), /could not find tray menu bar item/);
 await assert.rejects(
-  runMenuBarAction({ scope: "menu", index: menus.length, steps: "" }, app),
+  runMenuBarAction({ scope: "MENU", index: menus.length, steps: "" }, app),
   /could not find menu menu bar item/,
 );
 assert.deepEqual(await hover(trayCount + "r[[[["), firstTray);
@@ -111,7 +111,7 @@ for (const sequence of ["=[f.", "=[z-o2."]) {
     return match && binding["@input:menu"] ? [{ match, args: binding["@input:menu"] }] : [];
   });
   assert.equal(matches.length, 1);
-  await menu("by-letters", matches[0].args[1].replace("$1", matches[0].match[1]));
+  await menu("BY_LETTERS", matches[0].args[1].replace("$1", matches[0].match[1]));
 }
 await waitFor(async () => ((await Bun.file(output).text()) === "Zoom Original" ? true : undefined));
 if (!(await probe("display"))[0].notch) {

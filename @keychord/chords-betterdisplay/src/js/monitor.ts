@@ -108,18 +108,58 @@ async function pointerDisplay(command: Command): Promise<string> {
   return [...targets][0]!;
 }
 
-async function waitFor(command: Command, args: string[], expected: string): Promise<void> {
+function singleValue(output: string): string {
+  // The CLI can report both a virtual definition and its linked display.
+  // Accept repeated identical values, but retain disagreements for validation.
+  const values = output.split(",").map((value) => value.trim());
+  return values.every((value) => value === values[0]) ? values[0] : output;
+}
+
+async function waitFor(
+  command: Command,
+  args: string[],
+  expected: string | RegExp,
+): Promise<string> {
   const deadline = Date.now() + 5_000;
   let actual: string | undefined;
   do {
     actual = await optional(command, args);
-    if (actual === expected) return;
+    if (actual !== undefined) actual = singleValue(actual);
+    if (
+      actual !== undefined &&
+      (typeof expected === "string" ? actual === expected : expected.test(actual))
+    ) {
+      return actual;
+    }
     await new Promise((resolve) => setTimeout(resolve, 100));
   } while (Date.now() < deadline);
   throw new Error(`BetterDisplay did not apply ${expected} (reported ${actual ?? "unavailable"})`);
 }
 
 const screen = (tagID: string) => ["--type=VirtualScreen", `--tagID=${tagID}`];
+
+async function selectVirtualResolution(
+  command: Command,
+  virtual: string[],
+  resolution: string,
+): Promise<void> {
+  await waitFor(command, ["get", ...virtual, "--connected"], "on");
+  // macOS can initially choose a pixel-doubled LoDPI mode instead of the
+  // requested HiDPI desktop, particularly at smaller sizes such as 720x864.
+  const initial = await waitFor(
+    command,
+    ["get", ...virtual, "--resolution"],
+    /^[1-9]\d*x[1-9]\d*$/,
+  );
+  if (
+    initial !== resolution ||
+    singleValue(await command(["get", ...virtual, "--hiDPI"])) !== "on"
+  ) {
+    await command(["set", ...virtual, `--resolution=${resolution}`, "--hiDPI=on"]);
+  }
+  await waitFor(command, ["get", ...virtual, "--resolution"], resolution);
+  await waitFor(command, ["get", ...virtual, "--hiDPI"], "on");
+}
 
 async function setResolution(command: Command, resolution: string): Promise<void> {
   const target = await pointerDisplay(command);
@@ -172,7 +212,7 @@ async function setResolution(command: Command, resolution: string): Promise<void
           "--connected=off",
         ]);
         await command(["set", ...virtual, "--connected=on"]);
-        await waitFor(command, ["get", ...virtual, "--resolution"], resolution);
+        await selectVirtualResolution(command, virtual, resolution);
         await command(["set", ...virtual, "--mirror=on", `--targetUUID=${target}`]);
         await waitFor(command, ["get", ...virtual, "--mirror", `--targetUUID=${target}`], "on");
       }
@@ -200,9 +240,7 @@ async function setResolution(command: Command, resolution: string): Promise<void
     }
     for (const entry of suspended) {
       await restore(() => command(["set", ...screen(entry.tagID), "--connected=on"]));
-      await restore(() =>
-        waitFor(command, ["get", ...screen(entry.tagID), "--resolution"], entry.resolution),
-      );
+      await restore(() => selectVirtualResolution(command, screen(entry.tagID), entry.resolution));
       await restore(() =>
         command(["set", ...screen(entry.tagID), "--mirror=on", `--targetUUID=${target}`]),
       );

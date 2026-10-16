@@ -1,21 +1,21 @@
-name = "Raycast"
+name = 'Raycast'
 
 [meta]
-url = "https://manual.raycast.com/keyboard-shortcuts"
+url = 'https://manual.raycast.com/keyboard-shortcuts'
 
 [on.raycast]
-file = "raycast.js"
+file = 'raycast.js'
 
 [chords]
-'//(.*)' = { name = "Raycast: Search $1", '@input:raycast' = ['$1'] }
+'//(.*)' = { name = 'Raycast: Search $1', '@input:raycast' = ['$1'] }
 
-'nn' = { name = "Navigate: North", shortcut = "up" }
-'ne' = { name = "Navigate: East", shortcut = "right" }
-'ns' = { name = "Navigate: South", shortcut = "down" }
-'nw' = { name = "Navigate: West", shortcut = "left" }
+'nn' = { name = 'Navigate: North', shortcut = 'up' }
+'ne' = { name = 'Navigate: East', shortcut = 'right' }
+'ns' = { name = 'Navigate: South', shortcut = 'down' }
+'nw' = { name = 'Navigate: West', shortcut = 'left' }
 
-'p[' = { name = "Page: Previous", shortcut = "alt+up" }
-'p]' = { name = "Page: Next", shortcut = "alt+down" }
+'p[' = { name = 'Page: Previous', shortcut = 'alt+up' }
+'p]' = { name = 'Page: Next', shortcut = 'alt+down' }
 
-'s[' = { name = "Section: Previous", shortcut = "cmd+up" }
-'s]' = { name = "Section: Next", shortcut = "cmd+down" }
+'s[' = { name = 'Section: Previous', shortcut = 'cmd+up' }
+'s]' = { name = 'Section: Next', shortcut = 'cmd+down' }

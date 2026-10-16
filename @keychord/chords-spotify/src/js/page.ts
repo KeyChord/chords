@@ -3,17 +3,17 @@ import { buildSpotifyNavigationJavaScript, type SpotifyNavigationAction } from "
 import { buildSpotifyNowPlayingJavaScript, type SpotifyNowPlayingAction } from "./now-playing-view";
 
 export type SpotifyTrackAction =
-  | "more"
-  | "remove"
-  | "queue"
-  | "exclude"
-  | "jam"
-  | "song-radio"
-  | "artist"
-  | "album"
-  | "credits"
-  | "copy-link"
-  | "embed";
+  | "MORE"
+  | "REMOVE"
+  | "QUEUE"
+  | "EXCLUDE"
+  | "JAM"
+  | "SONG_RADIO"
+  | "ARTIST"
+  | "ALBUM"
+  | "CREDITS"
+  | "COPY_LINK"
+  | "EMBED";
 
 // Serialized into Spotify's renderer; keep every dependency inside this function.
 async function runInPage(action: SpotifyTrackAction, index: number): Promise<string> {
@@ -103,29 +103,29 @@ async function runInPage(action: SpotifyTrackAction, index: number): Promise<str
       () => menus().find((candidate) => items(candidate).length > 0),
       `Spotify did not open the menu for playlist track #${index}.`,
     );
-    if (action === "more") return JSON.stringify({ ok: true });
+    if (action === "MORE") return JSON.stringify({ ok: true });
 
-    const labels: Record<Exclude<SpotifyTrackAction, "more">, string[]> = {
-      remove: [
+    const labels: Record<Exclude<SpotifyTrackAction, "MORE">, string[]> = {
+      REMOVE: [
         "Remove from this playlist",
         "Remove from playlist",
         ...(list.getAttribute("aria-label") === "Liked Songs"
           ? ["Remove from Liked Songs", "Remove from your Liked Songs"]
           : []),
       ],
-      queue: ["Add to queue"],
-      exclude: ["Exclude from your taste profile"],
-      jam: ["Start a Jam"],
-      "song-radio": ["Go to song radio"],
-      artist: ["Go to artist"],
-      album: ["Go to album"],
-      credits: ["View credits"],
-      "copy-link": ["Copy link to Song", "Copy song link"],
-      embed: ["Embed track"],
+      QUEUE: ["Add to queue"],
+      EXCLUDE: ["Exclude from your taste profile"],
+      JAM: ["Start a Jam"],
+      SONG_RADIO: ["Go to song radio"],
+      ARTIST: ["Go to artist"],
+      ALBUM: ["Go to album"],
+      CREDITS: ["View credits"],
+      COPY_LINK: ["Copy link to Song", "Copy song link"],
+      EMBED: ["Embed track"],
     };
     const wanted = labels[action];
     let scope = menu;
-    if (action === "copy-link" || action === "embed") {
+    if (action === "COPY_LINK" || action === "EMBED") {
       const share = items(menu).find((item) => label(item) === "Share");
       if (
         !share ||
@@ -161,26 +161,26 @@ export function buildSpotifyJavaScript(
   action: SpotifyTrackAction | SpotifyBarAction | SpotifyNavigationAction | SpotifyNowPlayingAction,
   index?: string | number,
 ): string {
-  if (action === "liked-songs") return buildSpotifyNavigationJavaScript();
-  if (action.startsWith("np-")) {
+  if (action === "LIKED_SONGS") return buildSpotifyNavigationJavaScript();
+  if (action.startsWith("NP_")) {
     return buildSpotifyNowPlayingJavaScript(action as SpotifyNowPlayingAction);
   }
-  if (action.startsWith("bar-")) {
+  if (action.startsWith("BAR_")) {
     return buildSpotifyBarJavaScript(action as SpotifyBarAction, index);
   }
   if (
     ![
-      "more",
-      "remove",
-      "queue",
-      "exclude",
-      "jam",
-      "song-radio",
-      "artist",
-      "album",
-      "credits",
-      "copy-link",
-      "embed",
+      "MORE",
+      "REMOVE",
+      "QUEUE",
+      "EXCLUDE",
+      "JAM",
+      "SONG_RADIO",
+      "ARTIST",
+      "ALBUM",
+      "CREDITS",
+      "COPY_LINK",
+      "EMBED",
     ].includes(action)
   ) {
     throw new Error(`Unknown Spotify action: ${action}`);

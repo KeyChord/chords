@@ -49,28 +49,28 @@ function run(action: YouTubeAction, seconds?: string | number) {
 }
 
 test("seek uses absolute seconds and does not seek a preview video", () => {
-  expect(run("seek", "30")).toEqual({ ok: true });
+  expect(run("SEEK", "30")).toEqual({ ok: true });
   expect(video.currentTime).toBe(30);
   expect(player.seekTo).toHaveBeenCalledWith(30, true);
   expect(window.document.querySelector<HTMLVideoElement>("#preview")!.currentTime).toBe(0);
 });
 
 test("seek clamps to the last playable whole second and supports zero", () => {
-  run("seek", "999");
+  run("SEEK", "999");
   expect(video.currentTime).toBe(119);
-  run("seek", "0");
+  run("SEEK", "0");
   expect(video.currentTime).toBe(0);
 });
 
 test("fractional video durations clamp to their last playable whole second", () => {
   Object.defineProperty(video, "duration", { value: 372.941 });
-  run("seek", "999");
+  run("SEEK", "999");
   expect(video.currentTime).toBe(372);
 });
 
 test("seek falls back to the media element when the player API is unavailable", () => {
   delete player.seekTo;
-  expect(run("seek", "45").ok).toBe(true);
+  expect(run("SEEK", "45").ok).toBe(true);
   expect(video.currentTime).toBe(45);
 });
 
@@ -78,7 +78,7 @@ test.each([NaN, Infinity, 0, -1])(
   "does not seek a video with unavailable duration %s",
   (duration) => {
     Object.defineProperty(video, "duration", { value: duration });
-    expect(run("seek", "30")).toEqual({
+    expect(run("SEEK", "30")).toEqual({
       ok: false,
       error: "This video does not have a seekable duration yet.",
     });
@@ -98,16 +98,16 @@ test.each([
   -1,
   Number.MAX_SAFE_INTEGER + 1,
 ])("rejects invalid seek input %s before generating browser code", (input) => {
-  expect(() => buildYouTubeJavaScript("seek", input)).toThrow("non-negative safe integer");
+  expect(() => buildYouTubeJavaScript("SEEK", input)).toThrow("non-negative safe integer");
 });
 
 test("play and halt are idempotent and work while the search input has focus", () => {
   window.document.querySelector<HTMLInputElement>("#search")!.focus();
-  run("play");
-  run("play");
+  run("PLAY");
+  run("PLAY");
   expect(video.paused).toBe(false);
-  run("pause");
-  run("pause");
+  run("PAUSE");
+  run("PAUSE");
   expect(video.paused).toBe(true);
   expect(window.document.activeElement?.id).toBe("search");
 });
@@ -115,19 +115,19 @@ test("play and halt are idempotent and work while the search input has focus", (
 test("the play fallback does not claim success when its control is missing", () => {
   delete player.playVideo;
   player.querySelector(".ytp-play-button")!.remove();
-  expect(run("play")).toEqual({
+  expect(run("PLAY")).toEqual({
     ok: false,
     error: "The play control is unavailable for this video.",
   });
 });
 
 const toggles: [YouTubeAction, string][] = [
-  ["mute", "ytp-mute-button"],
-  ["autoplay", "ytp-autonav-toggle-button"],
-  ["captions", "ytp-subtitles-button"],
-  ["settings", "ytp-settings-button"],
-  ["theater", "ytp-size-button"],
-  ["fullscreen", "ytp-fullscreen-button"],
+  ["MUTE", "ytp-mute-button"],
+  ["AUTOPLAY", "ytp-autonav-toggle-button"],
+  ["CAPTIONS", "ytp-subtitles-button"],
+  ["SETTINGS", "ytp-settings-button"],
+  ["THEATER", "ytp-size-button"],
+  ["FULLSCREEN", "ytp-fullscreen-button"],
 ];
 
 test.each(toggles)("%s toggles its player control both ways", (action, className) => {
@@ -167,7 +167,7 @@ test.each(["disabled", "aria-disabled", "hidden", "display", "visibility", "miss
         button.remove();
         break;
     }
-    expect(run("captions")).toEqual({
+    expect(run("CAPTIONS")).toEqual({
       ok: false,
       error: "The captions control is unavailable for this video.",
     });
@@ -177,7 +177,7 @@ test.each(["disabled", "aria-disabled", "hidden", "display", "visibility", "miss
 
 test("the home page reports that a video needs to be opened", () => {
   player.remove();
-  expect(run("play")).toEqual({
+  expect(run("PLAY")).toEqual({
     ok: false,
     error: "Open a YouTube video before using video chords.",
   });
@@ -187,7 +187,7 @@ test("search focuses and selects the existing query without requiring a video", 
   player.remove();
   const input = window.document.querySelector<HTMLInputElement>("#search")!;
   input.value = "existing query";
-  expect(run("search")).toEqual({ ok: true });
+  expect(run("SEARCH")).toEqual({ ok: true });
   expect(window.document.activeElement).toBe(input);
   expect(input.selectionStart).toBe(0);
   expect(input.selectionEnd).toBe(input.value.length);
@@ -195,7 +195,7 @@ test("search focuses and selects the existing query without requiring a video", 
 
 test("an unrelated Brave tab is not modified", () => {
   window.location.href = "https://youtube.com.example.com/watch?v=test";
-  expect(run("play")).toEqual({ ok: false, error: "The active Brave window is not YouTube." });
+  expect(run("PLAY")).toEqual({ ok: false, error: "The active Brave window is not YouTube." });
   expect(player.playVideo).not.toHaveBeenCalled();
 });
 

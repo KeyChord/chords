@@ -1,6 +1,6 @@
-name = "Rider"
+name = 'Rider'
 
 [[import]]
-file = "base.toml"
+file = 'base.toml'
 [import.override.meta]
-'$execPath' = "/Applications/Rider.app/Contents/MacOS/rider"
+'$execPath' = '/Applications/Rider.app/Contents/MacOS/rider'

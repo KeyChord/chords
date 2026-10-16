@@ -48,7 +48,7 @@ function router(pathname: string, state: object = {}) {
 }
 
 async function run(): Promise<{ ok: boolean; error?: string }> {
-  return JSON.parse(await window.eval(buildSpotifyJavaScript("liked-songs")));
+  return JSON.parse(await window.eval(buildSpotifyJavaScript("LIKED_SONGS")));
 }
 
 test.each([

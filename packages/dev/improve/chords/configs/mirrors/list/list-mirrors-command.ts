@@ -4,7 +4,7 @@ import { listMirrors } from "#list-mirrors";
 export const listMirrorsCommand = defineCommand({
   meta: {
     name: "_list-mirrors",
-    description: "List mirror destinations declared by packages.",
+    description: "List the KeyChord mirror for every directory under @keychord/.",
   },
   args: {
     "packages-directory": {

@@ -23,10 +23,10 @@ try {
     JSON.parse((await runCommand([binary])).stdout);
   const initial = await state();
   const handler = buildMonitorHandler();
-  await handler(initial.current.join("x"), "size");
+  await handler(initial.current.join("x"), "SIZE");
   assert.deepEqual((await state()).current, initial.current);
   await assert.rejects(
-    handler("2000x200", "size"),
+    handler("2000x200", "SIZE"),
     /Unsupported monitor resolution.*Available resolutions/s,
   );
   assert.deepEqual((await state()).current, initial.current);
@@ -35,10 +35,10 @@ try {
   );
   if (alternate) {
     try {
-      await handler(alternate.join("x"), "size");
+      await handler(alternate.join("x"), "SIZE");
       assert.deepEqual((await state()).current, alternate);
     } finally {
-      await handler(initial.current.join("x"), "size");
+      await handler(initial.current.join("x"), "SIZE");
     }
     assert.deepEqual((await state()).current, initial.current);
     console.log(

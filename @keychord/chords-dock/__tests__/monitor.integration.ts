@@ -20,7 +20,7 @@ const handler = buildMonitorHandler();
 await assert.rejects(handler("999999"), /does not exist/);
 await handler("1");
 await waitFor(async () => ((await state()).frontmostAppId === appId ? true : undefined));
-for (const target of ["previous", "next", "1"]) {
+for (const target of ["PREVIOUS", "NEXT", "1"]) {
   await handler(target);
   await waitFor(async () => {
     const current = await state();

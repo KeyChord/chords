@@ -5,10 +5,10 @@
  */
 import addon from "./menu.node";
 
-export type TrayClickType = "left" | "right";
+export type TrayClickType = "LEFT" | "RIGHT";
 
 export type MenuBarSelection = {
-  scope: "menu" | "tray";
+  scope: "MENU" | "TRAY";
   /** Menu indexes start at Apple (0); tray indexes are zero-based within the tray. */
   index: number;
   steps: string;
@@ -62,7 +62,7 @@ export async function runTrayAction(...args: TrayAction): Promise<void> {
   return addon.runTrayAction(
     type,
     value === undefined ? "" : String(value),
-    action ?? (type === "ITEM" ? "left" : ""),
+    action ?? (type === "ITEM" ? "LEFT" : ""),
   );
 }
 

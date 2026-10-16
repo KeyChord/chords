@@ -39,14 +39,14 @@ hiding through System Events; macOS may request Automation access on first use.
 ```ts
 import buildMenuHandler from "@keychord/chords-menu/js/menu.js";
 const menu = buildMenuHandler();
-await menu.call({ focusedAppId: "com.apple.Safari" }, "search", "New Window");
-await menu("by-index", 1);
-await menu("by-letters", "f");
-await menu("by-path", ["Window"]);
-await menu("by-path", ["File", "New Window"]);
+await menu.call({ focusedAppId: "com.apple.Safari" }, "SEARCH", "New Window");
+await menu("BY_INDEX", 1);
+await menu("BY_LETTERS", "f");
+await menu("BY_PATH", ["Window"]);
+await menu("BY_PATH", ["File", "New Window"]);
 ```
 
-`by-index` uses zero-based menu indexes. `by-path` accepts one or more exact titles.
+`BY_INDEX` uses zero-based menu indexes. `BY_PATH` accepts one or more exact titles.
 Handlers capture the resolved application's bundle identifier from Chord's context
 and return promises that callers should await. Native operations run on Swift's
 main actor and complete on the originating JavaScript queue.
@@ -55,7 +55,7 @@ main actor and complete on the originating JavaScript queue.
 
 ```toml
 '@input:tray' = ['ITEM', 0]                  # First item; negative indexes count from the right
-'@input:tray' = ['ITEM', -1, 'right']        # Last item, right click
+'@input:tray' = ['ITEM', -1, 'RIGHT']        # Last item, right click
 '@input:tray' = ['HOVER', 0]               # Move the pointer over the first tray item without clicking
 '@input:tray' = ['NOTCH']                  # Click the main display's hardware notch
 '@input:tray' = ['BATTERY']                # Power / Battery menu
@@ -79,7 +79,7 @@ options toggle their accessibility controls. Controls absent on a particular Mac
 unavailable-control error. Display Settings uses `=cds`; `=cd.` expands the section.
 
 The exported `runMenuBarAction({ scope, index, steps, clickType? }, focusedAppId?)` powers
-numeric selection. `scope` is `menu` or `tray`; menu native indexes start at
+numeric selection. `scope` is `MENU` or `TRAY`; menu native indexes start at
 Apple (0), and tray native indexes are zero-based. Negative indexes count from the right;
 `steps` contains bracket movements, and omitting `clickType` previews without activating.
 The selection handler forwards Chord's captured application identifier for menu discovery.

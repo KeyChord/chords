@@ -1,8 +1,8 @@
-name = "Microsoft Edge"
+name = 'Microsoft Edge'
 
 [on.js]
 file = 'chrome.js'
 args = ['/Applications/Microsoft Edge.app']
 
 [[import]]
-file = "base.toml"
+file = 'base.toml'

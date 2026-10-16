@@ -1,0 +1,14 @@
+{
+  "name": "@keychord/chords-finder",
+  "version": "0.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KeyChord/chords-finder"
+  },
+  "type": "module",
+  "devDependencies": {
+    "@keychord/chordtest": "workspace:*",
+    "@keychord/config": "catalog:"
+  },
+  "packageManager": "pnpm@12.11.2"
+}
