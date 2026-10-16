@@ -6,6 +6,7 @@ var repository = {
 	"url": "https://github.com/KeyChord/chords-com.apple"
 };
 var type = "module";
+var scripts = { "test": "bun test --isolate" };
 var dependencies = {
 	"@keychord/chords-click": "workspace:*",
 	"@keychord/chords-menu": "workspace:*",
@@ -2064,10 +2065,11 @@ var package_default = {
 	version,
 	repository,
 	type,
+	scripts,
 	dependencies,
 	devDependencies,
 	packageManager,
 	chords
 };
 //#endregion
-export { chords, package_default as default, dependencies, devDependencies, name, packageManager, repository, type, version };
+export { chords, package_default as default, dependencies, devDependencies, name, packageManager, repository, scripts, type, version };

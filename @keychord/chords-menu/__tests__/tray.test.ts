@@ -15,18 +15,8 @@ const nativeSelection = mock(
 const openAddon = mock(() => ({
   default: { runTrayAction: nativeAction, runMenuBarAction: nativeSelection },
 }));
-mock.module("tray-native-mock", openAddon);
-// These tests load source without the bundler's native-addon plugin.
-// Redirect its native import to a mocked JavaScript module.
-Bun.plugin({
-  name: "tray-native-mock",
-  setup(builder) {
-    builder.onLoad({ filter: /\/src\/js\/tray\.ts$/ }, async ({ path }) => ({
-      loader: "ts",
-      contents: (await Bun.file(path).text()).replace('"./menu.node"', '"tray-native-mock"'),
-    }));
-  },
-});
+// The chordtest preload stubs the handler's native import; replace it with the mocked addon.
+mock.module("../src/js/menu.node", openAddon);
 const { default: buildHandler } = await import("../src/js/tray.ts");
 const handler = buildHandler();
 const { default: buildSelectionHandler, parseMenuBarSelection } =

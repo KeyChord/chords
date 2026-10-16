@@ -1,17 +1,16 @@
-import { execFileSync } from "node:child_process";
-import { readFileSync } from "node:fs";
-import { beforeEach, expect, test, vi } from "vite-plus/test";
+import { beforeEach, expect, mock, test } from "bun:test";
+import { waitFor } from "@keychord/chordtest/test";
+import { chordPattern } from "@keychord/chordtest/patterns";
 import type { WhatsAppAction } from "../src/js/whatsapp";
 import { cases } from "./cases";
 
-const { perform, click, getAppWindows } = vi.hoisted(() => ({
-  perform: vi.fn(),
-  click: vi.fn(),
-  getAppWindows: vi.fn(),
-}));
-vi.mock("../src/js/whatsapp.node", () => ({ default: { perform } }));
-vi.mock("chord", () => ({ click, getAppWindows }));
-import buildWhatsAppHandler from "../src/js/whatsapp";
+const perform = mock();
+const click = mock();
+const getAppWindows = mock();
+mock.module("../src/js/whatsapp.node", () => ({ default: { perform } }));
+mock.module("chord", () => ({ click, getAppWindows }));
+// Import after the mocks, as vitest's hoisted vi.mock did.
+const { default: buildWhatsAppHandler } = await import("../src/js/whatsapp");
 
 beforeEach(() => {
   perform.mockReset().mockResolvedValue("");
@@ -19,26 +18,13 @@ beforeEach(() => {
   getAppWindows.mockReset().mockReturnValue([]);
 });
 
-test("all existing executable chords go through the WhatsApp handler", async () => {
-  const definitions = JSON.parse(
-    execFileSync(
-      "bun",
-      ["-e", "console.log(JSON.stringify(Bun.TOML.parse(await Bun.stdin.text())))"],
-      {
-        input: readFileSync(
-          new URL("../chords/net/whatsapp/WhatsApp/macos.toml", import.meta.url),
-          "utf8",
-        ),
-        encoding: "utf8",
-      },
-    ),
-  );
+test("every non-hint chord is implemented and covered", async () => {
+  const definitions = Bun.TOML.parse(
+    await Bun.file(new URL("../chords/net/whatsapp/WhatsApp/macos.toml", import.meta.url)).text(),
+  ) as { on: unknown; chords: Record<string, unknown> };
   expect(definitions.on).toEqual({ whatsapp: { file: "whatsapp.js" } });
   const handler = buildWhatsAppHandler();
-  const bindings = Object.entries(definitions.chords).filter(
-    ([chord, binding]) =>
-      !chord.startsWith("?") && Object.keys(binding as object).some((key) => key !== "name"),
-  );
+  const bindings = Object.entries(definitions.chords).filter(([chord]) => !chord.startsWith("?"));
   expect(bindings.map(([chord]) => chord).sort()).toEqual(
     cases.map((scenario) => scenario.chord).sort(),
   );
@@ -56,6 +42,23 @@ test("all existing executable chords go through the WhatsApp handler", async () 
   }
 });
 
+test.each([
+  ["ci(\\d+)", "ci12", "12"],
+  ["cgc.(\\d+)", "cgc.12", "12"],
+  ["gc(\\d+)", "gc12", "12"],
+  ["gch(\\d+)", "gch12", "12"],
+  ["gca(\\d+)", "gca12", "12"],
+  ["gcu(\\d+)", "gcu12", "12"],
+  ["gcf(\\d+)", "gcf12", "12"],
+  ["gcg(\\d+)", "gcg1", "1"],
+] as const)("%s captures the position from %s using Chord's grammar", async (key, input, index) => {
+  const definitions = Bun.TOML.parse(
+    await Bun.file(new URL("../chords/net/whatsapp/WhatsApp/macos.toml", import.meta.url)).text(),
+  ) as { chords: Record<string, unknown> };
+  expect(definitions.chords[key]).toBeDefined();
+  expect(chordPattern(key).exec(input)?.[1]).toBe(index);
+});
+
 test.each(cases)(
   "$chord dispatches $action through the native UI bridge",
   async ({ action, index, input }) => {
@@ -63,10 +66,32 @@ test.each(cases)(
     expect(perform).toHaveBeenCalled();
     for (const [app, json] of perform.mock.calls) {
       expect(app).toBe("net.whatsapp.WhatsApp");
-      expect(JSON.parse(json)[0].kind).toMatch(/^(MENU|ELEMENT|CHAT|GRID|DEVICE|DISMISS_POPOVER)$/);
+      expect(JSON.parse(json)[0].kind).toMatch(
+        /^(MENU|ELEMENT|CHAT|PARTICIPANT|GRID|DEVICE|DISMISS_POPOVER|GROUP_PERMISSIONS|VERIFY)$/,
+      );
     }
   },
 );
+
+test("group permissions verifies the destination after its row is invoked", async () => {
+  await buildWhatsAppHandler()("GROUP_PERMISSIONS");
+  const steps = perform.mock.calls.flatMap(([, json]) => JSON.parse(json));
+  expect(steps.at(-2)).toMatchObject({
+    kind: "GROUP_PERMISSIONS",
+    scope: "contact-info-view-content-stack-view",
+    scopeParent: true,
+    scroll: true,
+    unlessAny: [
+      { description: "Group permissions", role: "AXHeading" },
+      { description: "Group settings", role: "AXHeading" },
+    ],
+  });
+  expect(steps.at(-1)).toEqual({
+    kind: "VERIFY",
+    descriptions: ["Group permissions", "Group settings"],
+    role: "AXHeading",
+  });
+});
 
 test.each([undefined, 0, "00", "10", "1", "123", "1,0", "1,,2", "1,2junk"])(
   "invalid palette position %s performs no action",
@@ -115,11 +140,15 @@ test("commands wait for completion and continue after a rejected action", async 
   );
   const handler = buildWhatsAppHandler();
   const first = handler("CHAT_INFO");
-  const failed = expect(first).rejects.toThrow("disabled");
+  // Bun's `expect(promise).rejects` blocks until the promise settles; capture the error instead.
+  const failed = first.then(
+    () => undefined,
+    (error: unknown) => error,
+  );
   const second = handler("VIEW_CHATS");
-  await vi.waitFor(() => expect(perform).toHaveBeenCalledTimes(1));
+  await waitFor(() => expect(perform).toHaveBeenCalledTimes(1));
   reject(new Error("disabled"));
-  await failed;
+  expect(String(await failed)).toContain("disabled");
   await second;
   expect(perform).toHaveBeenCalledTimes(2);
 });
@@ -130,7 +159,99 @@ test.each([undefined, 0, -1, 1.5, "01", "1junk", "9007199254740992", Infinity, N
     await expect(buildWhatsAppHandler()("CHAT_SWITCH", index)).rejects.toThrow(
       "positive safe integer",
     );
+    await expect(buildWhatsAppHandler()("CHAT_INFO_AT", index)).rejects.toThrow(
+      "positive safe integer",
+    );
     expect(perform).not.toHaveBeenCalled();
+  },
+);
+
+test("numbered chat info selects its chat before opening the info dialog", async () => {
+  await buildWhatsAppHandler()("CHAT_INFO_AT", "12");
+  expect(perform.mock.calls.flatMap(([, json]) => JSON.parse(json))).toEqual([
+    expect.objectContaining({
+      kind: "ELEMENT",
+      scope: "contact-info-view-content-stack-view",
+      description: "close",
+    }),
+    { kind: "MENU", scope: "com.apple.menu.application", identifiers: ["open_main_window"] },
+    { kind: "MENU", scope: "com.apple.menu.view", identifiers: ["chats"] },
+    { kind: "CHAT", index: 12 },
+    expect.objectContaining({ kind: "MENU", identifiers: ["contact_info", "group_info"] }),
+  ]);
+});
+
+test.each([
+  ["VIEW_CHATS", { kind: "MENU", scope: "com.apple.menu.view", identifiers: ["chats"] }],
+  ["VIEW_ARCHIVED", { kind: "ELEMENT", identifiers: ["SidebarButton_Archived"] }],
+  ["VIEW_CHATS_ALL", { kind: "ELEMENT", description: "All" }],
+  ["VIEW_CHATS_UNREAD", { kind: "ELEMENT", description: "Unread" }],
+  ["VIEW_CHATS_FAVOURITES", { kind: "ELEMENT", description: "Favourites" }],
+  ["VIEW_CHATS_GROUPS", { kind: "ELEMENT", description: "Groups" }],
+] as const)("%s opens its view before selecting a numbered chat", async (action, destination) => {
+  const handler = buildWhatsAppHandler();
+  for (const index of [1, 12]) {
+    perform.mockClear();
+    await handler(action, String(index));
+    const steps = perform.mock.calls.flatMap(([, json]) => JSON.parse(json));
+    expect(steps[0]).toMatchObject({
+      kind: "ELEMENT",
+      scope: "contact-info-view-content-stack-view",
+      description: "close",
+    });
+    expect(steps[1]).toEqual({
+      kind: "MENU",
+      scope: "com.apple.menu.application",
+      identifiers: ["open_main_window"],
+    });
+    expect(steps.at(-2)).toMatchObject(destination);
+    expect(steps.at(-1)).toEqual({ kind: "CHAT", index });
+  }
+  perform.mockClear();
+  for (const index of [0, -1, 1.5, "00", "01", "1junk", "9007199254740992", Infinity, NaN]) {
+    await expect(handler(action, index)).rejects.toThrow("positive safe integer");
+  }
+  expect(perform).not.toHaveBeenCalled();
+});
+
+test("a numbered group waits for the Groups filter before selecting its chat", async () => {
+  let filtered!: () => void;
+  perform
+    .mockResolvedValueOnce("")
+    .mockResolvedValueOnce("")
+    .mockResolvedValueOnce("")
+    .mockImplementationOnce(
+      () =>
+        new Promise<string>((resolve) => {
+          filtered = () => resolve("");
+        }),
+    );
+  const pending = buildWhatsAppHandler()("VIEW_CHATS_GROUPS", "1");
+  await waitFor(() => expect(perform).toHaveBeenCalledTimes(4));
+  expect(JSON.parse(perform.mock.lastCall![1])[0]).toMatchObject({ description: "Groups" });
+  filtered();
+  await pending;
+  expect(JSON.parse(perform.mock.lastCall![1])).toEqual([{ kind: "CHAT", index: 1 }]);
+});
+
+test.each([
+  ["CHAT_INFO_BLOCK", "Block"],
+  ["CHAT_INFO_BLOCK_REPORT", "Block and report"],
+  ["CHAT_INFO_UNBLOCK", "Unblock"],
+] as const)(
+  "%s invokes only its named confirmation in the action sheet",
+  async (action, description) => {
+    await buildWhatsAppHandler()(action);
+    expect(JSON.parse(perform.mock.lastCall![1])[0]).toMatchObject({
+      kind: "ELEMENT",
+      scope: "ActionSheet_TitleLabel",
+      scopeParent: true,
+      description,
+      role: "AXButton",
+    });
+    expect(JSON.parse(perform.mock.lastCall![1])[0].optional).toBe(
+      action === "CHAT_INFO_UNBLOCK" ? true : undefined,
+    );
   },
 );
 
@@ -144,6 +265,16 @@ test("chat index validation and unknown actions never poison the queue", async (
       index,
     });
   }
+});
+
+test("invalid group member indices never open or change a picker", async () => {
+  const handler = buildWhatsAppHandler();
+  for (const index of [undefined, 0, -1, 1.5, "01", "12junk", "9007199254740992"]) {
+    await expect(handler("CHAT_GROUP_SELECT", index)).rejects.toThrow("positive safe integer");
+  }
+  expect(perform).not.toHaveBeenCalled();
+  await handler("CHAT_GROUP_SELECT", "12");
+  expect(JSON.parse(perform.mock.lastCall![1])).toEqual([{ kind: "PARTICIPANT", index: 12 }]);
 });
 
 test.each([
@@ -192,7 +323,8 @@ test("text controls use a click in the matching WhatsApp window", async () => {
   getAppWindows.mockReturnValue([{ windowId: 12, processId: 42, bounds }]);
   await buildWhatsAppHandler()("VIEW_ARCHIVED");
   expect(getAppWindows).toHaveBeenCalledWith("net.whatsapp.WhatsApp");
-  expect(click).toHaveBeenCalledExactlyOnceWith({
+  expect(click).toHaveBeenCalledTimes(1);
+  expect(click).toHaveBeenCalledWith({
     windowId: 12,
     x: 150,
     y: 220,
@@ -234,7 +366,7 @@ test("UI navigation waits for each click before resolving the next control", asy
   const handler = buildWhatsAppHandler();
   const first = handler("VIEW_PROFILE");
   const second = handler("CHAT_PIN");
-  await vi.waitFor(() => expect(click).toHaveBeenCalledTimes(1));
+  await waitFor(() => expect(click).toHaveBeenCalledTimes(1));
   expect(perform).toHaveBeenCalledTimes(2);
   finish();
   await Promise.all([first, second]);

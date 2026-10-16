@@ -1,16 +1,7 @@
-import { execFileSync } from "node:child_process";
-import { readFileSync } from "node:fs";
-import { expect, test } from "vite-plus/test";
+import { expect, test } from "bun:test";
 
-const definition = JSON.parse(
-  execFileSync(
-    "bun",
-    ["-e", "console.log(JSON.stringify(Bun.TOML.parse(await Bun.stdin.text())))"],
-    {
-      input: readFileSync(new URL("../chords/macos.toml", import.meta.url), "utf8"),
-      encoding: "utf8",
-    },
-  ),
+const definition = Bun.TOML.parse(
+  await Bun.file(new URL("../chords/macos.toml", import.meta.url)).text(),
 ) as { chords: Record<string, { shortcut?: string }> };
 
 test("Space chords use Mission Control shortcuts", () => {

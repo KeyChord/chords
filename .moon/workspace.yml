@@ -9,6 +9,7 @@ projects:
   chords-dock: "@keychord/chords-dock"
   chords-windows: "@keychord/chords-windows"
   chords-monitors: "@keychord/chords-monitors"
+  chords-navigation: "@keychord/chords-navigation"
 
 vcs:
   defaultBranch: main

@@ -7,6 +7,7 @@ var repository = {
 };
 var type = "module";
 var imports = { "#/*": "./src/js/*" };
+var scripts = { "test": "bun test --isolate" };
 var devDependencies = {
 	"@keychord/chordtest": "workspace:*",
 	"@keychord/config": "catalog:",
@@ -363,9 +364,10 @@ var package_default = {
 	repository,
 	type,
 	imports,
+	scripts,
 	devDependencies,
 	packageManager,
 	chords
 };
 //#endregion
-export { chords, package_default as default, devDependencies, imports, name, packageManager, repository, type, version };
+export { chords, package_default as default, devDependencies, imports, name, packageManager, repository, scripts, type, version };

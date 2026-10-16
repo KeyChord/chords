@@ -1,8 +1,6 @@
-import { readFileSync } from "node:fs";
-import { execFileSync } from "node:child_process";
+import { afterEach, expect, mock, test } from "bun:test";
 import { chordPattern } from "@keychord/chordtest/patterns";
-import type { MenuAction, MenuArguments } from "../src/js/menu";
-import { afterEach, expect, test, vi } from "vite-plus/test";
+import buildMenuHandler, { type MenuAction, type MenuArguments } from "../src/js/menu";
 
 type Binding = {
   name: string;
@@ -12,19 +10,11 @@ type Binding = {
   "@input:visibility"?: [];
   shortcut?: string;
 };
-function loadBindings(path: string): Record<string, Binding> {
-  return JSON.parse(
-    execFileSync(
-      "bun",
-      ["-e", "console.log(JSON.stringify(Bun.TOML.parse(await Bun.stdin.text()).chords))"],
-      {
-        input: readFileSync(new URL(path, import.meta.url), "utf8"),
-        encoding: "utf8",
-      },
-    ),
-  );
-}
-const bindings = loadBindings("../chords/macos.toml");
+const bindings = (
+  Bun.TOML.parse(await Bun.file(new URL("../chords/macos.toml", import.meta.url)).text()) as {
+    chords: Record<string, Binding>;
+  }
+).chords;
 const trayBindings = bindings;
 const menuBindings = Object.entries(bindings).filter(([, binding]) => binding["@input:menu"]);
 
@@ -46,9 +36,7 @@ function menuAction(sequence: string): [MenuAction, string] {
 }
 
 afterEach(() => {
-  vi.restoreAllMocks();
-  vi.doUnmock("../src/js/menu.node");
-  vi.resetModules();
+  mock.restore();
 });
 
 test.each([
@@ -62,9 +50,8 @@ test.each([
   ["=/Window > Move & Resize", "SEARCH", "Window > Move & Resize"],
   ["=/100% … 日本語", "SEARCH", "100% … 日本語"],
 ])("%s dispatches %s %s with the captured application", async (sequence, action, value) => {
-  const nativeAction = vi.fn().mockResolvedValue(undefined);
-  vi.doMock("../src/js/menu.node", () => ({ default: { runMenuAction: nativeAction } }));
-  const { default: buildMenuHandler } = await import("../src/js/menu.ts");
+  const nativeAction = mock().mockResolvedValue(undefined);
+  mock.module("../src/js/menu.node", () => ({ default: { runMenuAction: nativeAction } }));
   const menu = buildMenuHandler();
   const [resolvedAction, argument] = menuAction(sequence);
   expect([resolvedAction, argument]).toEqual([action, value]);
@@ -74,7 +61,8 @@ test.each([
     if (resolvedAction === "SEARCH") await menu.call(context, "SEARCH", argument);
     else await menu.call(context, "BY_LETTERS", argument);
   }
-  expect(nativeAction).toHaveBeenCalledExactlyOnceWith("dev.keychord.fixture", action, value);
+  expect(nativeAction).toHaveBeenCalledTimes(1);
+  expect(nativeAction).toHaveBeenCalledWith("dev.keychord.fixture", action, value);
 });
 
 test("tray selection, menu indexes, letter queries, and named actions have distinct bindings", () => {
@@ -126,9 +114,8 @@ test("tray selection, menu indexes, letter queries, and named actions have disti
 });
 
 test("Window-menu chords invoke exact menu paths and share the unified menu-bar addon", async () => {
-  const nativeAction = vi.fn().mockResolvedValue(undefined);
-  vi.doMock("../src/js/menu.node", () => ({ default: { runMenuAction: nativeAction } }));
-  const { default: buildMenuHandler } = await import("../src/js/menu");
+  const nativeAction = mock().mockResolvedValue(undefined);
+  mock.module("../src/js/menu.node", () => ({ default: { runMenuAction: nativeAction } }));
   const menu = buildMenuHandler();
   const windows = Object.entries(bindings).filter(
     ([chord]) => chord.startsWith("=w") && chord !== "=wi" && chord !== "=wiv",

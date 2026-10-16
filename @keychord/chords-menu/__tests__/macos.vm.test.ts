@@ -13,7 +13,7 @@ test.skipIf(!macOSUITestsEnabled)(
   300_000,
 );
 
-if (macOSUITestsEnabled) await import("./tray-native.bun.test");
+if (macOSUITestsEnabled) await import("./tray-native.test");
 
 test.skipIf(!macOSUITestsEnabled)(
   "native menu handler invokes items in a controlled AppKit app",

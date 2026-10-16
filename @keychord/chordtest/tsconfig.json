@@ -3,7 +3,6 @@
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "paths": { "chord": ["./src/chord.ts"] },
     "strict": true,
     "noEmit": true,
     "allowImportingTsExtensions": true,

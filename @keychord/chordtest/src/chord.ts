@@ -52,8 +52,8 @@ export const getAppWindows = chordMock((_bundleId: string): NativeWindow[] =>
 export const press = chordMock((_key: string): void => unconfigured("press"));
 export const release = chordMock((_key: string): void => unconfigured("release"));
 export const tap = chordMock((_key: string): void => unconfigured("tap"));
-export const getGlobalHotkey = chordMock((_bundleId: string, _hotkeyId: string): string | undefined =>
-  unconfigured("getGlobalHotkey"),
+export const getGlobalHotkey = chordMock(
+  (_bundleId: string, _hotkeyId: string): string | undefined => unconfigured("getGlobalHotkey"),
 );
 export const registerGlobalHotkey = chordMock(
   (_bundleId: string, _hotkeyId: string): string | undefined =>

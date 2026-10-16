@@ -6,6 +6,9 @@
     "url": "https://github.com/KeyChord/chords-com.apple"
   },
   "type": "module",
+  "scripts": {
+    "test": "bun test --isolate"
+  },
   "dependencies": {
     "@keychord/chords-click": "workspace:*",
     "@keychord/chords-menu": "workspace:*",

@@ -5,9 +5,13 @@
     "url": "https://github.com/KeyChord/chords-spaces"
   },
   "type": "module",
+  "scripts": {
+    "test": "bun test --isolate"
+  },
   "devDependencies": {
     "@keychord/chordtest": "workspace:*",
-    "@keychord/config": "catalog:"
+    "@keychord/config": "catalog:",
+    "@types/bun": "^1.4.3"
   },
   "packageManager": "pnpm@12.11.2"
 }

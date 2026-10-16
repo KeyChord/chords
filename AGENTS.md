@@ -1,12 +1,26 @@
 # Runtime APIs
 
-Prefer Bun APIs over `node:*` in Chord handlers and Bun scripts. Use `Bun.file` / `Bun.write` for file contents and copies, `Bun.spawn` / `Bun.spawnSync` for subprocesses, and Bun's URL helpers. Keep Node APIs for operations without a Bun equivalent or code that must run under Node, including Vite+ configuration and tests. Preserve failure handling, timeouts, permissions, and locking semantics.
+Prefer Bun APIs over `node:*` in Chord handlers, tests, and Bun scripts. Use `Bun.file` / `Bun.write` for file contents and copies, `Bun.spawn` / `Bun.spawnSync` for subprocesses, and Bun's URL helpers. Keep Node APIs for operations without a Bun equivalent or code that must run under Node, such as Vite+ configuration. Preserve failure handling, timeouts, permissions, and locking semantics.
+
+# Tests
+
+Chord runs handlers under Bun, so tests do too. Run `vp run test` (each package's
+`bun test --isolate`, or every package from the root), never `vp test`, which runs Vitest
+under Node. Import test APIs from `bun:test` and helpers from `@keychord/chordtest/test`, not
+`vite-plus/test`. A package's `bunfig.toml` preloads `@keychord/chordtest/preload`, which
+provides the mockable `chord` module and stubs relative `.node` imports; mock an addon with
+`mock.module` and the specifier the handler imports. Bun's `expect(promise).rejects` waits for
+the promise to settle, so capture a pending rejection with `.then(undefined, (error) => error)`
+and assert it after the promise can settle.
 
 # Chord locations
 
 Define symbol-prefixed global chords and their hints in each package's root
 `chords/macos.toml`, alongside any handlers they use. Application-specific
 alphanumeric chords belong in the nested application/bundle-ID folders.
+
+Always single-quote binding keys in TOML `[chords]` tables, even when bare keys
+would be valid (for example, `'fr'`). Oxfmt preserves these quotes with `vp fmt`.
 
 # Action identifiers
 
@@ -124,6 +138,6 @@ For GitHub Actions, consider using [`voidzero-dev/setup-vp`](https://github.com/
 ## Review Checklist for Agents
 
 - [ ] Run `vp install` after pulling remote changes and before getting started.
-- [ ] Run `vp check` and `vp test` to validate changes.
+- [ ] Run `vp check` and `vp run test` (Bun tests; see Tests above) to validate changes.
 
 <!--VITE PLUS END-->

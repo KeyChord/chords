@@ -1,15 +1,22 @@
 import { readFileSync } from "node:fs";
-import { afterEach, beforeEach, expect, test, vi } from "vite-plus/test";
+import { afterEach, beforeEach, expect, mock, spyOn, test } from "bun:test";
 import { chordPattern } from "@keychord/chordtest/patterns";
+import {
+  advanceTimersByTimeAsync,
+  runAllTimersAsync,
+  useFakeTimers,
+  useRealTimers,
+} from "@keychord/chordtest/test";
 import buildRaycastHandler, { isRaycastInputFocused } from "../src/js/raycast";
 
-const { readState, setSearch, activateSearch, returnRoot } = vi.hoisted(() => ({
-  readState: vi.fn(),
-  setSearch: vi.fn(),
-  activateSearch: vi.fn(),
-  returnRoot: vi.fn(),
-}));
-vi.mock("../src/js/utils/native", () => ({
+// Bun's `expect(promise).rejects` blocks until the promise settles, so tests that must advance
+// fake timers first mark the pending action as handled and assert once it has settled.
+
+const readState = mock();
+const setSearch = mock();
+const activateSearch = mock();
+const returnRoot = mock();
+mock.module("../src/js/utils/native", () => ({
   readRaycastState: readState,
   setRaycastSearch: setSearch,
   activateRaycastSearch: activateSearch,
@@ -27,14 +34,24 @@ const ready = {
   fingerprint: "old results",
 };
 let state: Record<string, unknown>;
-const spawn = vi.fn();
+const spawn = mock();
+let restoreSpies: Array<() => void> = [];
 
 function launchResult(exitCode = 0, stderr = "") {
   return { exited: Promise.resolve(exitCode), stderr: new Response(stderr).body };
 }
 
 beforeEach(() => {
-  vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "performance"] });
+  // Fakes performance.now() too, which the handler uses for deadlines. Bun.sleep goes through
+  // the faked setTimeout.
+  useFakeTimers();
+  const spies = [
+    spyOn(Bun, "spawn").mockImplementation(((...args: unknown[]) => spawn(...args)) as never),
+    spyOn(Bun, "sleep").mockImplementation(
+      ((ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms))) as never,
+    ),
+  ];
+  restoreSpies = spies.map((spy) => () => spy.mockRestore());
   spawn.mockReset().mockImplementation(() => launchResult());
   state = { ...ready };
   returnRoot.mockReset().mockImplementation(async () => {
@@ -49,15 +66,11 @@ beforeEach(() => {
     state = { bundleId: "com.apple.calculator", rootSearchVisible: false };
     return true;
   });
-  vi.stubGlobal("Bun", {
-    spawn,
-    sleep: (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms)),
-  });
 });
 
 afterEach(() => {
-  vi.useRealTimers();
-  vi.unstubAllGlobals();
+  restoreSpies.forEach((restore) => restore());
+  useRealTimers();
 });
 
 test("// captures the entire query and loads the TypeScript handler's generated module", () => {
@@ -80,13 +93,13 @@ test("app activation alone leaves the Promise pending until the search input get
     .mockResolvedValueOnce({ bundleId: "com.raycast.macos" })
     .mockResolvedValueOnce({ ...ready, role: "AXButton" })
     .mockResolvedValue(ready);
-  const settled = vi.fn();
+  const settled = mock();
   const action = buildRaycastHandler()().then(settled);
-  await vi.advanceTimersByTimeAsync(0);
+  await advanceTimersByTimeAsync(0);
   expect(settled).not.toHaveBeenCalled();
-  await vi.advanceTimersByTimeAsync(50);
+  await advanceTimersByTimeAsync(50);
   expect(settled).not.toHaveBeenCalled();
-  await vi.advanceTimersByTimeAsync(50);
+  await advanceTimersByTimeAsync(50);
   await action;
   expect(settled).toHaveBeenCalledOnce();
   expect(spawn).toHaveBeenCalledWith(["/usr/bin/open", "-b", "com.raycast.macos"], {
@@ -138,7 +151,7 @@ test("launch completion is awaited before checking focus", async () => {
     stderr: new Response("").body,
   });
   const action = buildRaycastHandler()();
-  await vi.advanceTimersByTimeAsync(100);
+  await advanceTimersByTimeAsync(100);
   expect(readState).not.toHaveBeenCalled();
   exit(0);
   await action;
@@ -154,11 +167,12 @@ test("the deadline includes launch time and rejects when focus never arrives", a
     stderr: new Response("").body,
   });
   readState.mockResolvedValue({});
-  const rejected = expect(buildRaycastHandler(200)()).rejects.toThrow("within 200ms");
-  await vi.advanceTimersByTimeAsync(150);
+  const rejected = buildRaycastHandler(200)();
+  rejected.catch(() => {});
+  await advanceTimersByTimeAsync(150);
   exit(0);
-  await vi.advanceTimersByTimeAsync(50);
-  await rejected;
+  await advanceTimersByTimeAsync(50);
+  await expect(rejected).rejects.toThrow("within 200ms");
   expect(readState).toHaveBeenCalledOnce();
 });
 
@@ -188,7 +202,7 @@ test("concurrent invocations share a launch and later invocations can launch aga
   const second = handler();
   expect(first).toBe(second);
   expect(spawn).toHaveBeenCalledOnce();
-  await vi.advanceTimersByTimeAsync(50);
+  await advanceTimersByTimeAsync(50);
   await Promise.all([first, second]);
   await handler();
   expect(spawn).toHaveBeenCalledTimes(2);
@@ -203,22 +217,20 @@ test("atomic text entry waits for updated results and confirms activation", asyn
   setSearch.mockImplementation(async () => {
     state = { ...ready, value: query }; // Input changed; results are still stale.
   });
-  const settled = vi.fn();
+  const settled = mock();
   const action = buildRaycastHandler()(query).then(settled);
-  await vi.advanceTimersByTimeAsync(150);
-  expect(setSearch).toHaveBeenCalledExactlyOnceWith(query, expect.any(Number));
+  await advanceTimersByTimeAsync(150);
+  expect(setSearch).toHaveBeenCalledTimes(1);
+  expect(setSearch).toHaveBeenCalledWith(query, expect.any(Number));
   expect(activateSearch).not.toHaveBeenCalled();
   state = { ...ready, value: query, fingerprint: "updated results", busy: true };
-  await vi.advanceTimersByTimeAsync(150);
+  await advanceTimersByTimeAsync(150);
   expect(activateSearch).not.toHaveBeenCalled();
   state.busy = false;
-  await vi.advanceTimersByTimeAsync(100);
+  await advanceTimersByTimeAsync(100);
   await action;
-  expect(activateSearch).toHaveBeenCalledExactlyOnceWith(
-    query,
-    "updated results",
-    expect.any(Number),
-  );
+  expect(activateSearch).toHaveBeenCalledTimes(1);
+  expect(activateSearch).toHaveBeenCalledWith(query, "updated results", expect.any(Number));
   expect(settled).toHaveBeenCalledOnce();
 });
 
@@ -228,7 +240,7 @@ test("a result change between readiness and AXPress restarts observation", async
     return false;
   });
   const action = buildRaycastHandler()("calculator");
-  await vi.runAllTimersAsync();
+  await runAllTimersAsync();
   await action;
   expect(activateSearch).toHaveBeenNthCalledWith(
     1,
@@ -247,11 +259,12 @@ test("a result change between readiness and AXPress restarts observation", async
 test("repeating an already populated query resets the previous result selection", async () => {
   state = { ...ready, value: "calculator" };
   const action = buildRaycastHandler()("calculator");
-  await vi.runAllTimersAsync();
+  await runAllTimersAsync();
   await action;
   expect(setSearch).toHaveBeenNthCalledWith(1, "", expect.any(Number));
   expect(setSearch).toHaveBeenNthCalledWith(2, "calculator", expect.any(Number));
-  expect(activateSearch).toHaveBeenCalledExactlyOnceWith(
+  expect(activateSearch).toHaveBeenCalledTimes(1);
+  expect(activateSearch).toHaveBeenCalledWith(
     "calculator",
     "results:calculator",
     expect.any(Number),
@@ -264,17 +277,16 @@ test("a command view appearing inside Raycast confirms activation", async () => 
     return true;
   });
   const action = buildRaycastHandler()("calculator history");
-  await vi.runAllTimersAsync();
+  await runAllTimersAsync();
   await action;
 });
 
 test("an action that leaves root search unchanged is not silently reported as success or pressed twice", async () => {
   activateSearch.mockResolvedValue(true);
-  const rejected = expect(buildRaycastHandler(300)("calculator")).rejects.toThrow(
-    "activation was not confirmed",
-  );
-  await vi.advanceTimersByTimeAsync(300);
-  await rejected;
+  const rejected = buildRaycastHandler(300)("calculator");
+  rejected.catch(() => {});
+  await advanceTimersByTimeAsync(300);
+  await expect(rejected).rejects.toThrow("activation was not confirmed");
   expect(activateSearch).toHaveBeenCalledOnce();
 });
 
@@ -283,11 +295,10 @@ test("an unreadable window is not mistaken for confirmed activation", async () =
     state = { bundleId: "com.raycast.macos" };
     return true;
   });
-  const rejected = expect(buildRaycastHandler(300)("calculator")).rejects.toThrow(
-    "activation was not confirmed",
-  );
-  await vi.runAllTimersAsync();
-  await rejected;
+  const rejected = buildRaycastHandler(300)("calculator");
+  rejected.catch(() => {});
+  await runAllTimersAsync();
+  await expect(rejected).rejects.toThrow("activation was not confirmed");
   expect(activateSearch).toHaveBeenCalledOnce();
 });
 
@@ -296,9 +307,10 @@ test("a slow native read cannot dispatch text after the overall deadline", async
     await new Promise<void>((resolve) => setTimeout(resolve, 250));
     return ready;
   });
-  const rejected = expect(buildRaycastHandler(200)("calculator")).rejects.toThrow("within 200ms");
-  await vi.runAllTimersAsync();
-  await rejected;
+  const rejected = buildRaycastHandler(200)("calculator");
+  rejected.catch(() => {});
+  await runAllTimersAsync();
+  await expect(rejected).rejects.toThrow("within 200ms");
   expect(setSearch).not.toHaveBeenCalled();
   expect(activateSearch).not.toHaveBeenCalled();
 });
@@ -315,11 +327,10 @@ test("a missing letter never launches the wrong query", async () => {
   setSearch.mockImplementation(async () => {
     state = { ...ready, value: "alculator", fingerprint: "wrong results" };
   });
-  const rejected = expect(buildRaycastHandler(200)("calculator")).rejects.toThrow(
-    "results did not become ready",
-  );
-  await vi.advanceTimersByTimeAsync(200);
-  await rejected;
+  const rejected = buildRaycastHandler(200)("calculator");
+  rejected.catch(() => {});
+  await advanceTimersByTimeAsync(200);
+  await expect(rejected).rejects.toThrow("results did not become ready");
   expect(activateSearch).not.toHaveBeenCalled();
 });
 
@@ -328,14 +339,15 @@ test("duplicate queries share an action and different queries run in order", asy
   const first = handler("calculator");
   expect(handler("calculator")).toBe(first);
   const second = handler("calendar");
-  await vi.advanceTimersByTimeAsync(0);
-  expect(setSearch).toHaveBeenCalledExactlyOnceWith("calculator", expect.any(Number));
+  await advanceTimersByTimeAsync(0);
+  expect(setSearch).toHaveBeenCalledTimes(1);
+  expect(setSearch).toHaveBeenCalledWith("calculator", expect.any(Number));
   // Each subsequent open puts Raycast back in the foreground.
   spawn.mockImplementation(() => {
     state = { ...ready };
     return launchResult();
   });
-  await vi.runAllTimersAsync();
+  await runAllTimersAsync();
   await Promise.all([first, second]);
   expect(setSearch).toHaveBeenNthCalledWith(2, "calendar", expect.any(Number));
   expect(activateSearch).toHaveBeenCalledTimes(2);
@@ -344,22 +356,22 @@ test("duplicate queries share an action and different queries run in order", asy
 test("native failures propagate and a queued query can recover", async () => {
   setSearch.mockRejectedValueOnce(new Error("AX write failed"));
   const handler = buildRaycastHandler();
-  const rejected = expect(handler("calculator")).rejects.toThrow("AX write failed");
+  const rejected = handler("calculator");
+  rejected.catch(() => {});
   const next = handler("calendar");
-  await vi.runAllTimersAsync();
-  await Promise.all([rejected, next]);
-  expect(activateSearch).toHaveBeenCalledExactlyOnceWith(
-    "calendar",
-    "results:calendar",
-    expect.any(Number),
-  );
+  await runAllTimersAsync();
+  await expect(rejected).rejects.toThrow("AX write failed");
+  await next;
+  expect(activateSearch).toHaveBeenCalledTimes(1);
+  expect(activateSearch).toHaveBeenCalledWith("calendar", "results:calendar", expect.any(Number));
 });
 
 test("a configured command uses the official deeplink without loading the Accessibility path", async () => {
   const link =
     "raycast://extensions/raycast/clipboard-history/clipboard-history?launchType=background";
   await buildRaycastHandler(5_000, { clips: link })("clips");
-  expect(spawn).toHaveBeenCalledExactlyOnceWith(
+  expect(spawn).toHaveBeenCalledTimes(1);
+  expect(spawn).toHaveBeenCalledWith(
     ["/usr/bin/open", link],
     expect.objectContaining({ timeout: 5_000 }),
   );
@@ -408,10 +420,12 @@ test("an existing command view returns to Root Search before entering the query"
     navigationFingerprint: "history view",
   };
   const action = buildRaycastHandler()("calculator");
-  await vi.runAllTimersAsync();
+  await runAllTimersAsync();
   await action;
-  expect(returnRoot).toHaveBeenCalledExactlyOnceWith("history view", expect.any(Number));
-  expect(setSearch).toHaveBeenCalledExactlyOnceWith("calculator", expect.any(Number));
+  expect(returnRoot).toHaveBeenCalledTimes(1);
+  expect(returnRoot).toHaveBeenCalledWith("history view", expect.any(Number));
+  expect(setSearch).toHaveBeenCalledTimes(1);
+  expect(setSearch).toHaveBeenCalledWith("calculator", expect.any(Number));
   expect(activateSearch).toHaveBeenCalledOnce();
 });
 
@@ -423,9 +437,10 @@ test("a pending Back action is not repeated against the same view", async () => 
     navigationFingerprint: "history view",
   };
   returnRoot.mockResolvedValue(true);
-  const rejected = expect(buildRaycastHandler(200)("calculator")).rejects.toThrow("within 200ms");
-  await vi.runAllTimersAsync();
-  await rejected;
+  const rejected = buildRaycastHandler(200)("calculator");
+  rejected.catch(() => {});
+  await runAllTimersAsync();
+  await expect(rejected).rejects.toThrow("within 200ms");
   expect(returnRoot).toHaveBeenCalledOnce();
   expect(setSearch).not.toHaveBeenCalled();
 });

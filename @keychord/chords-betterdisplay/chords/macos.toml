@@ -4,5 +4,5 @@ name = 'BetterDisplay'
 file = 'monitor.js'
 
 [chords]
-'?/ms' = { name = 'Monitor: Size' }
-'/ms(.+)' = { name = 'Monitor: Size (Set)', '@input:monitor' = ['$1'] }
+'?/md' = { name = 'Monitor: Dimensions' }
+'/md(.+)' = { name = 'Monitor: Dimensions (Set)', '@input:monitor' = ['$1'] }

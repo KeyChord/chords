@@ -6,15 +6,21 @@ import Foundation
 import NodeAPI
 
 #NodeModule(exports: [
+    "moveWindowToSpace": try NodeFunction { (bundleId: String?, windowId: Int?, target: String) throws -> NodePromise in
+        try mainActorPromise { try await moveWindowToSpace(bundleId: bundleId, windowId: windowId, command: target) }
+    },
+    "cycleWindows": try NodeFunction { (bundleId: String?, direction: String) throws -> NodePromise in
+        try mainActorPromise { try await cycleWindows(bundleId: bundleId, direction: direction) }
+    },
     "runWindowAction": try NodeFunction {
-        (bundleId: String?, action: String, request: String) throws -> NodePromise in
+        (bundleId: String?, windowId: Int?, action: String, request: String) throws -> NodePromise in
         try mainActorPromise {
-            try await runWindowAction(bundleId: bundleId, action: action, request: request)
+            try await runWindowAction(bundleId: bundleId, windowId: windowId, action: action, request: request)
         }
     },
 ])
 
-private struct WindowError: Error, CustomStringConvertible {
+struct WindowError: Error, CustomStringConvertible {
     let description: String
     init(_ description: String) { self.description = description }
 }
@@ -45,14 +51,6 @@ private struct Dimensions: Decodable {
     let top: Dimension?
     let right: Bool?
     let preset: String?
-}
-
-@MainActor
-private func windowElement(_ app: Element) throws -> Element {
-    guard let window = app.focusedWindow() ?? app.mainWindow() else {
-        throw WindowError("The target application has no focused or main window")
-    }
-    return window
 }
 
 /// AppKit uses bottom-left coordinates; AX positions use top-left coordinates on the primary display.
@@ -94,7 +92,7 @@ private func checkGeometryChange(_ error: AXError, attribute: String) throws {
 
 @MainActor
 private func readSize(_ window: Element) throws -> CGSize {
-    guard let size = window.size() else { throw WindowError("Could not read the window size") }
+    guard let size = window.size() else { throw WindowError("Could not read the window dimensions") }
     return size
 }
 
@@ -167,29 +165,21 @@ private func resizeWindow(_ window: Element, to target: CGSize, at origin: CGPoi
     if let failure { throw failure }
     let applied = try await settledSize(window, expected: target)
     guard matches(applied, target) else {
-        throw WindowError("The application limited the window size to \(applied.width)x\(applied.height); requested \(target.width)x\(target.height)")
+        throw WindowError("The application limited the window dimensions to \(applied.width)x\(applied.height); requested \(target.width)x\(target.height)")
     }
     try await verifyPosition(window, expected: origin)
 }
 
 @MainActor
-private func runWindowAction(bundleId: String?, action: String, request: String) async throws {
-    guard ["SIZE", "POSITION", "FRAME", "PRESET"].contains(action) else { throw WindowError("Unknown window action") }
+private func runWindowAction(bundleId: String?, windowId: Int?, action: String, request: String) async throws {
+    let relative = action == "DIMENSIONS_INCREASE" || action == "DIMENSIONS_DECREASE"
+    let resizing = action == "DIMENSIONS" || relative
+    guard resizing || ["POSITION", "FRAME", "PRESET"].contains(action) else { throw WindowError("Unknown window action") }
     let dimensions = try JSONDecoder().decode(Dimensions.self, from: Data(request.utf8))
     guard dimensions.width != nil || dimensions.height != nil || dimensions.preset != nil || (action == "FRAME" && dimensions.left != nil && dimensions.top != nil) else {
         throw WindowError("Expected window dimensions")
     }
-    guard AXPermissionHelpers.hasAccessibilityPermissions() else { throw WindowError("Accessibility permission is required to manage windows") }
-    let target: NSRunningApplication?
-    if let bundleId {
-        target = NSRunningApplication.runningApplications(withBundleIdentifier: bundleId).first
-    } else {
-        target = NSWorkspace.shared.frontmostApplication
-    }
-    guard let target else { throw WindowError("The target application is not running") }
-    let app = AXApp(target).element
-    app.setMessagingTimeout(2)
-    let window = try windowElement(app)
+    let window = try targetWindow(bundleId: bundleId, windowId: windowId).requireElement()
     var size = try readSize(window)
     var position = try readPosition(window)
     let screen = try screenBounds(for: CGRect(origin: position, size: size))
@@ -206,12 +196,13 @@ private func runWindowAction(bundleId: String?, action: String, request: String)
         else { try await verifyPosition(window, expected: position) }
         return
     }
-    let horizontal = try dimensions.width?.resolve(screen.width)
-    let vertical = try dimensions.height?.resolve(screen.height)
+    // Relative adjustments use the live window size when this queued action runs.
+    let horizontal = try dimensions.width?.resolve(relative ? size.width : screen.width)
+    let vertical = try dimensions.height?.resolve(relative ? size.height : screen.height)
     if action == "FRAME" {
         guard let left = dimensions.left, let top = dimensions.top else { throw WindowError("Expected left and top offsets") }
         size = CGSize(width: horizontal ?? size.width, height: vertical ?? size.height)
-        guard size.width > 0, size.height > 0 else { throw WindowError("Window sizes must be positive") }
+        guard size.width > 0, size.height > 0 else { throw WindowError("Window dimensions must be positive") }
         position = CGPoint(x: screen.minX + (try left.resolve(screen.width)), y: screen.minY + (try top.resolve(screen.height)))
         let resizing = horizontal != nil || vertical != nil
         if resizing { try requireSettable(window, kAXSizeAttribute) }
@@ -223,11 +214,11 @@ private func runWindowAction(bundleId: String?, action: String, request: String)
         else { try await verifyPosition(window, expected: position) }
         return
     }
-    let name = action == "SIZE" ? kAXSizeAttribute : kAXPositionAttribute
+    let name = resizing ? kAXSizeAttribute : kAXPositionAttribute
     try requireSettable(window, name)
-    if action == "SIZE" {
+    if resizing {
         size = CGSize(width: horizontal ?? size.width, height: vertical ?? size.height)
-        guard size.width > 0, size.height > 0 else { throw WindowError("Window sizes must be positive") }
+        guard size.width > 0, size.height > 0 else { throw WindowError("Window dimensions must be positive") }
         try await resizeWindow(window, to: size, at: position, screen: screen)
         return
     } else {

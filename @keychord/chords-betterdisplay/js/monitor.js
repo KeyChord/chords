@@ -161,7 +161,7 @@ var import_isUUID = /* @__PURE__ */ __toESM((/* @__PURE__ */ __commonJSMin(((exp
 	module.exports.default = exports.default;
 })))(), 1);
 function managedTarget(name) {
-	const match = /^Chord \/ms (\S+) [1-9]\d*x[1-9]\d* (\S+)$/.exec(name);
+	const match = /^Chord \/m[ds] (\S+) [1-9]\d*x[1-9]\d* (\S+)$/.exec(name);
 	return match && (0, import_isUUID.default)(match[1], "loose") && (0, import_isUUID.default)(match[2], "loose") ? match[1] : void 0;
 }
 var BetterDisplayError = class extends Error {
@@ -246,7 +246,7 @@ async function pointerDisplay(command) {
 		"--identifier=name"
 	])).split(",").map(managedTarget);
 	const targets = new Set(resolved);
-	if (targets.size !== 1 || targets.has(void 0)) throw new Error("Move the pointer to a physical display or a virtual screen created by /ms");
+	if (targets.size !== 1 || targets.has(void 0)) throw new Error("Move the pointer to a physical display or a virtual screen created by /md");
 	return [...targets][0];
 }
 function singleValue(output) {
@@ -358,7 +358,7 @@ async function setResolution(command, resolution) {
 				]);
 			} else {
 				if (await command(["get", "--proAvailable"]) !== "on") throw new Error("Custom resolutions require BetterDisplay Pro or its trial");
-				created = `Chord /ms ${target} ${resolution} ${v4()}`;
+				created = `Chord /md ${target} ${resolution} ${v4()}`;
 				const virtual = ["--type=VirtualScreen", `--name=${created}`];
 				await command([
 					"create",

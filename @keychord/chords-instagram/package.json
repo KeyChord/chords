@@ -5,6 +5,9 @@
     "url": "https://github.com/KeyChord/chords-instagram"
   },
   "type": "module",
+  "scripts": {
+    "test": "bun test --isolate"
+  },
   "devDependencies": {
     "@keychord/chordtest": "workspace:*",
     "@keychord/config": "catalog:",

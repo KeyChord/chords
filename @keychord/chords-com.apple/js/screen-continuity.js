@@ -206,7 +206,7 @@ async function clickPoints(bounds, points, validate) {
 //#region src/js/utils/screen-continuity-points.ts
 var import__keychord_native_screenContinuity = /* @__PURE__ */ __toESM((/* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const nativeRequire = createRequire(import.meta.url);
-	const nativeFiles = { "darwin-arm64": new URL("native/aarch64-apple-darwin/screenContinuity/screenContinuity-44440e296038.node", import.meta.url).href };
+	const nativeFiles = { "darwin-arm64": new URL("native/aarch64-apple-darwin/screenContinuity/screenContinuity-af36b58718c0.node", import.meta.url).href };
 	const nativeTarget = process.platform + "-" + process.arch;
 	const nativeFile = nativeFiles[nativeTarget];
 	if (!nativeFile) throw new Error("[chord-native] screenContinuity has no addon for " + nativeTarget);

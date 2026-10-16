@@ -3,16 +3,30 @@ import { click, getAppWindows, type WindowBounds } from "chord";
 
 type Selector = { identifiers?: string[]; description?: string; role?: string };
 type Request = {
-  kind: "MENU" | "ELEMENT" | "CHAT" | "GRID" | "DEVICE" | "DISMISS_POPOVER";
+  kind:
+    | "MENU"
+    | "ELEMENT"
+    | "CHAT"
+    | "PARTICIPANT"
+    | "GRID"
+    | "DEVICE"
+    | "DISMISS_POPOVER"
+    | "GROUP_PERMISSIONS"
+    | "VERIFY";
   scope?: string;
   identifiers?: string[];
   titlePrefix?: string;
   description?: string;
+  descriptions?: string[];
   descriptionPrefix?: string;
+  descriptionSuffix?: string;
   unlessIdentifier?: string;
   unlessAny?: Selector[];
   onlyIfAny?: Selector[];
   scopeParent?: boolean;
+  scopeAncestor?: number;
+  scroll?: boolean;
+  optional?: boolean;
   role?: string;
   index?: number;
   row?: number;
@@ -66,6 +80,14 @@ const info: Request = {
   ...menu(chat, "contact_info", "group_info"),
   unlessIdentifier: "contact-info-view-content-stack-view",
 };
+const closeInfo: Request = {
+  kind: "ELEMENT",
+  scope: "contact-info-view-content-stack-view",
+  scopeAncestor: 2,
+  description: "close",
+  role: "AXButton",
+  onlyIfAny: [{ identifiers: ["contact-info-view-content-stack-view"] }],
+};
 const infoControl = (description: string, role?: string): Request[] => [
   info,
   {
@@ -77,6 +99,62 @@ const infoControl = (description: string, role?: string): Request[] => [
   },
 ];
 const heading = (description: string): Selector => ({ description, role: "AXHeading" });
+const participantPicker = "ParticipantPicker_TableView";
+const newGroup: Request = {
+  ...menu(file, "new_group"),
+  unlessAny: [{ identifiers: [participantPicker] }, heading("New group")],
+};
+const groupControl = (request: Partial<Request>): Request[] => [
+  info,
+  {
+    kind: "ELEMENT",
+    scope: "contact-info-view-content-stack-view",
+    scopeParent: true,
+    scroll: true,
+    ...request,
+  },
+];
+const blockDialog: Selector[] = [
+  { description: "Block", role: "AXButton" },
+  { description: "Block and report", role: "AXButton" },
+];
+const blockContact = (description: "Block" | "Block and report"): Request[] => [
+  { ...info, unlessAny: blockDialog },
+  {
+    ...groupControl({ descriptionPrefix: "Block ", role: "AXButton" })[1],
+    unlessAny: blockDialog,
+  },
+  {
+    kind: "ELEMENT",
+    scope: "ActionSheet_TitleLabel",
+    scopeParent: true,
+    description,
+    role: "AXButton",
+  },
+];
+const settingsControl = (request: Partial<Request>): Request[] => [
+  {
+    ...menu("com.apple.menu.application", "settings"),
+    unlessIdentifier: "SettingsView_CloseButton",
+  },
+  {
+    kind: "ELEMENT",
+    scope: "SettingsView_CloseButton",
+    scopeAncestor: 2,
+    role: "AXButton",
+    scroll: true,
+    ...request,
+  },
+];
+const chatFilter = (description: string): Request[] => [
+  menu("com.apple.menu.application", "open_main_window"),
+  menu(view, "chats"),
+  { kind: "ELEMENT", scope: "ChatListView_chipButtonsCell", description, role: "AXButton" },
+];
+const sidebar = (request: Partial<Request>): Request[] => [
+  menu("com.apple.menu.application", "open_main_window"),
+  { kind: "ELEMENT", ...request },
+];
 const themePage = heading("Chat theme");
 const bubblePage = heading("Chat bubble");
 const wallpaperPage = heading("Wallpaper");
@@ -157,14 +235,21 @@ const actions = {
   CHAT_INFO_FAVOURITE: [info, element("Contact_Info_Favorite_Action", "AXButton")],
   CHAT_INFO_EXPORT: infoControl("Export chat", "AXButton"),
   CHAT_INFO_CLEAR: infoControl("Clear chat", "AXButton"),
-  CHAT_INFO_BLOCK: [
-    info,
+  CHAT_INFO_BLOCK: blockContact("Block"),
+  CHAT_INFO_BLOCK_REPORT: blockContact("Block and report"),
+  CHAT_INFO_UNBLOCK: [
+    { ...info, unlessAny: [{ description: "Unblock", role: "AXButton" }] },
+    {
+      ...groupControl({ descriptionPrefix: "Unblock ", role: "AXButton" })[1],
+      unlessAny: [{ description: "Unblock", role: "AXButton" }],
+    },
     {
       kind: "ELEMENT",
-      scope: "contact-info-view-content-stack-view",
+      scope: "ActionSheet_TitleLabel",
       scopeParent: true,
-      descriptionPrefix: "Block ",
+      description: "Unblock",
       role: "AXButton",
+      optional: true,
     },
   ],
   CHAT_INFO_REPORT: [
@@ -190,6 +275,7 @@ const actions = {
     { kind: "ELEMENT", description: "Open in new window", role: "AXMenuItem" },
   ],
   CHAT_NEW: menu(file, "new_chat"),
+  CHAT_GROUP_CREATE: newGroup,
   CHAT_PIN: menu(chat, "pin", "unpin"),
   CHAT_ARCHIVE: menu(chat, "archive", "unarchive"),
   CHAT_MUTE: infoControl("Mute", "AXButton"),
@@ -204,13 +290,59 @@ const actions = {
   VIEW_CHATS: menu(view, "chats"),
   VIEW_CALLS: menu(view, "calls"),
   VIEW_UPDATES: menu(view, "updates"),
-  VIEW_ARCHIVED: element("SidebarButton_Archived"),
-  VIEW_STARRED: element("SidebarButton_Starred"),
+  VIEW_ARCHIVED: [menu(view, "chats"), element("SidebarButton_Archived")],
+  VIEW_CHATS_ALL: chatFilter("All"),
+  VIEW_CHATS_UNREAD: chatFilter("Unread"),
+  VIEW_CHATS_FAVOURITES: chatFilter("Favourites"),
+  VIEW_CHATS_GROUPS: chatFilter("Groups"),
+  VIEW_COMMUNITIES: sidebar({ identifiers: ["SidebarButton_Communities"] }),
+  VIEW_AI: sidebar({ identifiers: ["SidebarButton_MetaAI"] }),
+  VIEW_MEDIA: sidebar({ description: "Media", role: "AXStaticText" }),
+  VIEW_STARRED: sidebar({ identifiers: ["SidebarButton_Starred"] }),
   VIEW_SETTINGS: menu("com.apple.menu.application", "settings"),
   VIEW_PROFILE: [
     menu("com.apple.menu.application", "settings"),
     element("SettingsView_ProfileCell", "AXButton"),
   ],
+  SETTINGS_FAVOURITES: settingsControl({ identifiers: ["SettingsView_FavoritesCell"] }),
+  SETTINGS_STARRED: settingsControl({ identifiers: ["SettingsView_StarredMessagesCell"] }),
+  SETTINGS_HISTORY: settingsControl({ description: "Chat history" }),
+  SETTINGS_ACCOUNT: settingsControl({ identifiers: ["SettingsView_AccountsCell"] }),
+  SETTINGS_PRIVACY: settingsControl({ identifiers: ["SettingsView_PrivacyCell"] }),
+  SETTINGS_CHATS: settingsControl({ identifiers: ["SettingsView_ChatsCell"] }),
+  SETTINGS_APPEARANCE: settingsControl({ identifiers: ["SettingsView_AppearanceCell"] }),
+  SETTINGS_NOTIFICATIONS: settingsControl({ identifiers: ["SettingsView_NotificationsCell"] }),
+  SETTINGS_AGENTS: settingsControl({ identifiers: ["SettingsView_AgentsCell"] }),
+  SETTINGS_STORAGE: settingsControl({ identifiers: ["SettingsView_DataAndStorageUsageCell"] }),
+  SETTINGS_HELP: settingsControl({ identifiers: ["SettingsView_HelpCell"] }),
+  GROUP_ADD: groupControl({ description: "Add", role: "AXButton" }),
+  GROUP_DESCRIPTION: groupControl({ identifiers: ["group-description-row"], role: "AXButton" }),
+  GROUP_MEMBERS: groupControl({ descriptionSuffix: " members", role: "AXLink" }),
+  GROUP_MEMBER_CHANGES: groupControl({
+    identifiers: ["Group_Info_Member_Changes"],
+    role: "AXButton",
+  }),
+  GROUP_EXIT: groupControl({ description: "Exit group", role: "AXButton" }),
+  GROUP_REPORT: groupControl({ description: "Report group", role: "AXButton" }),
+  GROUP_CREATE_SIMILAR: groupControl({ description: "Create a similar group", role: "AXButton" }),
+  GROUP_PERMISSIONS: [
+    { ...info, unlessAny: [heading("Group permissions"), heading("Group settings")] },
+    {
+      ...groupControl({
+        kind: "GROUP_PERMISSIONS",
+        descriptions: ["Group permissions", "Group settings"],
+        role: "AXButton",
+      })[1],
+      unlessAny: [heading("Group permissions"), heading("Group settings")],
+    },
+    {
+      kind: "VERIFY",
+      descriptions: ["Group permissions", "Group settings"],
+      role: "AXHeading",
+    },
+  ],
+  GROUP_NOTIFY: groupControl({ description: "Notify for", role: "AXButton" }),
+  GROUP_QR: [info, element("NavigationBar_GroupInfoQRButton", "AXButton")],
   CALL_NEW: menu(file, "new_call..."),
   CALL_NEW_GROUP: menu(file, "new_group_call"),
   CALL_LINK: menu(file, "new_call_link"),
@@ -238,6 +370,8 @@ const actions = {
 export type WhatsAppAction =
   | keyof typeof actions
   | "CHAT_SWITCH"
+  | "CHAT_INFO_AT"
+  | "CHAT_GROUP_SELECT"
   | "CALL_CAMERA_SELECT"
   | "CALL_MICROPHONE_SELECT"
   | "CALL_SPEAKER_SELECT"
@@ -249,7 +383,15 @@ export default function buildWhatsAppHandler(bundleId = "net.whatsapp.WhatsApp")
   let previous: Promise<unknown> = Promise.resolve();
   return function whatsapp(action: WhatsAppAction, index?: number | string): Promise<void> {
     let request: Request | Request[];
-    if (action === "CHAT_SWITCH") {
+    if (action === "CHAT_GROUP_SELECT") {
+      let position: number;
+      try {
+        position = positiveIndex(index, "group member index");
+      } catch (error) {
+        return Promise.reject(error);
+      }
+      request = [newGroup, { kind: "PARTICIPANT", index: position }];
+    } else if (action === "CHAT_SWITCH" || action === "CHAT_INFO_AT") {
       let position: number;
       try {
         position = positiveIndex(index, "chat index");
@@ -257,8 +399,34 @@ export default function buildWhatsAppHandler(bundleId = "net.whatsapp.WhatsApp")
         return Promise.reject(error);
       }
       request = [
+        closeInfo,
         menu("com.apple.menu.application", "open_main_window"),
         menu(view, "chats"),
+        { kind: "CHAT", index: position },
+        ...(action === "CHAT_INFO_AT" ? [info] : []),
+      ];
+    } else if (
+      index !== undefined &&
+      (action === "VIEW_CHATS" ||
+        action === "VIEW_ARCHIVED" ||
+        action === "VIEW_CHATS_ALL" ||
+        action === "VIEW_CHATS_UNREAD" ||
+        action === "VIEW_CHATS_FAVOURITES" ||
+        action === "VIEW_CHATS_GROUPS")
+    ) {
+      let position: number;
+      try {
+        position = positiveIndex(index, "chat index");
+      } catch (error) {
+        return Promise.reject(error);
+      }
+      const destination = actions[action];
+      request = [
+        closeInfo,
+        ...(action === "VIEW_CHATS" || action === "VIEW_ARCHIVED"
+          ? [menu("com.apple.menu.application", "open_main_window")]
+          : []),
+        ...(Array.isArray(destination) ? destination : [destination]),
         { kind: "CHAT", index: position },
       ];
     } else if (

@@ -5,6 +5,9 @@
     "url": "https://github.com/KeyChord/chords-spotify"
   },
   "type": "module",
+  "scripts": {
+    "test": "bun test --isolate"
+  },
   "devDependencies": {
     "@chord/com.npmjs.types__node": "workspace:*",
     "@keychord/chordtest": "workspace:*",

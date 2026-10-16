@@ -1,29 +1,19 @@
 import { execFileSync } from "node:child_process";
-import { readFileSync, mkdtempSync, rmSync } from "node:fs";
+import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { afterEach, expect, test, vi } from "vite-plus/test";
+import { expect, mock, test } from "bun:test";
 import { chordPattern } from "@keychord/chordtest/patterns";
+import { waitFor } from "@keychord/chordtest/test";
+import buildMonitorHandler from "../src/js/monitor";
 
-const definition = JSON.parse(
-  execFileSync(
-    "bun",
-    ["-e", "console.log(JSON.stringify(Bun.TOML.parse(await Bun.stdin.text())))"],
-    {
-      input: readFileSync(new URL("../chords/macos.toml", import.meta.url), "utf8"),
-      encoding: "utf8",
-    },
-  ),
+const definition = Bun.TOML.parse(
+  await Bun.file(new URL("../chords/macos.toml", import.meta.url)).text(),
 ) as {
   on: Record<string, { file: string }>;
   chords: Record<string, { "@input:monitor"?: [string, string?]; shortcut?: string }>;
 };
-
-afterEach(() => {
-  vi.doUnmock("../src/js/monitor.node");
-  vi.resetModules();
-});
 
 test.each([
   ["/m1", "1"],
@@ -35,9 +25,8 @@ test.each([
   ["/mt", "UP"],
   ["/mb", "DOWN"],
 ])("%s resolves one monitor action", async (input, expected) => {
-  const native = vi.fn().mockResolvedValue(undefined);
-  vi.doMock("../src/js/monitor.node", () => ({ default: { focusMonitor: native } }));
-  const { default: buildMonitorHandler } = await import("../src/js/monitor");
+  const native = mock().mockResolvedValue(undefined);
+  mock.module("../src/js/monitor.node", () => ({ default: { focusMonitor: native } }));
   const matches = Object.entries(definition.chords).flatMap(([pattern, binding]) => {
     const captures = chordPattern(pattern).exec(input);
     const args = binding["@input:monitor"];
@@ -45,17 +34,16 @@ test.each([
   });
   expect(matches).toEqual([expected]);
   await buildMonitorHandler()(matches[0]);
-  expect(native).toHaveBeenCalledExactlyOnceWith(expected);
+  expect(native).toHaveBeenCalledTimes(1);
+  expect(native).toHaveBeenCalledWith(expected);
   expect(definition.on.monitor.file).toBe("monitor.js");
 });
 
 test("invalid targets never reach native code; native failures reject and the queue recovers", async () => {
-  const native = vi
-    .fn()
+  const native = mock()
     .mockRejectedValueOnce(new Error("Monitor 2 does not exist"))
     .mockResolvedValue(undefined);
-  vi.doMock("../src/js/monitor.node", () => ({ default: { focusMonitor: native } }));
-  const { default: buildMonitorHandler } = await import("../src/js/monitor");
+  mock.module("../src/js/monitor.node", () => ({ default: { focusMonitor: native } }));
   const handler = buildMonitorHandler();
   for (const target of ["", "0", "-1", "1.5", "01", "9007199254740992", "sideways"]) {
     await expect(handler(target)).rejects.toThrow(TypeError);
@@ -68,8 +56,7 @@ test("invalid targets never reach native code; native failures reject and the qu
 
 test("monitor actions wait for the previous focus change before reading the pointer again", async () => {
   let finish!: () => void;
-  const native = vi
-    .fn()
+  const native = mock()
     .mockImplementationOnce(
       () =>
         new Promise<void>((resolve) => {
@@ -77,12 +64,11 @@ test("monitor actions wait for the previous focus change before reading the poin
         }),
     )
     .mockResolvedValue(undefined);
-  vi.doMock("../src/js/monitor.node", () => ({ default: { focusMonitor: native } }));
-  const { default: buildMonitorHandler } = await import("../src/js/monitor");
+  mock.module("../src/js/monitor.node", () => ({ default: { focusMonitor: native } }));
   const handler = buildMonitorHandler();
   const first = handler("NEXT");
   const second = handler("NEXT");
-  await vi.waitFor(() => expect(native).toHaveBeenCalledTimes(1));
+  await waitFor(() => expect(native).toHaveBeenCalledTimes(1));
   finish();
   await Promise.all([first, second]);
   expect(native).toHaveBeenCalledTimes(2);
@@ -142,38 +128,39 @@ test.each([
   "200x200x",
   "9007199254740992x200",
 ])("resolution %s is rejected before native code", async (expression) => {
-  const resolution = vi.fn().mockResolvedValue(undefined);
-  vi.doMock("../src/js/monitor.node", () => ({ default: { setMonitorResolution: resolution } }));
-  const { default: buildMonitorHandler } = await import("../src/js/monitor");
+  const resolution = mock().mockResolvedValue(undefined);
+  mock.module("../src/js/monitor.node", () => ({ default: { setMonitorResolution: resolution } }));
   await expect(buildMonitorHandler()(expression, "SIZE")).rejects.toThrow(TypeError);
   expect(resolution).not.toHaveBeenCalled();
 });
 
 test("the native resolution API preserves the focus queue; /ms belongs to BetterDisplay", async () => {
   let finish!: () => void;
-  const focus = vi.fn().mockImplementation(
+  const focus = mock().mockImplementation(
     () =>
       new Promise<void>((resolve) => {
         finish = resolve;
       }),
   );
-  const resolution = vi
-    .fn()
+  const resolution = mock()
     .mockRejectedValueOnce(new Error("Unsupported monitor resolution"))
     .mockResolvedValue(undefined);
-  vi.doMock("../src/js/monitor.node", () => ({
+  mock.module("../src/js/monitor.node", () => ({
     default: { focusMonitor: focus, setMonitorResolution: resolution },
   }));
-  const { default: buildMonitorHandler } = await import("../src/js/monitor");
   const handler = buildMonitorHandler();
   const first = handler("NEXT");
   const changing = handler("2000x200", "SIZE");
-  const rejected = expect(changing).rejects.toThrow("Unsupported monitor resolution");
-  await vi.waitFor(() => expect(focus).toHaveBeenCalledTimes(1));
+  // Bun's `expect(promise).rejects` blocks until the promise settles; capture the error instead.
+  const rejected = changing.then(
+    () => undefined,
+    (error: unknown) => error,
+  );
+  await waitFor(() => expect(focus).toHaveBeenCalledTimes(1));
   expect(resolution).not.toHaveBeenCalled();
   finish();
   await first;
-  await rejected;
+  expect(await rejected).toHaveProperty("message", "Unsupported monitor resolution");
   await handler("1920x1080", "SIZE");
   expect(resolution.mock.calls).toEqual([
     [2000, 200],

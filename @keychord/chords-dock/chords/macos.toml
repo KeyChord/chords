@@ -6,8 +6,13 @@ file = '@keychord/chords-menu/js/menu.js'
 [on.dock]
 file = 'dock.js'
 
+[on.application]
+file = 'application.js'
+
 [chords]
 '?/d' = { name = "Dock" }
+'/dw[' = { name = 'Dock: Previous App', '@input:application' = ['PREVIOUS'] }
+'/dw]' = { name = 'Dock: Next App', '@input:application' = ['NEXT'] }
 '/dv' = { name = 'Dock: Vary (On/Off)', shortcut = 'ctrl+f3' }
 '/d(\d+)' = { name = 'Dock > Focus $1', '@input:dock' = ['$1'] }
 '/d.(\d+).' = { name = 'Dock > Click @ Item $1', '@input:dock' = ['$1'] }

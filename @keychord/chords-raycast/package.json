@@ -9,6 +9,9 @@
   "imports": {
     "#/*": "./src/js/*"
   },
+  "scripts": {
+    "test": "bun test --isolate"
+  },
   "dependencies": {
     "array-uniq": "latest",
     "brace-expansion": "latest",

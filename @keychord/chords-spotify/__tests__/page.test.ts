@@ -1,5 +1,5 @@
 import { Window } from "happy-dom";
-import { afterEach, beforeEach, expect, test } from "vite-plus/test";
+import { afterEach, beforeEach, expect, test } from "bun:test";
 import { buildSpotifyJavaScript, type SpotifyTrackAction } from "../src/js/page";
 
 let window: Window;

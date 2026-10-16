@@ -26,14 +26,30 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 //#region src/js/utils/window-dimensions.ts
 var import__keychord_native_window = /* @__PURE__ */ __toESM((/* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const nativeRequire = createRequire(import.meta.url);
-	const nativeFiles = { "darwin-arm64": new URL("native/aarch64-apple-darwin/window/window-fbbeb02dfd48.node", import.meta.url).href };
+	const nativeFiles = { "darwin-arm64": new URL("native/aarch64-apple-darwin/window/window-fc4cf6ed3ce8.node", import.meta.url).href };
 	const nativeTarget = process.platform + "-" + process.arch;
 	const nativeFile = nativeFiles[nativeTarget];
 	if (!nativeFile) throw new Error("[chord-native] window has no addon for " + nativeTarget);
 	module.exports = nativeRequire(fileURLToPath(nativeFile));
 })))(), 1);
-/** Signed single-digit shorthand: negative sizes add whole display extents. */
+/** Absolute shorthand uses display extents; relative actions scale current dimensions. */
 function parseWindowDimensions(action, expression) {
+	if (action === "DIMENSIONS_INCREASE" || action === "DIMENSIONS_DECREASE") {
+		if (typeof expression !== "string") throw new TypeError("Expected relative window dimensions");
+		const match = /^(h)?([0-9]?)$/.exec(expression.trim());
+		if (!match) throw new TypeError("Expected one dimension adjustment digit: 1–9 for 10–90%, 0 for 100%");
+		const amount = match[2] === "" ? 1 : match[2] === "0" ? 10 : Number(match[2]);
+		const value = (action === "DIMENSIONS_INCREASE" ? 10 + amount : 10 - amount) / 10;
+		if (value <= 0) throw new TypeError("A 100% decrease would produce a zero window dimension");
+		const scale = {
+			value,
+			unit: "fraction"
+		};
+		return match[1] ? { height: scale } : {
+			width: scale,
+			height: scale
+		};
+	}
 	if (action === "PRESET") {
 		if (![
 			"LEFT",
@@ -51,7 +67,7 @@ function parseWindowDimensions(action, expression) {
 		].includes(expression)) throw new TypeError("Unknown window preset");
 		return { preset: expression };
 	}
-	if (action !== "SIZE" && action !== "POSITION" && action !== "FRAME") throw new TypeError("Unknown window action");
+	if (action !== "DIMENSIONS" && action !== "POSITION" && action !== "FRAME") throw new TypeError("Unknown window action");
 	if (typeof expression !== "string") throw new TypeError("Expected window dimensions");
 	let input = expression.trim();
 	const right = action === "POSITION" && input.startsWith("r");
@@ -61,9 +77,9 @@ function parseWindowDimensions(action, expression) {
 	if (right && heightOnly) throw new TypeError("Right-edge positioning needs a horizontal offset");
 	const dimensions = [];
 	function dimension(token, unit) {
-		const kind = action === "FRAME" ? dimensions.length < 2 ? "SIZE" : "POSITION" : action;
+		const kind = action === "FRAME" ? dimensions.length < 2 ? "DIMENSIONS" : "POSITION" : action;
 		const value = Number(token);
-		if (!Number.isFinite(value) || Math.abs(value) > Number.MAX_SAFE_INTEGER || kind === "SIZE" && (action === "FRAME" ? value < 0 : value <= 0) || unit === "divisor" && (!value || !Number.isFinite(1 / value))) throw new TypeError("Window dimensions must be finite; sizes must be positive");
+		if (!Number.isFinite(value) || Math.abs(value) > Number.MAX_SAFE_INTEGER || kind === "DIMENSIONS" && (action === "FRAME" ? value < 0 : value <= 0) || unit === "divisor" && (!value || !Number.isFinite(1 / value))) throw new TypeError("Window dimensions must be finite; width and height must be positive");
 		return {
 			value,
 			unit
@@ -84,10 +100,10 @@ function parseWindowDimensions(action, expression) {
 			if (!match || dimensions.length === (action === "FRAME" ? 4 : 2)) throw new TypeError("Unexpected window dimension count or syntax");
 			index = token.lastIndex;
 			const amount = Number(match[1]);
-			const kind = action === "FRAME" ? dimensions.length < 2 ? "SIZE" : "POSITION" : action;
+			const kind = action === "FRAME" ? dimensions.length < 2 ? "DIMENSIONS" : "POSITION" : action;
 			if (Object.is(amount, -0)) throw new TypeError("Negative zero is not a window dimension");
-			const unit = action === "FRAME" && amount === 0 || kind === "SIZE" && amount < 0 || kind === "POSITION" && amount === 0 ? "fraction" : "divisor";
-			dimensions.push(dimension(String(kind === "SIZE" && amount < 0 ? 1 - amount : amount), unit));
+			const unit = action === "FRAME" && amount === 0 || kind === "DIMENSIONS" && amount < 0 || kind === "POSITION" && amount === 0 ? "fraction" : "divisor";
+			dimensions.push(dimension(String(kind === "DIMENSIONS" && amount < 0 ? 1 - amount : amount), unit));
 		}
 	}
 	if (action === "FRAME") {
@@ -114,9 +130,25 @@ function buildWindowHandler() {
 	let pending = Promise.resolve();
 	return function window(action, expression) {
 		let request;
+		const windowId = this?.focusedWindowId ?? null;
 		try {
-			const axis = /^(?:\/)?(?:ws([wh])|wp([xy]))/.exec(this?.input ?? "");
-			if (axis && (action === "SIZE" || action === "POSITION")) {
+			if (windowId !== null && (!Number.isSafeInteger(windowId) || windowId < 0)) throw new TypeError("Expected a window number");
+			if (action === "SPACE") {
+				if (expression !== "NEXT" && expression !== "PREVIOUS" && (!/^[1-9]\d*$/.test(expression) || !Number.isSafeInteger(Number(expression)))) throw new TypeError("Expected a positive Space number, NEXT, or PREVIOUS");
+				const appId = this?.focusedAppId;
+				const result = pending.then(() => import__keychord_native_window.default.moveWindowToSpace(appId, windowId, expression));
+				pending = result.catch(() => {});
+				return result;
+			}
+			if (action === "CYCLE") {
+				if (expression !== "NEXT" && expression !== "PREVIOUS") throw new TypeError("Unknown window cycle direction");
+				const appId = this?.focusedAppId;
+				const result = pending.then(() => import__keychord_native_window.default.cycleWindows(appId, expression));
+				pending = result.catch(() => {});
+				return result;
+			}
+			const axis = /^(?:\/)?(?:wd([wh])|wp([xy]))/.exec(this?.input ?? "");
+			if (axis && (action === "DIMENSIONS" || action === "DIMENSIONS_INCREASE" || action === "DIMENSIONS_DECREASE" || action === "POSITION")) {
 				const { height: value } = parseWindowDimensions(action, `h${expression}`);
 				request = JSON.stringify(axis[1] === "w" || axis[2] === "x" ? { width: value } : { height: value });
 			} else request = JSON.stringify(parseWindowDimensions(action, expression));
@@ -125,7 +157,7 @@ function buildWindowHandler() {
 			return Promise.reject(error);
 		}
 		const appId = this?.focusedAppId;
-		const result = pending.then(() => import__keychord_native_window.default.runWindowAction(appId, action, request));
+		const result = pending.then(() => import__keychord_native_window.default.runWindowAction(appId, windowId, action, request));
 		pending = result.catch(() => {});
 		return result;
 	};

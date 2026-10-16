@@ -1,4 +1,4 @@
-import { expect, test } from "vite-plus/test";
+import { expect, test } from "bun:test";
 import { clampDevicePoints } from "../src/js/utils/screen-continuity-points";
 
 const bounds = { x: -100, y: 200, width: 300, height: 600 };

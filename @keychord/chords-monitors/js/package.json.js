@@ -5,6 +5,7 @@ var repository = {
 	"url": "https://github.com/KeyChord/chords-monitors"
 };
 var type = "module";
+var scripts = { "test": "bun test --isolate" };
 var devDependencies = {
 	"@keychord/chordtest": "workspace:*",
 	"@keychord/config": "catalog:",
@@ -52,9 +53,10 @@ var package_default = {
 	name,
 	repository,
 	type,
+	scripts,
 	devDependencies,
 	packageManager,
 	chords
 };
 //#endregion
-export { chords, package_default as default, devDependencies, name, packageManager, repository, type };
+export { chords, package_default as default, devDependencies, name, packageManager, repository, scripts, type };

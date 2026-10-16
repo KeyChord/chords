@@ -9,6 +9,9 @@
   "exports": {
     ".": "./src/js/keys.ts"
   },
+  "scripts": {
+    "test": "bun test --isolate"
+  },
   "devDependencies": {
     "@keychord/chordtest": "workspace:*",
     "@keychord/config": "catalog:",

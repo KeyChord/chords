@@ -1,26 +1,12 @@
 import { defineConfig } from "vite-plus";
-import { configDefaults } from "vite-plus/test/config";
-import { chordTestRuntime } from "@keychord/chordtest/vitest";
 
-const runtime = chordTestRuntime();
-
+// Tests run with `bun test` in each package (`vp run -r test`), not Vitest.
 export default defineConfig({
-  ...runtime,
   fmt: {
+    // Oxfmt preserves TOML key quotes, including optional single quotes on chord bindings.
     ignorePatterns: [".github/workflows/*.yml"],
   },
-  test: {
-    ...runtime.test,
-    // This package tests its native addon and TOML loader using Bun's runtime.
-    exclude: [
-      ...configDefaults.exclude,
-      ".chord-testing/**",
-      "**/*.bun.test.ts",
-      "@keychord/chordtest/__tests__/**",
-      "**/*.vm.test.ts",
-    ],
-  },
   staged: {
-    "*.{js,ts,tsx,json}": "vp fmt",
+    "*.{js,ts,tsx,json,toml}": "vp fmt",
   },
 });

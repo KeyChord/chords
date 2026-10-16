@@ -1,19 +1,18 @@
-import { onAppLaunch, onAppTerminate, setAppNeedsRelaunch } from "chord";
-import { afterEach, beforeEach, expect, test, vi } from "vite-plus/test";
-import { configureSpotifyDebugging } from "../src/js/spotify/app";
+import { afterEach, beforeEach, expect, mock, spyOn, test } from "bun:test";
+import { advanceTimersByTimeAsync, useFakeTimers, useRealTimers } from "@keychord/chordtest/test";
 
-vi.mock("chord", () => ({
-  onAppLaunch: vi.fn(),
-  onAppTerminate: vi.fn(),
-  setAppNeedsRelaunch: vi.fn(),
-}));
+const onAppLaunch = mock();
+const onAppTerminate = mock();
+const setAppNeedsRelaunch = mock();
+mock.module("chord", () => ({ onAppLaunch, onAppTerminate, setAppNeedsRelaunch }));
+const { configureSpotifyDebugging } = await import("../src/js/spotify/app");
 
 const bundleId = "com.spotify.client";
 const app = (pid = 123) => ({ pid, bundleId });
 let runningPids: string;
 let commandLine: string;
 let failure: string | undefined;
-const spawn = vi.fn((command: string[]) => {
+const spawn = mock((command: string[]) => {
   let stdout = "";
   let exitCode = 0;
   let stderr = "";
@@ -35,29 +34,31 @@ const spawn = vi.fn((command: string[]) => {
   };
 });
 const launch = () =>
-  vi.mocked(onAppLaunch).mock.calls[0][1] as (value: ReturnType<typeof app>) => Promise<void>;
+  onAppLaunch.mock.calls[0][1] as (value: ReturnType<typeof app>) => Promise<void>;
 const terminate = () =>
-  vi.mocked(onAppTerminate).mock.calls[0][1] as (value: ReturnType<typeof app>) => Promise<void>;
+  onAppTerminate.mock.calls[0][1] as (value: ReturnType<typeof app>) => Promise<void>;
 const commands = () => spawn.mock.calls.map(([command]) => command);
 const signals = () => commands().filter(([program]) => program === "/bin/kill");
 const opens = () => commands().filter(([program]) => program === "/usr/bin/open");
 
 beforeEach(() => {
-  vi.clearAllMocks();
-  vi.stubGlobal("Bun", { spawn });
+  mock.clearAllMocks();
+  spyOn(Bun, "spawn").mockImplementation(spawn as unknown as typeof Bun.spawn);
   runningPids = "";
   commandLine = "/Applications/Spotify.app/Contents/MacOS/Spotify";
   failure = undefined;
 });
 afterEach(() => {
-  vi.unstubAllGlobals();
-  vi.useRealTimers();
+  mock.restore();
+  useRealTimers();
 });
 
 test("registers Spotify lifecycle callbacks and leaves a closed app closed", async () => {
   await configureSpotifyDebugging(9223);
-  expect(onAppLaunch).toHaveBeenCalledExactlyOnceWith(bundleId, expect.any(Function));
-  expect(onAppTerminate).toHaveBeenCalledExactlyOnceWith(bundleId, expect.any(Function));
+  expect(onAppLaunch).toHaveBeenCalledTimes(1);
+  expect(onAppLaunch).toHaveBeenCalledWith(bundleId, expect.any(Function));
+  expect(onAppTerminate).toHaveBeenCalledTimes(1);
+  expect(onAppTerminate).toHaveBeenCalledWith(bundleId, expect.any(Function));
   expect(setAppNeedsRelaunch).toHaveBeenLastCalledWith(bundleId, true);
   expect(signals()).toEqual([]);
   await terminate()(app());
@@ -130,10 +131,10 @@ test("a failed termination reports the error and does not reopen on a later norm
 });
 
 test("a refused graceful quit does not reopen an app quit later by the user", async () => {
-  vi.useFakeTimers();
+  useFakeTimers();
   await configureSpotifyDebugging(9223);
   await launch()(app());
-  await vi.advanceTimersByTimeAsync(10_001);
+  await advanceTimersByTimeAsync(10_001);
   await terminate()(app());
   expect(opens()).toEqual([]);
   expect(setAppNeedsRelaunch).toHaveBeenLastCalledWith(bundleId, true);

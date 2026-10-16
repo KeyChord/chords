@@ -38,10 +38,7 @@ const { chords } = Bun.TOML.parse(
 };
 assert.deepEqual(
   Object.entries(chords)
-    .filter(
-      ([chord, binding]) =>
-        !chord.startsWith("?") && Object.keys(binding).some((key) => key !== "name"),
-    )
+    .filter(([chord]) => !chord.startsWith("?"))
     .map(([chord]) => chord)
     .sort(),
   cases.map((test) => test.chord).sort(),
@@ -66,6 +63,17 @@ for (const scenario of cases) {
   );
   await handler.call({ focusedAppId: coverId }, args[0], scenario.input ?? args[1]);
   await recorded(scenario.control);
+  if (scenario.action === "CHAT_INFO_AT") {
+    assert.equal((await Bun.file(output).json()).selectedChat, Number(scenario.input));
+  }
+  if (scenario.action === "CHAT_INFO_BLOCK" || scenario.action === "CHAT_INFO_BLOCK_REPORT") {
+    const state = await Bun.file(output).json();
+    assert.equal(state.blocked, true);
+    assert.equal(state.reported, scenario.action === "CHAT_INFO_BLOCK_REPORT");
+  }
+  if (scenario.action === "CHAT_INFO_UNBLOCK") {
+    assert.equal((await Bun.file(output).json()).blocked, false);
+  }
   if (scenario.action === "CHAT_OPEN_WINDOW") {
     assert.equal((await Bun.file(output).json()).chatWindowOpen, true);
   }
@@ -131,6 +139,88 @@ console.log(
 );
 if (scope === "VOICE") process.exit(0);
 
+// Each view has different fixture rows, so using the main list's position
+// instead of the chosen filter would select a different chat.
+for (const [action, filter, index, selectedChat, unavailable] of [
+  ["VIEW_CHATS", "ALL", 12, 12, 13],
+  ["VIEW_ARCHIVED", "ARCHIVED", 2, 11, 3],
+  ["VIEW_CHATS_ALL", "ALL", 12, 12, 13],
+  ["VIEW_CHATS_UNREAD", "UNREAD", 2, 5, 4],
+  ["VIEW_CHATS_FAVOURITES", "FAVOURITES", 2, 9, 3],
+  ["VIEW_CHATS_GROUPS", "GROUPS", 1, 3, 4],
+] as const) {
+  await reset();
+  // A prefix may have already selected the view before its number is typed.
+  await handler(action);
+  await handler("CHAT_INFO");
+  await handler(action, String(index));
+  await recorded(`chat_${selectedChat}`);
+  const state = await Bun.file(output).json();
+  assert.equal(state.chatFilter, filter);
+  assert.equal(state.selectedChat, selectedChat);
+  await assert.rejects(handler(action, String(unavailable)), /not loaded/);
+  assert.equal((await Bun.file(output).json()).selectedChat, selectedChat);
+  assert.equal((await Bun.file(output).json()).chatFilter, filter);
+}
+
+for (const index of [1, 9, 10, 12]) {
+  await reset();
+  // Typing the ci prefix can open the current chat's Info first.
+  await handler("CHAT_INFO");
+  await handler("CHAT_INFO_AT", String(index));
+  await recorded("group_info");
+  assert.equal((await Bun.file(output).json()).selectedChat, index);
+}
+await reset();
+await assert.rejects(handler("CHAT_INFO_AT", "13"), /not loaded/);
+assert.notEqual((await Bun.file(output).json()).action, "group_info");
+
+await reset("GROUP");
+await handler("GROUP_MEMBER_CHANGES");
+await recorded("Group_Info_Member_Changes");
+await handler("GROUP_DESCRIPTION");
+await recorded("group-description-row");
+await reset("GROUP_PERMISSIONS_HIDDEN");
+await handler("GROUP_PERMISSIONS");
+await recorded("group_permissions");
+assert.equal((await Bun.file(output).json()).phase, "GROUP_PERMISSIONS");
+const permissionsOpen = await Bun.file(output).json();
+await handler("GROUP_PERMISSIONS");
+assert.deepEqual(await Bun.file(output).json(), permissionsOpen, "reopened Group permissions");
+for (const mode of ["GROUP_PERMISSIONS_OCCUPIED", "GROUP_PERMISSIONS_BAD_LAYOUT"]) {
+  await reset(mode);
+  await assert.rejects(handler("GROUP_PERMISSIONS"), /unavailable/);
+  assert.equal(
+    (await Bun.file(output).json()).action,
+    "group_info",
+    `${mode} clicked an unknown row`,
+  );
+}
+await reset("GROUP_PERMISSIONS_WRONG_PAGE");
+await assert.rejects(handler("GROUP_PERMISSIONS"), /Group permissions.*did not open/);
+assert.equal((await Bun.file(output).json()).phase, "GROUP_PERMISSIONS");
+await reset();
+await handler("SETTINGS_STORAGE");
+await recorded("SettingsView_DataAndStorageUsageCell");
+await handler("SETTINGS_ACCOUNT");
+await recorded("SettingsView_AccountsCell");
+
+// Both report choices are exercised ONLY against this local AppKit fixture.
+for (const [action, control] of [
+  ["CHAT_INFO_BLOCK", "block_confirmed"],
+  ["CHAT_INFO_BLOCK_REPORT", "block_report_confirmed"],
+] as const) {
+  await reset("BLOCK_DIALOG");
+  await handler(action);
+  await recorded(control);
+}
+await reset("UNBLOCK_IMMEDIATE");
+await handler("CHAT_INFO_UNBLOCK");
+await recorded("unblock_confirmed");
+assert.equal((await Bun.file(output).json()).blocked, false);
+await reset();
+await assert.rejects(handler("CHAT_INFO_UNBLOCK"), /unavailable/);
+
 // Prefix navigation can already have opened Info, Theme, or Wallpaper. Child
 // chords must continue from those views, without selecting a theme preset.
 await reset();
@@ -184,6 +274,8 @@ for (const action of ["CALL_DECLINE", "CALL_ACCEPT"] as const) {
 await reset();
 await handler("VIEW_PROFILE");
 await recorded("SettingsView_ProfileCell");
+// The additional dialog-navigation cases run in navigation.vm.test.ts.
+// This suite covers every binding plus the chat, group, settings and call flows.
 console.log(
   `whatsapp-app-targeting-ok: ${cases.length} chords, UI clicks, nested navigation, toggles, errors`,
 );

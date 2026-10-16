@@ -1,5 +1,5 @@
 import { Window } from "happy-dom";
-import { afterEach, beforeEach, expect, test, vi } from "vite-plus/test";
+import { afterEach, beforeEach, expect, mock, test } from "bun:test";
 import { buildSpotifyJavaScript } from "../src/js/page";
 
 let window: Window;
@@ -14,18 +14,18 @@ function router(pathname: string, state: object = {}) {
   const location = { pathname, search: "?old-search", hash: "#old-anchor", state, key: "old" };
   const history = {
     location,
-    replace: vi.fn((path: string, newState: object) => {
+    replace: mock((path: string, newState: object) => {
       history.location = { pathname: path, search: "", hash: "", state: newState, key: "new" };
       commit();
     }),
     // Reproduce Spotify's guard: it ignores a push to the same URL even if state differs.
-    push: vi.fn(),
+    push: mock(),
   };
   const committed = { memoizedProps: { value: { location } } };
   const current = { memoizedProps: { value: { navigator: history } }, child: committed };
   const container = {
     // The attached fiber's props are stale; production must use stateNode.current.
-    memoizedProps: { value: { navigator: { replace: vi.fn(), location } } },
+    memoizedProps: { value: { navigator: { replace: mock(), location } } },
     stateNode: { current },
   };
   Object.assign(element, { __reactContainer$randomSuffix: container });

@@ -2,5 +2,5 @@
 import addon from "./probe.node";
 
 export function callAddon(): string {
-  return (addon as { probe(): string }).probe();
+  return addon.probe();
 }

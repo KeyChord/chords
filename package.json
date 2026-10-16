@@ -8,7 +8,7 @@
     "workflows:build": "gwf build",
     "postinstall": "vp run workflows:build",
     "native:check": "_check-native-artifacts",
-    "test:bun": "bun test ./@keychord/chordtest/__tests__ ./@keychord/chords-menu/__tests__/actor-queue.bun.test.ts ./@keychord/chords-menu/__tests__/tray-native.bun.test.ts ./@keychord/chords-menu/__tests__/tray.bun.test.ts ./@keychord/chords-menu/__tests__/visibility.bun.test.ts",
+    "test": "vp run --filter './@keychord/*' test",
     "test:macos:setup": "chordtest setup",
     "test:macos": "chordtest test",
     "test:macos:status": "chordtest status",

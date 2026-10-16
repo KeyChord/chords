@@ -3,7 +3,7 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { expect, test } from "vite-plus/test";
+import { expect, test } from "bun:test";
 
 test.skipIf(process.platform !== "darwin")(
   "native device bounds exclude chrome across zoom, orientation and display origins",

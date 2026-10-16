@@ -10,6 +10,9 @@
     ".": "./src/js/click.ts",
     "./sequence": "./src/js/utils/click-sequence.ts"
   },
+  "scripts": {
+    "test": "bun test --isolate"
+  },
   "devDependencies": {
     "@keychord/chordtest": "workspace:*",
     "@keychord/config": "catalog:",

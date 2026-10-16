@@ -1,13 +1,18 @@
-import { readFileSync } from "node:fs";
-import { execFileSync } from "node:child_process";
-import { afterEach, beforeEach, expect, test, vi } from "vite-plus/test";
-import buildHandler from "../src/js/spotify";
+import { afterEach, beforeEach, expect, mock, spyOn, test } from "bun:test";
+import {
+  advanceTimersByTimeAsync,
+  stubGlobal,
+  unstubAllGlobals,
+  useFakeTimers,
+  useRealTimers,
+  waitFor,
+} from "@keychord/chordtest/test";
 import { buildSpotifyJavaScript } from "../src/js/page";
-import { configureSpotifyDebugging } from "../src/js/spotify/app";
 
-vi.mock("../src/js/spotify/app", () => ({
-  configureSpotifyDebugging: vi.fn(() => Promise.resolve()),
-}));
+const configureSpotifyDebugging = mock((_port: number) => Promise.resolve());
+mock.module("../src/js/spotify/app", () => ({ configureSpotifyDebugging }));
+// The real app module imports the host `chord` module; import the handler after mocking it.
+const { default: buildHandler } = await import("../src/js/spotify");
 
 const sockets: FakeSocket[] = [];
 let replies: (expression: string, url: string) => unknown;
@@ -16,7 +21,7 @@ class FakeSocket {
   onmessage: ((event: { data: string }) => void) | null = null;
   onerror: (() => void) | null = null;
   onclose: (() => void) | null = null;
-  close = vi.fn();
+  close = mock();
   requests: { method: string; params: { expression: string } }[] = [];
   constructor(readonly url: string) {
     sockets.push(this);
@@ -37,35 +42,30 @@ function target(
 ) {
   return { type: "page", url, webSocketDebuggerUrl: endpoint };
 }
-const fetchMock = vi.fn();
+const fetchMock = mock();
 beforeEach(() => {
-  vi.mocked(configureSpotifyDebugging).mockReset().mockResolvedValue();
+  configureSpotifyDebugging.mockReset().mockResolvedValue(undefined);
   sockets.length = 0;
   fetchMock.mockReset().mockResolvedValue({ ok: true, json: async () => [target()] });
   replies = () => ({ id: 1, result: { result: { value: '{"ok":true}' } } });
-  vi.stubGlobal("fetch", fetchMock);
-  vi.stubGlobal("WebSocket", FakeSocket);
+  stubGlobal("fetch", fetchMock);
+  stubGlobal("WebSocket", FakeSocket);
 });
 afterEach(() => {
-  vi.restoreAllMocks();
-  vi.unstubAllGlobals();
-  vi.useRealTimers();
+  mock.restore();
+  unstubAllGlobals();
+  useRealTimers();
 });
 
 test("all TOML chords dispatch their intended Spotify action and argument", async () => {
   // Chord discovers app bindings at chords/<bundle-id segments>/macos.toml.
   const path = new URL("../chords/com/spotify/client/macos.toml", import.meta.url);
   // Chord uses Bun's TOML parser, so validate the actual host format.
-  const bindings = JSON.parse(
-    execFileSync(
-      "bun",
-      ["-e", "console.log(JSON.stringify(Bun.TOML.parse(await Bun.stdin.text())))"],
-      {
-        input: readFileSync(path, "utf8"),
-        encoding: "utf8",
-      },
-    ),
-  );
+  const bindings = Bun.TOML.parse(await Bun.file(path).text()) as {
+    name: string;
+    on: unknown;
+    chords: Record<string, unknown>;
+  };
   expect(bindings.name).toBe("Spotify");
   expect(bindings.on).toEqual({ spotify: { file: "spotify.js" } });
   // Group headings have no action and are not regular-expression triggers.
@@ -145,7 +145,8 @@ test("all TOML chords dispatch their intended Spotify action and argument", asyn
 
 test("supports a configured debugging port", async () => {
   await buildHandler(9333)("MORE", "1");
-  expect(configureSpotifyDebugging).toHaveBeenCalledExactlyOnceWith(9333);
+  expect(configureSpotifyDebugging).toHaveBeenCalledTimes(1);
+  expect(configureSpotifyDebugging).toHaveBeenCalledWith(9333);
   expect(fetchMock.mock.calls[0][0]).toBe("http://127.0.0.1:9333/json/list");
 });
 
@@ -157,7 +158,7 @@ test.each([0, 65536, -1, 1.5, NaN])("rejects invalid debugging port %s", (port) 
 
 test("chords wait for Spotify setup and only configure it once", async () => {
   let finishSetup!: () => void;
-  vi.mocked(configureSpotifyDebugging).mockReturnValueOnce(
+  configureSpotifyDebugging.mockReturnValueOnce(
     new Promise((resolve) => {
       finishSetup = resolve;
     }),
@@ -169,13 +170,14 @@ test("chords wait for Spotify setup and only configure it once", async () => {
   finishSetup();
   await expect(pending).resolves.toBe(true);
   await expect(handler("QUEUE", "2")).resolves.toBe(true);
-  expect(configureSpotifyDebugging).toHaveBeenCalledExactlyOnceWith(9223);
+  expect(configureSpotifyDebugging).toHaveBeenCalledTimes(1);
+  expect(configureSpotifyDebugging).toHaveBeenCalledWith(9223);
 });
 
 test("a setup failure is reported without blocking future chords", async () => {
   const error = new Error("Permission denied");
-  const log = vi.spyOn(console, "error").mockImplementation(() => undefined);
-  vi.mocked(configureSpotifyDebugging).mockRejectedValueOnce(error);
+  const log = spyOn(console, "error").mockImplementation(() => undefined);
+  configureSpotifyDebugging.mockRejectedValueOnce(error);
   const handler = buildHandler();
   await expect(handler("MORE", "1")).rejects.toThrow("Permission denied");
   expect(log).toHaveBeenCalledWith("Could not enable Spotify debugging:", error);
@@ -310,11 +312,15 @@ test("malformed protocol messages reject and clean up", async () => {
 });
 
 test("a stalled runtime times out and closes its socket", async () => {
-  vi.useFakeTimers();
+  useFakeTimers();
   replies = () => undefined;
-  const assertion = expect(buildHandler()("MORE", "1")).rejects.toThrow("did not respond");
-  await vi.advanceTimersByTimeAsync(5000);
-  await assertion;
+  // Bun's `expect(promise).rejects` blocks until the promise settles; capture the error instead.
+  const outcome = buildHandler()("MORE", "1").then(
+    () => new Error("expected the stalled runtime to time out"),
+    (error: unknown) => error,
+  );
+  await advanceTimersByTimeAsync(5000);
+  expect(((await outcome) as Error).message).toContain("did not respond");
   expect(sockets[0].close).toHaveBeenCalledOnce();
 });
 
@@ -323,11 +329,11 @@ test("overlapping chords wait for the previous menu action to finish", async () 
   const handler = buildHandler();
   const first = handler("QUEUE", "1");
   const second = handler("REMOVE", "2");
-  await vi.waitFor(() => expect(sockets).toHaveLength(1));
+  await waitFor(() => expect(sockets).toHaveLength(1));
   const result = { data: JSON.stringify({ id: 1, result: { result: { value: '{"ok":true}' } } }) };
   sockets[0].onmessage?.(result);
   await first;
-  await vi.waitFor(() => expect(sockets).toHaveLength(2));
+  await waitFor(() => expect(sockets).toHaveLength(2));
   expect(sockets[1].requests[0].params.expression).toBe(buildSpotifyJavaScript("REMOVE", "2"));
   sockets[1].onmessage?.(result);
   await second;
@@ -343,11 +349,11 @@ test("the next playlist chord waits for Liked Songs navigation to finish", async
   const handler = buildHandler();
   const first = handler("LIKED_SONGS");
   const second = handler("MORE", "1");
-  await vi.waitFor(() => expect(sockets).toHaveLength(1));
+  await waitFor(() => expect(sockets).toHaveLength(1));
   const result = { data: JSON.stringify({ id: 1, result: { result: { value: '{"ok":true}' } } }) };
   sockets[0].onmessage?.(result);
   await first;
-  await vi.waitFor(() => expect(sockets).toHaveLength(2));
+  await waitFor(() => expect(sockets).toHaveLength(2));
   expect(sockets[1].requests[0].params.expression).toBe(buildSpotifyJavaScript("MORE", "1"));
   sockets[1].onmessage?.(result);
   await second;

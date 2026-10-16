@@ -472,6 +472,24 @@ importers:
         specifier: latest
         version: 1.4.3
 
+  '@keychord/chords-navigation':
+    devDependencies:
+      '@keychord/chords-whatsapp':
+        specifier: workspace:*
+        version: link:../chords-whatsapp
+      '@keychord/chordtest':
+        specifier: workspace:*
+        version: link:../chordtest
+      '@keychord/config':
+        specifier: link:../../../config
+        version: link:../../../config
+      '@keychord/tsconfig':
+        specifier: 'catalog:'
+        version: 0.0.6
+      '@types/bun':
+        specifier: latest
+        version: 1.4.3
+
   '@keychord/chords-raycast':
     dependencies:
       array-uniq:
@@ -514,6 +532,9 @@ importers:
       '@keychord/config':
         specifier: link:../../../config
         version: link:../../../config
+      '@types/bun':
+        specifier: ^1.4.3
+        version: 1.4.3
 
   '@keychord/chords-spotify':
     devDependencies:
@@ -643,6 +664,9 @@ importers:
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
+      '@types/bun':
+        specifier: ^1.4.3
+        version: 1.4.3
       happy-dom:
         specifier: ^21.0.1
         version: 21.0.1
@@ -659,9 +683,6 @@ importers:
       '@types/bun':
         specifier: latest
         version: 1.4.3
-      '@types/sinonjs__fake-timers':
-        specifier: 15.0.1
-        version: 15.0.1
       typescript:
         specifier: 'catalog:'
         version: 7.0.2
@@ -1442,9 +1463,6 @@ packages:
 
   '@types/node@26.6.5':
     resolution: {integrity: sha512-uMzsv9stDdofIZBx4UGh4Z9ZgXnGC9seRDscilBcTHAeOFk67MZg/k9bWVfO+bk4qZmG+l52hRnLwUiH2LnJTg==}
-
-  '@types/sinonjs__fake-timers@15.0.1':
-    resolution: {integrity: sha512-Ko2tjWJq8oozHzHV+reuvS5KYIRAokHnGbDwGh/J64LntgpbuylF74ipEL24HCyRjf9FOlBiBHWBR1RlVKsI1w==}
 
   '@types/validator@13.15.10':
     resolution: {integrity: sha512-T8L6i7wCuyoK8A/ZeLYt1+q0ty3Zb9+qbSSvrIVitzT3YjZqkTZ40IbRsPanlB4h1QB3JVL1SYCdR6ngtFYcuA==}
@@ -2988,8 +3006,6 @@ snapshots:
   '@types/node@26.6.5':
     dependencies:
       undici-types: 8.9.0
-
-  '@types/sinonjs__fake-timers@15.0.1': {}
 
   '@types/validator@13.15.10': {}
 

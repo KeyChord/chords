@@ -5,6 +5,7 @@ var repository = {
 	"url": "https://github.com/KeyChord/chords-dock"
 };
 var type = "module";
+var scripts = { "test": "bun test --isolate" };
 var devDependencies = {
 	"@keychord/chords-menu": "workspace:*",
 	"@keychord/chordtest": "workspace:*",
@@ -361,10 +362,19 @@ var chords = {
 		"name": "macOS Dock",
 		"on": {
 			"menu": { "file": "@keychord/chords-menu/js/menu.js" },
-			"dock": { "file": "dock.js" }
+			"dock": { "file": "dock.js" },
+			"application": { "file": "application.js" }
 		},
 		"chords": {
 			"?/d": { "name": "Dock" },
+			"/dw[": {
+				"name": "Dock: Previous App",
+				"@input:application": ["PREVIOUS"]
+			},
+			"/dw]": {
+				"name": "Dock: Next App",
+				"@input:application": ["NEXT"]
+			},
 			"/dv": {
 				"name": "Dock: Vary (On/Off)",
 				"shortcut": "ctrl+f3"
@@ -388,9 +398,10 @@ var package_default = {
 	name,
 	repository,
 	type,
+	scripts,
 	devDependencies,
 	packageManager,
 	chords
 };
 //#endregion
-export { chords, package_default as default, devDependencies, name, packageManager, repository, type };
+export { chords, package_default as default, devDependencies, name, packageManager, repository, scripts, type };

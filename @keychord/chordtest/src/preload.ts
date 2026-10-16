@@ -11,11 +11,14 @@
  * - The `chord` mocks return to their unconfigured defaults before every test.
  */
 import { plugin } from "bun";
-import { beforeEach, type Mock } from "bun:test";
+import { beforeEach, mock, type Mock } from "bun:test";
 import { dirname, extname, resolve } from "node:path";
 import * as chord from "./chord.ts";
 
-const chordModule = Bun.fileURLToPath(new URL("./chord.ts", import.meta.url));
+// Runtime plugins never see bare specifiers, so `chord` is registered as a module mock instead.
+// Tests and handlers share these exports, which the beforeEach below resets.
+mock.module("chord", () => chord);
+
 const namespaceModule = Bun.fileURLToPath(new URL("./module-namespace.ts", import.meta.url));
 const defaultImplementation = Symbol.for("chordtest.defaultImplementation");
 const loaders: Record<string, "js" | "jsx" | "ts" | "tsx"> = {
@@ -32,8 +35,6 @@ const loaders: Record<string, "js" | "jsx" | "ts" | "tsx"> = {
 plugin({
   name: "chord-test-runtime",
   setup(build) {
-    build.onResolve({ filter: /^chord$/ }, () => ({ path: chordModule }));
-
     build.onResolve({ filter: /^\.\.?\/.*\.node$/ }, ({ path, importer }) => {
       if (importer.includes("/node_modules/")) return undefined;
       // A non-`.node` path keeps Bun's Node-API loader away; mock.module resolves the same path.

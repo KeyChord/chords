@@ -13,6 +13,34 @@ test.skipIf(!macOSUITestsEnabled)(
 );
 
 test.skipIf(!macOSUITestsEnabled)(
+  "window cycling focuses only regular same-app windows in a stable ring",
+  async () => {
+    const fixture = await launchMacOSFixture(
+      new URL("./WindowCycleFixture.swift", import.meta.url),
+      "dev.keychord.window-cycle-fixture",
+    );
+    try {
+      const cover = await launchMacOSFixture(
+        new URL("./WindowFixture.swift", import.meta.url),
+        "dev.keychord.window-cycle-cover",
+      );
+      try {
+        const result = await runChordScript(
+          new URL("./window-cycle.integration.ts", import.meta.url),
+          [fixture.bundleId, fixture.output, cover.bundleId],
+        );
+        expect(result.stdout).toContain("window-cycle-ok");
+      } finally {
+        await cover.close();
+      }
+    } finally {
+      await fixture.close();
+    }
+  },
+  120_000,
+);
+
+test.skipIf(!macOSUITestsEnabled)(
   "standard AppKit windows support native frame, snapping and overflow",
   async () => {
     const fixture = await launchMacOSFixture(

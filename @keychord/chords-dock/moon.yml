@@ -4,12 +4,14 @@ layer: library
 language: typescript
 
 tasks:
-  # Vendors the shared menu addon.
+  # Builds application switching and vendors the shared menu addon.
   build-native:
     deps:
       - "chords-menu:build-native"
     command: "vp pack"
     inputs:
+      - "Sources/**/*"
+      - "Package.swift"
       - "package.json"
       - "vite.config.ts"
     outputs:

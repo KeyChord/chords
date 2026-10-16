@@ -39,7 +39,7 @@ the local `main` bookmark.
 rebases current work onto it. Coordinate before running it in a shared checkout.
 Describing and pushing the current working copy includes all edits in that
 revision, so review them first. Jujutsu does not run Git hooks; run `vp check` and
-`vp test` before pushing.
+`vp run test` (Bun tests in every package) before pushing.
 
 ## Usage
 
@@ -69,6 +69,10 @@ In the default chord package, these are the categories assigned to the global ch
 > `` ` `` isn't reserved, but is conventionally used for "config" (e.g. `` 3`d=1`/w] ``)
 
 ## Conventions
+
+Always single-quote binding keys in TOML `[chords]` tables, even when quotes are
+optional (for example, `'fr' = { name = 'Find and Replace' }`). `vp fmt` preserves
+these quotes.
 
 In TOML chord keys, only parenthesized sections use regex syntax; all surrounding keys are literal. Write `hs.(\d+)` to match `hs.12` and pass `12` as `$1`. Dots outside parentheses need no backslash; dots inside a regex section still use `\.` when they must match literally. Chord patterns match the complete entered sequence automatically.
 

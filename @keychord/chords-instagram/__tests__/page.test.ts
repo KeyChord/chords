@@ -1,5 +1,5 @@
 import { Window } from "happy-dom";
-import { afterEach, beforeEach, expect, test, vi } from "vite-plus/test";
+import { afterEach, beforeEach, expect, mock, spyOn, test } from "bun:test";
 import { buildInstagramJavaScript, type InstagramAction } from "../src/js/page";
 
 let window: Window;
@@ -67,14 +67,14 @@ function storyTray(count = 12) {
   </ul></div>
   <article><div role="button" aria-label="Story by feed-account, not seen">Feed avatar</div></article>`;
   const stories = [...main.querySelectorAll('[data-pagelet="story_tray"] [role="button"]')];
-  const clicked = vi.fn();
+  const clicked = mock();
   for (const [index, story] of stories.entries()) {
     story.addEventListener("click", () => {
       clicked(index + 1);
       window.history.pushState(null, "", `/stories/account${index + 1}/123/`);
     });
   }
-  const unrelated = vi.fn();
+  const unrelated = mock();
   for (const control of main.querySelectorAll("button, article [role=button], [role=link]")) {
     control.addEventListener("click", unrelated);
   }
@@ -86,7 +86,8 @@ test.each([1, "2", "12", "01"])(
   async (index) => {
     const { clicked, unrelated } = storyTray();
     expect(await run("STORY", index)).toEqual({ ok: true });
-    expect(clicked).toHaveBeenCalledExactlyOnceWith(Number(index));
+    expect(clicked).toHaveBeenCalledTimes(1);
+    expect(clicked).toHaveBeenCalledWith(Number(index));
     expect(unrelated).not.toHaveBeenCalled();
     expect(window.location.pathname).toBe(`/stories/account${Number(index)}/123/`);
   },
@@ -97,7 +98,8 @@ test("hidden and disabled story controls do not count toward the position", asyn
   stories[0].setAttribute("hidden", "");
   stories[1].setAttribute("aria-disabled", "true");
   expect(await run("STORY", "1")).toEqual({ ok: true });
-  expect(clicked).toHaveBeenCalledExactlyOnceWith(3);
+  expect(clicked).toHaveBeenCalledTimes(1);
+  expect(clicked).toHaveBeenCalledWith(3);
 });
 
 test.each([
@@ -106,7 +108,7 @@ test.each([
   '<div contenteditable="true" role="textbox" aria-label="Reply to account2..."></div>',
 ])("story reply opens the selected story and focuses its editor: %s", async (markup) => {
   const { stories, clicked } = storyTray(2);
-  const sent = vi.fn();
+  const sent = mock();
   stories[1].addEventListener("click", () =>
     setTimeout(() => {
       window.document.querySelector("main")!.innerHTML = `${markup}<button>Send</button>`;
@@ -114,7 +116,8 @@ test.each([
     }, 10),
   );
   expect(await run("STORY_REPLY", 2)).toEqual({ ok: true });
-  expect(clicked).toHaveBeenCalledExactlyOnceWith(2);
+  expect(clicked).toHaveBeenCalledTimes(1);
+  expect(clicked).toHaveBeenCalledWith(2);
   const input = window.document.querySelector('textarea, input, [contenteditable="true"]')!;
   expect(window.document.activeElement).toBe(input);
   expect(input.textContent).toBe("");
@@ -140,7 +143,7 @@ test.each(["hidden", "disabled", "readonly"])(
   "unavailable story replies (%s) report an error",
   async (attribute) => {
     let now = 0;
-    vi.spyOn(window.Date, "now").mockImplementation(() => (now += 1000));
+    spyOn(window.Date, "now").mockImplementation(() => (now += 1000));
     const { stories } = storyTray(1);
     stories[0].addEventListener("click", () => {
       window.document.querySelector("main")!.innerHTML =
@@ -189,7 +192,7 @@ test("stories require Home and leave open dialogs untouched", async () => {
 
 test("an empty story tray and a click that does not open a story report errors", async () => {
   let now = 0;
-  vi.spyOn(window.Date, "now").mockImplementation(() => (now += 1000));
+  spyOn(window.Date, "now").mockImplementation(() => (now += 1000));
   storyTray(0);
   expect((await run("STORY", 1)).error).toContain("story tray is unavailable");
   storyTray(1);
@@ -235,7 +238,7 @@ function bottomNavigation(svgTitles = false) {
     <a href="/owner/"><img alt="owner's profile picture" /></a>`;
   const actions = ["HOME", "SEARCH", "CREATE", "REELS", "MESSAGES", "PROFILE"] as const;
   const labels = ["Home", "Explore", "New post", "Reels", "Messenger", "Profile"];
-  const clicked = vi.fn();
+  const clicked = mock();
   for (const [index, target] of [...bar.children].entries()) {
     target.addEventListener("click", (event) => {
       event.preventDefault();
@@ -261,7 +264,7 @@ function bottomNavigation(svgTitles = false) {
   content.innerHTML = `
     ${labels.map((label) => `<button>${icon(label)}</button>`).join("")}
     <a href="/someone-else/"><img alt="someone-else's profile picture" /></a>`;
-  const unrelated = vi.fn();
+  const unrelated = mock();
   content.addEventListener("click", unrelated);
   window.document.querySelector("main")!.prepend(content);
   const suggestion = window.document.createElement("aside");
@@ -312,7 +315,8 @@ test.each(gotoActions)("%s uses the icon-only bottom bar", async (action) => {
   window.history.pushState(null, "", "/");
   const { clicked, unrelated } = bottomNavigation();
   expect(await run(action)).toEqual({ ok: true });
-  expect(clicked).toHaveBeenCalledExactlyOnceWith(action);
+  expect(clicked).toHaveBeenCalledTimes(1);
+  expect(clicked).toHaveBeenCalledWith(action);
   expect(unrelated).not.toHaveBeenCalled();
   expectGoto(action);
 });
@@ -321,7 +325,8 @@ test.each(gotoActions)("%s also recognizes SVG title icons", async (action) => {
   window.history.pushState(null, "", "/");
   const { clicked, unrelated } = bottomNavigation(true);
   expect(await run(action)).toEqual({ ok: true });
-  expect(clicked).toHaveBeenCalledExactlyOnceWith(action);
+  expect(clicked).toHaveBeenCalledTimes(1);
+  expect(clicked).toHaveBeenCalledWith(action);
   expect(unrelated).not.toHaveBeenCalled();
   expectGoto(action);
 });
@@ -329,7 +334,7 @@ test.each(gotoActions)("%s also recognizes SVG title icons", async (action) => {
 test("Profile uses the avatar in the sidebar when its text is absent", async () => {
   const profile = window.document.querySelector('nav a[href="/owner/"]')!;
   profile.innerHTML = '<img alt="owner\'s profile picture" />';
-  const clicked = vi.fn();
+  const clicked = mock();
   profile.addEventListener("click", clicked);
   expect(await run("PROFILE")).toEqual({ ok: true });
   expect(clicked).toHaveBeenCalledOnce();
@@ -339,11 +344,12 @@ test("navigation ignores hidden icons inside otherwise visible controls", async 
   const { clicked } = bottomNavigation();
   const hidden = window.document.createElement("nav");
   hidden.innerHTML = '<button><svg aria-label="Home" hidden></svg></button>';
-  const hiddenClick = vi.fn();
+  const hiddenClick = mock();
   hidden.addEventListener("click", hiddenClick);
   window.document.body.prepend(hidden);
   expect(await run("HOME")).toEqual({ ok: true });
-  expect(clicked).toHaveBeenCalledExactlyOnceWith("HOME");
+  expect(clicked).toHaveBeenCalledTimes(1);
+  expect(clicked).toHaveBeenCalledWith("HOME");
   expect(hiddenClick).not.toHaveBeenCalled();
 });
 
@@ -352,7 +358,7 @@ test("Search prefers its sidebar toggle to a separate Explore icon", async () =>
   const explore = window.document.createElement("a");
   explore.href = "/explore/";
   explore.innerHTML = '<svg aria-label="Explore"></svg>';
-  const exploreClick = vi.fn();
+  const exploreClick = mock();
   explore.addEventListener("click", exploreClick);
   window.document.querySelector("nav")!.prepend(explore);
   expect(await run("SEARCH")).toEqual({ ok: true });
@@ -364,7 +370,8 @@ test("Search recognizes the compact Search & Explore icon", async () => {
   const { bar, clicked } = bottomNavigation();
   bar.querySelector('svg[aria-label="Explore"]')!.setAttribute("aria-label", "Search & Explore");
   expect(await run("SEARCH")).toEqual({ ok: true });
-  expect(clicked).toHaveBeenCalledExactlyOnceWith("SEARCH");
+  expect(clicked).toHaveBeenCalledTimes(1);
+  expect(clicked).toHaveBeenCalledWith("SEARCH");
   expectGoto("SEARCH");
 });
 
@@ -385,7 +392,7 @@ function storyViewer(dialog = false) {
   if (dialog) viewer.setAttribute("role", "dialog");
   viewer.innerHTML = `<div role="button"><svg aria-label="Close"></svg></div>
     <textarea placeholder="Reply to account1..."></textarea><button>Send</button>`;
-  const close = vi.fn(() => {
+  const close = mock(() => {
     setTimeout(() => {
       viewer.remove();
       window.history.pushState(null, "", "/");
@@ -394,7 +401,7 @@ function storyViewer(dialog = false) {
     }, 10);
   });
   viewer.querySelector('[role="button"]')!.addEventListener("click", close);
-  const send = vi.fn();
+  const send = mock();
   viewer.querySelector("button")!.addEventListener("click", send);
   window.document.body.append(viewer);
   viewer.querySelector("textarea")!.focus();
@@ -439,8 +446,8 @@ test.each(gotoActions)("%s closes the current editor before navigating", async (
   window.history.pushState(null, "", "/");
   prepareGoto(action);
   const dialog = editor();
-  const share = vi.fn();
-  const remove = vi.fn();
+  const share = mock();
+  const remove = mock();
   dialog.querySelectorAll("button")[0].addEventListener("click", share);
   dialog.querySelectorAll("button")[1].addEventListener("click", remove);
   expect(await run(action)).toEqual({ ok: true });
@@ -465,8 +472,8 @@ test("goto closes stacked dialogs from the top before leaving a story", async ()
 
 test("goto leaves Instagram's unsaved-draft confirmation for the user", async () => {
   const dialog = editor();
-  const discard = vi.fn();
-  const navigate = vi.fn();
+  const discard = mock();
+  const navigate = mock();
   window.document.querySelector('a[href="/"]')!.addEventListener("click", navigate);
   dialog.querySelector('[role="button"]')!.addEventListener("click", () => {
     const confirmation = window.document.createElement("div");
@@ -484,7 +491,7 @@ test("goto leaves Instagram's unsaved-draft confirmation for the user", async ()
 
 test("goto cannot use a background Close control to dismiss an unrelated dialog", async () => {
   const background = editor();
-  const closeBackground = vi.fn();
+  const closeBackground = mock();
   background.querySelector('[role="button"]')!.addEventListener("click", closeBackground);
   const foreground = window.document.createElement("div");
   foreground.setAttribute("role", "dialog");
@@ -497,10 +504,10 @@ test("goto cannot use a background Close control to dismiss an unrelated dialog"
 
 test("goto reports a stalled story close instead of navigating behind it", async () => {
   let now = 0;
-  vi.spyOn(window.Date, "now").mockImplementation(() => (now += 1000));
+  spyOn(window.Date, "now").mockImplementation(() => (now += 1000));
   const { viewer, close } = storyViewer();
   close.mockImplementation(() => undefined);
-  const navigate = vi.fn();
+  const navigate = mock();
   window.document.querySelector('a[href="/"]')!.addEventListener("click", navigate);
   expect((await run("HOME")).error).toContain("story viewer did not close");
   expect(close).toHaveBeenCalledOnce();
@@ -510,7 +517,7 @@ test("goto reports a stalled story close instead of navigating behind it", async
 
 test("goto reports an unavailable story Close control", async () => {
   let now = 0;
-  vi.spyOn(window.Date, "now").mockImplementation(() => (now += 1000));
+  spyOn(window.Date, "now").mockImplementation(() => (now += 1000));
   const { viewer } = storyViewer();
   viewer.querySelector('[role="button"]')!.remove();
   expect((await run("HOME")).error).toContain("story viewer Close control is unavailable");
@@ -540,7 +547,7 @@ test("Search waits for the new page input, focuses it, and selects its existing 
   const input = window.document.querySelector<HTMLInputElement>("input")!;
   expect(window.document.activeElement).toBe(input);
   expect([input.selectionStart, input.selectionEnd]).toEqual([0, input.value.length]);
-  const clicked = vi.fn();
+  const clicked = mock();
   link.addEventListener("click", clicked);
   expect(await run("SEARCH")).toEqual({ ok: true });
   expect(clicked).not.toHaveBeenCalled();
@@ -550,7 +557,7 @@ test("Search does not mistake the Messages search field for the navigation searc
   window.history.pushState(null, "", "/direct/inbox/");
   window.document.querySelector("main")!.innerHTML = '<input placeholder="Search" />';
   const link = window.document.querySelector('a[href="/explore/"]')!;
-  const clicked = vi.fn();
+  const clicked = mock();
   link.addEventListener("click", clicked);
   await run("SEARCH");
   expect(clicked).toHaveBeenCalledOnce();
@@ -579,7 +586,7 @@ test("Create handles the Post submenu and opens the composer without sharing", a
 });
 
 test("Avatar clicks the current profile avatar, never the navigation avatar", async () => {
-  const clicked = vi.fn();
+  const clicked = mock();
   window.document
     .querySelector('button[title="Change profile photo"]')!
     .addEventListener("click", clicked);
@@ -588,7 +595,7 @@ test("Avatar clicks the current profile avatar, never the navigation avatar", as
 });
 
 test("Notes opens the editor and repeated calls leave it open", async () => {
-  const open = vi.fn(editor);
+  const open = mock(editor);
   window.document.querySelector('header [role="button"]')!.addEventListener("click", open);
   expect(await run("NOTE")).toEqual({ ok: true });
   expect(await run("NOTE")).toEqual({ ok: true });
@@ -599,7 +606,7 @@ test("Notes opens the editor and repeated calls leave it open", async () => {
 test("an existing note's bubble opens Leave a new note without deleting the old note", async () => {
   const bubble = window.document.querySelector('header [role="button"]')!;
   bubble.textContent = "My existing note";
-  const remove = vi.fn();
+  const remove = mock();
   bubble.addEventListener("click", () => {
     const dialog = window.document.createElement("div");
     dialog.setAttribute("role", "dialog");
@@ -618,8 +625,8 @@ test("an existing note's bubble opens Leave a new note without deleting the old 
 
 test("Close note only closes its editor and never shares or deletes", async () => {
   const dialog = editor();
-  const share = vi.fn();
-  const remove = vi.fn();
+  const share = mock();
+  const remove = mock();
   dialog.querySelectorAll("button")[0].addEventListener("click", share);
   dialog.querySelectorAll("button")[1].addEventListener("click", remove);
   expect(await run("CLOSE_NOTE")).toEqual({ ok: true });
@@ -634,7 +641,7 @@ test("Close note cannot close an unrelated Create dialog", async () => {
   dialog.setAttribute("role", "dialog");
   dialog.innerHTML = '<h1>Create new post</h1><button aria-label="Close">Close</button>';
   window.document.body.append(dialog);
-  const close = vi.fn();
+  const close = mock();
   dialog.querySelector("button")!.addEventListener("click", close);
   expect((await run("CLOSE_NOTE")).error).toContain("not an Instagram note editor");
   expect(close).not.toHaveBeenCalled();

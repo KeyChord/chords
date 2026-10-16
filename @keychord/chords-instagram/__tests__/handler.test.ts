@@ -1,12 +1,19 @@
-import { execFileSync } from "node:child_process";
-import { readFileSync } from "node:fs";
-import { afterEach, beforeEach, expect, test, vi } from "vite-plus/test";
+import { afterEach, beforeEach, expect, mock, spyOn, test } from "bun:test";
+import {
+  advanceTimersByTimeAsync,
+  mocked,
+  stubGlobal,
+  unstubAllGlobals,
+  useFakeTimers,
+  useRealTimers,
+  waitFor,
+} from "@keychord/chordtest/test";
 import buildHandler from "../src/js/instagram";
 import { buildInstagramJavaScript } from "../src/js/page";
 import { configureBraveDebugging } from "../src/js/instagram/browser";
 
-vi.mock("../src/js/instagram/browser", () => ({
-  configureBraveDebugging: vi.fn(() => Promise.resolve()),
+mock.module("../src/js/instagram/browser", () => ({
+  configureBraveDebugging: mock(() => Promise.resolve()),
 }));
 
 const sockets: FakeSocket[] = [];
@@ -17,7 +24,7 @@ class FakeSocket {
   onmessage: ((event: { data: string }) => void) | null = null;
   onerror: (() => void) | null = null;
   onclose: (() => void) | null = null;
-  close = vi.fn();
+  close = mock();
   requests: {
     method: string;
     params: { expression: string; userGesture: boolean; awaitPromise: boolean };
@@ -38,36 +45,30 @@ const target = (
   url = "https://www.instagram.com/owner/",
   endpoint = "ws://127.0.0.1:9222/devtools/page/instagram",
 ) => ({ type: "page", url, webSocketDebuggerUrl: endpoint });
-const fetchMock = vi.fn();
+const fetchMock = mock();
 beforeEach(() => {
-  vi.mocked(configureBraveDebugging).mockReset().mockResolvedValue();
+  mocked(configureBraveDebugging).mockReset().mockResolvedValue();
   sockets.length = 0;
   fetchMock.mockReset().mockResolvedValue({ ok: true, json: async () => [target()] });
   reply = () => ({ id: 1, result: { result: { value: '{"ok":true}' } } });
-  vi.stubGlobal("fetch", fetchMock);
-  vi.stubGlobal("WebSocket", FakeSocket);
+  stubGlobal("fetch", fetchMock);
+  stubGlobal("WebSocket", FakeSocket);
 });
 afterEach(() => {
-  vi.restoreAllMocks();
-  vi.unstubAllGlobals();
-  vi.useRealTimers();
+  mock.restore();
+  unstubAllGlobals();
+  useRealTimers();
 });
 
 test("every TOML chord is wired to the Instagram handler", async () => {
-  const contents = readFileSync(
-    new URL(
-      "../chords/com/brave/Browser/app/akpamiohjfcnimfljfndmaldlcfphjmp/macos.toml",
-      import.meta.url,
-    ),
-    "utf8",
-  );
-  const bindings = JSON.parse(
-    execFileSync(
-      "bun",
-      ["-e", "console.log(JSON.stringify(Bun.TOML.parse(await Bun.stdin.text())))"],
-      { input: contents, encoding: "utf8" },
-    ),
-  );
+  const bindings = Bun.TOML.parse(
+    await Bun.file(
+      new URL(
+        "../chords/com/brave/Browser/app/akpamiohjfcnimfljfndmaldlcfphjmp/macos.toml",
+        import.meta.url,
+      ),
+    ).text(),
+  ) as { on: { instagram: { file: string } }; chords: Record<string, unknown> };
   expect(bindings.on.instagram.file).toBe("instagram.js");
   const chords = Object.entries(bindings.chords).filter(([chord]) => !chord.startsWith("?")) as [
     string,
@@ -123,7 +124,8 @@ test("invalid story numbers never contact the browser and do not block following
 
 test("a custom local port is supported", async () => {
   await buildHandler(9333)("HOME");
-  expect(configureBraveDebugging).toHaveBeenCalledExactlyOnceWith(9333);
+  expect(configureBraveDebugging).toHaveBeenCalledTimes(1);
+  expect(configureBraveDebugging).toHaveBeenCalledWith(9333);
   expect(fetchMock.mock.calls[0][0]).toBe("http://127.0.0.1:9333/json/list");
 });
 
@@ -135,9 +137,7 @@ test.each([0, 65536, -1, 1.5, NaN])("rejects invalid port %s", (port) => {
 
 test("chords wait for browser setup and only configure it once", async () => {
   let ready!: () => void;
-  vi.mocked(configureBraveDebugging).mockReturnValueOnce(
-    new Promise((resolve) => (ready = resolve)),
-  );
+  mocked(configureBraveDebugging).mockReturnValueOnce(new Promise((resolve) => (ready = resolve)));
   const handler = buildHandler();
   const first = handler("HOME");
   const second = handler("MESSAGES");
@@ -146,13 +146,14 @@ test("chords wait for browser setup and only configure it once", async () => {
   ready();
   await expect(first).resolves.toBe(true);
   await expect(second).resolves.toBe(true);
-  expect(configureBraveDebugging).toHaveBeenCalledExactlyOnceWith(9222);
+  expect(configureBraveDebugging).toHaveBeenCalledTimes(1);
+  expect(configureBraveDebugging).toHaveBeenCalledWith(9222);
 });
 
 test("a setup failure is reported without blocking future chords", async () => {
   const error = new Error("Could not terminate Brave");
-  const log = vi.spyOn(console, "error").mockImplementation(() => undefined);
-  vi.mocked(configureBraveDebugging).mockRejectedValueOnce(error);
+  const log = spyOn(console, "error").mockImplementation(() => undefined);
+  mocked(configureBraveDebugging).mockRejectedValueOnce(error);
   const handler = buildHandler();
   await expect(handler("HOME")).rejects.toThrow(error.message);
   expect(fetchMock).not.toHaveBeenCalled();
@@ -232,7 +233,7 @@ test("quickly entered chords complete in order", async () => {
   reply = () => undefined;
   const first = handler("NOTE");
   const second = handler("CLOSE_NOTE");
-  await vi.waitFor(() => expect(sockets).toHaveLength(1));
+  await waitFor(() => expect(sockets).toHaveLength(1));
   reply = () => ({ id: 1, result: { result: { value: '{"ok":true}' } } });
   sockets[0].onmessage?.({ data: JSON.stringify(reply("", "")) });
   await expect(first).resolves.toBe(true);
@@ -256,11 +257,17 @@ test.each([
 });
 
 test("a stalled page times out and closes its socket", async () => {
-  vi.useFakeTimers();
+  useFakeTimers();
   reply = () => undefined;
   const pending = buildHandler()("HOME");
-  const assertion = expect(pending).rejects.toThrow("did not respond");
-  await vi.advanceTimersByTimeAsync(10_000);
-  await assertion;
+  // Bun's `expect(promise).rejects` blocks until the promise settles; capture the error instead.
+  const failure = pending.then(
+    () => undefined,
+    (error: unknown) => error,
+  );
+  await advanceTimersByTimeAsync(10_000);
+  const error = await failure;
+  expect(error).toBeInstanceOf(Error);
+  expect((error as Error).message).toContain("did not respond");
   expect(sockets[0].close).toHaveBeenCalledOnce();
 });

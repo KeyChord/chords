@@ -1,23 +1,29 @@
 import { readFileSync } from "node:fs";
-import { beforeEach, expect, test, vi } from "vite-plus/test";
+import { beforeEach, expect, mock, test } from "bun:test";
 import { chordPattern } from "@keychord/chordtest/patterns";
+import { waitFor } from "@keychord/chordtest/test";
 import {
   parseClickSequence,
   resolveClickSequence,
   type ScreenBounds,
 } from "@keychord/chords-click/sequence";
 
-const native = vi.hoisted(() => ({ getScreenBounds: vi.fn(), clickPoints: vi.fn() }));
-const openAddon = vi.hoisted(() => vi.fn());
-vi.mock("../src/js/utils/screen-continuity-native", () => ({
+const native = { getScreenBounds: mock(), clickPoints: mock() };
+const openAddon = mock();
+mock.module("../src/js/utils/screen-continuity-native", () => ({
   openScreenContinuityAddon: openAddon,
 }));
+// The handler caches its addon and queue at module level; load a fresh instance per test.
+let instance = 0;
+const loadHandler = async () =>
+  (await import(`../src/js/screen-continuity.ts?test=${instance}`))
+    .default as typeof import("../src/js/screen-continuity").default;
 const bounds: ScreenBounds = { x: 100, y: 200, width: 300, height: 600 };
 const parseTap = (sequence: string) => parseClickSequence(sequence, undefined, 36);
 const resolveTap = (sequence: string) => resolveClickSequence(parseTap(sequence), bounds);
 
 beforeEach(() => {
-  vi.resetModules();
+  instance++;
   native.getScreenBounds.mockReset().mockResolvedValue(JSON.stringify(bounds));
   native.clickPoints.mockReset().mockResolvedValue(undefined);
   openAddon.mockReset().mockReturnValue(native);
@@ -109,9 +115,10 @@ test("the configured chord captures and forwards all base-36 pairs", async () =>
   const binding = source.match(/^'([^']+)' = .*'@input:tap' = \['(\$1)'\]/m)!;
   expect(binding[1]).toBe("t(.+)");
   expect(chordPattern(binding[1]).exec("t00zz")?.[1]).toBe("00zz");
-  const { default: buildHandler } = await import("../src/js/screen-continuity");
+  const buildHandler = await loadHandler();
   await buildHandler()("00zz");
-  expect(native.clickPoints).toHaveBeenCalledExactlyOnceWith(
+  expect(native.clickPoints).toHaveBeenCalledTimes(1);
+  expect(native.clickPoints).toHaveBeenCalledWith(
     JSON.stringify({
       bounds,
       points: [
@@ -142,28 +149,29 @@ test.each([
     ],
   ],
 ] as const)("the tap handler dispatches the new syntax: %s", async (sequence, points) => {
-  const { default: buildHandler } = await import("../src/js/screen-continuity");
+  const buildHandler = await loadHandler();
   await buildHandler()(sequence);
-  expect(native.clickPoints).toHaveBeenCalledExactlyOnceWith(JSON.stringify({ bounds, points }));
+  expect(native.clickPoints).toHaveBeenCalledTimes(1);
+  expect(native.clickPoints).toHaveBeenCalledWith(JSON.stringify({ bounds, points }));
 });
 
 test.each(["00!", "=ii", "00=301l0"])(
   "invalid complete input never requests clicks: %s",
   async (sequence) => {
-    const { default: buildHandler } = await import("../src/js/screen-continuity");
+    const buildHandler = await loadHandler();
     await expect(buildHandler()(sequence)).rejects.toThrow();
     expect(native.clickPoints).not.toHaveBeenCalled();
   },
 );
 
 test("a malformed tail is rejected before native code loads", async () => {
-  const { default: buildHandler } = await import("../src/js/screen-continuity");
+  const buildHandler = await loadHandler();
   await expect(buildHandler()("00!")).rejects.toThrow();
   expect(openAddon).not.toHaveBeenCalled();
 });
 
 test("native connection errors propagate and the next sequence can run", async () => {
-  const { default: buildHandler } = await import("../src/js/screen-continuity");
+  const buildHandler = await loadHandler();
   const handler = buildHandler();
   native.getScreenBounds.mockRejectedValueOnce(new Error("iPhone Mirroring is not connected"));
   await expect(handler("00")).rejects.toThrow("not connected");
@@ -181,11 +189,11 @@ test("overlapping sequences wait until previous clicks finish", async () => {
         finishFirst = resolve;
       }),
   );
-  const { default: buildHandler } = await import("../src/js/screen-continuity");
+  const buildHandler = await loadHandler();
   const handler = buildHandler();
   const first = handler("00");
   const second = handler("zz");
-  await vi.waitFor(() => expect(native.clickPoints).toHaveBeenCalledOnce());
+  await waitFor(() => expect(native.clickPoints).toHaveBeenCalledOnce());
   expect(native.getScreenBounds).toHaveBeenCalledOnce();
   finishFirst();
   await Promise.all([first, second]);
@@ -197,7 +205,7 @@ test("overlapping sequences wait until previous clicks finish", async () => {
 });
 
 test("a failed click does not block later sequences", async () => {
-  const { default: buildHandler } = await import("../src/js/screen-continuity");
+  const buildHandler = await loadHandler();
   const handler = buildHandler();
   native.clickPoints.mockRejectedValueOnce(new Error("window moved"));
   await expect(handler("00")).rejects.toThrow("window moved");
@@ -212,9 +220,10 @@ test("h captures the same base-36 sequence and configures the hover handler", as
   expect(source).toMatch(/\[on\.hover\]\s+file = 'screen-continuity\.js'\s+args = \['HOVER'\]/);
   const binding = source.match(/^'([^']+)' = .*'@input:hover' = \['(\$1)'\]/m)!;
   expect(chordPattern(binding[1]).exec("h00zz")?.[1]).toBe("00zz");
-  const { default: buildHandler } = await import("../src/js/screen-continuity");
+  const buildHandler = await loadHandler();
   await buildHandler("HOVER")("00zz");
-  expect(native.clickPoints).toHaveBeenCalledExactlyOnceWith(
+  expect(native.clickPoints).toHaveBeenCalledTimes(1);
+  expect(native.clickPoints).toHaveBeenCalledWith(
     JSON.stringify({
       bounds,
       points: [
@@ -229,16 +238,17 @@ test("h captures the same base-36 sequence and configures the hover handler", as
 test.each(["-00", "00-", ",00", ".00", ".-00", ";00"])(
   "hover rejects click and hold modifiers before native input: %s",
   async (sequence) => {
-    const { default: buildHandler } = await import("../src/js/screen-continuity");
+    const buildHandler = await loadHandler();
     await expect(buildHandler("HOVER")(sequence)).rejects.toThrow();
     expect(openAddon).not.toHaveBeenCalled();
   },
 );
 
 test("hover supports exact pixel offsets and fractional coordinates", async () => {
-  const { default: buildHandler } = await import("../src/js/screen-continuity");
+  const buildHandler = await loadHandler();
   await buildHandler("HOVER")("=20l=30th/ih/i");
-  expect(native.clickPoints).toHaveBeenCalledExactlyOnceWith(
+  expect(native.clickPoints).toHaveBeenCalledTimes(1);
+  expect(native.clickPoints).toHaveBeenCalledWith(
     JSON.stringify({
       bounds,
       points: [
@@ -258,10 +268,10 @@ test("tap and hover sequences share a queue", async () => {
         finish = resolve;
       }),
   );
-  const { default: buildHandler } = await import("../src/js/screen-continuity");
+  const buildHandler = await loadHandler();
   const tap = buildHandler()("00");
   const hover = buildHandler("HOVER")("zz");
-  await vi.waitFor(() => expect(native.clickPoints).toHaveBeenCalledOnce());
+  await waitFor(() => expect(native.clickPoints).toHaveBeenCalledOnce());
   expect(native.getScreenBounds).toHaveBeenCalledOnce();
   finish();
   await Promise.all([tap, hover]);

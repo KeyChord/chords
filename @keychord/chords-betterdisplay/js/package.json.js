@@ -5,6 +5,7 @@ var repository = {
 	"url": "https://github.com/KeyChord/chords-betterdisplay"
 };
 var type = "module";
+var scripts = { "test": "bun test --isolate" };
 var dependencies = {
 	"p-wait-for": "^6.0.0",
 	"uuid": "^14.0.3",
@@ -22,9 +23,9 @@ var chords = { "macos.toml": {
 	"name": "BetterDisplay",
 	"on": { "monitor": { "file": "monitor.js" } },
 	"chords": {
-		"?/ms": { "name": "Monitor: Size" },
-		"/ms(.+)": {
-			"name": "Monitor: Size (Set)",
+		"?/md": { "name": "Monitor: Dimensions" },
+		"/md(.+)": {
+			"name": "Monitor: Dimensions (Set)",
 			"@input:monitor": ["$1"]
 		}
 	}
@@ -33,10 +34,11 @@ var package_default = {
 	name,
 	repository,
 	type,
+	scripts,
 	dependencies,
 	devDependencies,
 	packageManager,
 	chords
 };
 //#endregion
-export { chords, package_default as default, dependencies, devDependencies, name, packageManager, repository, type };
+export { chords, package_default as default, dependencies, devDependencies, name, packageManager, repository, scripts, type };

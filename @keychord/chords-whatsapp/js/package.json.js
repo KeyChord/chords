@@ -1,343 +1,480 @@
 //#region package.json
 var name = "@keychord/chords-whatsapp";
 var repository = {
-  type: "git",
-  url: "https://github.com/KeyChord/chords-whatsapp",
+	"type": "git",
+	"url": "https://github.com/KeyChord/chords-whatsapp"
 };
 var type = "module";
+var scripts = { "test": "bun test --isolate" };
 var devDependencies = {
-  "@keychord/chordtest": "workspace:*",
-  "@keychord/config": "catalog:",
-  "@keychord/tsconfig": "catalog:",
-  "@types/bun": "latest",
+	"@keychord/chordtest": "workspace:*",
+	"@keychord/config": "catalog:",
+	"@keychord/tsconfig": "catalog:",
+	"@types/bun": "latest"
 };
 var packageManager = "pnpm@12.11.2";
-var chords = {
-  net: {
-    whatsapp: {
-      WhatsApp: {
-        "macos.toml": {
-          name: "WhatsApp",
-          on: { whatsapp: { file: "whatsapp.js" } },
-          chords: {
-            "?c": { name: "Chat" },
-            cq: {
-              name: "Chat: Quit",
-              "@input:whatsapp": ["CHAT_CLOSE"],
-            },
-            cb: {
-              name: "Chat: Block",
-              "@input:whatsapp": ["CHAT_BLOCK"],
-            },
-            "c/": {
-              name: "Chat: Search",
-              "@input:whatsapp": ["CHAT_SEARCH"],
-            },
-            cv: {
-              name: "Chat: Video (Call)",
-              "@input:whatsapp": ["CHAT_VIDEO_CALL"],
-            },
-            ca: {
-              name: "Chat: Audio (Call)",
-              "@input:whatsapp": ["CHAT_VOICE_CALL"],
-            },
-            co: {
-              name: "Chat: Open (in new window)",
-              "@input:whatsapp": ["CHAT_OPEN_WINDOW"],
-            },
-            cn: {
-              name: "Chat: New",
-              "@input:whatsapp": ["CHAT_NEW"],
-            },
-            cp: {
-              name: "Chat: Pin",
-              "@input:whatsapp": ["CHAT_PIN"],
-            },
-            ch: {
-              name: "Chat: Hide (Archive)",
-              "@input:whatsapp": ["CHAT_ARCHIVE"],
-            },
-            cm: {
-              name: "Chat: Mute",
-              "@input:whatsapp": ["CHAT_MUTE"],
-            },
-            cm8: {
-              name: "Chat: Mute 8 Hours",
-              "@input:whatsapp": ["CHAT_MUTE_8_HOURS"],
-            },
-            cmw: {
-              name: "Chat: Mute 1 Week",
-              "@input:whatsapp": ["CHAT_MUTE_1_WEEK"],
-            },
-            cu: {
-              name: "Chat: Unread",
-              "@input:whatsapp": ["CHAT_UNREAD"],
-            },
-            "c[": {
-              name: "Chat: Previous",
-              "@input:whatsapp": ["CHAT_PREVIOUS"],
-            },
-            "c]": {
-              name: "Chat: Next",
-              "@input:whatsapp": ["CHAT_NEXT"],
-            },
-            ce: {
-              name: "Chat: Export",
-              "@input:whatsapp": ["CHAT_EXPORT"],
-            },
-            cc: {
-              name: "Chat: Clear",
-              "@input:whatsapp": ["CHAT_CLEAR"],
-            },
-            cd: {
-              name: "Chat: Delete",
-              "@input:whatsapp": ["CHAT_DELETE"],
-            },
-            "?ci": { name: "Contact Info" },
-            ci: {
-              name: "Contact Info",
-              "@input:whatsapp": ["CHAT_INFO"],
-            },
-            cii: {
-              name: "Contact Info > Image (Avatar)",
-              "@input:whatsapp": ["CHAT_INFO_AVATAR"],
-            },
-            cia: {
-              name: "Contact Info > Audio (Call)",
-              "@input:whatsapp": ["CHAT_INFO_VOICE"],
-            },
-            civ: {
-              name: "Contact Info > Video",
-              "@input:whatsapp": ["CHAT_INFO_VIDEO"],
-            },
-            "ci/": {
-              name: "Contact Info > Search",
-              "@input:whatsapp": ["CHAT_INFO_SEARCH"],
-            },
-            cig: {
-              name: "Contact Info > Gallery (Media, links and docs)",
-              "@input:whatsapp": ["CHAT_INFO_GALLERY"],
-            },
-            cis: {
-              name: "Contact Info > Starred",
-              "@input:whatsapp": ["CHAT_INFO_STARRED"],
-            },
-            cim: {
-              name: "Contact Info > Mute",
-              "@input:whatsapp": ["CHAT_MUTE"],
-            },
-            cims: {
-              name: "Contact Info > Mute status (notifications)",
-              "@input:whatsapp": ["CHAT_INFO_MUTE_STATUS"],
-            },
-            cit: {
-              name: "Contact Info > Theme",
-              "@input:whatsapp": ["CHAT_INFO_THEME"],
-            },
-            citb: {
-              name: "Contact Info > Theme > Bubble",
-              "@input:whatsapp": ["CHAT_INFO_THEME_BUBBLE"],
-            },
-            citb0: {
-              name: "Contact Info > Theme > Bubble > Reset",
-              "@input:whatsapp": ["CHAT_INFO_THEME_BUBBLE_RESET"],
-            },
-            "citb(\\d,?\\d)": {
-              name: "Contact Info > Theme > Bubble @ Row, Column",
-              "@input:whatsapp": ["CHAT_INFO_THEME_BUBBLE_SELECT", "$1"],
-            },
-            citw: {
-              name: "Contact Info > Theme > Wallpaper",
-              "@input:whatsapp": ["CHAT_INFO_THEME_WALLPAPER"],
-            },
-            "citw(\\d,?\\d)": {
-              name: "Contact Info > Theme > Wallpaper @ Row, Column",
-              "@input:whatsapp": ["CHAT_INFO_THEME_WALLPAPER_SELECT", "$1"],
-            },
-            citwp: {
-              name: "Contact Info > Theme > Wallpaper > Photo",
-              "@input:whatsapp": ["CHAT_INFO_THEME_WALLPAPER_PHOTO"],
-            },
-            citwc: {
-              name: "Contact Info > Theme > Wallpaper > Colour",
-              "@input:whatsapp": ["CHAT_INFO_THEME_WALLPAPER_COLOUR"],
-            },
-            cisd: {
-              name: "Contact Info > Save (to) Downloads",
-              "@input:whatsapp": ["CHAT_INFO_SAVE_DOWNLOADS"],
-            },
-            cidm: {
-              name: "Contact Info > Disappearing Messages",
-              "@input:whatsapp": ["CHAT_INFO_DISAPPEARING_MESSAGES"],
-            },
-            cipa: {
-              name: "Contact Info > Privacy (Advanced)",
-              "@input:whatsapp": ["CHAT_INFO_PRIVACY"],
-            },
-            cie: {
-              name: "Contact Info > Encryption",
-              "@input:whatsapp": ["CHAT_INFO_ENCRYPTION"],
-            },
-            cicd: {
-              name: "Contact Info > Contact Details",
-              "@input:whatsapp": ["CHAT_INFO_CONTACT_DETAILS"],
-            },
-            "?cig": { name: "Contact Info > Group" },
-            cigc: {
-              name: "Contact Info > Group: Create",
-              "@input:whatsapp": ["CHAT_INFO_GROUP_CREATE"],
-            },
-            ciga: {
-              name: "Contact Info > Group: Add (to)",
-              "@input:whatsapp": ["CHAT_INFO_GROUP_ADD"],
-            },
-            cisc: {
-              name: "Contact Info: Share Contact",
-              "@input:whatsapp": ["CHAT_INFO_SHARE_CONTACT"],
-            },
-            cif: {
-              name: "Contact Info: Favourite",
-              "@input:whatsapp": ["CHAT_INFO_FAVOURITE"],
-            },
-            ciec: {
-              name: "Contact Info: Export Chat",
-              "@input:whatsapp": ["CHAT_INFO_EXPORT"],
-            },
-            cicc: {
-              name: "Contact Info: Clear Chat",
-              "@input:whatsapp": ["CHAT_INFO_CLEAR"],
-            },
-            cib: {
-              name: "Contact Info: Block",
-              "@input:whatsapp": ["CHAT_INFO_BLOCK"],
-            },
-            cir: {
-              name: "Contact Info: Report",
-              "@input:whatsapp": ["CHAT_INFO_REPORT"],
-            },
-            "c(\\d+)": {
-              name: "Chat: Switch to Chat #",
-              "@input:whatsapp": ["CHAT_SWITCH", "$1"],
-            },
-            "?g": { name: "Goto" },
-            gc: {
-              name: "Goto: Chats",
-              "@input:whatsapp": ["VIEW_CHATS"],
-            },
-            gch: {
-              name: "Goto: Chats > Hidden (Archived)",
-              "@input:whatsapp": ["VIEW_ARCHIVED"],
-            },
-            gca: { name: "Goto: Chats > All" },
-            gcu: { name: "Goto: Chats > Unread" },
-            gcf: { name: "Goto: Chats > Favourites" },
-            gu: {
-              name: "Goto: Updates",
-              "@input:whatsapp": ["VIEW_UPDATES"],
-            },
-            gs: { name: "Goto: Servers (Communities)" },
-            gp: {
-              name: "Goto: Phone (Calls)",
-              "@input:whatsapp": ["VIEW_CALLS"],
-            },
-            ga: { name: "Goto: AI" },
-            gm: { name: "Goto: Media" },
-            "g,": {
-              name: "Goto: Settings",
-              "@input:whatsapp": ["VIEW_SETTINGS"],
-            },
-            "?v": { name: "Voicechat (Call)" },
-            vv: {
-              name: "Voicechat: Video (Toggle)",
-              "@input:whatsapp": ["CALL_CAMERA"],
-            },
-            "vv(\\d+)": {
-              name: "Voicechat: Video (Camera) @ #",
-              "@input:whatsapp": ["CALL_CAMERA_SELECT", "$1"],
-            },
-            vm: {
-              name: "Voicechat: Mic (Toggle)",
-              "@input:whatsapp": ["CALL_MICROPHONE"],
-            },
-            "vm(\\d+)": {
-              name: "Voicechat: Mic @ #",
-              "@input:whatsapp": ["CALL_MICROPHONE_SELECT", "$1"],
-            },
-            "vs(\\d+)": {
-              name: "Voicechat: Speaker @ #",
-              "@input:whatsapp": ["CALL_SPEAKER_SELECT", "$1"],
-            },
-            vr: {
-              name: "Voicechat: React",
-              "@input:whatsapp": ["CALL_REACTIONS"],
-            },
-            "vr(\\d+)": {
-              name: "Voicechat: React @ #",
-              "@input:whatsapp": ["CALL_REACTION_SELECT", "$1"],
-            },
-            vs: {
-              name: "Voicechat: Screenshare",
-              "@input:whatsapp": ["CALL_SCREEN_SHARE"],
-            },
-            va: {
-              name: "Voicechat: Add (People)",
-              "@input:whatsapp": ["CALL_ADD_PEOPLE"],
-            },
-            vc: {
-              name: "Voicechat: Chat (Toggle)",
-              "@input:whatsapp": ["CALL_CHAT"],
-            },
-            vx: {
-              name: "Voicechat: X (End Call)",
-              "@input:whatsapp": ["CALL_END"],
-            },
-            "?i": { name: "Input" },
-            ie: {
-              name: "Input: Emoji",
-              "@input:whatsapp": ["INPUT_EMOJI"],
-            },
-            ig: {
-              name: "Input: GIF",
-              "@input:whatsapp": ["INPUT_GIF"],
-            },
-            is: {
-              name: "Input: Sticker",
-              "@input:whatsapp": ["INPUT_STICKER"],
-            },
-            "?z": { name: "Zoom" },
-            zi: {
-              name: "Zoom In",
-              "@input:whatsapp": ["ZOOM_IN"],
-            },
-            zo: {
-              name: "Zoom Out",
-              "@input:whatsapp": ["ZOOM_OUT"],
-            },
-            zr: {
-              name: "Zoom Reset",
-              "@input:whatsapp": ["ZOOM_RESET"],
-            },
-          },
-        },
-      },
-    },
-  },
-};
+var chords = { "net": { "whatsapp": { "WhatsApp": { "macos.toml": {
+	"name": "WhatsApp",
+	"on": { "whatsapp": { "file": "whatsapp.js" } },
+	"chords": {
+		"?c": { "name": "Chat" },
+		"cq": {
+			"name": "Chat: Quit",
+			"@input:whatsapp": ["CHAT_CLOSE"]
+		},
+		"cb": {
+			"name": "Chat: Block",
+			"@input:whatsapp": ["CHAT_BLOCK"]
+		},
+		"c/": {
+			"name": "Chat: Search",
+			"@input:whatsapp": ["CHAT_SEARCH"]
+		},
+		"cv": {
+			"name": "Chat: Video (Call)",
+			"@input:whatsapp": ["CHAT_VIDEO_CALL"]
+		},
+		"ca": {
+			"name": "Chat: Audio (Call)",
+			"@input:whatsapp": ["CHAT_VOICE_CALL"]
+		},
+		"co": {
+			"name": "Chat: Open (in new window)",
+			"@input:whatsapp": ["CHAT_OPEN_WINDOW"]
+		},
+		"cn": {
+			"name": "Chat: New",
+			"@input:whatsapp": ["CHAT_NEW"]
+		},
+		"cp": {
+			"name": "Chat: Pin",
+			"@input:whatsapp": ["CHAT_PIN"]
+		},
+		"ch": {
+			"name": "Chat: Hide (Archive)",
+			"@input:whatsapp": ["CHAT_ARCHIVE"]
+		},
+		"cm": {
+			"name": "Chat: Mute",
+			"@input:whatsapp": ["CHAT_MUTE"]
+		},
+		"cm8": {
+			"name": "Chat: Mute 8 Hours",
+			"@input:whatsapp": ["CHAT_MUTE_8_HOURS"]
+		},
+		"cmw": {
+			"name": "Chat: Mute 1 Week",
+			"@input:whatsapp": ["CHAT_MUTE_1_WEEK"]
+		},
+		"cu": {
+			"name": "Chat: Unread",
+			"@input:whatsapp": ["CHAT_UNREAD"]
+		},
+		"c[": {
+			"name": "Chat: Previous",
+			"@input:whatsapp": ["CHAT_PREVIOUS"]
+		},
+		"c]": {
+			"name": "Chat: Next",
+			"@input:whatsapp": ["CHAT_NEXT"]
+		},
+		"ce": {
+			"name": "Chat: Export",
+			"@input:whatsapp": ["CHAT_EXPORT"]
+		},
+		"cc": {
+			"name": "Chat: Clear",
+			"@input:whatsapp": ["CHAT_CLEAR"]
+		},
+		"cd": {
+			"name": "Chat: Delete",
+			"@input:whatsapp": ["CHAT_DELETE"]
+		},
+		"ci": {
+			"name": "Chat: Info",
+			"@input:whatsapp": ["CHAT_INFO"]
+		},
+		"ci(\\d+)": {
+			"name": "Chat: Info @ #",
+			"@input:whatsapp": ["CHAT_INFO_AT", "$1"]
+		},
+		"?cg": { "name": "Chat Groups" },
+		"cgc": {
+			"name": "Chat Groups > Create",
+			"@input:whatsapp": ["CHAT_GROUP_CREATE"]
+		},
+		"cgc.(\\d+)": {
+			"name": "Chat Groups > Create > Select @ #",
+			"@input:whatsapp": ["CHAT_GROUP_SELECT", "$1"]
+		},
+		"?i": { "name": "Info" },
+		"gi": {
+			"name": "Goto: Info",
+			"@input:whatsapp": ["CHAT_INFO"]
+		},
+		"ii": {
+			"name": "Info > Image (Avatar)",
+			"@input:whatsapp": ["CHAT_INFO_AVATAR"]
+		},
+		"ia": {
+			"name": "Info > Audio (Call)",
+			"@input:whatsapp": ["CHAT_INFO_VOICE"]
+		},
+		"iv": {
+			"name": "Info > Video",
+			"@input:whatsapp": ["CHAT_INFO_VIDEO"]
+		},
+		"i/": {
+			"name": "Info > Search",
+			"@input:whatsapp": ["CHAT_INFO_SEARCH"]
+		},
+		"ig": {
+			"name": "Info > Gallery (Media, links and docs)",
+			"@input:whatsapp": ["CHAT_INFO_GALLERY"]
+		},
+		"?ig": { "name": "Info [Group]" },
+		"iga": {
+			"name": "Info [Group] > Add",
+			"@input:whatsapp": ["GROUP_ADD"]
+		},
+		"igd": {
+			"name": "Info [Group] > Description (Add)",
+			"@input:whatsapp": ["GROUP_DESCRIPTION"]
+		},
+		"igm": {
+			"name": "Info [Group] > Members",
+			"@input:whatsapp": ["GROUP_MEMBERS"]
+		},
+		"igmc": {
+			"name": "Info [Group] > Member Changes",
+			"@input:whatsapp": ["GROUP_MEMBER_CHANGES"]
+		},
+		"ige": {
+			"name": "Info [Group] > Exit",
+			"@input:whatsapp": ["GROUP_EXIT"]
+		},
+		"igr": {
+			"name": "Info [Group] > Report",
+			"@input:whatsapp": ["GROUP_REPORT"]
+		},
+		"igcs": {
+			"name": "Info [Group] > Create Similar",
+			"@input:whatsapp": ["GROUP_CREATE_SIMILAR"]
+		},
+		"igp": {
+			"name": "Info [Group] > Permissions",
+			"@input:whatsapp": ["GROUP_PERMISSIONS"]
+		},
+		"ign": {
+			"name": "Info [Group] > Notify (for)",
+			"@input:whatsapp": ["GROUP_NOTIFY"]
+		},
+		"igq": {
+			"name": "Info [Group] > QR (Code)",
+			"@input:whatsapp": ["GROUP_QR"]
+		},
+		"is": {
+			"name": "Info > Starred",
+			"@input:whatsapp": ["CHAT_INFO_STARRED"]
+		},
+		"im": {
+			"name": "Info > Mute",
+			"@input:whatsapp": ["CHAT_MUTE"]
+		},
+		"ims": {
+			"name": "Info > Mute status (notifications)",
+			"@input:whatsapp": ["CHAT_INFO_MUTE_STATUS"]
+		},
+		"it": {
+			"name": "Info > Theme",
+			"@input:whatsapp": ["CHAT_INFO_THEME"]
+		},
+		"itb": {
+			"name": "Info > Theme > Bubble",
+			"@input:whatsapp": ["CHAT_INFO_THEME_BUBBLE"]
+		},
+		"itb0": {
+			"name": "Info > Theme > Bubble > Reset",
+			"@input:whatsapp": ["CHAT_INFO_THEME_BUBBLE_RESET"]
+		},
+		"itb(\\d,?\\d)": {
+			"name": "Info > Theme > Bubble @ Row, Column",
+			"@input:whatsapp": ["CHAT_INFO_THEME_BUBBLE_SELECT", "$1"]
+		},
+		"itw": {
+			"name": "Info > Theme > Wallpaper",
+			"@input:whatsapp": ["CHAT_INFO_THEME_WALLPAPER"]
+		},
+		"itw(\\d,?\\d)": {
+			"name": "Info > Theme > Wallpaper @ Row, Column",
+			"@input:whatsapp": ["CHAT_INFO_THEME_WALLPAPER_SELECT", "$1"]
+		},
+		"itwp": {
+			"name": "Info > Theme > Wallpaper > Photo",
+			"@input:whatsapp": ["CHAT_INFO_THEME_WALLPAPER_PHOTO"]
+		},
+		"itwc": {
+			"name": "Info > Theme > Wallpaper > Colour",
+			"@input:whatsapp": ["CHAT_INFO_THEME_WALLPAPER_COLOUR"]
+		},
+		"isd": {
+			"name": "Info > Save (to) Downloads",
+			"@input:whatsapp": ["CHAT_INFO_SAVE_DOWNLOADS"]
+		},
+		"idm": {
+			"name": "Info > Disappearing Messages",
+			"@input:whatsapp": ["CHAT_INFO_DISAPPEARING_MESSAGES"]
+		},
+		"ipa": {
+			"name": "Info > Privacy (Advanced)",
+			"@input:whatsapp": ["CHAT_INFO_PRIVACY"]
+		},
+		"ie": {
+			"name": "Info > Encryption",
+			"@input:whatsapp": ["CHAT_INFO_ENCRYPTION"]
+		},
+		"icd": {
+			"name": "Info > Contact Details",
+			"@input:whatsapp": ["CHAT_INFO_CONTACT_DETAILS"]
+		},
+		"igc": {
+			"name": "Info > Group: Create",
+			"@input:whatsapp": ["CHAT_INFO_GROUP_CREATE"]
+		},
+		"igat": {
+			"name": "Info > Group: Add (to)",
+			"@input:whatsapp": ["CHAT_INFO_GROUP_ADD"]
+		},
+		"isc": {
+			"name": "Info: Share Contact",
+			"@input:whatsapp": ["CHAT_INFO_SHARE_CONTACT"]
+		},
+		"if": {
+			"name": "Info: Favourite",
+			"@input:whatsapp": ["CHAT_INFO_FAVOURITE"]
+		},
+		"iec": {
+			"name": "Info: Export Chat",
+			"@input:whatsapp": ["CHAT_INFO_EXPORT"]
+		},
+		"icc": {
+			"name": "Info: Clear Chat",
+			"@input:whatsapp": ["CHAT_INFO_CLEAR"]
+		},
+		"ib": {
+			"name": "Info: Block",
+			"@input:whatsapp": ["CHAT_INFO_BLOCK"]
+		},
+		"iu": {
+			"name": "Info: Unblock",
+			"@input:whatsapp": ["CHAT_INFO_UNBLOCK"]
+		},
+		"ibr": {
+			"name": "Info: Block & Report",
+			"@input:whatsapp": ["CHAT_INFO_BLOCK_REPORT"]
+		},
+		"ir": {
+			"name": "Info: Report",
+			"@input:whatsapp": ["CHAT_INFO_REPORT"]
+		},
+		"c(\\d+)": {
+			"name": "Chat: Switch to Chat #",
+			"@input:whatsapp": ["CHAT_SWITCH", "$1"]
+		},
+		"?g": { "name": "Goto" },
+		"gc": {
+			"name": "Goto: Chats",
+			"@input:whatsapp": ["VIEW_CHATS"]
+		},
+		"gc(\\d+)": {
+			"name": "Goto: Chats @ #",
+			"@input:whatsapp": ["VIEW_CHATS", "$1"]
+		},
+		"gch": {
+			"name": "Goto: Chats > Hidden (Archived)",
+			"@input:whatsapp": ["VIEW_ARCHIVED"]
+		},
+		"gch(\\d+)": {
+			"name": "Goto: Chats > Hidden (Archived) @ #",
+			"@input:whatsapp": ["VIEW_ARCHIVED", "$1"]
+		},
+		"gca": {
+			"name": "Goto: Chats > All",
+			"@input:whatsapp": ["VIEW_CHATS_ALL"]
+		},
+		"gca(\\d+)": {
+			"name": "Goto: Chats > All @ #",
+			"@input:whatsapp": ["VIEW_CHATS_ALL", "$1"]
+		},
+		"gcu": {
+			"name": "Goto: Chats > Unread",
+			"@input:whatsapp": ["VIEW_CHATS_UNREAD"]
+		},
+		"gcu(\\d+)": {
+			"name": "Goto: Chats > Unread @ #",
+			"@input:whatsapp": ["VIEW_CHATS_UNREAD", "$1"]
+		},
+		"gcf": {
+			"name": "Goto: Chats > Favourites",
+			"@input:whatsapp": ["VIEW_CHATS_FAVOURITES"]
+		},
+		"gcf(\\d+)": {
+			"name": "Goto: Chats > Favourites @ #",
+			"@input:whatsapp": ["VIEW_CHATS_FAVOURITES", "$1"]
+		},
+		"gcg": {
+			"name": "Goto: Chats > Groups",
+			"@input:whatsapp": ["VIEW_CHATS_GROUPS"]
+		},
+		"gcg(\\d+)": {
+			"name": "Goto: Chats > Groups @ #",
+			"@input:whatsapp": ["VIEW_CHATS_GROUPS", "$1"]
+		},
+		"gu": {
+			"name": "Goto: Updates",
+			"@input:whatsapp": ["VIEW_UPDATES"]
+		},
+		"gs": {
+			"name": "Goto: Servers (Communities)",
+			"@input:whatsapp": ["VIEW_COMMUNITIES"]
+		},
+		"gp": {
+			"name": "Goto: Phone (Calls)",
+			"@input:whatsapp": ["VIEW_CALLS"]
+		},
+		"ga": {
+			"name": "Goto: AI",
+			"@input:whatsapp": ["VIEW_AI"]
+		},
+		"gm": {
+			"name": "Goto: Media",
+			"@input:whatsapp": ["VIEW_MEDIA"]
+		},
+		"gms": {
+			"name": "Goto: More > Starred",
+			"@input:whatsapp": ["VIEW_STARRED"]
+		},
+		"g,": {
+			"name": "Goto: Settings",
+			"@input:whatsapp": ["VIEW_SETTINGS"]
+		},
+		"?v": { "name": "Voicechat (Call)" },
+		"vv": {
+			"name": "Voicechat: Video (Toggle)",
+			"@input:whatsapp": ["CALL_CAMERA"]
+		},
+		"vv(\\d+)": {
+			"name": "Voicechat: Video (Camera) @ #",
+			"@input:whatsapp": ["CALL_CAMERA_SELECT", "$1"]
+		},
+		"vm": {
+			"name": "Voicechat: Mic (Toggle)",
+			"@input:whatsapp": ["CALL_MICROPHONE"]
+		},
+		"vm(\\d+)": {
+			"name": "Voicechat: Mic @ #",
+			"@input:whatsapp": ["CALL_MICROPHONE_SELECT", "$1"]
+		},
+		"vs(\\d+)": {
+			"name": "Voicechat: Speaker @ #",
+			"@input:whatsapp": ["CALL_SPEAKER_SELECT", "$1"]
+		},
+		"vr": {
+			"name": "Voicechat: React",
+			"@input:whatsapp": ["CALL_REACTIONS"]
+		},
+		"vr(\\d+)": {
+			"name": "Voicechat: React @ #",
+			"@input:whatsapp": ["CALL_REACTION_SELECT", "$1"]
+		},
+		"vs": {
+			"name": "Voicechat: Screenshare",
+			"@input:whatsapp": ["CALL_SCREEN_SHARE"]
+		},
+		"va": {
+			"name": "Voicechat: Add (People)",
+			"@input:whatsapp": ["CALL_ADD_PEOPLE"]
+		},
+		"vc": {
+			"name": "Voicechat: Chat (Toggle)",
+			"@input:whatsapp": ["CALL_CHAT"]
+		},
+		"vx": {
+			"name": "Voicechat: X (Decline / End Call)",
+			"@input:whatsapp": ["CALL_END"]
+		},
+		"vy": {
+			"name": "Voicechat: Yes (Accept)",
+			"@input:whatsapp": ["CALL_ACCEPT"]
+		},
+		"?z": { "name": "Zoom" },
+		"zi": {
+			"name": "Zoom In",
+			"@input:whatsapp": ["ZOOM_IN"]
+		},
+		"zo": {
+			"name": "Zoom Out",
+			"@input:whatsapp": ["ZOOM_OUT"]
+		},
+		"zr": {
+			"name": "Zoom Reset",
+			"@input:whatsapp": ["ZOOM_RESET"]
+		},
+		"?p": { "name": "Profile" },
+		"pf": {
+			"name": "Profile > Favourites",
+			"@input:whatsapp": ["SETTINGS_FAVOURITES"]
+		},
+		"ps": {
+			"name": "Profile > Starred",
+			"@input:whatsapp": ["SETTINGS_STARRED"]
+		},
+		"ph": {
+			"name": "Profile > History (Chat)",
+			"@input:whatsapp": ["SETTINGS_HISTORY"]
+		},
+		"pa": {
+			"name": "Profile > Account",
+			"@input:whatsapp": ["SETTINGS_ACCOUNT"]
+		},
+		"pp": {
+			"name": "Profile > Privacy",
+			"@input:whatsapp": ["SETTINGS_PRIVACY"]
+		},
+		"pc": {
+			"name": "Profile > Chats",
+			"@input:whatsapp": ["SETTINGS_CHATS"]
+		},
+		"pap": {
+			"name": "Profile > Appearance",
+			"@input:whatsapp": ["SETTINGS_APPEARANCE"]
+		},
+		"pn": {
+			"name": "Profile > Notifications",
+			"@input:whatsapp": ["SETTINGS_NOTIFICATIONS"]
+		},
+		"pag": {
+			"name": "Profile > Agents",
+			"@input:whatsapp": ["SETTINGS_AGENTS"]
+		},
+		"psd": {
+			"name": "Profile > Storage & Data",
+			"@input:whatsapp": ["SETTINGS_STORAGE"]
+		},
+		"phf": {
+			"name": "Profile > Help & Feedback",
+			"@input:whatsapp": ["SETTINGS_HELP"]
+		}
+	}
+} } } } };
 var package_default = {
-  name,
-  repository,
-  type,
-  devDependencies,
-  packageManager,
-  chords,
+	name,
+	repository,
+	type,
+	scripts,
+	devDependencies,
+	packageManager,
+	chords
 };
 //#endregion
-export {
-  chords,
-  package_default as default,
-  devDependencies,
-  name,
-  packageManager,
-  repository,
-  type,
-};
+export { chords, package_default as default, devDependencies, name, packageManager, repository, scripts, type };

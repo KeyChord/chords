@@ -5,60 +5,66 @@ file = '@keychord/chords-menu/js/menu.js'
 
 [chords]
 '?v' = { name = 'View' }
-va = { name = 'View: All Processes', '@input:menu' = ['BY_PATH', ['View', 'All Processes']] }
-vh = { name = 'View: Hierarchially, All Processes', '@input:menu' = [
+'va' = { name = 'View: All Processes', '@input:menu' = ['BY_PATH', ['View', 'All Processes']] }
+'vh' = { name = 'View: Hierarchially, All Processes', '@input:menu' = [
   'BY_PATH',
   [
     'View',
     'All Processes, Hierarchically',
   ],
 ] }
-vm = { name = 'View: My Processes', '@input:menu' = ['BY_PATH', ['View', 'My Processes']] }
-vs = { name = 'View: Selected Processes', '@input:menu' = [
+'vm' = { name = 'View: My Processes', '@input:menu' = ['BY_PATH', ['View', 'My Processes']] }
+'vs' = { name = 'View: Selected Processes', '@input:menu' = [
   'BY_PATH',
   [
     'View',
     'Selected Processes',
   ],
 ] }
-vy = { name = 'View: System Processes', '@input:menu' = ['BY_PATH', ['View', 'System Processes']] }
-vo = { name = '''View: Other Users' Processes''', '@input:menu' = [
+'vy' = { name = 'View: System Processes', '@input:menu' = [
+  'BY_PATH',
+  [
+    'View',
+    'System Processes',
+  ],
+] }
+'vo' = { name = '''View: Other Users' Processes''', '@input:menu' = [
   'BY_PATH',
   [
     'View',
     'Other Users’ Processes',
   ],
 ] }
-vc = { name = 'View: Current (Active) Processes', '@input:menu' = [
+'vc' = { name = 'View: Current (Active) Processes', '@input:menu' = [
   'BY_PATH',
   [
     'View',
     'Active Processes',
   ],
 ] }
-vi = { name = 'View: Inactive Processes', '@input:menu' = [
+'vi' = { name = 'View: Inactive Processes', '@input:menu' = [
   'BY_PATH',
   [
     'View',
     'Inactive Processes',
   ],
 ] }
-vg = { name = 'View: GPU Processes', '@input:menu' = ['BY_PATH', ['View', 'GPU Processes']] }
-vw = { name = 'View: Windowed Processes', '@input:menu' = [
+'vg' = { name = 'View: GPU Processes', '@input:menu' = ['BY_PATH', ['View', 'GPU Processes']] }
+'vw' = { name = 'View: Windowed Processes', '@input:menu' = [
   'BY_PATH',
   [
     'View',
     'Windowed Processes',
   ],
 ] }
-vl = { name = 'View: Last 12 Hour Applications', '@input:menu' = [
+'vl' = { name = 'View: Last 12 Hour Applications', '@input:menu' = [
   'BY_PATH',
   [
     'View',
     'Applications in last 12 hours',
   ],
 ] }
-vp = { name = 'View: Processes, by GPU', '@input:menu' = [
+'vp' = { name = 'View: Processes, by GPU', '@input:menu' = [
   'BY_PATH',
   [
     'View',
@@ -67,18 +73,18 @@ vp = { name = 'View: Processes, by GPU', '@input:menu' = [
 ] }
 
 '?p' = { name = 'Process' }
-pf = { name = 'Process: Filter', '@input:menu' = ['BY_PATH', ['View', 'Filter Processes']] }
-pi = { name = 'Process: Inspect', '@input:menu' = ['BY_PATH', ['View', 'Inspect Process']] }
-ps = { name = 'Process: Sample', '@input:menu' = ['BY_PATH', ['View', 'Sample Process']] }
-pq = { name = 'Process: Quit', '@input:menu' = ['BY_PATH', ['View', 'Quit Process']] }
-pss = { name = 'Process: Send Signal', '@input:menu' = [
+'pf' = { name = 'Process: Filter', '@input:menu' = ['BY_PATH', ['View', 'Filter Processes']] }
+'pi' = { name = 'Process: Inspect', '@input:menu' = ['BY_PATH', ['View', 'Inspect Process']] }
+'ps' = { name = 'Process: Sample', '@input:menu' = ['BY_PATH', ['View', 'Sample Process']] }
+'pq' = { name = 'Process: Quit', '@input:menu' = ['BY_PATH', ['View', 'Quit Process']] }
+'pss' = { name = 'Process: Send Signal', '@input:menu' = [
   'BY_PATH',
   [
     'View',
     'Send Signal to Process...',
   ],
 ] }
-psd = { name = 'Process: Show Deltas', '@input:menu' = [
+'psd' = { name = 'Process: Show Deltas', '@input:menu' = [
   'BY_PATH',
   [
     'View',
@@ -87,8 +93,8 @@ psd = { name = 'Process: Show Deltas', '@input:menu' = [
 ] }
 
 '?r' = { name = 'Run' }
-rs = { name = 'Run: Spindump', '@input:menu' = ['BY_PATH', ['View', 'Run Spindump']] }
-rd = { name = 'Run: Diagonstics for System', '@input:menu' = [
+'rs' = { name = 'Run: Spindump', '@input:menu' = ['BY_PATH', ['View', 'Run Spindump']] }
+'rd' = { name = 'Run: Diagonstics for System', '@input:menu' = [
   'BY_PATH',
   [
     'View',
@@ -97,7 +103,7 @@ rd = { name = 'Run: Diagonstics for System', '@input:menu' = [
 ] }
 
 '?c' = { name = 'Columns' }
-cpi = { name = 'Columns: Process ID', '@input:menu' = [
+'cpi' = { name = 'Columns: Process ID', '@input:menu' = [
   'BY_PATH',
   [
     'View',
@@ -105,14 +111,21 @@ cpi = { name = 'Columns: Process ID', '@input:menu' = [
     'Process ID',
   ],
 ] }
-cu = { name = 'Columns: User', '@input:menu' = ['BY_PATH', ['View', 'Columns', 'User']] }
-cpc = { name = 'Columns: % CPU', '@input:menu' = ['BY_PATH', ['View', 'Columns', '% CPU']] }
-cct = { name = 'Columns: CPU Time', '@input:menu' = ['BY_PATH', ['View', 'Columns', 'CPU Time']] }
-cpg = { name = 'Columns: % GPU', '@input:menu' = ['BY_PATH', ['View', 'Columns', '% GPU']] }
-cgt = { name = 'Columns: GPU Time', '@input:menu' = ['BY_PATH', ['View', 'Columns', 'GPU Time']] }
-cnt = { name = 'Columns: # Threads', '@input:menu' = ['BY_PATH', ['View', 'Columns', '# Threads']] }
-cnp = { name = 'Columns: # Ports', '@input:menu' = ['BY_PATH', ['View', 'Columns', '# Ports']] }
-crm = { name = 'Columns: Real Memory', '@input:menu' = [
+'cu' = { name = 'Columns: User', '@input:menu' = ['BY_PATH', ['View', 'Columns', 'User']] }
+'cpc' = { name = 'Columns: % CPU', '@input:menu' = ['BY_PATH', ['View', 'Columns', '% CPU']] }
+'cct' = { name = 'Columns: CPU Time', '@input:menu' = ['BY_PATH', ['View', 'Columns', 'CPU Time']] }
+'cpg' = { name = 'Columns: % GPU', '@input:menu' = ['BY_PATH', ['View', 'Columns', '% GPU']] }
+'cgt' = { name = 'Columns: GPU Time', '@input:menu' = ['BY_PATH', ['View', 'Columns', 'GPU Time']] }
+'cnt' = { name = 'Columns: # Threads', '@input:menu' = [
+  'BY_PATH',
+  [
+    'View',
+    'Columns',
+    '# Threads',
+  ],
+] }
+'cnp' = { name = 'Columns: # Ports', '@input:menu' = ['BY_PATH', ['View', 'Columns', '# Ports']] }
+'crm' = { name = 'Columns: Real Memory', '@input:menu' = [
   'BY_PATH',
   [
     'View',
@@ -120,7 +133,7 @@ crm = { name = 'Columns: Real Memory', '@input:menu' = [
     'Real Memory',
   ],
 ] }
-crpm = { name = 'Columns: Real Private Memory', '@input:menu' = [
+'crpm' = { name = 'Columns: Real Private Memory', '@input:menu' = [
   'BY_PATH',
   [
     'View',
@@ -128,7 +141,7 @@ crpm = { name = 'Columns: Real Private Memory', '@input:menu' = [
     'Real Private Memory',
   ],
 ] }
-crsm = { name = 'Columns: Real Shared Memory', '@input:menu' = [
+'crsm' = { name = 'Columns: Real Shared Memory', '@input:menu' = [
   'BY_PATH',
   [
     'View',
@@ -136,8 +149,8 @@ crsm = { name = 'Columns: Real Shared Memory', '@input:menu' = [
     'Real Shared Memory',
   ],
 ] }
-ck = { name = 'Columns: Kind', '@input:menu' = ['BY_PATH', ['View', 'Columns', 'Kind']] }
-cst = { name = 'Columns: Sudden Termination', '@input:menu' = [
+'ck' = { name = 'Columns: Kind', '@input:menu' = ['BY_PATH', ['View', 'Columns', 'Kind']] }
+'cst' = { name = 'Columns: Sudden Termination', '@input:menu' = [
   'BY_PATH',
   [
     'View',
@@ -145,8 +158,8 @@ cst = { name = 'Columns: Sudden Termination', '@input:menu' = [
     'Sudden Termination',
   ],
 ] }
-cs = { name = 'Columns: Sandbox', '@input:menu' = ['BY_PATH', ['View', 'Columns', 'Sandbox']] }
-cr = { name = 'Columns: Restricted', '@input:menu' = [
+'cs' = { name = 'Columns: Sandbox', '@input:menu' = ['BY_PATH', ['View', 'Columns', 'Sandbox']] }
+'cr' = { name = 'Columns: Restricted', '@input:menu' = [
   'BY_PATH',
   [
     'View',
@@ -154,7 +167,7 @@ cr = { name = 'Columns: Restricted', '@input:menu' = [
     'Restricted',
   ],
 ] }
-ciwu = { name = 'Columns: Idle Wake Ups', '@input:menu' = [
+'ciwu' = { name = 'Columns: Idle Wake Ups', '@input:menu' = [
   'BY_PATH',
   [
     'View',
@@ -162,7 +175,7 @@ ciwu = { name = 'Columns: Idle Wake Ups', '@input:menu' = [
     'Idle Wake Ups',
   ],
 ] }
-cei = { name = 'Columns: Energy Impact', '@input:menu' = [
+'cei' = { name = 'Columns: Energy Impact', '@input:menu' = [
   'BY_PATH',
   [
     'View',
@@ -170,8 +183,8 @@ cei = { name = 'Columns: Energy Impact', '@input:menu' = [
     'Energy Impact',
   ],
 ] }
-can = { name = 'Columns: App Nap', '@input:menu' = ['BY_PATH', ['View', 'Columns', 'App Nap']] }
-csb = { name = 'Columns: Sent Bytes', '@input:menu' = [
+'can' = { name = 'Columns: App Nap', '@input:menu' = ['BY_PATH', ['View', 'Columns', 'App Nap']] }
+'csb' = { name = 'Columns: Sent Bytes', '@input:menu' = [
   'BY_PATH',
   [
     'View',
@@ -179,7 +192,7 @@ csb = { name = 'Columns: Sent Bytes', '@input:menu' = [
     'Sent Bytes',
   ],
 ] }
-csp = { name = 'Columns: Sent Packets', '@input:menu' = [
+'csp' = { name = 'Columns: Sent Packets', '@input:menu' = [
   'BY_PATH',
   [
     'View',
@@ -187,7 +200,7 @@ csp = { name = 'Columns: Sent Packets', '@input:menu' = [
     'Sent Packets',
   ],
 ] }
-crb = { name = 'Columns: Received Bytes', '@input:menu' = [
+'crb' = { name = 'Columns: Received Bytes', '@input:menu' = [
   'BY_PATH',
   [
     'View',
@@ -195,7 +208,7 @@ crb = { name = 'Columns: Received Bytes', '@input:menu' = [
     'Received Bytes',
   ],
 ] }
-crp = { name = 'Columns: Received Packets', '@input:menu' = [
+'crp' = { name = 'Columns: Received Packets', '@input:menu' = [
   'BY_PATH',
   [
     'View',
@@ -203,7 +216,7 @@ crp = { name = 'Columns: Received Packets', '@input:menu' = [
     'Received Packets',
   ],
 ] }
-cpm = { name = 'Columns: Purgeable Memory', '@input:menu' = [
+'cpm' = { name = 'Columns: Purgeable Memory', '@input:menu' = [
   'BY_PATH',
   [
     'View',
@@ -211,8 +224,8 @@ cpm = { name = 'Columns: Purgeable Memory', '@input:menu' = [
     'Purgeable Memory',
   ],
 ] }
-cm = { name = 'Columns: Memory', '@input:menu' = ['BY_PATH', ['View', 'Columns', 'Memory']] }
-ccm = { name = 'Columns: Compressed Memory', '@input:menu' = [
+'cm' = { name = 'Columns: Memory', '@input:menu' = ['BY_PATH', ['View', 'Columns', 'Memory']] }
+'ccm' = { name = 'Columns: Compressed Memory', '@input:menu' = [
   'BY_PATH',
   [
     'View',
@@ -220,7 +233,7 @@ ccm = { name = 'Columns: Compressed Memory', '@input:menu' = [
     'Compressed Memory',
   ],
 ] }
-cbw = { name = 'Columns: Bytes Written', '@input:menu' = [
+'cbw' = { name = 'Columns: Bytes Written', '@input:menu' = [
   'BY_PATH',
   [
     'View',
@@ -228,7 +241,7 @@ cbw = { name = 'Columns: Bytes Written', '@input:menu' = [
     'Bytes Written',
   ],
 ] }
-cbr = { name = 'Columns: Bytes Read', '@input:menu' = [
+'cbr' = { name = 'Columns: Bytes Read', '@input:menu' = [
   'BY_PATH',
   [
     'View',
@@ -236,7 +249,7 @@ cbr = { name = 'Columns: Bytes Read', '@input:menu' = [
     'Bytes Read',
   ],
 ] }
-cps = { name = 'Columns: Preventing Sleep', '@input:menu' = [
+'cps' = { name = 'Columns: Preventing Sleep', '@input:menu' = [
   'BY_PATH',
   [
     'View',

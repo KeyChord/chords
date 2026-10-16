@@ -1,6 +1,11 @@
-import { readFileSync } from "node:fs";
-import { execFileSync } from "node:child_process";
-import { afterEach, beforeEach, expect, test, vi } from "vite-plus/test";
+import { afterEach, beforeEach, expect, mock, test } from "bun:test";
+import {
+  advanceTimersByTimeAsync,
+  stubGlobal,
+  unstubAllGlobals,
+  useFakeTimers,
+  useRealTimers,
+} from "@keychord/chordtest/test";
 import buildHandler from "../src/js/youtube";
 import { buildYouTubeJavaScript } from "../src/js/page";
 
@@ -11,7 +16,7 @@ class FakeSocket {
   onmessage: ((event: { data: string }) => void) | null = null;
   onerror: (() => void) | null = null;
   onclose: (() => void) | null = null;
-  close = vi.fn();
+  close = mock();
   requests: {
     method: string;
     params: { expression: string; userGesture: boolean; awaitPromise: boolean };
@@ -35,17 +40,17 @@ function target(
 ) {
   return { type: "page", url, webSocketDebuggerUrl: endpoint };
 }
-const fetchMock = vi.fn();
+const fetchMock = mock();
 beforeEach(() => {
   sockets.length = 0;
   fetchMock.mockReset().mockResolvedValue({ ok: true, json: async () => [target()] });
   replies = () => ({ id: 1, result: { result: { value: '{"ok":true}' } } });
-  vi.stubGlobal("fetch", fetchMock);
-  vi.stubGlobal("WebSocket", FakeSocket);
+  stubGlobal("fetch", fetchMock);
+  stubGlobal("WebSocket", FakeSocket);
 });
 afterEach(() => {
-  vi.unstubAllGlobals();
-  vi.useRealTimers();
+  unstubAllGlobals();
+  useRealTimers();
 });
 
 test("all ten TOML bindings reach the page through the configured handler", async () => {
@@ -55,16 +60,11 @@ test("all ten TOML bindings reach the page through the configured handler", asyn
     import.meta.url,
   );
   // Use the same TOML parser as the Chord host.
-  const bindings = JSON.parse(
-    execFileSync(
-      "bun",
-      ["-e", "console.log(JSON.stringify(Bun.TOML.parse(await Bun.stdin.text())))"],
-      {
-        input: readFileSync(path, "utf8"),
-        encoding: "utf8",
-      },
-    ),
-  );
+  const bindings = Bun.TOML.parse(await Bun.file(path).text()) as {
+    name: string;
+    on: { youtube: { file: string } };
+    chords: Record<string, unknown>;
+  };
   expect(bindings.name).toBe("YouTube");
   expect(bindings.on.youtube.file).toBe("youtube.js");
   const executable = Object.entries(bindings.chords).filter(
@@ -184,11 +184,14 @@ test("runtime exceptions close the socket and propagate", async () => {
 });
 
 test("a stalled runtime times out and closes its socket", async () => {
-  vi.useFakeTimers();
+  useFakeTimers();
   replies = () => undefined;
-  const pending = buildHandler()("PLAY");
-  const assertion = expect(pending).rejects.toThrow("did not respond");
-  await vi.advanceTimersByTimeAsync(5000);
-  await assertion;
+  // Bun's `expect(promise).rejects` blocks until the promise settles; capture the error instead.
+  const outcome = buildHandler()("PLAY").then(
+    () => new Error("expected the stalled runtime to time out"),
+    (error: unknown) => error,
+  );
+  await advanceTimersByTimeAsync(5000);
+  expect(((await outcome) as Error).message).toContain("did not respond");
   expect(sockets[0].close).toHaveBeenCalledOnce();
 });

@@ -2,6 +2,9 @@
 
 macOS Space navigation shortcuts for Chord.
 
+To move the current window between Spaces, `chords-windows` provides `/ws<number>`,
+`/ws]` (next), and `/ws[` (previous).
+
 | Chord          | Result                           |
 | -------------- | -------------------------------- |
 | `/s[` or `/sl` | Switch to the Space on the left  |

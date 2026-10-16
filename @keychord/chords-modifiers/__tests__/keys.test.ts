@@ -1,7 +1,8 @@
 import { readFileSync } from "node:fs";
 import { tap } from "chord";
 import { chordPattern } from "@keychord/chordtest/patterns";
-import { beforeEach, expect, test, vi } from "vite-plus/test";
+import { beforeEach, expect, test } from "bun:test";
+import { mocked } from "@keychord/chordtest/test";
 import buildKeysHandler, { modifierShortcut } from "../src/js/keys";
 
 const source = readFileSync(new URL("../chords/macos.toml", import.meta.url), "utf8");
@@ -38,7 +39,7 @@ function permutations(value: string): string[] {
 }
 
 beforeEach(() => {
-  vi.mocked(tap).mockImplementation(() => {});
+  mocked(tap).mockImplementation(() => {});
 });
 
 test("all five modifier entry points capture a key followed by optional modifiers", () => {
@@ -64,27 +65,28 @@ test.each([
   [".m-", "cmd+-"],
 ])("%s sends %s", (input, shortcut) => {
   buildKeysHandler()(capture(input));
-  expect(tap).toHaveBeenCalledExactlyOnceWith(shortcut);
+  expect(tap).toHaveBeenCalledTimes(1);
+  expect(tap).toHaveBeenCalledWith(shortcut);
 });
 
 test.each(combinations)(
   ".$entryv$suffix supports $modifiers with every suffix order",
   ({ entry, suffix, modifiers }) => {
     for (const ordering of permutations(suffix)) {
-      vi.mocked(tap).mockClear();
+      mocked(tap).mockClear();
       buildKeysHandler()(capture(`.${entry}v${ordering}`));
-      expect(tap).toHaveBeenCalledExactlyOnceWith(`${modifiers}+v`);
+      expect(tap).toHaveBeenCalledTimes(1);
+      expect(tap).toHaveBeenCalledWith(`${modifiers}+v`);
     }
   },
 );
 
 test.each(letters)(".%s treats the next character as a literal regular key", (entry) => {
   for (const key of regularKeys) {
-    vi.mocked(tap).mockClear();
+    mocked(tap).mockClear();
     buildKeysHandler()(capture(`.${entry}${key}`));
-    expect(tap).toHaveBeenCalledExactlyOnceWith(
-      `${nativeModifiers[letters.indexOf(entry)]}+${key}`,
-    );
+    expect(tap).toHaveBeenCalledTimes(1);
+    expect(tap).toHaveBeenCalledWith(`${nativeModifiers[letters.indexOf(entry)]}+${key}`);
   }
 });
 
@@ -137,7 +139,7 @@ test.each([
 });
 
 test("native input failures propagate", () => {
-  vi.mocked(tap).mockImplementation(() => {
+  mocked(tap).mockImplementation(() => {
     throw new Error("Accessibility denied");
   });
   expect(() => buildKeysHandler()("mv")).toThrow("Accessibility denied");

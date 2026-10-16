@@ -9,6 +9,9 @@
   "imports": {
     "#/*": "./src/js/*"
   },
+  "scripts": {
+    "test": "bun test --isolate"
+  },
   "devDependencies": {
     "@keychord/chordtest": "workspace:*",
     "@keychord/config": "catalog:",

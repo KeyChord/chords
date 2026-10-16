@@ -46,13 +46,13 @@ await invoke("/wtl", [sx, sy + sh / 2, sw / 2, sh / 2]);
 await invoke("/wbr", [sx + sw / 2, sy, sw / 2, sh / 2]);
 await invoke("/wlr", [sx, sy, sw, sh / 2]);
 await invoke("/wtb", [sx, sy, sw, sh]);
-await invoke("/ws200x200", [sx, sy + sh - 200, 200, 200]);
+await invoke("/wd200x200", [sx, sy + sh - 200, 200, 200]);
 await invoke("/wp200x100", [sx + 200, initial.primaryTop - top - 100 - 200, 200, 200]);
 // Full-screen dimensions must extend beyond the right/bottom borders at the original origin.
-await invoke("/ws11", [sx + 200, sy - 100, sw, sh]);
+await invoke("/wd11", [sx + 200, sy - 100, sw, sh]);
 await invoke("/w1100", [sx, sy, sw, sh]);
-await invoke("/wsw2", [sx, sy, sw / 2, sh]);
-await invoke("/wsh2", [sx, sy + sh / 2, sw / 2, sh / 2]);
+await invoke("/wdw2", [sx, sy, sw / 2, sh]);
+await invoke("/wdh2", [sx, sy + sh / 2, sw / 2, sh / 2]);
 await invoke("/wpx2", [sx + sw / 2, sy + sh / 2, sw / 2, sh / 2]);
 await invoke("/wpy2", [sx + sw / 2, sy, sw / 2, sh / 2]);
 // Ordinary AppKit retains a visible strip when this small window would be fully offscreen.
@@ -61,10 +61,10 @@ await assert.rejects(
   /constrained.*requested/s,
 );
 await invoke("/wpx2", [sx + sw / 2, sy, sw / 2, sh / 2]);
-await invoke("/wsw1", [sx + sw / 2, sy, sw, sh / 2]);
+await invoke("/wdw1", [sx + sw / 2, sy, sw, sh / 2]);
 await invoke("/wpx-2", [sx - sw / 2, sy, sw, sh / 2]);
 await invoke("/w1100", [sx, sy, sw, sh]);
-await invoke("/wsw-1", [sx, sy, sw * 2, sh]);
+await invoke("/wdw=0", [sx, sy, sw * 2, sh]);
 await invoke("/wp-1", [sx - sw, sy, sw * 2, sh]);
 console.log(
   "standard-window-geometry-ok: full frame, zero size axes, snaps, stretches, named axes, overflow",

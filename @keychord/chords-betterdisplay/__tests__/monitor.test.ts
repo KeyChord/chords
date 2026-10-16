@@ -2,8 +2,15 @@ import { execFileSync } from "node:child_process";
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { expect, test, vi } from "vite-plus/test";
+import { expect, mock, spyOn, test } from "bun:test";
 import { chordPattern } from "@keychord/chordtest/patterns";
+import {
+  advanceTimersByTimeAsync,
+  runAllTimersAsync,
+  useFakeTimers,
+  useRealTimers,
+  waitFor,
+} from "@keychord/chordtest/test";
 import {
   BetterDisplayError,
   createMonitorHandler,
@@ -30,13 +37,13 @@ function betterDisplay() {
     { tagID: "10", name: "My screen", resolution: "800x600", connected: false },
     {
       tagID: "11",
-      name: `Chord /ms ${other} 800x600 ${other}`,
+      name: `Chord /md ${other} 800x600 ${other}`,
       resolution: "800x600",
       connected: false,
     },
   ];
   let next = 12;
-  const command = vi.fn(async (args: string[]): Promise<string> => {
+  const command = mock(async (args: string[]): Promise<string> => {
     const [operation] = args;
     if (args.includes("--proAvailable")) return "on";
     const value = (key: string) =>
@@ -141,27 +148,20 @@ test("absolute sizes retain arbitrary aspect ratios", () => {
   expect(parseMonitorResolution("2000x200")).toBe("2000x200");
 });
 
-test("the BetterDisplay package owns /ms, including exactly one reset binding", () => {
-  const parse = (file: URL) =>
-    JSON.parse(
-      execFileSync(
-        "bun",
-        ["-e", "console.log(JSON.stringify(Bun.TOML.parse(await Bun.stdin.text())))"],
-        { input: readFileSync(file, "utf8"), encoding: "utf8" },
-      ),
-    );
+test("the BetterDisplay package owns /md, including exactly one reset binding", () => {
+  const parse = (file: URL) => Bun.TOML.parse(readFileSync(file, "utf8")) as any;
   const definition = parse(new URL("../chords/macos.toml", import.meta.url));
   const monitors = parse(new URL("../../chords-monitors/chords/macos.toml", import.meta.url));
   expect(definition.on.monitor.file).toBe("monitor.js");
-  for (const input of ["/ms1440x1728", "/ms0"]) {
+  for (const input of ["/md1440x1728", "/md0"]) {
     const matches = Object.entries(definition.chords).filter(
       ([pattern, binding]) =>
         (binding as Record<string, unknown>)["@input:monitor"] && chordPattern(pattern).test(input),
     );
     expect(matches).toHaveLength(1);
   }
-  expect(monitors.chords["/ms(.+)"]).toBeUndefined();
-  expect(monitors.chords["?/ms"]).toBeUndefined();
+  expect(monitors.chords["/md(.+)"]).toBeUndefined();
+  expect(monitors.chords["?/md"]).toBeUndefined();
 });
 
 test("available modes use the physical display and current dimensions are a no-op", async () => {
@@ -182,9 +182,19 @@ test("an unavailable size creates and verifies a Retina mirror; a fresh handler 
   const create = state.command.mock.calls.find(([args]) => args[0] === "create")![0];
   expect(create).toContain("--virtualScreenHiDPI=on");
   expect(create).toContain("--resolutionList=1440x1728");
+  expect(state.screens[2].name).toStartWith(`Chord /md ${target} `);
   await createMonitorHandler(state.command)("2000x200");
   expect(state.resolution()).toBe("2000x200");
   expect(state.screens).toHaveLength(3);
+  await createMonitorHandler(state.command)("0");
+  expect(state.resolution()).toBe("1728x1117");
+  expect(state.screens.map((entry) => entry.tagID)).toEqual(["10", "11"]);
+});
+
+test("virtual screens created before the /md rename can still be targeted and reset", async () => {
+  const state = betterDisplay();
+  await createMonitorHandler(state.command)("1440x1728");
+  state.screens[2].name = state.screens[2].name.replace("/md", "/ms");
   await createMonitorHandler(state.command)("0");
   expect(state.resolution()).toBe("1728x1117");
   expect(state.screens.map((entry) => entry.tagID)).toEqual(["10", "11"]);
@@ -270,9 +280,9 @@ test("a rejected create does not turn an absent screen into a rollback failure",
 });
 
 test("a successful CLI exit without the requested dimensions still rejects", async () => {
-  vi.useFakeTimers();
-  // AbortSignal.timeout uses native timers, which Vitest does not replace.
-  const timeout = vi.spyOn(AbortSignal, "timeout").mockImplementation((milliseconds) => {
+  useFakeTimers();
+  // AbortSignal.timeout uses native timers, which the fake timers do not replace.
+  const timeout = spyOn(AbortSignal, "timeout").mockImplementation((milliseconds) => {
     const controller = new AbortController();
     setTimeout(() => controller.abort(new DOMException("Timed out", "TimeoutError")), milliseconds);
     return controller.signal;
@@ -285,20 +295,25 @@ test("a successful CLI exit without the requested dimensions still rejects", asy
         ? Promise.resolve("")
         : original(args),
     );
-    const result = expect(createMonitorHandler(state.command)("1920x1200")).rejects.toThrow(
+    // Bun's `expect(promise).rejects` blocks until the promise settles; capture the error instead.
+    const result = createMonitorHandler(state.command)("1920x1200").then(
+      () => undefined,
+      (error: unknown) => error,
+    );
+    await runAllTimersAsync();
+    expect(await result).toHaveProperty(
+      "message",
       "BetterDisplay did not apply 1920x1200 (reported 1728x1117)",
     );
-    await vi.runAllTimersAsync();
-    await result;
     expect(state.resolution()).toBe("1728x1117");
   } finally {
     timeout.mockRestore();
-    vi.useRealTimers();
+    useRealTimers();
   }
 });
 
 test("resolution polling retries missing and conflicting values before accepting repeated dimensions", async () => {
-  vi.useFakeTimers();
+  useFakeTimers();
   try {
     const state = betterDisplay();
     const original = state.command.getMockImplementation()!;
@@ -317,16 +332,16 @@ test("resolution polling retries missing and conflicting values before accepting
       return original(args);
     });
     const result = createMonitorHandler(state.command)("1920x1200");
-    await vi.advanceTimersByTimeAsync(0);
+    await advanceTimersByTimeAsync(0);
     expect(attempts).toBe(1);
-    await vi.advanceTimersByTimeAsync(100);
+    await advanceTimersByTimeAsync(100);
     expect(attempts).toBe(2);
-    await vi.advanceTimersByTimeAsync(100);
+    await advanceTimersByTimeAsync(100);
     await result;
     expect(attempts).toBe(3);
     expect(state.resolution()).toBe("1920x1200");
   } finally {
-    vi.useRealTimers();
+    useRealTimers();
   }
 });
 
@@ -352,8 +367,7 @@ test("a service error during resolution polling propagates and restores the nati
 });
 
 test("a screen belonging to another application is never reconfigured", async () => {
-  const command = vi
-    .fn()
+  const command = mock()
     .mockRejectedValueOnce(missing())
     .mockResolvedValueOnce("My screen,My screen");
   await expect(createMonitorHandler(command)("1440x1728")).rejects.toThrow("Move the pointer");
@@ -374,7 +388,7 @@ test("queued switches resolve the pointer after the previous change finishes", a
   const handler = createMonitorHandler(state.command);
   const first = handler("1440x1728");
   const second = handler("1920x1200");
-  await vi.waitFor(() => expect(state.command).toHaveBeenCalledTimes(1));
+  await waitFor(() => expect(state.command).toHaveBeenCalledTimes(1));
   finish();
   await Promise.all([first, second]);
   expect(state.resolution()).toBe("1920x1200");

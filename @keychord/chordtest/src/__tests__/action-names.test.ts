@@ -21,7 +21,7 @@ test("chord dispatch uses SCREAMING_SNAKE_CASE for internal action identifiers",
           const handler = /^@(?:input|keydown):(.+)$/.exec(event)?.[1];
           if (!handler || !Array.isArray(args) || !args.length) continue;
           const record = index => entries.push({ file, handler, action: args[index] });
-          if (["whatsapp", "spotify", "youtube", "instagram", "menu", "appearance", "select", "window"].includes(handler)) record(0);
+          if (["whatsapp", "spotify", "youtube", "instagram", "menu", "appearance", "select", "window", "navigation"].includes(handler)) record(0);
           if (handler === "window" && args[0] === "PRESET") record(1);
           if (handler === "click") record(1);
           if (handler === "tray") {

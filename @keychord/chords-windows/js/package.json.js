@@ -5,6 +5,7 @@ var repository = {
 	"url": "https://github.com/KeyChord/chords-windows"
 };
 var type = "module";
+var scripts = { "test": "bun test --isolate" };
 var devDependencies = {
 	"@keychord/chordtest": "workspace:*",
 	"@keychord/config": "catalog:",
@@ -88,36 +89,67 @@ var chords = { "macos.toml": {
 			"name": "Window: Position (Set)",
 			"@input:window": ["POSITION", "$1"]
 		},
-		"?/wsw": { "name": "Window: Size, Width" },
-		"/wsw(.+)": {
-			"name": "Window: Size, Width (Set)",
-			"@input:window": ["SIZE", "$1"]
+		"?/wdw": { "name": "Window: Dimensions, Width" },
+		"/wdw([^=-].*)": {
+			"name": "Window: Dimensions, Width (Set)",
+			"@input:window": ["DIMENSIONS", "$1"]
 		},
-		"?/wsh": { "name": "Window: Size, Height" },
-		"/wsh(.+)": {
-			"name": "Window: Size, Height (Set)",
-			"@input:window": ["SIZE", "$1"]
+		"?/wdw=": { "name": "Window: Dimensions, Width (Increase)" },
+		"/wdw=([0-9]?)": {
+			"name": "Window: Dimensions, Width (Increase)",
+			"@input:window": ["DIMENSIONS_INCREASE", "$1"]
 		},
-		"?/ws": { "name": "Window: Size" },
-		"/ws(.+)": {
-			"name": "Window: Size (Set)",
-			"@input:window": ["SIZE", "$1"]
+		"?/wdw-": { "name": "Window: Dimensions, Width (Decrease)" },
+		"/wdw-([0-9]?)": {
+			"name": "Window: Dimensions, Width (Decrease)",
+			"@input:window": ["DIMENSIONS_DECREASE", "$1"]
+		},
+		"?/wdh": { "name": "Window: Dimensions, Height" },
+		"/wdh([^=-].*)": {
+			"name": "Window: Dimensions, Height (Set)",
+			"@input:window": ["DIMENSIONS", "$1"]
+		},
+		"?/wdh=": { "name": "Window: Dimensions, Height (Increase)" },
+		"/wdh=([0-9]?)": {
+			"name": "Window: Dimensions, Height (Increase)",
+			"@input:window": ["DIMENSIONS_INCREASE", "$1"]
+		},
+		"?/wdh-": { "name": "Window: Dimensions, Height (Decrease)" },
+		"/wdh-([0-9]?)": {
+			"name": "Window: Dimensions, Height (Decrease)",
+			"@input:window": ["DIMENSIONS_DECREASE", "$1"]
+		},
+		"?/wd": { "name": "Window: Dimensions" },
+		"/wd([^wh=-].*)": {
+			"name": "Window: Dimensions (Set)",
+			"@input:window": ["DIMENSIONS", "$1"]
+		},
+		"?/wd=": { "name": "Window: Dimensions (Increase)" },
+		"/wd=([0-9]?)": {
+			"name": "Window: Dimensions (Increase)",
+			"@input:window": ["DIMENSIONS_INCREASE", "$1"]
+		},
+		"?/wd-": { "name": "Window: Dimensions (Decrease)" },
+		"/wd-([0-9]?)": {
+			"name": "Window: Dimensions (Decrease)",
+			"@input:window": ["DIMENSIONS_DECREASE", "$1"]
 		},
 		"/w([0-9\\s-]+)": {
-			"name": "Window: Size + Position",
+			"name": "Window: Dimensions + Position",
 			"@input:window": ["FRAME", "$1"]
 		},
-		"/h": {
-			"name": "Hide",
-			"shortcut": "cmd+h"
+		"?/ws": { "name": "Window: Space" },
+		"/ws(\\d+)": {
+			"name": "Window: Space $1 (Move)",
+			"@input:window": ["SPACE", "$1"]
 		},
-		"/m": {
-			"name": "Minimize",
-			"shortcut": "cmd+m"
+		"/ws]": {
+			"name": "Window: Space (Next)",
+			"@input:window": ["SPACE", "NEXT"]
 		},
-		"/q": {
-			"name": "Quit",
-			"shortcut": "cmd+q"
+		"/ws[": {
+			"name": "Window: Space (Previous)",
+			"@input:window": ["SPACE", "PREVIOUS"]
 		},
 		"/wh": {
 			"name": "Window: Hide",
@@ -131,17 +163,24 @@ var chords = { "macos.toml": {
 			"name": "Window: Quit",
 			"shortcut": "cmd+q"
 		},
-		"/w[": { "name": "Window: Previous " },
-		"/w]": { "name": "Window: Window" }
+		"/w[": {
+			"name": "Window: Previous",
+			"@input:window": ["CYCLE", "PREVIOUS"]
+		},
+		"/w]": {
+			"name": "Window: Next",
+			"@input:window": ["CYCLE", "NEXT"]
+		}
 	}
 } };
 var package_default = {
 	name,
 	repository,
 	type,
+	scripts,
 	devDependencies,
 	packageManager,
 	chords
 };
 //#endregion
-export { chords, package_default as default, devDependencies, name, packageManager, repository, type };
+export { chords, package_default as default, devDependencies, name, packageManager, repository, scripts, type };

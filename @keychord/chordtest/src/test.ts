@@ -8,21 +8,20 @@ import FakeTimers from "@sinonjs/fake-timers";
 import type { Mock } from "bun:test";
 
 const realSetTimeout = globalThis.setTimeout;
-let clock: FakeTimers.InstalledClock | undefined;
+let clock: FakeTimers.Clock | undefined;
 
-/** Fakes timers and `Date` (vitest's default set), leaving `performance` and microtasks real. */
-export function useFakeTimers() {
+/**
+ * Fakes every timer API, `Date` and `performance` except `nextTick` and `queueMicrotask`, like
+ * vitest's default, so promise callbacks still run. `config` is passed to the clock's install.
+ */
+export function useFakeTimers(config: FakeTimers.Config = {}) {
   clock?.uninstall();
-  clock = FakeTimers.withGlobal(globalThis).install({
-    toFake: [
-      "setTimeout",
-      "clearTimeout",
-      "setImmediate",
-      "clearImmediate",
-      "setInterval",
-      "clearInterval",
-      "Date",
-    ],
+  const timers = FakeTimers.withGlobal(globalThis);
+  clock = timers.install({
+    toFake: Object.keys(timers.timers).filter(
+      (method) => method !== "nextTick" && method !== "queueMicrotask",
+    ) as FakeTimers.Config["toFake"],
+    ...config,
   });
 }
 

@@ -1,0 +1,12 @@
+name = 'Navigation'
+
+[on.navigation]
+file = 'navigation.js'
+
+[chords]
+'?[' = { name = 'Navigation: Back / Dismiss' }
+'?]' = { name = 'Navigation: Continue / Options' }
+'[[' = { name = 'Navigation: Back / Escape', '@input:navigation' = ['PREVIOUS'] }
+']]' = { name = 'Navigation: Next / Continue', '@input:navigation' = ['NEXT'] }
+'[x' = { name = 'Navigation: Close Dialog', '@input:navigation' = ['CLOSE'] }
+'](\d+)' = { name = 'Navigation: Option $1', '@input:navigation' = ['OPTION', '$1'] }

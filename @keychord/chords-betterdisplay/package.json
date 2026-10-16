@@ -5,6 +5,9 @@
     "url": "https://github.com/KeyChord/chords-betterdisplay"
   },
   "type": "module",
+  "scripts": {
+    "test": "bun test --isolate"
+  },
   "dependencies": {
     "p-wait-for": "^6.0.0",
     "uuid": "^14.0.3",

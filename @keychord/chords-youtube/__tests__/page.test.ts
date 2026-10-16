@@ -1,13 +1,13 @@
 import { Window } from "happy-dom";
-import { afterEach, beforeEach, expect, test, vi } from "vite-plus/test";
+import { afterEach, beforeEach, expect, mock, spyOn, test } from "bun:test";
 import { buildYouTubeJavaScript, type YouTubeAction } from "../src/js/page";
 
 let window: Window;
 let video: ReturnType<Window["document"]["createElement"]>;
 let player: ReturnType<Window["document"]["createElement"]> & {
-  seekTo?: ReturnType<typeof vi.fn>;
-  playVideo?: ReturnType<typeof vi.fn>;
-  pauseVideo?: ReturnType<typeof vi.fn>;
+  seekTo?: ReturnType<typeof mock>;
+  playVideo?: ReturnType<typeof mock>;
+  pauseVideo?: ReturnType<typeof mock>;
 };
 
 beforeEach(() => {
@@ -28,13 +28,13 @@ beforeEach(() => {
   player = window.document.querySelector("#movie_player")!;
   video = player.querySelector("video")!;
   Object.defineProperty(video, "duration", { value: 120, configurable: true });
-  player.seekTo = vi.fn((seconds: number) => {
+  player.seekTo = mock((seconds: number) => {
     video.currentTime = seconds;
   });
-  player.playVideo = vi.fn(() => {
+  player.playVideo = mock(() => {
     Object.defineProperty(video, "paused", { value: false, configurable: true });
   });
-  player.pauseVideo = vi.fn(() => {
+  player.pauseVideo = mock(() => {
     Object.defineProperty(video, "paused", { value: true, configurable: true });
   });
 });
@@ -146,7 +146,7 @@ test.each(["disabled", "aria-disabled", "hidden", "display", "visibility", "miss
   "reports unavailable captions (%s) without claiming success",
   (unavailable) => {
     const button = player.querySelector<HTMLElement>(".ytp-subtitles-button")!;
-    const click = vi.spyOn(button, "click");
+    const click = spyOn(button, "click");
     switch (unavailable) {
       case "disabled":
         button.setAttribute("disabled", "");

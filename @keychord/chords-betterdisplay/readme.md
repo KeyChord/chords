@@ -2,14 +2,14 @@
 
 Set the resolution of the display containing the pointer with BetterDisplay.
 Enable this package in Chord's monorepo package selection, then reload chords.
-This package owns `/ms`; `chords-monitors` provides monitor focusing.
+This package owns `/md`; `chords-monitors` provides monitor focusing.
 
 | Chord          | Result                                                          |
 | -------------- | --------------------------------------------------------------- |
-| `/ms1440x1728` | Set a 1440 × 1728 desktop                                       |
-| `/ms720x864`   | Set a 720 × 864 desktop                                         |
-| `/ms1920x1080` | Set a 1920 × 1080 desktop                                       |
-| `/ms0`         | Remove this package's virtual screens for the pointer's display |
+| `/md1440x1728` | Set a 1440 × 1728 desktop                                       |
+| `/md720x864`   | Set a 720 × 864 desktop                                         |
+| `/md1920x1080` | Set a 1920 × 1080 desktop                                       |
+| `/md0`         | Remove this package's virtual screens for the pointer's display |
 
 Install and run [BetterDisplay](https://betterdisplay.pro/) with CLI integration
 enabled (the default). The handler uses `betterdisplaycli` from PATH or the CLI
@@ -26,18 +26,19 @@ apply; a command rejects if BetterDisplay cannot apply the exact dimensions.
 
 Changes are serialized and checked after application. A failed switch attempts
 to restore the preceding native resolution and managed mirror. Switching to a
-native mode or using `/ms0` removes only virtual screens created by this
+native mode or using `/md0` removes only virtual screens created by this
 package for that display. Other virtual screens are left alone. The reserved
-virtual-screen name format is `Chord /ms <display UUID> <size> <unique UUID>`.
+virtual-screen name format is `Chord /md <display UUID> <dimensions> <unique UUID>`.
+Older managed virtual screens remain recognized after the command rename.
 
 BetterDisplay owns the resulting configuration: it persists when Chord quits or
-reloads. Use `/ms0` to return from a custom virtual desktop; it does not undo
+reloads. Use `/md0` to return from a custom virtual desktop; it does not undo
 a directly selected native mode. The handler also recognizes its mirrored
-virtual screen after a Chord restart, so subsequent `/ms` commands keep targeting
+virtual screen after a Chord restart, so subsequent `/md` commands keep targeting
 the same physical display.
 
 Build with `vp pack` in this directory. Test from the monorepo root with
-`vp test @keychord/chords-betterdisplay/__tests__/monitor.test.ts`.
+`vp run --filter @keychord/chords-betterdisplay test`.
 
 To run the opt-in live check, use
 `CHORD_BETTERDISPLAY_LIVE_TEST=1 bun __tests__/monitor.integration.ts` here. It
