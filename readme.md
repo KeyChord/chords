@@ -112,7 +112,7 @@ In TOML chord keys, only parenthesized sections use regex syntax; all surroundin
 `,` Settings\
 `.` Left Click\
 `.,` Right Click\
-`..` Double Click (not currently used)\
+`..` Double Click\
 `.;` Middle Click (Rare)\
 `/` Search
 
