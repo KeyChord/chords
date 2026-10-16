@@ -1,6 +1,12 @@
 # @keychord/chords-windows
 
-Native macOS window geometry and application shortcuts for Chord.
+> [!NOTE]
+> This document is largely AI-written, so parts of it may not be fully accurate. It will be replaced with a hand-written version when I get the time.
+
+Native macOS window geometry and application shortcuts for Chord, for whichever app is
+focused. To install, in [Chord](https://github.com/KeyChord/Chord) open Settings → Chords →
+**Chord Monorepos** → **Add Monorepo**, enter `KeyChord/chords`, then tick
+`@keychord/chords-windows` under **Packages to use**.
 
 `/ws<number>` moves the captured application's focused window to a desktop Space,
 numbered from 1 in Mission Control display order, excluding full-screen Spaces.
@@ -93,7 +99,7 @@ for absolute pixels or individual axes.
 `/wbr` align corners and preserve size. `/wc` centers the window. `/wlr` (or `/wrl`)
 stretches from left to right, preserving height and top; `/wtb` (or `/wbt`) stretches
 from top to bottom, preserving width and left. `/wf` fills the display. These commands
-use native window geometry. The previous Window-menu actions live under `=w` in
+use native window geometry. The equivalent Window-menu actions live under `=w` in
 `@keychord/chords-menu`.
 
 Geometry uses the usable area of the display containing most of the window, excluding

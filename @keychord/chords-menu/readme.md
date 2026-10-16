@@ -1,8 +1,15 @@
 # @keychord/chords-menu
 
+> [!NOTE]
+> This document is largely AI-written, so parts of it may not be fully accurate. It will be replaced with a hand-written version when I get the time.
+
 One package for macOS application menus, menu-bar extras, Control Center, and menu-bar
-visibility. The former `chords-tray` functionality is included here, sharing one
-native addon with application-menu actions.
+visibility. Its chords work in whichever app is focused. [Chord](https://github.com/KeyChord/Chord)
+installs this package by default as part of its default chordpack, from its pinned
+`KeyChord/chords-menu` repository. To use the monorepo's current version documented here
+instead, open Settings → Chords → **Chord Monorepos** → **Add Monorepo**, enter
+`KeyChord/chords`, tick `@keychord/chords-menu` under **Packages to use**, and remove the
+`KeyChord/chords-menu` entry under **Chord Repos**.
 
 `=/<text>` searches menu titles and complete menu paths using a case-insensitive,
 literal substring. Spaces, punctuation, numbers, and Unicode are accepted; no final
@@ -10,12 +17,12 @@ dot is required. Exact matches and title prefixes take priority. Ambiguous resul
 report the matching paths so the query can include a parent menu, for example
 `=/Window > Center`.
 
-Letter abbreviations remain available as `=[<letters>.`: `=[f.` selects File,
+Letter abbreviations use `=[<letters>.`: `=[f.` selects File,
 `=[hh.` selects the second top-level menu starting with H. In expanded menus,
 `=[zo.`, `=[z2.`, and `=[z-o2.` select by prefix, occurrence, and word prefix.
 Letter queries exclude the Apple menu.
 
-`=w` opens Window. The previous Window-menu commands use this prefix: `=wl`, `=wr`,
+`=w` opens Window. Window-menu commands use this prefix: `=wl`, `=wr`,
 `=wt`, `=wb`, corners `=wtl`/`=wtr`/`=wbl`/`=wbr`, arrangements `=wlr`/`=wrl`/`=wtb`/`=wbt`,
 `=wq` for Quarters, `=ws[` for Return to Previous Size, `=wz` for Zoom, `=wf` for Fill,
 `=wc` for Center, `=wfl`/`=wfr` for full-screen tiling, and `=waf` for Bring All to Front.
@@ -34,7 +41,8 @@ the selection; completing input does not click again.
 Wi-Fi, and `=cdd` toggles Dark Mode. `=s` opens Spotlight. Bare `=-` clicks the main
 display's notch and rejects on displays without one. `=v` toggles automatic menu-bar
 hiding through System Events; macOS may request Automation access on first use.
-`=vu`, `=vd`, and `=vm` adjust volume.
+`=vu`, `=vd`, and `=vm` adjust volume, `=bu` and `=bd` adjust brightness, and `=q` opens
+Force Quit.
 
 ```ts
 import buildMenuHandler from "@keychord/chords-menu/js/menu.js";
@@ -54,14 +62,14 @@ main actor and complete on the originating JavaScript queue.
 `@input:tray` starts with an action type:
 
 ```toml
-'@input:tray' = ['ITEM', 0]                  # First item; negative indexes count from the right
-'@input:tray' = ['ITEM', -1, 'RIGHT']        # Last item, right click
-'@input:tray' = ['HOVER', 0]               # Move the pointer over the first tray item without clicking
-'@input:tray' = ['NOTCH']                  # Click the main display's hardware notch
-'@input:tray' = ['BATTERY']                # Power / Battery menu
-'@input:tray' = ['DATE_TIME']              # Notification Center via the clock
-'@input:tray' = ['WIFI']                   # Wi-Fi menu; Control Center if its icon is hidden
-'@input:tray' = ['WIFI', 'TOGGLE']          # Switch Wi-Fi on/off
+'@input:tray' = ['ITEM', 0] # First item; negative indexes count from the right
+'@input:tray' = ['ITEM', -1, 'RIGHT'] # Last item, right click
+'@input:tray' = ['HOVER', 0] # Move the pointer over the first tray item without clicking
+'@input:tray' = ['NOTCH'] # Click the main display's hardware notch
+'@input:tray' = ['BATTERY'] # Power / Battery menu
+'@input:tray' = ['DATE_TIME'] # Notification Center via the clock
+'@input:tray' = ['WIFI'] # Wi-Fi menu; Control Center if its icon is hidden
+'@input:tray' = ['WIFI', 'TOGGLE'] # Switch Wi-Fi on/off
 '@input:tray' = ['CONTROL_CENTER']
 '@input:tray' = ['CONTROL_CENTER', 'DISPLAY', 'INCREASE']
 '@input:tray' = ['CONTROL_CENTER', 'SOUND', 'CLICK']
@@ -83,14 +91,14 @@ numeric selection. `scope` is `MENU` or `TRAY`; menu native indexes start at
 Apple (0), and tray native indexes are zero-based. Negative indexes count from the right;
 `steps` contains bracket movements, and omitting `clickType` previews without activating.
 The selection handler forwards Chord's captured application identifier for menu discovery.
-The existing `ITEM` / `HOVER` API continues to address tray icons only.
+The `ITEM` / `HOVER` actions address tray icons only.
 
-The unified addon is built from `Sources/KeychordChordsMenuNativeMenu` and exposes
-`runMenuAction`, `runMenuBarAction`, and `runTrayAction`. All handlers import `menu.node`;
-the build packages it, `libNodeAPI.dylib`, and `libAXorcistRuntime.dylib` beside the JavaScript, including when
-vendored into other chord packages. Requires macOS 14+, Accessibility access, and a
-Chord CLI with main-run-loop support.
+The native addon is built from `Sources/KeychordChordsMenuNativeMenu` and exposes
+`runMenuAction`, `runMenuBarAction`, and `runTrayAction`. The menu, tray, and selection
+handlers import `menu.node` (the `=v` visibility handler runs `osascript` instead); the build
+packages it, `libNodeAPI.dylib`, and `libAXorcistRuntime.dylib` under `js/native/<triple>/menu/`,
+including when vendored into other chord packages. Requires macOS 14+ and Accessibility access.
 
-Build with `vp pack` (Swift 6.2+). Run binding tests with `vp test`, Bun/native bridge
-tests with root `vp run test:bun`, and real menu/tray checks in the disposable macOS VM
-with `vp run test:macos -- @keychord/chords-menu`.
+Build with `vp pack` (Swift 6.2+). Run unit tests with `vp run test` (`bun test --isolate`)
+in this directory, and real menu/tray checks in the disposable macOS VM with
+`vp run test:macos -- @keychord/chords-menu` from the monorepo root.

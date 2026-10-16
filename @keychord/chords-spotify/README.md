@@ -1,6 +1,9 @@
 # Spotify chords
 
-Commands for the macOS Spotify desktop app (`com.spotify.client`).
+> [!NOTE]
+> This document is largely AI-written, so parts of it may not be fully accurate. It will be replaced with a hand-written version when I get the time.
+
+Commands for the macOS Spotify desktop app (`com.spotify.client`). To install, in [Chord](https://github.com/KeyChord/Chord) open Settings → Chords → **Chord Monorepos** → **Add Monorepo**, enter `KeyChord/chords`, then tick `@keychord/chords-spotify` under **Packages to use**. Spotify must be installed; see [Setup](#setup) for how Chord connects to it.
 
 App bindings live in `chords/com/spotify/client/macos.toml`, the path Chord uses to discover Spotify's chords.
 
@@ -81,4 +84,4 @@ The handler targets the desktop renderer (`xpui.app.spotify.com`), selecting the
 
 ## Development
 
-Use `vp pack` from this package directory to build the JavaScript artifacts. From the workspace root, run `vp check` and `vp test`. The Spotify tests execute the serialized page payload against desktop-style playlist, menu, and Now Playing fixtures, validate every TOML binding, and cover exact scrubbing, playback states, unavailable controls, target selection, overlapping commands, protocol failures, timeouts, and socket cleanup.
+Use `vp pack` from this package directory to build the JavaScript artifacts, and `vp run test` (`bun test --isolate`) to run the tests. From the monorepo root, run `vp check`. The Spotify tests execute the serialized page payload against desktop-style playlist, menu, and Now Playing fixtures, validate every TOML binding, and cover exact scrubbing, playback states, unavailable controls, target selection, overlapping commands, protocol failures, timeouts, and socket cleanup.

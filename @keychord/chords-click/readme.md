@@ -1,6 +1,16 @@
 # @keychord/chords-click
 
-General macOS window clicks. Start with `.` and enter x/y coordinate pairs from the
+> [!NOTE]
+> This document is largely AI-written, so parts of it may not be fully accurate. It will be replaced with a hand-written version when I get the time.
+
+Mouse clicks, drags and pointer moves by coordinates, in the focused app's window or
+on the screen. It works with any app; Chord needs Accessibility permission. To install
+it, add the `KeyChord/chords` monorepo under Settings → Chords → Chord Monorepos and
+tick `@keychord/chords-click`.
+
+## Coordinates
+
+Start with `.` and enter x/y coordinate pairs from the
 top left. Each bare digit is one coordinate in tenths: `.13` clicks 10% across and
 30% down; `.1313` clicks that position twice. Within coordinate pairs, `-` means 0%, `1`–`9` mean 10%–90%, and `0` means
 100%. Far-edge coordinates land on the last pixel inside the window.
@@ -54,8 +64,8 @@ Combine modifiers as `./=55` (move globally), `./-1328` (drag globally), or
 also support screen scope. Window-scoped commands continue to target the captured
 app's window even when covered.
 
-A `-` immediately after the command/button prefix now starts a drag. To begin a
-normal click with a zero horizontal offset, write `0l`: `.0l9`, `.,0l9`, or
+Because a `-` immediately after the command/button prefix starts a drag, write `0l`
+to begin a normal click with a zero horizontal offset: `.0l9`, `.,0l9`, or
 `.;0l9`. Dashes inside pairs remain zero coordinates: `.0-` still clicks the
 top-right edge. A trailing `-` is a hold only after a complete coordinate pair.
 
@@ -68,6 +78,8 @@ The five-click example is:
 It clicks 20 pixels above the bottom at the horizontal center, halfway down at the
 left edge, 30% from the left and 70% down, 20 pixels above the bottom at the right
 edge, and 60% from the left and halfway down.
+
+## Behavior
 
 The handler uses the application captured by Chord when the chord was entered and
 targets its frontmost on-screen normal window. It validates the complete sequence
@@ -82,9 +94,12 @@ including when another app covers it; cursor movement does not activate the app 
 click a covering window. Chord needs Accessibility permission. The sequence stops if the window
 moves, resizes, disappears, or a click fails. No additional native addon is needed.
 
+## Development
+
 Other chord packages can reuse `click.js`, optionally passing a bundle ID to the
-builder to target a specific app. The existing iPhone Mirroring handler shares the
-parser and click routine while retaining its connection checks.
+builder to target a specific app. The iPhone Mirroring handler in
+[`chords-com.apple`](https://github.com/KeyChord/chords/tree/main/@keychord/chords-com.apple)
+shares the parser and click routine while retaining its connection checks.
 
 Run `vp run test:macos -- @keychord/chords-click` from the workspace root after
 `vp run test:macos:setup`. The VM test sends real native clicks to a controlled

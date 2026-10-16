@@ -1,8 +1,26 @@
 # @keychord/chords-web
 
-Browser chords send JavaScript to the active tab of the front window in Google Chrome,
-Brave Browser, Microsoft Edge, or Arc. Chord needs Automation permission for the browser,
-and the browser must allow JavaScript from Apple events.
+> [!NOTE]
+> This document is largely AI-written, so parts of it may not be fully accurate. It will be replaced with a hand-written version when I get the time.
+
+Global `;` chords that send JavaScript to the active tab of the front window in Google Chrome,
+Brave Browser, Microsoft Edge, or Arc. To install, in [Chord](https://github.com/KeyChord/Chord)
+open Settings → Chords → **Chord Monorepos** → **Add Monorepo**, enter `KeyChord/chords`, then
+tick `@keychord/chords-web` under **Packages to use**.
+
+| Chord | Result                  |
+| ----- | ----------------------- |
+| `;n`  | Scroll up 100 pixels    |
+| `;s`  | Scroll down 100 pixels  |
+| `;e`  | Scroll right 100 pixels |
+| `;w`  | Scroll left 100 pixels  |
+
+Chord needs Automation permission for the browser, and the browser must allow JavaScript from
+Apple events (in Chrome: View → Developer → Allow JavaScript from Apple Events). When the
+frontmost app is not one of the supported browsers, the chord shows an "Unsupported Browser"
+alert instead.
+
+## Development
 
 The native addon uses Apple's Scripting Bridge framework. The
 [swift-scripting-bridge](https://github.com/rhx/swift-scripting-bridge) build plugin generates

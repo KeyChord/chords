@@ -1,8 +1,25 @@
 # @keychord/chords-raycast
 
+> [!NOTE]
+> This document is largely AI-written, so parts of it may not be fully accurate. It will be replaced with a hand-written version when I get the time.
+
+Chords for [Raycast](https://www.raycast.com/), which must be installed. To install this
+package, in [Chord](https://github.com/KeyChord/Chord) open Settings → Chords →
+**Chord Monorepos** → **Add Monorepo**, enter `KeyChord/chords`, then tick
+`@keychord/chords-raycast` under **Packages to use**.
+
 Use `//<query>` to activate Raycast's first result. For example, `//calculator`
 searches for `calculator` and opens its first match. Complete the chord using
-Chord's usual completion key. `//` alone opens Raycast. This replaces `/r`.
+Chord's usual completion key. `//` alone opens Raycast.
+
+While Raycast is focused, these chords press its keyboard shortcuts:
+
+| Chord       | Result                                              |
+| ----------- | --------------------------------------------------- |
+| `nn` / `ns` | Navigate north / south (Up / Down)                  |
+| `nw` / `ne` | Navigate west / east (Left / Right)                 |
+| `p[` / `p]` | Previous / next page (Option-Up / Option-Down)      |
+| `s[` / `s]` | Previous / next section (Command-Up / Command-Down) |
 
 ## Direct command launches
 
@@ -59,8 +76,8 @@ search readiness and activation confirmation; it defaults to five seconds and is
 the handler's first argument. Duplicate concurrent queries share an action and
 different queries run in order.
 
-Build JavaScript and the Swift addon with `vp pack`. Run unit tests from the
-monorepo root with `vp test @keychord/chords-raycast`. Run the production search
-flow against a controlled WebKit fixture with `vp run test:macos --
-@keychord/chords-raycast`; the fixture deliberately delays results beyond the old
-200 ms timer and verifies exact Unicode queries and one activation per query.
+Build JavaScript and the Swift addon with `vp pack`. Run unit tests with `vp run test`
+(`bun test --isolate`) in this directory. Run the production search flow against a
+controlled WebKit fixture with `vp run test:macos -- @keychord/chords-raycast` from the
+monorepo root; the fixture deliberately delays results beyond 200 ms and verifies exact
+Unicode queries and one activation per query.

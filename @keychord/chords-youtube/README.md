@@ -1,6 +1,9 @@
 # YouTube chords
 
-Commands for the installed Brave YouTube app (`com.brave.Browser.app.agimnkijcaahngcdmfeangaknmldooml`).
+> [!NOTE]
+> This document is largely AI-written, so parts of it may not be fully accurate. It will be replaced with a hand-written version when I get the time.
+
+Commands for YouTube installed as a web app from Brave Browser (`com.brave.Browser.app.agimnkijcaahngcdmfeangaknmldooml`). They apply while that app is focused, not in ordinary browser tabs. To install, in [Chord](https://github.com/KeyChord/Chord) open Settings → Chords → **Chord Monorepos** → **Add Monorepo**, enter `KeyChord/chords`, tick `@keychord/chords-youtube` under **Packages to use**, then follow [Browser setup](#browser-setup).
 
 | Chord  | Action                                                                                  |
 | ------ | --------------------------------------------------------------------------------------- |
@@ -44,7 +47,7 @@ vp pack
 vp fmt .
 vp check .
 vp exec tsc --noEmit --project tsconfig.json
-vp test
+vp run test
 ```
 
-The tests exercise the serialized browser payload, all TOML bindings, target selection, protocol errors, socket cleanup, and timeouts. Live verification on 2026-10-11 used the compiled handler in Chord's embedded Bun runtime against the installed YouTube app: repeated play/pause, an exact seek to 30 seconds, toggles in both directions, settings visibility, fullscreen entry/exit, and Search focus.
+`vp run test` runs `bun test --isolate`. The tests exercise the serialized browser payload, all TOML bindings, target selection, protocol errors, socket cleanup, and timeouts.

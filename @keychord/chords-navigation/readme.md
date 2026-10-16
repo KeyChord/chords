@@ -1,7 +1,13 @@
 # @keychord/chords-navigation
 
-Global macOS navigation through Accessibility. The app captured when chord mode
-opens is brought forward before acting; a queued chord retains its own target.
+> [!NOTE]
+> This document is largely AI-written, so parts of it may not be fully accurate. It will be replaced with a hand-written version when I get the time.
+
+Global macOS navigation through Accessibility, for whichever app is focused. The app
+captured when chord mode opens is brought forward before acting; a queued chord retains
+its own target. To install, in [Chord](https://github.com/KeyChord/Chord) open Settings →
+Chords → **Chord Monorepos** → **Add Monorepo**, enter `KeyChord/chords`, then tick
+`@keychord/chords-navigation` under **Packages to use**.
 
 - `[[`: go back, or dismiss the active dialog/popover with cancel or Escape.
 - `]]`: press the default action, or the next/continue button in the header.
@@ -21,6 +27,6 @@ pressing Escape. Numbering includes only controls exposed in the current scope;
 scroll unloaded options into view first.
 
 Requires macOS 14+ and Chord's Accessibility permission. Build with `vp pack`;
-run handler tests with `vp run test`. From the workspace root, run
+run handler tests with `vp run test` (`bun test --isolate`). From the monorepo root, run
 `vp run test:macos -- @keychord/chords-navigation` for native regression checks,
 including WhatsApp's group picker and wallpaper-style dialogs.

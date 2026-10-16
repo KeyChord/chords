@@ -1,11 +1,18 @@
 # @keychord/chordtest
 
+> [!NOTE]
+> This document is largely AI-written, so parts of it may not be fully accurate. It will be replaced with a hand-written version when I get the time.
+
+A private development package for authors of the chord packages in the
+[`KeyChord/chords`](https://github.com/KeyChord/chords) monorepo. It is not a chord package and
+is not installed in Chord; it is only used from a checkout of the monorepo.
+
 Shared Bun and native macOS test helpers, plus a Tart VM runner for UI tests. The VM has its own desktop, and runs without a host window, audio passthrough, or clipboard sharing. UI helpers check `hw.model` and refuse to run on the physical Mac, even if `CHORD_TESTING_UI=1` is set.
 
 From the workspace root:
 
 ```sh
-vp run test:bun            # Noninteractive Bun tests; native addons are built and loaded in Bun
+vp run test                # Every package's noninteractive Bun unit tests (bun test --isolate)
 vp run test:macos:setup    # Download and prepare the shared macOS VM once
 vp run test:macos          # Run Bun tests inside the VM, then stop the VM
 vp run test:macos:status
@@ -57,7 +64,6 @@ the real host import and do not include the test module.
 `advanceTimersByTimeAsync` / `runAllTimersAsync` (vitest's fake-timer semantics), `waitFor`,
 `stubGlobal` / `unstubAllGlobals`, and `mocked`. Spy on `Bun` methods with `spyOn(Bun, "spawn")`
 rather than replacing the global.
-The Rust helper and `chord bun` CLI checks remain integration tests of the real native implementation.
 
 Helpers exported from this package:
 
@@ -83,4 +89,4 @@ test.skipIf(!macOSUITestsEnabled)(
 );
 ```
 
-Keep live tests in `*.vm.test.ts`; `vp test` excludes them. Run them with `vp run test:macos`, which enables the VM flag and hardware check. Add behavior scenarios in the same file using the exported fixture helpers. Do not enable the UI flag to run these tests on a physical Mac.
+Keep live tests in `*.vm.test.ts`, gated with `test.skipIf(!macOSUITestsEnabled)` as above, so `vp run test` skips them. Run them with `vp run test:macos`, which enables the VM flag and hardware check. Add behavior scenarios in the same file using the exported fixture helpers. Do not enable the UI flag to run these tests on a physical Mac.

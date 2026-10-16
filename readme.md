@@ -1,59 +1,52 @@
 A monorepo of all the conventional chord packages.
 
+> [!NOTE]
+> This section is largely AI-written, so parts of it may not be fully accurate. It will be replaced with a hand-written version when I get the time.
+
 Chord packages live in `@keychord/`; workspace tooling and third-party wrappers
 live in `packages/`.
 
-## Version control
+## Installing packages
 
-This repository uses colocated Jujutsu (`jj`) and Git, following Haniverse's
-workflow with `main` as the integration branch. The checked-in `.jj.toml` provides
-repository-specific aliases, overriding any global aliases that target `trunk`.
+These packages run in [Chord](https://github.com/KeyChord/Chord). Download
+`Chord-aarch64.dmg` from the [latest release](https://github.com/KeyChord/Chord/releases/latest)
+(Apple Silicon only), grant Accessibility access on first launch, then press
+Caps Lock + Space (the activation shortcut) to start a chord.
 
-To enable the same setup in a fresh Git checkout:
+On first launch Chord installs its default chordpack, which includes
+`@keychord/chords-chord`, `@keychord/chords-menu` and `@keychord/chords-com.apple`
+at pinned revisions.
 
-```sh
-jj --config-file .jj.toml git init --colocate
-cp .jj.toml "$(jj config path --repo)"
-jj bookmark track main --remote origin
-```
+To install any other package from this repo:
 
-The config allows new files up to 10 MB, matching Haniverse and accommodating the
-native addons and generated bundles committed here. Re-run the `cp` command after
-changing `.jj.toml` to update the active local config.
+1. Open Settings → Chords → **Chord Monorepos** and use **Add Monorepo** with `KeyChord/chords`.
+2. Under **Packages to use**, tick the packages you want. Chord reloads as soon as
+   you tick one.
 
-```sh
-jj --no-pager status
-jj --no-pager diff --git
-jj --no-pager log
-jj gf                              # fetch without rebasing
-jj describe -m "Describe the change"
-jj push                            # advance main and push to origin
-```
+Use **Sync Latest** on the monorepo to update it later. Settings → Browse also
+offers one-click **Add Repo** for a few curated packages (`chords-chromium`,
+`chords-vscode`, `chords-jetbrains`, `chords-terminal`, `chords-aerospace`). Those
+install the package's [mirror repository](#repository-mirrors), which can lag behind
+this monorepo, so add the monorepo instead when you want the current version.
 
-`jj push` selects the latest described, non-empty commit in the current working
-copy's ancestry and leaves working files in place. It forwards arguments to
-`jj git push`; `jj push --dry-run` previews the remote update but still advances
-the local `main` bookmark.
+When two sources provide the same package, local sources win over GitHub ones
+(Settings → Chords → Local Folders, a repo's **Link Local Folder**, or a linked local
+monorepo). Between GitHub repos, the pinned default `KeyChord/chords-menu` and
+`KeyChord/chords-com.apple` repos take precedence over the monorepo's copies, so
+remove them under **Chord Repos** if you want the monorepo's versions of those two
+packages.
 
-`jj pull` fetches `origin`, resets the local `main` bookmark to `main@origin`, and
-rebases current work onto it. Coordinate before running it in a shared checkout.
-Describing and pushing the current working copy includes all edits in that
-revision, so review them first. Jujutsu does not run Git hooks; run `vp check` and
-`vp run test` (Bun tests in every package) before pushing.
+To change one of the default chords (for example `/b`, which opens Safari from
+`@keychord/chords-com.apple`), override the package that defines it with a local
+copy, using **Link Local Folder** on its repo, and edit the chord there. Binding the
+same sequence in a different package isn't a reliable override: when two packages
+define the same chord, Chord doesn't consistently pick the same one.
 
 ## Usage
 
-You can re-define these defaults in _Chord_ by simply adding a Chord Package with a new definition for one of these sequences (e.g. if you don't use Safari which is defined as `/b` in these defaults, you can simply a new chord to `/b` and it will be used instead.
-
-You can also use this Chord Package as a template for creating your own chords. See [development.md](./development.md) for detailed instructions. When defining your own chords, it's recommended to follow the conventions below.
+You can use these Chord Packages as templates for creating your own chords. See [create-chord-package](https://github.com/KeyChord/create-chord-package) and Chord's [scripting.md](https://github.com/KeyChord/Chord/blob/dev/scripting.md) for detailed instructions. When defining your own chords, it's recommended to follow the conventions below.
 
 ## Default Global Keys
-
-Define global chords and their hints in the package's root `chords/macos.toml`
-(for example, `@keychord/chords-betterdisplay/chords/macos.toml`), with any
-handlers they use. Keep application-specific alphanumeric chords in nested
-application/bundle-ID folders. Package builds reject global chords outside the
-root file.
 
 In the default chord package, these are the categories assigned to the global chords (which must start with a non-alphanumeric character). If you want to define your own custom global chord which doesn't fit into any of the following categories, you should prefer the `,` prefix.
 
@@ -66,15 +59,18 @@ In the default chord package, these are the categories assigned to the global ch
 
 > `'` is reserved for pass-through input (can appear anywhere in a chord)\
 > `\` is reserved for escape characters (can appear anywhere in a chord)\
-> `` ` `` isn't reserved, but is conventionally used for "config" (e.g. `` 3`d2,i1`/w] `` waits 200 ms, then closes three tabs 100 ms apart)
+> `` ` `` isn't reserved, but is conventionally used for "config" (e.g. ``3`d2,i1`/w]`` waits 200 ms, then runs `/w]` (next window) three times, 100 ms apart)
+
+> [!NOTE]
+> This section is largely AI-written, so parts of it may not be fully accurate. It will be replaced with a hand-written version when I get the time.
+
+Define global chords and their hints in the package's root `chords/macos.toml`
+(for example, `@keychord/chords-betterdisplay/chords/macos.toml`), with any
+handlers they use. Keep application-specific alphanumeric chords in nested
+application/bundle-ID folders. Package builds reject global chords outside the
+root file.
 
 ## Conventions
-
-Always single-quote binding keys in TOML `[chords]` tables, even when quotes are
-optional (for example, `'fr' = { name = 'Find and Replace' }`). `vp fmt` preserves
-these quotes.
-
-In TOML chord keys, only parenthesized sections use regex syntax; all surrounding keys are literal. Write `hs.(\d+)` to match `hs.12` and pass `12` as `$1`. Dots outside parentheses need no backslash; dots inside a regex section still use `\.` when they must match literally. Chord patterns match the complete entered sequence automatically.
 
 `l` Left\
 `r` Right\
@@ -121,37 +117,136 @@ In TOML chord keys, only parenthesized sections use regex syntax; all surroundin
 `.;` Middle Click (Rare)\
 `/` Search
 
-## Native addons
+> [!NOTE]
+> This section is largely AI-written, so parts of it may not be fully accurate. It will be replaced with a hand-written version when I get the time.
 
-Some packages (`chords-menu`, `chords-web`, `chords-com.apple`)
-ship NodeSwift addons built from `src/swift/`. They can only be compiled on
-macOS, so the built `.node` files are committed. Mirrors copy all committed
-files, including JS and native artifacts, as-is. Build and commit generated
-handlers before pushing changes to their source.
+Always single-quote binding keys in TOML `[chords]` tables, even when quotes are
+optional (for example, `'fr' = { name = 'Find and Replace' }`). `vp fmt` preserves
+these quotes.
 
-A pre-commit hook formats staged JS, TS, TSX, and JSON files. Native artifact
-checks are manual because rebuilding addons can be slow. To enable the hooks
-in a fresh clone:
+In TOML chord keys, only parenthesized sections use regex syntax; all surrounding keys are literal. Write `hs.(\d+)` to match `hs.12` and pass `12` as `$1`. Dots outside parentheses need no backslash; dots inside a regex section still use `\.` when they must match literally. Chord patterns match the complete entered sequence automatically.
+
+## Development
+
+> [!NOTE]
+> This section is largely AI-written, so parts of it may not be fully accurate. It will be replaced with a hand-written version when I get the time.
+
+### Setup
+
+You need macOS on Apple Silicon, [Vite+](https://viteplus.dev/) (the global `vp`
+CLI, which drives pnpm for this workspace), [Bun](https://bun.sh/) for tests, and a
+Swift 6.2+ toolchain (Xcode) to rebuild native add-ons. Chord runs handlers under Bun, so
+package tests do too.
+
+Until the updated `@keychord/config` is published, `pnpm-workspace.yaml` links it to a
+sibling checkout at `../config`, which has to be built before `vp install` here can
+load the package configs:
+
+```sh
+git clone https://github.com/KeyChord/config
+git clone https://github.com/KeyChord/chords
+(cd config && vp install && vp pack)
+cd chords && vp install
+```
+
+Run `vp pack` in `../config` again after changing the shared config.
+
+- `vp check` runs format, lint and type checks.
+- `vp run test` runs every package's Bun tests (`bun test --isolate`);
+  `vp run --filter @keychord/chords-click test` runs one package. Don't use
+  `vp test`, which runs Vitest under Node.
+- `vp pack` in a package directory builds its `js/` output and native add-ons;
+  `vp run build` from the root builds every package.
+
+To try a local checkout in Chord, link it under Settings → Chords → **Chord
+Monorepos** → Local monorepos and tick the packages you're working on. Reload
+with `0,r` after rebuilding.
+
+Chord packages normally use `export default config()` from `@keychord/config` in
+`vite.config.ts`. Tests and their fixtures live in each package's `__tests__/`
+directory.
+
+All chord packages have a macOS VM smoke test. Run `vp run test:macos:setup`
+once, then `vp run test:macos` for the full suite or
+`vp run test:macos -- @keychord/chords-click` for one package. Each run uses a fresh
+Tart clone of a pinned, prepared macOS image. Shared helpers and fixture apps are
+exported by [`@keychord/chordtest`](./@keychord/chordtest/readme.md).
+
+### Version control
+
+This repository uses colocated Jujutsu (`jj`) and Git, following Haniverse's
+workflow with `main` as the integration branch. The checked-in `.jj.toml` provides
+repository-specific aliases, overriding any global aliases that target `trunk`.
+
+To enable the same setup in a fresh Git checkout:
+
+```sh
+jj --config-file .jj.toml git init --colocate
+cp .jj.toml "$(jj config path --repo)"
+jj bookmark track main --remote origin
+```
+
+The config allows new files up to 10 MB, matching Haniverse and accommodating the
+native addons and generated bundles committed here. Re-run the `cp` command after
+changing `.jj.toml` to update the active local config.
+
+```sh
+jj --no-pager status
+jj --no-pager diff --git
+jj --no-pager log
+jj gf                              # fetch without rebasing
+jj describe -m "Describe the change"
+jj push                            # advance main and push to origin
+```
+
+`jj push` selects the latest described, non-empty commit in the current working
+copy's ancestry and leaves working files in place. It forwards arguments to
+`jj git push`; `jj push --dry-run` previews the remote update but still advances
+the local `main` bookmark.
+
+`jj pull` fetches `origin`, resets the local `main` bookmark to `main@origin`, and
+rebases current work onto it. Coordinate before running it in a shared checkout.
+Describing and pushing the current working copy includes all edits in that
+revision, so review them first. Jujutsu does not run Git hooks; run `vp check` and
+`vp run test` (Bun tests in every package) before pushing.
+
+A pre-commit hook formats staged JS, TS, TSX, JSON, and TOML files. To enable the
+hooks in a fresh Git clone:
 
 ```sh
 vp config --hooks-dir .vite-hooks
 ```
 
-Rebuild the artifacts yourself with `moon run ':build-native'`, then
-`git add @keychord/*/target`.
+### Native add-ons
 
-To check native artifacts manually, run `vp run native:check`.
+Packages with a `Package.swift` at their root ship
+[NodeSwift](https://github.com/kabiroberai/node-swift) add-ons built from their Swift
+sources (usually `Sources/`). `vp pack` in such a package compiles them through
+`@keychord/config`, stages them in `target/<triple>/`, and bundles hashed copies with
+their runtime libraries under `js/native/`. They can only be compiled on macOS, so
+the built files are committed. Mirrors copy all committed files, including JS and
+native artifacts, as-is. Build and commit generated handlers before pushing changes
+to their source.
+
+With [moon](https://moonrepo.dev/) installed, `moon run ':build-native'` rebuilds
+the packages listed in `.moon/workspace.yml`.
+Native artifact checks are manual because rebuilding addons can be slow:
+`vp run native:check` checks that Swift module names are unique across packages,
+rebuilds with moon, and fails if any committed `.node` file's machine code differs
+from the rebuild. Commit the rebuilt `target/` and `js/` files when it does.
 
 > Mach-O output is not byte-reproducible -- the linker mints a fresh `LC_UUID`
 > each run -- so the check compares disassembled machine code rather than file
 > hashes, and every genuine rebuild rewrites the binaries.
 
-## Repository mirrors
+### Repository mirrors
 
-Every directory `@keychord/<name>` automatically mirrors to
+The Sync workflow mirrors every directory `@keychord/<name>` to
 `https://github.com/KeyChord/<name>`, including private workspace packages such as
 `chordtest`. No list or manifest opt-in is required, and `repository.url` does not
-control mirroring. Missing repositories are created as public repositories.
+control mirroring. Missing repositories are created as public repositories. Not
+every package has a mirror at the moment; install those through the monorepo (see
+[Installing packages](#installing-packages)).
 
 `KeyChord/chords` is the source of truth. The Sync workflow force-replaces each
 mirror's `main` with an independent snapshot of the committed package directory;
@@ -199,18 +294,3 @@ The native artifact checker lives in `packages/dev/improve/chords/configs/native
 All three tooling packages run TypeScript directly on Node.js 22.18 or newer.
 Third-party runtime helpers are accessed through wrappers in
 `packages/com/npmjs/`; scoped names use `scope__name` directory names.
-
-Tests and their fixtures live in each package's `__tests__/` directory.
-
-Chord packages normally use `export default config()` from `@keychord/config` in
-`vite.config.ts`. This includes the shared Chord test runtime automatically.
-Until the updated config and test runtime are published, the root
-`pnpm-workspace.yaml` links `@keychord/config` to `../config`, whose workspace
-override links back to the local `@keychord/chordtest` package. Run `vp install`
-in both workspaces and `vp pack` in `../config` after changing the shared config.
-
-All chord packages have a macOS VM smoke test. Run `vp run test:macos:setup`
-once, then `vp run test:macos` for the full suite or
-`vp run test:macos -- @keychord/chords-click` for one package. Each run uses a fresh
-Tart clone of a pinned, prepared macOS image. Shared helpers and fixture apps are
-exported by [`@keychord/chordtest`](./@keychord/chordtest/readme.md).

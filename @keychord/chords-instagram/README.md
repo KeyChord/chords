@@ -1,6 +1,14 @@
 # Instagram chords
 
-For the installed Brave Instagram app (`com.brave.Browser.app.akpamiohjfcnimfljfndmaldlcfphjmp`).
+> [!NOTE]
+> This document is largely AI-written, so parts of it may not be fully accurate. It will be replaced with a hand-written version when I get the time.
+
+For the installed Brave Instagram app (`com.brave.Browser.app.akpamiohjfcnimfljfndmaldlcfphjmp`):
+instagram.com installed from [Brave](https://brave.com/) as an app. Brave needs remote
+debugging, which Chord sets up for you (see [Browser setup](#browser-setup)).
+
+To install the package, add the `KeyChord/chords` monorepo under Settings → Chords →
+Chord Monorepos and tick `@keychord/chords-instagram`.
 
 | Chord  | Action                                                                                           |
 | ------ | ------------------------------------------------------------------------------------------------ |
@@ -24,7 +32,7 @@ Notes requires your own profile to be open (`gp`) and Notes to be available on y
 
 Story chords require Home to be open (`gh`) with no dialog. They count available story buttons in the rendered tray from left to right, including seen stories, and exclude the Create story and tray navigation controls. Numbers must be positive integers; unavailable positions report an error.
 
-`hsrN` leaves the reply editor ready for you to type and send. Stories with replies disabled report an error. Action arguments use screaming snake case: `hs.N` sends `['STORY', '$1']`, while `hsrN` sends `['STORY_REPLY', '$1']`. Story patterns require a Chord runtime that treats text outside parenthesized regex sections as literal keys.
+`hsrN` leaves the reply editor ready for you to type and send. Stories with replies disabled report an error. Action arguments use screaming snake case: `hs.N` sends `['STORY', '$1']`, while `hsrN` sends `['STORY_REPLY', '$1']`.
 
 ## Browser setup
 
@@ -48,20 +56,14 @@ args = [9333]
 
 ## Development
 
-Build in this package with `vp pack`. From the monorepo root, run `vp fmt @keychord/chords-instagram`, `vp check @keychord/chords-instagram`, and `vp test @keychord/chords-instagram`. Check source types with `vp exec tsc --noEmit --project tsconfig.json` from this package.
+Build in this package with `vp pack`. From the monorepo root, run `vp fmt @keychord/chords-instagram`, `vp check @keychord/chords-instagram`, and `vp run --filter @keychord/chords-instagram test`.
 
 The tests cover every TOML binding, the serialized page payload, navigation and dialogs, page isolation, ordered commands, protocol errors, socket timeouts, and Brave's automatic relaunch lifecycle.
 
-All nine actions were verified in the installed Instagram app through Chord's embedded Bun runtime on 2026-10-12.
-
-The generated story action was also verified in signed-in Brave on 2026-10-12: position 2 opened the matching account's story viewer.
-
-The generated story reply action was verified in the installed PWA on 2026-10-13: position 1 opened the selected story and focused its empty reply textarea.
-
-The recorded Notes control walkthrough is [instagram-controls-20261012.yaml](../../.argent/flows/instagram-controls-20261012.yaml). From the monorepo root, replay it with:
+The recorded Notes control walkthrough is [instagram-controls-20261012.yaml](https://github.com/KeyChord/chords/blob/main/.argent/flows/instagram-controls-20261012.yaml). From the monorepo root, replay it with:
 
 ```sh
 argent flow run instagram-controls-20261012 --device chromium-cdp-9222
 ```
 
-Select the signed-in Instagram app first, with your own profile open, the `Note...` bubble visible, no existing note, and no open dialog. The flow opens and closes the empty editor using text selectors. Replay passed; its idle check reported minor animation in the editor before the Close action. No coordinate exceptions were retained.
+Select the signed-in Instagram app first, with your own profile open, the `Note...` bubble visible, no existing note, and no open dialog. The flow opens and closes the empty editor using text selectors.
