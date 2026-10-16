@@ -32,7 +32,7 @@ export const cases: {
   { chord: "ii", action: "CHAT_INFO_AVATAR", control: "contact-info-header-profile-image" },
   { chord: "ia", action: "CHAT_INFO_VOICE", control: "info_audio" },
   { chord: "iv", action: "CHAT_INFO_VIDEO", control: "info_video" },
-  { chord: "i/", action: "CHAT_INFO_SEARCH", control: "info_search" },
+  { chord: "i/", action: "CHAT_INFO_SEARCH", control: "search_chat" },
   { chord: "ig", action: "CHAT_INFO_GALLERY", control: "info_gallery" },
   { chord: "is", action: "CHAT_INFO_STARRED", control: "info_starred" },
   { chord: "im", action: "CHAT_MUTE", control: "mute_dialog" },

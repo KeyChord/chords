@@ -80,6 +80,9 @@ for (const scenario of cases) {
   if (scenario.action === "CHAT_OPEN_WINDOW") {
     assert.equal((await Bun.file(output).json()).chatWindowOpen, true);
   }
+  if (scenario.action === "CHAT_SEARCH" || scenario.action === "CHAT_INFO_SEARCH") {
+    assert.equal((await Bun.file(output).json()).searchFocused, true);
+  }
   assert.deepEqual(
     await Bun.file(coverOutput).json(),
     before,
@@ -308,6 +311,19 @@ for (const [action, first, second] of [
 }
 await reset("DISABLED");
 await assert.rejects(handler("CALL_END"), /disabled/);
+// Info is modal in WhatsApp, so search uses Info's own Search button, which closes
+// Info and focuses the chat's search field once Info has gone.
+await reset();
+await handler("CHAT_INFO");
+await handler("CHAT_INFO_SEARCH");
+await recorded("info_search");
+assert.equal((await Bun.file(output).json()).phase, "MAIN");
+assert.equal((await Bun.file(output).json()).searchFocused, true);
+// Search Chat toggles, so an open search bar is focused rather than closed.
+await reset();
+await handler("CHAT_SEARCH");
+await handler("CHAT_SEARCH");
+assert.equal((await Bun.file(output).json()).searchFocused, true);
 await reset("MISSING");
 await assert.rejects(handler("CHAT_DELETE"), /unavailable/);
 await reset("AMBIGUOUS");

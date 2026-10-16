@@ -24,6 +24,7 @@ private struct Request: Decodable, Sendable {
         case device = "DEVICE", dismissPopover = "DISMISS_POPOVER"
         case groupPermissions = "GROUP_PERMISSIONS", verify = "VERIFY"
         case filter = "FILTER", filterSelected = "FILTER_SELECTED", openChat = "OPEN_CHAT"
+        case openWindow = "OPEN_WINDOW", searchChat = "SEARCH_CHAT"
     }
     let kind: Kind
     let scope: String?
@@ -572,23 +573,15 @@ private final class Wakeups: Sendable {
     init(_ continuation: AsyncStream<Void>.Continuation) { self.continuation = continuation }
 }
 
-// WhatsApp applies a filter about 75 ms after the chip's AXPress returns. In one
-// main-thread call it selects the chip, swaps the list's fetch and reloads the
-// table, so a selected chip means the filter's chats are WhatsApp's current list.
-// Nothing announces the selection, but the reload posts layout changes: one per
-// frame while rows animate, and one about 0.5 s after any table reload (UIKit's
-// accessibility debounce). Each notification wakes one read of the chip, which
-// WhatsApp keeps across filter changes; a chip that was rebuilt is found again. The
-// deadline only bounds a press WhatsApp ignored.
+private let changeNotifications = [
+    kAXLayoutChangedNotification, kAXValueChangedNotification, kAXSelectedChildrenChangedNotification,
+    kAXCreatedNotification, kAXUIElementDestroyedNotification, kAXFocusedUIElementChangedNotification,
+]
+
+// Runs `check`, then runs it again on each accessibility notification WhatsApp
+// posts, until it returns true. The deadline only bounds an action WhatsApp ignored.
 @MainActor
-private func awaitSelected(_ found: Element, application: Element, request: Request, processId: pid_t, deadline: Date) async throws -> Bool {
-    var chip = found
-    func selected() throws -> Bool {
-        if let state = selectedState(chip) { return state }
-        guard let current = try filterChip(application, request: request) else { return false }
-        chip = current
-        return selectedState(current) == true
-    }
+private func awaitChange(processId: pid_t, deadline: Date, _ check: @MainActor () throws -> Bool) async throws -> Bool {
     var created: AXObserver?
     let callback: AXObserverCallbackWithInfo = { _, _, _, info, context in
         // Reading reused table rows makes Catalyst post forced layout changes;
@@ -602,10 +595,8 @@ private func awaitSelected(_ found: Element, application: Element, request: Requ
     }
     let (wakeups, continuation) = AsyncStream.makeStream(of: Void.self, bufferingPolicy: .bufferingNewest(1))
     let context = Unmanaged.passRetained(Wakeups(continuation))
-    let application = AXUIElementCreateApplication(processId)
-    let names = [kAXLayoutChangedNotification, kAXValueChangedNotification, kAXSelectedChildrenChangedNotification,
-                 kAXCreatedNotification, kAXUIElementDestroyedNotification]
-    for name in names { AXObserverAddNotification(observer, application, name as CFString, context.toOpaque()) }
+    let observed = AXUIElementCreateApplication(processId)
+    for name in changeNotifications { AXObserverAddNotification(observer, observed, name as CFString, context.toOpaque()) }
     let source = AXObserverGetRunLoopSource(observer)
     CFRunLoopAddSource(CFRunLoopGetMain(), source, .commonModes)
     let timeout = Task {
@@ -615,25 +606,83 @@ private func awaitSelected(_ found: Element, application: Element, request: Requ
     defer {
         timeout.cancel()
         CFRunLoopRemoveSource(CFRunLoopGetMain(), source, .commonModes)
-        for name in names { AXObserverRemoveNotification(observer, application, name as CFString) }
+        for name in changeNotifications { AXObserverRemoveNotification(observer, observed, name as CFString) }
         context.release()
     }
-    // Observing first means a selection right after this read still wakes the loop.
-    if try selected() { return true }
+    // Observing first means a change right after this check still wakes the loop.
+    if try check() { return true }
     for await _ in wakeups {
-        if try selected() { return true }
+        if try check() { return true }
     }
     return false
 }
 
+// WhatsApp applies a filter about 75 ms after the chip's AXPress returns. In one
+// main-thread call it selects the chip, swaps the list's fetch and reloads the
+// table, so a selected chip means the filter's chats are WhatsApp's current list.
+// Nothing announces the selection, but the reload posts layout changes: one per
+// frame while rows animate, and one about 0.5 s after any table reload (UIKit's
+// accessibility debounce). Each notification wakes one read of the chip, which
+// WhatsApp keeps across filter changes; a chip that was rebuilt is found again.
+@MainActor
+private func awaitSelected(_ found: Element, application: Element, request: Request, processId: pid_t, deadline: Date) async throws -> Bool {
+    var chip = found
+    return try await awaitChange(processId: processId, deadline: deadline) {
+        if let state = selectedState(chip) { return state }
+        guard let current = try filterChip(application, request: request) else { return false }
+        chip = current
+        return selectedState(current) == true
+    }
+}
+
+// The chat's own search field; the chat list's search is a separate tokenized bar.
+// A chat open in its own window has its own field, so the main window's is used.
+@MainActor
+private func chatSearchField(_ application: Element) throws -> Element? {
+    let fields = try find(application) {
+        $0.role() == kAXTextFieldRole && $0.attribute(Attribute<String>(kAXSubroleAttribute)) == "AXSearchField"
+    }
+    guard fields.count > 1 else { return fields.first }
+    return fields.first { field in
+        var main: CFTypeRef?
+        guard let window = field.attribute(Attribute<AXUIElement>(kAXWindowAttribute)),
+              AXUIElementCopyAttributeValue(window, kAXMainAttribute as CFString, &main) == .success else { return false }
+        return (main as? Bool) == true
+    }
+}
+
+@MainActor
+private func focusedElement(_ application: Element) -> Element? {
+    var value: CFTypeRef?
+    guard AXUIElementCopyAttributeValue(application.underlyingElement, kAXFocusedUIElementAttribute as CFString, &value) == .success,
+          let value, CFGetTypeID(value) == AXUIElementGetTypeID() else { return nil }
+    return Element(value as! AXUIElement)
+}
+
+// Info's Search button focuses the chat's search field only after Info has animated
+// away, and a closing Info can give focus back to the composer after the menu
+// focused the field. Focus on another control is returned to the field with a tap;
+// focus on the window itself means WhatsApp has not finished the transition.
+@MainActor
+private func awaitSearchFocus(_ application: Element, processId: pid_t) async throws -> Bool {
+    try await awaitChange(processId: processId, deadline: Date(timeIntervalSinceNow: 3)) {
+        guard let field = try chatSearchField(application), let focus = focusedElement(application) else { return false }
+        if focus == field { return true }
+        if focus.role() != kAXWindowRole, focus.attribute(Attribute<String>(kAXSubroleAttribute)) != "iOSContentGroup" {
+            _ = try? field.performAction(.press)
+        }
+        return false
+    }
+}
+
 private let digitKeys: [CGKeyCode] = [0x12, 0x13, 0x14, 0x15, 0x17, 0x16, 0x1A, 0x1C, 0x19] // kVK_ANSI_1…9
 private let rightBracketKey: CGKeyCode = 0x1E // kVK_ANSI_RightBracket
+private let oKey: CGKeyCode = 0x1F // kVK_ANSI_O
 
 // ⌘1–⌘9 ("Select recent chats") select a row of the current filter from WhatsApp's
 // list data, and Next Chat (⇧⌘]) selects the following row. Unlike a row's AXPress,
 // a tap that WhatsApp ignores while a filter reload animates, they do not depend on
-// accessibility rows or layout. The events go to WhatsApp's process rather than
-// the keyboard focus, and WhatsApp handles them in order.
+// accessibility rows or layout.
 @MainActor
 private func openChat(_ table: Element, index: Int, processId: pid_t) throws {
     // Catalyst exposes only on-screen rows. A list without page actions fits on
@@ -642,9 +691,14 @@ private func openChat(_ table: Element, index: Int, processId: pid_t) throws {
     if index > loaded, try scrollArea(table) == nil {
         throw WhatsAppError("chat #\(index) is unavailable; this filter shows \(loaded)")
     }
-    let keys = [(digitKeys[min(index, 9) - 1], CGEventFlags.maskCommand)]
-        + Array(repeating: (rightBracketKey, CGEventFlags([.maskCommand, .maskShift])), count: max(0, index - 9))
-    // A private source keeps keys the user is holding out of these events.
+    try postShortcuts([(digitKeys[min(index, 9) - 1], .maskCommand)]
+        + Array(repeating: (rightBracketKey, [.maskCommand, .maskShift]), count: max(0, index - 9)), processId: processId)
+}
+
+// The events go to WhatsApp's process rather than the keyboard focus, and WhatsApp
+// handles them in order. A private source keeps keys the user is holding out of them.
+@MainActor
+private func postShortcuts(_ keys: [(CGKeyCode, CGEventFlags)], processId: pid_t) throws {
     let source = CGEventSource(stateID: .privateState)
     for (key, flags) in keys {
         guard let down = CGEvent(keyboardEventSource: source, virtualKey: key, keyDown: true),
@@ -747,6 +801,8 @@ private func perform(bundleId: String, requests: [Request]) async throws -> Stri
                 target = try filterChip(application, request: request)
             case .openChat:
                 target = try chatList(application)
+            case .openWindow, .searchChat:
+                target = application
             case .grid:
                 target = try gridControl(application, request: request)
             case .device:
@@ -778,6 +834,18 @@ private func perform(bundleId: String, requests: [Request]) async throws -> Stri
         if request.kind == .openChat {
             guard let position = request.index, position > 0 else { throw WhatsAppError("chat index must be positive") }
             try openChat(target, index: position, processId: app.processIdentifier)
+            continue
+        }
+        if request.kind == .openWindow {
+            // "Open in new window" (⌥⌘O) does not depend on the chat's toolbar, whose
+            // More menu WhatsApp hides while the chat's search bar is open.
+            try postShortcuts([(oKey, [.maskCommand, .maskAlternate])], processId: app.processIdentifier)
+            continue
+        }
+        if request.kind == .searchChat {
+            guard try await awaitSearchFocus(application, processId: app.processIdentifier) else {
+                throw WhatsAppError("the chat's search field did not take focus; open a chat first")
+            }
             continue
         }
         if request.kind == .filter {

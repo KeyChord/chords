@@ -16,7 +16,9 @@ type Request = {
     | "VERIFY"
     | "FILTER"
     | "FILTER_SELECTED"
-    | "OPEN_CHAT";
+    | "OPEN_CHAT"
+    | "OPEN_WINDOW"
+    | "SEARCH_CHAT";
   scope?: string;
   identifiers?: string[];
   titlePrefix?: string;
@@ -108,6 +110,19 @@ const infoRow = (request: Partial<Request>): Request => ({
 const infoControl = (description: string, role?: string): Request[] => [
   info,
   infoRow({ description, ...(role ? { role } : {}) }),
+];
+// Chat › Search Chat opens the chat's search bar with its field focused. It toggles,
+// so it is skipped when the bar is already open, and Info, which is modal, disables
+// it; Info's own Search button closes Info and opens the same bar instead. Either
+// way SEARCH_CHAT waits until the bar's field has focus.
+const infoOpen: Selector = { identifiers: ["contact-info-view-content-stack-view"] };
+const searchChat: Request[] = [
+  {
+    ...menu(chat, "search_chat"),
+    unlessAny: [infoOpen, { description: "Search", role: "AXTextField" }],
+  },
+  { ...infoRow({ description: "Search", role: "AXButton" }), onlyIfAny: [infoOpen] },
+  { kind: "SEARCH_CHAT" },
 ];
 const heading = (description: string): Selector => ({ description, role: "AXHeading" });
 const participantPicker = "ParticipantPicker_TableView";
@@ -210,7 +225,7 @@ const actions = {
   CHAT_INFO_AVATAR: [info, infoRow({ identifiers: ["contact-info-header-profile-image"] })],
   CHAT_INFO_VOICE: infoControl("Audio call", "AXButton"),
   CHAT_INFO_VIDEO: infoControl("Video call", "AXButton"),
-  CHAT_INFO_SEARCH: infoControl("Search", "AXButton"),
+  CHAT_INFO_SEARCH: searchChat,
   CHAT_INFO_GALLERY: infoControl("Media, links and docs", "AXStaticText"),
   CHAT_INFO_STARRED: infoControl("Starred", "AXStaticText"),
   CHAT_INFO_MUTE_STATUS: infoControl("Mute status notifications", "AXButton"),
@@ -259,17 +274,12 @@ const actions = {
   ],
   CHAT_INFO_REPORT: groupControl({ descriptionPrefix: "Report ", role: "AXButton" }),
   CHAT_BLOCK: { kind: "MENU", scope: chat, titlePrefix: "Block" },
-  CHAT_SEARCH: menu(chat, "search_chat"),
+  CHAT_SEARCH: searchChat,
   CHAT_VIDEO_CALL: menu(chat, "video_call"),
   CHAT_VOICE_CALL: menu(chat, "voice_call"),
-  CHAT_OPEN_WINDOW: [
-    {
-      ...element("NavigationBar_MoreButton", "AXButton"),
-      click: true,
-      unlessAny: [{ description: "Open in new window", role: "AXMenuItem" }],
-    },
-    { kind: "ELEMENT", description: "Open in new window", role: "AXMenuItem" },
-  ],
+  // WhatsApp's ⌥⌘O, since its toolbar's More menu is hidden while the chat's
+  // search bar is open.
+  CHAT_OPEN_WINDOW: { kind: "OPEN_WINDOW" },
   CHAT_NEW: menu(file, "new_chat"),
   CHAT_GROUP_CREATE: newGroup,
   CHAT_PIN: menu(chat, "pin", "unpin"),

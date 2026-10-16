@@ -173,6 +173,7 @@ final class Fixture: NSObject, NSApplicationDelegate {
     var chatFilter = "ALL"
     var chatRows: [Int] = []
     var chatPosition = 0
+    weak var searchField: NSSearchField?
     var unblockImmediately = false
     var blocked = false
     var reported = false
@@ -186,7 +187,7 @@ final class Fixture: NSObject, NSApplicationDelegate {
     func record(_ action: String) {
         sequence += 1
         let active = NSWorkspace.shared.frontmostApplication?.processIdentifier == ProcessInfo.processInfo.processIdentifier
-        let data = try! JSONSerialization.data(withJSONObject: ["action": action, "active": active, "phase": phase, "request": request, "sequence": sequence, "chatVisible": chatVisible, "chatWindowOpen": chatWindow?.isVisible == true, "selectedChat": selectedChat, "chatFilter": chatFilter, "blocked": blocked, "reported": reported, "admins": admins.sorted(), "removedMembers": removedMembers.sorted(), "listOffset": list?.offset ?? 0])
+        let data = try! JSONSerialization.data(withJSONObject: ["action": action, "active": active, "phase": phase, "request": request, "sequence": sequence, "chatVisible": chatVisible, "chatWindowOpen": chatWindow?.isVisible == true, "selectedChat": selectedChat, "chatFilter": chatFilter, "blocked": blocked, "reported": reported, "admins": admins.sorted(), "removedMembers": removedMembers.sorted(), "listOffset": list?.offset ?? 0, "searchFocused": searchField?.currentEditor() != nil])
         try! data.write(to: URL(fileURLWithPath: output), options: .atomic)
     }
 
@@ -223,6 +224,18 @@ final class Fixture: NSObject, NSApplicationDelegate {
                 self.showMain(filter)
                 NSAccessibility.post(element: self.window!, notification: .layoutChanged)
                 self.record(id)
+            }
+            return
+        case "search_chat":
+            // Search Chat toggles the chat's search bar; opening it focuses the field.
+            if let field = searchField { field.removeFromSuperview() } else { showSearch() }
+        case "info_search":
+            // Info's Search closes Info, then focuses the chat's search field once
+            // Info has animated away.
+            showMain()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
+                self?.showSearch()
+                self?.record(id)
             }
             return
         case "info_theme": showTheme()
@@ -309,7 +322,9 @@ final class Fixture: NSObject, NSApplicationDelegate {
         }
     }
 
-    @objc func openChatWindow(_ sender: NSMenuItem) {
+    @objc func openChatWindow(_ sender: NSMenuItem) { openChatWindow() }
+
+    func openChatWindow() {
         let chat = NSWindow(contentRect: NSRect(x: 120, y: 120, width: 500, height: 500), styleMask: [.titled, .closable], backing: .buffered, defer: false)
         chat.isReleasedWhenClosed = false
         chat.title = "Fixture Chat"
@@ -389,6 +404,17 @@ final class Fixture: NSObject, NSApplicationDelegate {
         }
     }
 
+    // The chat's search bar, opened by Search Chat and by Info's Search.
+    func showSearch() {
+        if phase != "MAIN" { showMain() }
+        let field = NSSearchField(frame: NSRect(x: 520, y: 440, width: 300, height: 24))
+        field.placeholderString = "Search"
+        field.setAccessibilityLabel("Search")
+        window.contentView?.addSubview(field)
+        window.makeFirstResponder(field)
+        searchField = field
+    }
+
     // WhatsApp's ⌘1–⌘9 select a row of the current filter from its list data, and
     // Next Chat (⇧⌘]) the row after the selected one. Positions past the list do nothing.
     func chatShortcut(_ code: UInt16, _ flags: NSEvent.ModifierFlags) -> Bool {
@@ -400,6 +426,10 @@ final class Fixture: NSObject, NSApplicationDelegate {
         } else if code == 0x1E, flags.contains(.shift) {
             guard chatPosition > 0, chatPosition < chatRows.count else { return true }
             chatPosition += 1
+        } else if code == 0x1F, flags.contains(.option) {
+            // Open in new window (⌥⌘O).
+            openChatWindow()
+            return true
         } else { return false }
         invoke("chat_\(chatRows[chatPosition - 1])")
         return true

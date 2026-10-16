@@ -27,7 +27,7 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 //#region src/js/whatsapp.ts
 var import__keychord_native_whatsapp = /* @__PURE__ */ __toESM((/* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const nativeRequire = createRequire(import.meta.url);
-	const nativeFiles = { "darwin-arm64": new URL("native/aarch64-apple-darwin/whatsapp/whatsapp-7b2238c9a17b.node", import.meta.url).href };
+	const nativeFiles = { "darwin-arm64": new URL("native/aarch64-apple-darwin/whatsapp/whatsapp-6380a45facab.node", import.meta.url).href };
 	const nativeTarget = process.platform + "-" + process.arch;
 	const nativeFile = nativeFiles[nativeTarget];
 	if (!nativeFile) throw new Error("[chord-native] whatsapp has no addon for " + nativeTarget);
@@ -103,6 +103,24 @@ const infoControl = (description, role) => [info, infoRow({
 	description,
 	...role ? { role } : {}
 })];
+const infoOpen = { identifiers: ["contact-info-view-content-stack-view"] };
+const searchChat = [
+	{
+		...menu(chat, "search_chat"),
+		unlessAny: [infoOpen, {
+			description: "Search",
+			role: "AXTextField"
+		}]
+	},
+	{
+		...infoRow({
+			description: "Search",
+			role: "AXButton"
+		}),
+		onlyIfAny: [infoOpen]
+	},
+	{ kind: "SEARCH_CHAT" }
+];
 const heading = (description) => ({
 	description,
 	role: "AXHeading"
@@ -216,7 +234,7 @@ const actions = {
 	CHAT_INFO_AVATAR: [info, infoRow({ identifiers: ["contact-info-header-profile-image"] })],
 	CHAT_INFO_VOICE: infoControl("Audio call", "AXButton"),
 	CHAT_INFO_VIDEO: infoControl("Video call", "AXButton"),
-	CHAT_INFO_SEARCH: infoControl("Search", "AXButton"),
+	CHAT_INFO_SEARCH: searchChat,
 	CHAT_INFO_GALLERY: infoControl("Media, links and docs", "AXStaticText"),
 	CHAT_INFO_STARRED: infoControl("Starred", "AXStaticText"),
 	CHAT_INFO_MUTE_STATUS: infoControl("Mute status notifications", "AXButton"),
@@ -297,21 +315,10 @@ const actions = {
 		scope: chat,
 		titlePrefix: "Block"
 	},
-	CHAT_SEARCH: menu(chat, "search_chat"),
+	CHAT_SEARCH: searchChat,
 	CHAT_VIDEO_CALL: menu(chat, "video_call"),
 	CHAT_VOICE_CALL: menu(chat, "voice_call"),
-	CHAT_OPEN_WINDOW: [{
-		...element("NavigationBar_MoreButton", "AXButton"),
-		click: true,
-		unlessAny: [{
-			description: "Open in new window",
-			role: "AXMenuItem"
-		}]
-	}, {
-		kind: "ELEMENT",
-		description: "Open in new window",
-		role: "AXMenuItem"
-	}],
+	CHAT_OPEN_WINDOW: { kind: "OPEN_WINDOW" },
 	CHAT_NEW: menu(file, "new_chat"),
 	CHAT_GROUP_CREATE: newGroup,
 	CHAT_PIN: menu(chat, "pin", "unpin"),

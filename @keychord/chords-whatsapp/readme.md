@@ -11,7 +11,7 @@ All active chords call `src/js/whatsapp.ts`, backed by the Swift addon in
 run in order; a failed action does not prevent subsequent chords from working.
 
 Menu actions press WhatsApp's accessibility identifiers rather than sending
-keyboard shortcuts; only numbered filter positions use WhatsApp's chat
+keyboard shortcuts; only `co` and numbered filter positions use WhatsApp's
 shortcuts (see below). This handles changing titles such as Pin/Unpin and
 Contact Info/Group Info. Archived and Starred use sidebar identifiers instead
 of version-dependent numbered view shortcuts. Missing, disabled, or ambiguous
@@ -21,9 +21,18 @@ Controls without an accessibility press action use Chord's window-targeted click
 API, with the element's accessibility bounds and a fresh matching app window.
 If the window moves or cannot be matched uniquely, the action fails.
 
-`co` opens the current chat in a separate window through its toolbar's More
-menu. The menu item has a dynamic identifier, so it uses the English label
-“Open in new window”. A chat must already be open.
+`co` opens the current chat in a separate window with WhatsApp's “Open in new
+window” shortcut (⌥⌘O), posted to WhatsApp's process rather than the focused
+app. WhatsApp 26.38.74 has no menu bar item for it, and the toolbar's More menu
+that offers it is hidden while the chat's search bar is open. A chat must
+already be open; otherwise WhatsApp ignores the shortcut.
+
+`c/` and `i/` open the chat's search bar and return once its field has focus.
+Chat › Search Chat opens the bar with the field focused; it toggles, so it is not
+pressed when the bar is already open. Info is modal and disables that menu, so
+with Info open they press Info's own Search button, which closes Info and focuses
+the field once Info has animated away. Closing Info can hand focus back to the
+composer, so if focus lands on another control the field is pressed again.
 
 Voice call controls use `vv` for video/camera toggle, `vm` for mic toggle,
 `vr` for the reaction tray, `vs` for screenshare, `va` to add people,

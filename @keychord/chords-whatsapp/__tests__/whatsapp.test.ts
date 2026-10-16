@@ -68,7 +68,7 @@ test.each(cases)(
     for (const [app, json] of perform.mock.calls) {
       expect(app).toBe("net.whatsapp.WhatsApp");
       expect(JSON.parse(json)[0].kind).toMatch(
-        /^(MENU|ELEMENT|CHAT|PARTICIPANT|MEMBER|GRID|DEVICE|DISMISS_POPOVER|GROUP_PERMISSIONS|VERIFY|FILTER|FILTER_SELECTED|OPEN_CHAT)$/,
+        /^(MENU|ELEMENT|CHAT|PARTICIPANT|MEMBER|GRID|DEVICE|DISMISS_POPOVER|GROUP_PERMISSIONS|VERIFY|FILTER|FILTER_SELECTED|OPEN_CHAT|OPEN_WINDOW|SEARCH_CHAT)$/,
       );
     }
   },
@@ -129,6 +129,38 @@ test("direct menu actions use identifiers and include both toggle states", async
     kind: "ELEMENT",
     identifiers: ["SidebarButton_Archived"],
   });
+});
+
+test.each(["CHAT_SEARCH", "CHAT_INFO_SEARCH"] as const)(
+  "%s opens the chat's search from the menu or Info, then waits for its focused field",
+  async (action) => {
+    await buildWhatsAppHandler()(action);
+    const info = { identifiers: ["contact-info-view-content-stack-view"] };
+    expect(perform.mock.calls.flatMap(([, json]) => JSON.parse(json))).toEqual([
+      {
+        kind: "MENU",
+        scope: "UIMenuChatListIdentifier",
+        identifiers: ["search_chat"],
+        // The menu toggles the bar, and Info disables it.
+        unlessAny: [info, { description: "Search", role: "AXTextField" }],
+      },
+      expect.objectContaining({
+        kind: "ELEMENT",
+        scope: "contact-info-view-content-stack-view",
+        description: "Search",
+        role: "AXButton",
+        onlyIfAny: [info],
+      }),
+      { kind: "SEARCH_CHAT" },
+    ]);
+  },
+);
+
+test("open in new window uses WhatsApp's shortcut instead of the toolbar's More menu", async () => {
+  await buildWhatsAppHandler()("CHAT_OPEN_WINDOW");
+  expect(perform.mock.calls.map(([, json]) => JSON.parse(json))).toEqual([
+    [{ kind: "OPEN_WINDOW" }],
+  ]);
 });
 
 test("commands wait for completion and continue after a rejected action", async () => {
