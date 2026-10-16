@@ -242,6 +242,16 @@ importers:
       validator:
         specifier: ^13.15.35
         version: 13.15.35
+    dependencies:
+      p-wait-for:
+        specifier: ^6.0.0
+        version: 6.0.0
+      uuid:
+        specifier: ^14.0.3
+        version: 14.0.3
+      validator:
+        specifier: ^13.15.35
+        version: 13.15.35
     devDependencies:
       '@keychord/chordtest':
         specifier: workspace:*
@@ -255,6 +265,9 @@ importers:
       '@types/bun':
         specifier: latest
         version: 1.4.3
+      '@types/validator':
+        specifier: ^13.15.10
+        version: 13.15.10
       '@types/validator':
         specifier: ^13.15.10
         version: 13.15.10
@@ -1514,6 +1527,9 @@ packages:
   '@vitest/utils@5.0.4':
     resolution: {integrity: sha512-hgpnyMuMqCz2PARmk3v62FxUr8jHIkY13ygvUeh8s+dmQxfnvkB/sgtoZFzG4lMitnEdnrg/lCvDbtVzuAsGWQ==}
 
+  '@types/validator@13.15.10':
+    resolution: {integrity: sha512-T8L6i7wCuyoK8A/ZeLYt1+q0ty3Zb9+qbSSvrIVitzT3YjZqkTZ40IbRsPanlB4h1QB3JVL1SYCdR6ngtFYcuA==}
+
   '@voidzero-dev/vite-plus-core@1.2.0':
     resolution: {integrity: sha512-SWTD9Q73hNpm07LLgYFcTLlPiOoOWtmpWxarclTHNVf6eKfdt0Saz2keDNpHPsJXKOjXREcGXozbdKc4J31sZg==}
     engines: {node: ^20.19.0 || ^22.18.0 || >=24.11.0}
@@ -2115,6 +2131,10 @@ packages:
     resolution: {integrity: sha512-2kKzMtjS8TVcpCOU/gr3vZ4K/WIyS1AsEFXFWapM/0lERCdyTbB6ZeuCIp+cL1aeLZfQoMdZFCBTHiK4I9UtOw==}
     engines: {node: '>=20'}
 
+  p-wait-for@6.0.0:
+    resolution: {integrity: sha512-2kKzMtjS8TVcpCOU/gr3vZ4K/WIyS1AsEFXFWapM/0lERCdyTbB6ZeuCIp+cL1aeLZfQoMdZFCBTHiK4I9UtOw==}
+    engines: {node: '>=20'}
+
   parse-ms@4.0.0:
     resolution: {integrity: sha512-TXfryirbmq34y8QBwgqCVLi+8oA3oWx2eAnSn62ITyEhEYaWRlVZ2DvMM9eZbMs/RfxPu/PK/aBLyGj4IrqMHw==}
     engines: {node: '>=18'}
@@ -2269,6 +2289,14 @@ packages:
 
   universal-user-agent@7.0.3:
     resolution: {integrity: sha512-TmnEAEAsBJVZM/AADELsK76llnwcf9vMKuPz8JflO1frO8Lchitr0fNaN9d+Ap0BjKtqWqd/J17qeDnXh8CL2A==}
+
+  uuid@14.0.3:
+    resolution: {integrity: sha512-Sc5u1VVln93y1Xnz4R+CunOZc7R9LUcTmhj7Rc7Eg3HVcf7rVn2FOoa812fe0W8p3jD7xeoGSYbfqCGGH2B6xw==}
+    hasBin: true
+
+  validator@13.15.35:
+    resolution: {integrity: sha512-TQ5pAGhd5whStmqWvYF4OjQROlmv9SMFVt37qoCBdqRffuuklWYQlCNnEs2ZaIBD1kZRNnikiZOS1eqgkar0iw==}
+    engines: {node: '>= 0.10'}
 
   uuid@14.0.3:
     resolution: {integrity: sha512-Sc5u1VVln93y1Xnz4R+CunOZc7R9LUcTmhj7Rc7Eg3HVcf7rVn2FOoa812fe0W8p3jD7xeoGSYbfqCGGH2B6xw==}
@@ -2933,6 +2961,8 @@ snapshots:
       convert-source-map: 2.0.0
       tinyrainbow: 3.2.0
 
+  '@types/validator@13.15.10': {}
+
   '@voidzero-dev/vite-plus-core@1.2.0(@types/node@26.6.5)(esbuild@0.28.2)(tsx@4.23.15)(typescript@7.0.2)':
     dependencies:
       '@oxc-project/runtime': 0.154.0
@@ -3407,6 +3437,8 @@ snapshots:
 
   p-wait-for@6.0.0: {}
 
+  p-wait-for@6.0.0: {}
+
   parse-ms@4.0.0: {}
 
   path-key@4.0.0: {}
@@ -3542,6 +3574,10 @@ snapshots:
   unicorn-magic@0.3.0: {}
 
   universal-user-agent@7.0.3: {}
+
+  uuid@14.0.3: {}
+
+  validator@13.15.35: {}
 
   uuid@14.0.3: {}
 
