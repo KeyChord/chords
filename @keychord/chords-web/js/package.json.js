@@ -16,7 +16,7 @@ var devDependencies = {
 	"@types/bun": "latest"
 };
 var packageManager = "pnpm@12.11.2";
-var chords = { "web.toml": {
+var chords = { "macos.toml": {
 	"name": "Web chords",
 	"on": { "js": { "file": "web.js" } },
 	"chords": {

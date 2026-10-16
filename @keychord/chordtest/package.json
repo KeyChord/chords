@@ -23,6 +23,7 @@
     "vm:stop": "bun src/cli.ts stop"
   },
   "dependencies": {
+    "@sinonjs/fake-timers": "15.4.0",
     "node-swift": "1.5.1"
   },
   "devDependencies": {
