@@ -271,6 +271,12 @@ test("a rejected create does not turn an absent screen into a rollback failure",
 
 test("a successful CLI exit without the requested dimensions still rejects", async () => {
   vi.useFakeTimers();
+  // AbortSignal.timeout uses native timers, which Vitest does not replace.
+  const timeout = vi.spyOn(AbortSignal, "timeout").mockImplementation((milliseconds) => {
+    const controller = new AbortController();
+    setTimeout(() => controller.abort(new DOMException("Timed out", "TimeoutError")), milliseconds);
+    return controller.signal;
+  });
   try {
     const state = betterDisplay();
     const original = state.command.getMockImplementation()!;
@@ -280,14 +286,60 @@ test("a successful CLI exit without the requested dimensions still rejects", asy
         : original(args),
     );
     const result = expect(createMonitorHandler(state.command)("1920x1200")).rejects.toThrow(
-      "did not apply 1920x1200",
+      "BetterDisplay did not apply 1920x1200 (reported 1728x1117)",
     );
     await vi.runAllTimersAsync();
     await result;
     expect(state.resolution()).toBe("1728x1117");
   } finally {
+    timeout.mockRestore();
     vi.useRealTimers();
   }
+});
+
+test("resolution polling retries missing and conflicting values before accepting repeated dimensions", async () => {
+  vi.useFakeTimers();
+  try {
+    const state = betterDisplay();
+    const original = state.command.getMockImplementation()!;
+    let attempts = 0;
+    state.command.mockImplementation((args) => {
+      if (
+        args[0] === "get" &&
+        args.includes("--type=Display") &&
+        args.includes("--resolution") &&
+        state.resolution() === "1920x1200"
+      ) {
+        attempts++;
+        if (attempts === 1) return Promise.reject(missing());
+        return Promise.resolve(attempts === 2 ? "1920x1200,1728x1117" : "1920x1200,1920x1200");
+      }
+      return original(args);
+    });
+    const result = createMonitorHandler(state.command)("1920x1200");
+    await vi.advanceTimersByTimeAsync(0);
+    expect(attempts).toBe(1);
+    await vi.advanceTimersByTimeAsync(100);
+    expect(attempts).toBe(2);
+    await vi.advanceTimersByTimeAsync(100);
+    await result;
+    expect(attempts).toBe(3);
+    expect(state.resolution()).toBe("1920x1200");
+  } finally {
+    vi.useRealTimers();
+  }
+});
+
+test("a service error during resolution polling propagates and restores the native mode", async () => {
+  const state = betterDisplay();
+  const original = state.command.getMockImplementation()!;
+  state.command.mockImplementation((args) =>
+    args[0] === "get" && args.includes("--resolution") && state.resolution() === "1920x1200"
+      ? Promise.reject(new Error("CLI connection lost"))
+      : original(args),
+  );
+  await expect(createMonitorHandler(state.command)("1920x1200")).rejects.toThrow("CLI connection lost");
+  expect(state.resolution()).toBe("1728x1117");
 });
 
 test("a screen belonging to another application is never reconfigured", async () => {

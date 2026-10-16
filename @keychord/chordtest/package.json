@@ -13,20 +13,24 @@
     "./vm": "./src/vm.ts",
     "./macos": "./src/macos.ts",
     "./patterns": "./src/patterns.ts",
+    "./preload": "./src/preload.ts",
+    "./test": "./src/test.ts",
     "./vitest": "./src/vitest.ts"
   },
   "scripts": {
-    "test": "bun test",
+    "test": "bun test --isolate",
     "vm:setup": "bun src/cli.ts setup",
     "vm:test": "bun src/cli.ts test",
     "vm:status": "bun src/cli.ts status",
     "vm:stop": "bun src/cli.ts stop"
   },
   "dependencies": {
+    "@sinonjs/fake-timers": "15.4.0",
     "node-swift": "1.5.1"
   },
   "devDependencies": {
     "@types/bun": "latest",
+    "@types/sinonjs__fake-timers": "15.0.1",
     "typescript": "catalog:",
     "vite-plus": "catalog:"
   },

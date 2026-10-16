@@ -1,11 +1,13 @@
 import pWaitFor from "p-wait-for";
 import { v4 as uuidv4 } from "uuid";
+import isUUID from "validator/lib/isUUID.js";
 
 type Command = (args: string[]) => Promise<string>;
-// macOS display UUIDs do not necessarily carry RFC version and variant bits.
-const uuidPattern = "[0-9A-Fa-f]{8}(?:-[0-9A-Fa-f]{4}){3}-[0-9A-Fa-f]{12}";
-const managedName = new RegExp(`^Chord /ms (${uuidPattern}) [1-9]\\d*x[1-9]\\d* ${uuidPattern}$`);
-const uuid = new RegExp(`^${uuidPattern}$`);
+
+function managedTarget(name: string): string | undefined {
+  const match = /^Chord \/ms (\S+) [1-9]\d*x[1-9]\d* (\S+)$/.exec(name);
+  return match && isUUID(match[1], "loose") && isUUID(match[2], "loose") ? match[1] : undefined;
+}
 
 export class BetterDisplayError extends Error {
   readonly missing: boolean;
@@ -78,7 +80,7 @@ async function managedScreens(command: Command): Promise<VirtualScreen[]> {
   const entries: unknown = JSON.parse(output.startsWith("[") ? output : `[${output}]`);
   if (!Array.isArray(entries)) throw new Error("Invalid BetterDisplay virtual-screen list");
   return entries.flatMap((entry) => {
-    const target = typeof entry?.name === "string" && managedName.exec(entry.name)?.[1];
+    const target = typeof entry?.name === "string" && managedTarget(entry.name);
     return target && entry.deviceType === "VirtualScreen" && /^[1-9]\d*$/.test(entry.tagID)
       ? [{ tagID: entry.tagID, name: entry.name, target }]
       : [];
@@ -92,7 +94,7 @@ async function pointerDisplay(command: Command): Promise<string> {
     "--displayWithMouse",
     "--identifier=UUID",
   ]);
-  if (physical && uuid.test(physical)) return physical;
+  if (physical && isUUID(physical, "loose")) return physical;
   const names = await command([
     "get",
     "--type=VirtualScreen",
@@ -100,13 +102,9 @@ async function pointerDisplay(command: Command): Promise<string> {
     "--identifier=name",
   ]);
   // A mirrored source can be reported twice. Pin its physical UUID before any reconfiguration.
-  const targets = new Set(
-    names
-      .split(",")
-      .map((name) => managedName.exec(name)?.[1])
-      .filter(Boolean),
-  );
-  if (targets.size !== 1 || names.split(",").some((name) => !managedName.test(name))) {
+  const resolved = names.split(",").map(managedTarget);
+  const targets = new Set(resolved);
+  if (targets.size !== 1 || targets.has(undefined)) {
     throw new Error("Move the pointer to a physical display or a virtual screen created by /ms");
   }
   return [...targets][0]!;

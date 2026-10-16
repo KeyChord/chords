@@ -1,7 +1,7 @@
 import { execFileSync } from "node:child_process";
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { expect, test } from "vite-plus/test";
+import { expect, test } from "bun:test";
 
 const root = new URL("../../../../", import.meta.url);
 const constant = /^[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)*$/;

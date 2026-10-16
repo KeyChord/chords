@@ -1,4 +1,4 @@
-import { expect, test } from "vite-plus/test";
+import { expect, test } from "bun:test";
 import { chordPattern } from "../patterns";
 
 test("literal punctuation around regex captures follows Chord's key grammar", () => {
