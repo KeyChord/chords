@@ -27,7 +27,7 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 //#region src/js/whatsapp.ts
 var import__keychord_native_whatsapp = /* @__PURE__ */ __toESM((/* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const nativeRequire = createRequire(import.meta.url);
-	const nativeFiles = { "darwin-arm64": new URL("native/aarch64-apple-darwin/whatsapp/whatsapp-6380a45facab.node", import.meta.url).href };
+	const nativeFiles = { "darwin-arm64": new URL("native/aarch64-apple-darwin/whatsapp/whatsapp-61e373c8961d.node", import.meta.url).href };
 	const nativeTarget = process.platform + "-" + process.arch;
 	const nativeFile = nativeFiles[nativeTarget];
 	if (!nativeFile) throw new Error("[chord-native] whatsapp has no addon for " + nativeTarget);
@@ -156,19 +156,51 @@ const blockDialog = [{
 	description: "Block and report",
 	role: "AXButton"
 }];
+const blocked = {
+	description: "Unblock",
+	role: "AXButton"
+};
+const blockToggle = {
+	kind: "MENU",
+	scope: chat,
+	titlePrefixes: ["Block ", "Unblock "],
+	missing: "Chat › Block (open a contact's chat)"
+};
+const blockButton = (description) => ({
+	kind: "ELEMENT",
+	scope: "ActionSheet_TitleLabel",
+	scopeAncestorRoles: ["AXPopover", "AXSheet"],
+	description,
+	role: "AXButton",
+	unlessAny: [blocked]
+});
 const blockContact = (description) => [
 	{
+		...blockToggle,
+		unlessAny: [
+			infoOpen,
+			blocked,
+			...blockDialog
+		]
+	},
+	{
+		kind: "VERIFY",
+		description: "Block",
+		role: "AXButton",
+		unlessAny: [infoOpen, blocked]
+	},
+	{
 		...info,
-		unlessAny: blockDialog
+		unlessAny: [blocked, ...blockDialog]
 	},
 	{
 		...infoRow({
 			descriptionPrefix: "Block ",
 			role: "AXButton"
 		}),
-		unlessAny: blockDialog
+		unlessAny: [blocked, ...blockDialog]
 	},
-	actionSheetButton(description)
+	blockButton(description)
 ];
 const settingsControl = (request) => [{
 	...menu("com.apple.menu.application", "settings"),
@@ -181,8 +213,12 @@ const settingsControl = (request) => [{
 	scroll: true,
 	...request
 }];
+const mainWindow = {
+	...menu("com.apple.menu.application", "open_main_window"),
+	kind: "MAIN_WINDOW"
+};
 const chatFilter = (description) => [
-	menu("com.apple.menu.application", "open_main_window"),
+	mainWindow,
 	menu(view, "chats"),
 	{
 		kind: "FILTER",
@@ -193,7 +229,7 @@ const chatFilter = (description) => [
 		description
 	}
 ];
-const sidebar = (request) => [menu("com.apple.menu.application", "open_main_window"), {
+const sidebar = (request) => [mainWindow, {
 	kind: "ELEMENT",
 	...request
 }];
@@ -285,24 +321,21 @@ const actions = {
 	CHAT_INFO_BLOCK_REPORT: blockContact("Block and report"),
 	CHAT_INFO_UNBLOCK: [
 		{
-			...info,
-			unlessAny: [{
-				description: "Unblock",
-				role: "AXButton"
-			}]
+			...blockToggle,
+			onlyIfAny: [blocked],
+			unlessAny: [infoOpen]
 		},
 		{
 			...infoRow({
 				descriptionPrefix: "Unblock ",
 				role: "AXButton"
 			}),
-			unlessAny: [{
-				description: "Unblock",
-				role: "AXButton"
-			}]
+			onlyIfAny: [infoOpen],
+			unlessAny: [actionSheetOpen]
 		},
 		{
 			...actionSheetButton("Unblock"),
+			onlyIfAny: [infoOpen, actionSheetOpen],
 			optional: true
 		}
 	],
@@ -310,11 +343,14 @@ const actions = {
 		descriptionPrefix: "Report ",
 		role: "AXButton"
 	}),
-	CHAT_BLOCK: {
-		kind: "MENU",
-		scope: chat,
-		titlePrefix: "Block"
-	},
+	CHAT_BLOCK: [
+		closeInfo,
+		{
+			...blockToggle,
+			unlessAny: [blocked, ...blockDialog]
+		},
+		blockButton("Block")
+	],
 	CHAT_SEARCH: searchChat,
 	CHAT_VIDEO_CALL: menu(chat, "video_call"),
 	CHAT_VOICE_CALL: menu(chat, "voice_call"),
@@ -327,15 +363,19 @@ const actions = {
 	CHAT_MUTE_8_HOURS: menu(chat, "8_hours"),
 	CHAT_MUTE_1_WEEK: menu(chat, "1_week"),
 	CHAT_UNREAD: menu(chat, "mark_as_unread", "mark_as_read"),
-	CHAT_PREVIOUS: menu(view, "previous_chat"),
-	CHAT_NEXT: menu(view, "next_chat"),
+	CHAT_PREVIOUS: [mainWindow, menu(view, "previous_chat")],
+	CHAT_NEXT: [mainWindow, menu(view, "next_chat")],
 	CHAT_EXPORT: menu(chat, "export_chat"),
 	CHAT_CLEAR: menu(chat, "clear_chat"),
 	CHAT_DELETE: menu(chat, "delete_chat"),
-	VIEW_CHATS: menu(view, "chats"),
-	VIEW_CALLS: menu(view, "calls"),
-	VIEW_UPDATES: menu(view, "updates"),
-	VIEW_ARCHIVED: [menu(view, "chats"), element("SidebarButton_Archived")],
+	VIEW_CHATS: [mainWindow, menu(view, "chats")],
+	VIEW_CALLS: [mainWindow, menu(view, "calls")],
+	VIEW_UPDATES: [mainWindow, menu(view, "updates")],
+	VIEW_ARCHIVED: [
+		mainWindow,
+		menu(view, "chats"),
+		element("SidebarButton_Archived")
+	],
 	VIEW_CHATS_ALL: chatFilter("All"),
 	VIEW_CHATS_UNREAD: chatFilter("Unread"),
 	VIEW_CHATS_FAVOURITES: chatFilter("Favourites"),
@@ -452,7 +492,7 @@ function buildWhatsAppHandler(bundleId = "net.whatsapp.WhatsApp") {
 				kind: "PARTICIPANT",
 				index: position
 			}];
-		} else if (action === "GROUP_MEMBER_SELECT") {
+		} else if (action === "GROUP_MEMBER_SELECT" || action === "GROUP_MEMBER_REMOVE" && index !== void 0) {
 			let position;
 			try {
 				position = positiveIndex(index, "group member index");
@@ -471,7 +511,11 @@ function buildWhatsAppHandler(bundleId = "net.whatsapp.WhatsApp") {
 				infoRow({
 					kind: "MEMBER",
 					index: position
-				})
+				}),
+				...action === "GROUP_MEMBER_REMOVE" ? [memberOption({
+					description: "Remove from group",
+					missing: `Group member #${position}'s options`
+				}), actionSheetButton("Remove")] : []
 			];
 		} else if (action === "CHAT_SWITCH" || action === "CHAT_INFO_AT") {
 			let position;
@@ -482,7 +526,7 @@ function buildWhatsAppHandler(bundleId = "net.whatsapp.WhatsApp") {
 			}
 			request = [
 				closeInfo,
-				menu("com.apple.menu.application", "open_main_window"),
+				mainWindow,
 				menu(view, "chats"),
 				{
 					kind: "CHAT",
@@ -501,7 +545,6 @@ function buildWhatsAppHandler(bundleId = "net.whatsapp.WhatsApp") {
 			const filtered = action !== "VIEW_CHATS" && action !== "VIEW_ARCHIVED";
 			request = [
 				closeInfo,
-				...filtered ? [] : [menu("com.apple.menu.application", "open_main_window")],
 				...Array.isArray(destination) ? destination : [destination],
 				{
 					kind: filtered ? "OPEN_CHAT" : "CHAT",
@@ -535,10 +578,12 @@ function buildWhatsAppHandler(bundleId = "net.whatsapp.WhatsApp") {
 		} else if (Object.hasOwn(actions, action)) request = actions[action];
 		else return Promise.reject(/* @__PURE__ */ new TypeError(`Unknown WhatsApp action: ${action}`));
 		const result = previous.then(async () => {
-			for (const step of Array.isArray(request) ? request : [request]) {
-				const resolved = await import__keychord_native_whatsapp.default.perform(bundleId, JSON.stringify([step]));
-				if (!resolved) continue;
+			let steps = Array.isArray(request) ? request : [request];
+			while (steps.length > 0) {
+				const resolved = await import__keychord_native_whatsapp.default.perform(bundleId, JSON.stringify(steps));
+				if (!resolved) break;
 				const target = JSON.parse(resolved);
+				if (!Number.isSafeInteger(target.next) || target.next < 1 || target.next > steps.length) throw new Error("WhatsApp's native step did not report where to resume");
 				const windows = getAppWindows(bundleId).filter((window) => window.processId === target.processId && Object.keys(target.bounds).every((key) => Math.abs(window.bounds[key] - target.bounds[key]) < .5));
 				if (windows.length !== 1) throw new Error("WhatsApp's target window moved or is unavailable; retry the action");
 				await click({
@@ -547,6 +592,7 @@ function buildWhatsAppHandler(bundleId = "net.whatsapp.WhatsApp") {
 					y: target.point.y - target.bounds.y,
 					expectedBounds: windows[0].bounds
 				});
+				steps = steps.slice(target.next);
 			}
 		});
 		previous = result.catch(() => void 0);

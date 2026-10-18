@@ -7,6 +7,24 @@ final class DismissWindow: NSWindow {
 }
 
 @MainActor
+// Reports focus only when a test asks, so it never overwrites another recorded action.
+final class SearchField: NSSearchField {
+    var focused: (() -> Void)?
+    override func becomeFirstResponder() -> Bool {
+        let became = super.becomeFirstResponder()
+        if became, let focused { DispatchQueue.main.async(execute: focused) }
+        return became
+    }
+}
+
+// Catalyst reports focus on a chat's content as a group with this subrole.
+final class ContentGroup: NSView {
+    override var acceptsFirstResponder: Bool { true }
+    override func isAccessibilityElement() -> Bool { true }
+    override func accessibilityRole() -> NSAccessibility.Role? { .group }
+    override func accessibilitySubrole() -> NSAccessibility.Subrole? { NSAccessibility.Subrole(rawValue: "iOSContentGroup") }
+}
+
 final class ClickableText: NSView {
     let label: String
     let invoke: () -> Void
@@ -187,7 +205,7 @@ final class Fixture: NSObject, NSApplicationDelegate {
     func record(_ action: String) {
         sequence += 1
         let active = NSWorkspace.shared.frontmostApplication?.processIdentifier == ProcessInfo.processInfo.processIdentifier
-        let data = try! JSONSerialization.data(withJSONObject: ["action": action, "active": active, "phase": phase, "request": request, "sequence": sequence, "chatVisible": chatVisible, "chatWindowOpen": chatWindow?.isVisible == true, "selectedChat": selectedChat, "chatFilter": chatFilter, "blocked": blocked, "reported": reported, "admins": admins.sorted(), "removedMembers": removedMembers.sorted(), "listOffset": list?.offset ?? 0, "searchFocused": searchField?.currentEditor() != nil])
+        let data = try! JSONSerialization.data(withJSONObject: ["action": action, "active": active, "phase": phase, "request": request, "sequence": sequence, "chatVisible": chatVisible, "chatWindowOpen": chatWindow?.isVisible == true, "selectedChat": selectedChat, "chatFilter": chatFilter, "blocked": blocked, "reported": reported, "admins": admins.sorted(), "removedMembers": removedMembers.sorted(), "listOffset": list?.offset ?? 0, "searchFocused": searchField?.currentEditor() != nil, "mainKey": window.isKeyWindow])
         try! data.write(to: URL(fileURLWithPath: output), options: .atomic)
     }
 
@@ -204,15 +222,23 @@ final class Fixture: NSObject, NSApplicationDelegate {
         case "group_permissions":
             _ = root("GROUP_PERMISSIONS", heading: permissionsMode == "GROUP_PERMISSIONS_WRONG_PAGE" ? "Advanced chat privacy" : "Group permissions")
         case "info_block": showBlockDialog()
+        // As in WhatsApp, Chat › Block toggles on the contact's state whatever its title
+        // says: blocked, it unblocks at once; otherwise it opens the block dialog.
+        case "block_dynamic":
+            if blocked { blocked = false; showMain(); record("unblock_confirmed"); return }
+            showBlockDialog(role: "AXSheet")
         case "block_confirmed", "block_report_confirmed":
             blocked = true
             reported = id == "block_report_confirmed"
-            showInfo()
+            if phase == "MAIN" { showMain() } else { showInfo() }
         case "info_unblock":
             if unblockImmediately { blocked = false; showInfo(); record("unblock_confirmed"); return }
             showUnblockDialog()
         case "unblock_confirmed": blocked = false; showInfo()
-        case "open_main_window", "chats": showMain()
+        case "open_main_window":
+            showMain()
+            window.makeKeyAndOrderFront(nil)
+        case "chats": showMain()
         case "SidebarButton_Archived": showMain("ARCHIVED")
         case "filter_all", "filter_unread", "filter_favourites", "filter_groups":
             // WhatsApp applies a filter about 75 ms after the chip's AXPress returns,
@@ -328,6 +354,8 @@ final class Fixture: NSObject, NSApplicationDelegate {
         let chat = NSWindow(contentRect: NSRect(x: 120, y: 120, width: 500, height: 500), styleMask: [.titled, .closable], backing: .buffered, defer: false)
         chat.isReleasedWhenClosed = false
         chat.title = "Fixture Chat"
+        // WhatsApp's chat windows have a content root with this identifier.
+        group("Chat_Window", frame: NSRect(x: 0, y: 0, width: 500, height: 500), parent: chat.contentView!)
         chat.makeKeyAndOrderFront(nil)
         chatWindow = chat
         record("open_chat_window")
@@ -402,12 +430,20 @@ final class Fixture: NSObject, NSApplicationDelegate {
                 list.addSubview(text)
             } else { button("chat_\(index)", "Fixture Chat \(index)", frame: frame, parent: list) }
         }
+        // A blocked contact's chat replaces the composer with these buttons.
+        if blocked {
+            let bar = group("blocked_bar", frame: NSRect(x: 520, y: 20, width: 340, height: 30), parent: view)
+            button("blocked_delete_chat", "Delete chat", frame: NSRect(x: 0, y: 0, width: 160, height: 30), parent: bar)
+            button("blocked_unblock", "Unblock", frame: NSRect(x: 180, y: 0, width: 160, height: 30), parent: bar)
+        }
     }
 
     // The chat's search bar, opened by Search Chat and by Info's Search.
     func showSearch() {
         if phase != "MAIN" { showMain() }
-        let field = NSSearchField(frame: NSRect(x: 520, y: 440, width: 300, height: 24))
+        // A chat has one search bar; replace one an earlier scenario left open.
+        searchField?.removeFromSuperview()
+        let field = SearchField(frame: NSRect(x: 520, y: 440, width: 300, height: 24))
         field.placeholderString = "Search"
         field.setAccessibilityLabel("Search")
         window.contentView?.addSubview(field)
@@ -614,16 +650,16 @@ final class Fixture: NSObject, NSApplicationDelegate {
         }
     }
 
-    // WhatsApp's action sheets are popovers. The title sits alone in nested
-    // groups, so its parent holds none of the sheet's buttons.
-    func showActionSheet(_ title: String, _ buttons: [(String, String)], member: Int = 0, closed: String) {
+    // WhatsApp's action sheets are popovers; Chat › Block shows its dialog as a sheet.
+    // The title sits alone in nested groups, so its parent holds none of the buttons.
+    func showActionSheet(_ title: String, _ buttons: [(String, String)], member: Int = 0, closed: String, role: String = "AXPopover") {
         guard let view = window.contentView else { return }
         closeActionSheet()
         list?.modal = true
         let sheet = DevicePopover(frame: NSRect(x: 250, y: 150, width: 400, height: 300))
         sheet.identifier = NSUserInterfaceItemIdentifier("fixture_action_sheet")
         sheet.setAccessibilityElement(true)
-        sheet.setAccessibilityRole(NSAccessibility.Role(rawValue: "AXPopover"))
+        sheet.setAccessibilityRole(NSAccessibility.Role(rawValue: role))
         sheet.dismiss = { [weak self] in
             self?.closeActionSheet()
             self?.record(closed)
@@ -648,8 +684,8 @@ final class Fixture: NSObject, NSApplicationDelegate {
         list?.modal = false
     }
 
-    func showBlockDialog() {
-        showActionSheet("Block “Fixture Contact”?", [("block_report_confirmed", "Block and report"), ("block_confirmed", "Block")], closed: "block_cancelled")
+    func showBlockDialog(role: String = "AXPopover") {
+        showActionSheet("Block “Fixture Contact”?", [("block_report_confirmed", "Block and report"), ("block_confirmed", "Block")], closed: "block_cancelled", role: role)
     }
 
     func showUnblockDialog() {
@@ -936,7 +972,9 @@ final class Fixture: NSObject, NSApplicationDelegate {
                 self.admins = []
                 self.removedMembers = []
                 self.selectedChat = 0
-                self.blocked = mode.hasPrefix("UNBLOCK")
+                // UNBLOCK_CONTACT and BLOCKED show the blocked chat; UNBLOCK_INFO and
+                // UNBLOCK_IMMEDIATE show its Info.
+                self.blocked = mode.hasPrefix("UNBLOCK") || mode == "BLOCKED"
                 self.reported = false
                 self.unblockImmediately = mode == "UNBLOCK_IMMEDIATE"
                 if mode.hasPrefix("NAVIGATION_") { self.showNavigation(mode) }
@@ -948,7 +986,16 @@ final class Fixture: NSObject, NSApplicationDelegate {
                 else if mode == "GROUP_SETUP" { self.showGroupSetup() }
                 else if mode == "GROUP_PICKER" { self.showGroupPicker() }
                 else if mode == "BLOCK_DIALOG" { self.showInfo(); self.showBlockDialog() }
+                else if mode == "UNBLOCK_INFO" || mode == "UNBLOCK_IMMEDIATE" { self.showInfo() }
                 else if mode == "GROUP_MEMBER_OPTIONS" { self.showGroupInfo(); self.showMemberOptions(2) }
+                else if mode == "SEARCH_UNFOCUSED" {
+                    // The chat's search bar is open, but focus moved to the chat's content.
+                    self.showSearch()
+                    let content = ContentGroup(frame: NSRect(x: 520, y: 200, width: 300, height: 200))
+                    self.window.contentView?.addSubview(content)
+                    self.window.makeFirstResponder(content)
+                    (self.searchField as? SearchField)?.focused = { [weak self] in self?.record("search_focused") }
+                }
                 else if mode == "INFO_COVERED" {
                     // Add to group sits under the translucent navigation bar.
                     self.showInfo()

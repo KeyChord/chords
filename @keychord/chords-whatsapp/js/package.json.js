@@ -165,6 +165,10 @@ var chords = { "net": { "whatsapp": { "WhatsApp": { "macos.toml": {
 			"name": "Info [Group] > Member > Remove (Confirmed)",
 			"@input:whatsapp": ["GROUP_MEMBER_REMOVE"]
 		},
+		"igmr(\\d+)": {
+			"name": "Info [Group] > Member @ # > Remove (Confirmed)",
+			"@input:whatsapp": ["GROUP_MEMBER_REMOVE", "$1"]
+		},
 		"ige": {
 			"name": "Info [Group] > Exit",
 			"@input:whatsapp": ["GROUP_EXIT"]

@@ -12,7 +12,7 @@ export const cases: {
 }[] = [
   { chord: "cq", action: "CHAT_CLOSE", control: "close_chat" },
   { chord: "gi", action: "CHAT_INFO", control: "group_info" },
-  { chord: "cb", action: "CHAT_BLOCK", control: "block_dynamic" },
+  { chord: "cb", action: "CHAT_BLOCK", control: "block_confirmed" },
   { chord: "c/", action: "CHAT_SEARCH", control: "search_chat" },
   { chord: "cv", action: "CHAT_VIDEO_CALL", control: "video_call" },
   { chord: "ca", action: "CHAT_VOICE_CALL", control: "voice_call" },
@@ -164,6 +164,14 @@ export const cases: {
     action: "GROUP_MEMBER_REMOVE",
     control: "member_removed_2",
     mode: "GROUP_MEMBER_OPTIONS",
+  },
+  {
+    chord: "igmr(\\d+)",
+    action: "GROUP_MEMBER_REMOVE",
+    control: "member_removed_12",
+    index: "$1",
+    input: "12",
+    mode: "GROUP",
   },
   { chord: "ige", action: "GROUP_EXIT", control: "group_exit", mode: "GROUP" },
   { chord: "igr", action: "GROUP_REPORT", control: "group_report", mode: "GROUP" },

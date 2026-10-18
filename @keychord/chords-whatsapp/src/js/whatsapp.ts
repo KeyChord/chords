@@ -18,10 +18,11 @@ type Request = {
     | "FILTER_SELECTED"
     | "OPEN_CHAT"
     | "OPEN_WINDOW"
-    | "SEARCH_CHAT";
+    | "SEARCH_CHAT"
+    | "MAIN_WINDOW";
   scope?: string;
   identifiers?: string[];
-  titlePrefix?: string;
+  titlePrefixes?: string[];
   description?: string;
   descriptions?: string[];
   descriptionPrefix?: string;
@@ -32,6 +33,7 @@ type Request = {
   scopeParent?: boolean;
   scopeAncestor?: number;
   scopeAncestorRole?: string;
+  scopeAncestorRoles?: string[];
   scroll?: boolean;
   optional?: boolean;
   missing?: string;
@@ -152,10 +154,41 @@ const blockDialog: Selector[] = [
   { description: "Block", role: "AXButton" },
   { description: "Block and report", role: "AXButton" },
 ];
+// A blocked contact's chat replaces the composer with Delete chat and Unblock.
+const blocked: Selector = { description: "Unblock", role: "AXButton" };
+// Chat › Block <name> and Chat › Unblock <name> are one toggle that acts on the
+// contact's current state: blocked, it unblocks at once; otherwise it opens the block
+// dialog as a sheet. WhatsApp retitles it only when it rebuilds the menu, on a chat
+// switch, so either title can be shown, and the chat's footer tells the state.
+const blockToggle: Request = {
+  kind: "MENU",
+  scope: chat,
+  titlePrefixes: ["Block ", "Unblock "],
+  missing: "Chat › Block (open a contact's chat)",
+};
+// The block dialog's buttons. Chat › Block opens the dialog as a sheet, Info's Block
+// row as a popover.
+const blockButton = (description: "Block" | "Block and report"): Request => ({
+  kind: "ELEMENT",
+  scope: "ActionSheet_TitleLabel",
+  scopeAncestorRoles: ["AXPopover", "AXSheet"],
+  description,
+  role: "AXButton",
+  unlessAny: [blocked],
+});
+// With Info closed, the toggle opens the block dialog at once. With Info open, which
+// disables the menu, Info's Block row at the end of the list opens it as a popover.
+// VERIFY waits for the menu's dialog so the Info steps see it. Every step is skipped
+// for a contact that is already blocked, where the toggle would unblock.
 const blockContact = (description: "Block" | "Block and report"): Request[] => [
-  { ...info, unlessAny: blockDialog },
-  { ...infoRow({ descriptionPrefix: "Block ", role: "AXButton" }), unlessAny: blockDialog },
-  actionSheetButton(description),
+  { ...blockToggle, unlessAny: [infoOpen, blocked, ...blockDialog] },
+  { kind: "VERIFY", description: "Block", role: "AXButton", unlessAny: [infoOpen, blocked] },
+  { ...info, unlessAny: [blocked, ...blockDialog] },
+  {
+    ...infoRow({ descriptionPrefix: "Block ", role: "AXButton" }),
+    unlessAny: [blocked, ...blockDialog],
+  },
+  blockButton(description),
 ];
 const settingsControl = (request: Partial<Request>): Request[] => [
   {
@@ -171,17 +204,24 @@ const settingsControl = (request: Partial<Request>): Request[] => [
     ...request,
   },
 ];
+// Chat list and view chords act in WhatsApp's main window. With a chat open in its
+// own window in front, MAIN_WINDOW presses this menu command and waits until the
+// main window has focus; it does nothing when the main window already has it.
+const mainWindow: Request = {
+  ...menu("com.apple.menu.application", "open_main_window"),
+  kind: "MAIN_WINDOW",
+};
 // WhatsApp applies a filter about 75 ms after its chip is pressed. FILTER presses
 // the chip unless it is already selected (pressing it again deselects it), and
 // FILTER_SELECTED waits until the chip is selected.
 const chatFilter = (description: string): Request[] => [
-  menu("com.apple.menu.application", "open_main_window"),
+  mainWindow,
   menu(view, "chats"),
   { kind: "FILTER", description },
   { kind: "FILTER_SELECTED", description },
 ];
 const sidebar = (request: Partial<Request>): Request[] => [
-  menu("com.apple.menu.application", "open_main_window"),
+  mainWindow,
   { kind: "ELEMENT", ...request },
 ];
 const themePage = heading("Chat theme");
@@ -264,16 +304,26 @@ const actions = {
   CHAT_INFO_CLEAR: infoControl("Clear chat", "AXButton"),
   CHAT_INFO_BLOCK: blockContact("Block"),
   CHAT_INFO_BLOCK_REPORT: blockContact("Block and report"),
+  // With Info closed, the block toggle unblocks a blocked contact at once, without a
+  // confirmation. Info disables the menu, so with Info open its Unblock row asks for
+  // confirmation instead, which WhatsApp sometimes skips.
   CHAT_INFO_UNBLOCK: [
-    { ...info, unlessAny: [{ description: "Unblock", role: "AXButton" }] },
+    { ...blockToggle, onlyIfAny: [blocked], unlessAny: [infoOpen] },
     {
       ...infoRow({ descriptionPrefix: "Unblock ", role: "AXButton" }),
-      unlessAny: [{ description: "Unblock", role: "AXButton" }],
+      onlyIfAny: [infoOpen],
+      unlessAny: [actionSheetOpen],
     },
-    { ...actionSheetButton("Unblock"), optional: true },
+    // An open action sheet hides Info from accessibility.
+    { ...actionSheetButton("Unblock"), onlyIfAny: [infoOpen, actionSheetOpen], optional: true },
   ],
   CHAT_INFO_REPORT: groupControl({ descriptionPrefix: "Report ", role: "AXButton" }),
-  CHAT_BLOCK: { kind: "MENU", scope: chat, titlePrefix: "Block" },
+  // Chat › Block, then the dialog's Block. Info disables the menu, so it is closed first.
+  CHAT_BLOCK: [
+    closeInfo,
+    { ...blockToggle, unlessAny: [blocked, ...blockDialog] },
+    blockButton("Block"),
+  ],
   CHAT_SEARCH: searchChat,
   CHAT_VIDEO_CALL: menu(chat, "video_call"),
   CHAT_VOICE_CALL: menu(chat, "voice_call"),
@@ -288,15 +338,15 @@ const actions = {
   CHAT_MUTE_8_HOURS: menu(chat, "8_hours"),
   CHAT_MUTE_1_WEEK: menu(chat, "1_week"),
   CHAT_UNREAD: menu(chat, "mark_as_unread", "mark_as_read"),
-  CHAT_PREVIOUS: menu(view, "previous_chat"),
-  CHAT_NEXT: menu(view, "next_chat"),
+  CHAT_PREVIOUS: [mainWindow, menu(view, "previous_chat")],
+  CHAT_NEXT: [mainWindow, menu(view, "next_chat")],
   CHAT_EXPORT: menu(chat, "export_chat"),
   CHAT_CLEAR: menu(chat, "clear_chat"),
   CHAT_DELETE: menu(chat, "delete_chat"),
-  VIEW_CHATS: menu(view, "chats"),
-  VIEW_CALLS: menu(view, "calls"),
-  VIEW_UPDATES: menu(view, "updates"),
-  VIEW_ARCHIVED: [menu(view, "chats"), element("SidebarButton_Archived")],
+  VIEW_CHATS: [mainWindow, menu(view, "chats")],
+  VIEW_CALLS: [mainWindow, menu(view, "calls")],
+  VIEW_UPDATES: [mainWindow, menu(view, "updates")],
+  VIEW_ARCHIVED: [mainWindow, menu(view, "chats"), element("SidebarButton_Archived")],
   VIEW_CHATS_ALL: chatFilter("All"),
   VIEW_CHATS_UNREAD: chatFilter("Unread"),
   VIEW_CHATS_FAVOURITES: chatFilter("Favourites"),
@@ -404,7 +454,10 @@ export default function buildWhatsAppHandler(bundleId = "net.whatsapp.WhatsApp")
         return Promise.reject(error);
       }
       request = [newGroup, { kind: "PARTICIPANT", index: position }];
-    } else if (action === "GROUP_MEMBER_SELECT") {
+    } else if (
+      action === "GROUP_MEMBER_SELECT" ||
+      (action === "GROUP_MEMBER_REMOVE" && index !== undefined)
+    ) {
       let position: number;
       try {
         position = positiveIndex(index, "group member index");
@@ -412,11 +465,21 @@ export default function buildWhatsAppHandler(bundleId = "net.whatsapp.WhatsApp")
         return Promise.reject(error);
       }
       // An open action sheet hides Group Info from accessibility; close it instead
-      // of reopening Info, then press the numbered member to show its options.
+      // of reopening Info, then press the numbered member to show its options. A
+      // numbered removal then removes that member and confirms.
       request = [
         { ...info, unlessAny: [actionSheetOpen] },
         { kind: "DISMISS_POPOVER", ...actionSheet },
         infoRow({ kind: "MEMBER", index: position }),
+        ...(action === "GROUP_MEMBER_REMOVE"
+          ? [
+              memberOption({
+                description: "Remove from group",
+                missing: `Group member #${position}'s options`,
+              }),
+              actionSheetButton("Remove"),
+            ]
+          : []),
       ];
     } else if (action === "CHAT_SWITCH" || action === "CHAT_INFO_AT") {
       let position: number;
@@ -427,7 +490,7 @@ export default function buildWhatsAppHandler(bundleId = "net.whatsapp.WhatsApp")
       }
       request = [
         closeInfo,
-        menu("com.apple.menu.application", "open_main_window"),
+        mainWindow,
         menu(view, "chats"),
         { kind: "CHAT", index: position },
         ...(action === "CHAT_INFO_AT" ? [info] : []),
@@ -451,7 +514,7 @@ export default function buildWhatsAppHandler(bundleId = "net.whatsapp.WhatsApp")
       const filtered = action !== "VIEW_CHATS" && action !== "VIEW_ARCHIVED";
       request = [
         closeInfo,
-        ...(filtered ? [] : [menu("com.apple.menu.application", "open_main_window")]),
+        // Each destination brings the main window forward first.
         ...(Array.isArray(destination) ? destination : [destination]),
         // WhatsApp ignores row taps while a filter reload animates, and exposes the
         // new rows only after layout. OPEN_CHAT selects the position from WhatsApp's
@@ -513,14 +576,21 @@ export default function buildWhatsAppHandler(bundleId = "net.whatsapp.WhatsApp")
     // As in the Spotify and Dock handlers, complete each action before starting
     // the next one, including activation and multi-step accessibility work.
     const result = previous.then(async () => {
-      for (const step of Array.isArray(request) ? request : [request]) {
-        const resolved = await addon.perform(bundleId, JSON.stringify([step]));
-        if (!resolved) continue;
+      // One native call runs the steps, so WhatsApp is activated once and a step can
+      // reuse the accessibility tree read by the step before it. A step that needs a
+      // window-targeted click returns it with the step to resume from.
+      let steps = Array.isArray(request) ? request : [request];
+      while (steps.length > 0) {
+        const resolved = await addon.perform(bundleId, JSON.stringify(steps));
+        if (!resolved) break;
         const target = JSON.parse(resolved) as {
           processId: number;
+          next: number;
           point: { x: number; y: number };
           bounds: WindowBounds;
         };
+        if (!Number.isSafeInteger(target.next) || target.next < 1 || target.next > steps.length)
+          throw new Error("WhatsApp's native step did not report where to resume");
         const windows = getAppWindows(bundleId).filter(
           (window) =>
             window.processId === target.processId &&
@@ -536,6 +606,7 @@ export default function buildWhatsAppHandler(bundleId = "net.whatsapp.WhatsApp")
           y: target.point.y - target.bounds.y,
           expectedBounds: windows[0].bounds,
         });
+        steps = steps.slice(target.next);
       }
     });
     previous = result.catch(() => undefined);

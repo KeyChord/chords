@@ -66,7 +66,11 @@ for (const scenario of cases) {
   if (scenario.action === "CHAT_INFO_AT") {
     assert.equal((await Bun.file(output).json()).selectedChat, Number(scenario.input));
   }
-  if (scenario.action === "CHAT_INFO_BLOCK" || scenario.action === "CHAT_INFO_BLOCK_REPORT") {
+  if (
+    scenario.action === "CHAT_BLOCK" ||
+    scenario.action === "CHAT_INFO_BLOCK" ||
+    scenario.action === "CHAT_INFO_BLOCK_REPORT"
+  ) {
     const state = await Bun.file(output).json();
     assert.equal(state.blocked, true);
     assert.equal(state.reported, scenario.action === "CHAT_INFO_BLOCK_REPORT");
@@ -75,7 +79,9 @@ for (const scenario of cases) {
     assert.equal((await Bun.file(output).json()).blocked, false);
   }
   if (scenario.action === "GROUP_MEMBER_REMOVE") {
-    assert.deepEqual((await Bun.file(output).json()).removedMembers, [2]);
+    assert.deepEqual((await Bun.file(output).json()).removedMembers, [
+      scenario.input === undefined ? 2 : Number(scenario.input),
+    ]);
   }
   if (scenario.action === "CHAT_OPEN_WINDOW") {
     assert.equal((await Bun.file(output).json()).chatWindowOpen, true);
@@ -95,6 +101,20 @@ for (const index of [1, 9, 10, 12]) {
   await reset();
   await handler("CHAT_SWITCH", String(index));
   await recorded(`chat_${index}`);
+}
+// From a chat in its own window, chat list chords bring the main window forward
+// before acting in it.
+for (const [action, index, control] of [
+  ["CHAT_SWITCH", "2", "chat_2"],
+  ["VIEW_CHATS_GROUPS", undefined, "filter_groups"],
+] as const) {
+  await reset();
+  await handler("CHAT_OPEN_WINDOW");
+  await recorded("open_chat_window");
+  assert.equal((await Bun.file(output).json()).mainKey, false);
+  await handler(action, index);
+  await recorded(control);
+  assert.equal((await Bun.file(output).json()).mainKey, true);
 }
 await reset();
 await assert.rejects(handler("CHAT_SWITCH", "13"), /not loaded/);
@@ -268,12 +288,30 @@ for (const [action, control] of [
   await handler(action);
   await recorded(control);
 }
-await reset("UNBLOCK_IMMEDIATE");
-await handler("CHAT_INFO_UNBLOCK");
-await recorded("unblock_confirmed");
-assert.equal((await Bun.file(output).json()).blocked, false);
+// With Info open, Info's Unblock row unblocks, with or without a confirmation.
+for (const mode of ["UNBLOCK_INFO", "UNBLOCK_IMMEDIATE"]) {
+  await reset(mode);
+  await handler("CHAT_INFO_UNBLOCK");
+  await recorded("unblock_confirmed");
+  assert.equal((await Bun.file(output).json()).blocked, false);
+}
+// Chat › Block toggles whatever its title says, so the block chords leave an already
+// blocked contact alone instead of unblocking it, and unblocking leaves an unblocked
+// contact alone.
+for (const action of ["CHAT_BLOCK", "CHAT_INFO_BLOCK", "CHAT_INFO_BLOCK_REPORT"] as const) {
+  await reset("BLOCKED");
+  await handler(action);
+  const state = await Bun.file(output).json();
+  assert.deepEqual(
+    [state.action, state.blocked],
+    ["READY", true],
+    `${action} on a blocked contact`,
+  );
+}
 await reset();
-await assert.rejects(handler("CHAT_INFO_UNBLOCK"), /unavailable/);
+await handler("CHAT_INFO_UNBLOCK");
+const unblocked = await Bun.file(output).json();
+assert.deepEqual([unblocked.action, unblocked.blocked], ["READY", false]);
 
 // Prefix navigation can already have opened Info, Theme, or Wallpaper. Child
 // chords must continue from those views, without selecting a theme preset.
@@ -324,6 +362,15 @@ await reset();
 await handler("CHAT_SEARCH");
 await handler("CHAT_SEARCH");
 assert.equal((await Bun.file(output).json()).searchFocused, true);
+// A search bar that is open but lost focus gets it back: nothing in the action
+// opens the bar or closes Info, so there is no transition to wait for.
+for (const action of ["CHAT_SEARCH", "CHAT_INFO_SEARCH"] as const) {
+  await reset("SEARCH_UNFOCUSED");
+  assert.equal((await Bun.file(output).json()).searchFocused, false);
+  await handler(action);
+  await recorded("search_focused");
+  assert.equal((await Bun.file(output).json()).searchFocused, true);
+}
 await reset("MISSING");
 await assert.rejects(handler("CHAT_DELETE"), /unavailable/);
 await reset("AMBIGUOUS");

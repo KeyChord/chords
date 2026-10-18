@@ -62,6 +62,10 @@ file = 'whatsapp.js'
 'igmr' = { name = 'Info [Group] > Member > Remove (Confirmed)', '@input:whatsapp' = [
   'GROUP_MEMBER_REMOVE',
 ] }
+'igmr(\d+)' = { name = 'Info [Group] > Member @ # > Remove (Confirmed)', '@input:whatsapp' = [
+  'GROUP_MEMBER_REMOVE',
+  '$1',
+] }
 'ige' = { name = 'Info [Group] > Exit', '@input:whatsapp' = ['GROUP_EXIT'] }
 'igr' = { name = 'Info [Group] > Report', '@input:whatsapp' = ['GROUP_REPORT'] }
 'igcs' = { name = 'Info [Group] > Create Similar', '@input:whatsapp' = ['GROUP_CREATE_SIMILAR'] }

@@ -24,12 +24,12 @@ private struct Request: Decodable, Sendable {
         case device = "DEVICE", dismissPopover = "DISMISS_POPOVER"
         case groupPermissions = "GROUP_PERMISSIONS", verify = "VERIFY"
         case filter = "FILTER", filterSelected = "FILTER_SELECTED", openChat = "OPEN_CHAT"
-        case openWindow = "OPEN_WINDOW", searchChat = "SEARCH_CHAT"
+        case openWindow = "OPEN_WINDOW", searchChat = "SEARCH_CHAT", mainWindow = "MAIN_WINDOW"
     }
     let kind: Kind
     let scope: String?
     let identifiers: [String]?
-    let titlePrefix: String?
+    let titlePrefixes: [String]?
     let description: String?
     let descriptions: [String]?
     let descriptionPrefix: String?
@@ -40,6 +40,7 @@ private struct Request: Decodable, Sendable {
     let scopeParent: Bool?
     let scopeAncestor: Int?
     let scopeAncestorRole: String?
+    let scopeAncestorRoles: [String]?
     let scroll: Bool?
     let optional: Bool?
     let missing: String?
@@ -79,22 +80,116 @@ private func clean(_ value: String) -> String {
         .trimmingCharacters(in: .whitespacesAndNewlines)
 }
 
+// Every attribute read is a round trip that WhatsApp answers on its main thread, so a
+// read can wait a frame while WhatsApp builds or animates a page. A snapshot reads each
+// element once, with every attribute that searches compare, and serves all searches
+// until WhatsApp may have changed: the next action or wait. One pass then covers a
+// step's guards, scope and target, and a step that only checks guards leaves its pass
+// to the next step.
+private let snapshotAttributes = [
+    kAXIdentifierAttribute, kAXRoleAttribute, kAXTitleAttribute, kAXDescriptionAttribute,
+    kAXValueAttribute, kAXHelpAttribute, kAXEnabledAttribute, kAXChildrenAttribute,
+]
+
+@MainActor
+private struct Snapshot {
+    var elements: [Element] = []
+    // `elements` is in depth-first order; each element's subtree ends at `ends[position]`.
+    var ends: [Int] = []
+    var positions: [Element: Int] = [:]
+}
+
+@MainActor private var snapshots: [Snapshot] = []
+
+@MainActor
+private func invalidateSnapshots() { snapshots.removeAll() }
+
+@MainActor
+private func snapshot(_ root: Element) throws -> (Snapshot, Range<Int>) {
+    for snapshot in snapshots {
+        if let start = snapshot.positions[root] { return (snapshot, start..<snapshot.ends[start]) }
+    }
+    var snapshot = Snapshot()
+    let names = snapshotAttributes as CFArray
+    // Menus are searched from their own menu bar item, never from the application.
+    let skipsMenuBar = root.role() == kAXApplicationRole
+    func walk(_ element: AXUIElement, depth: Int) throws {
+        guard depth < 30, snapshot.positions[Element(element)] == nil else { return }
+        guard snapshot.elements.count < 5000 else { throw WhatsAppError("accessibility tree is too large") }
+        var values: CFArray?
+        var attributes: [String: AttributeValue] = [:]
+        var childElements: [AXUIElement] = []
+        if AXUIElementCopyMultipleAttributeValues(element, names, [], &values) == .success,
+           let values = values as? [AnyObject], values.count == snapshotAttributes.count {
+            for (name, value) in zip(snapshotAttributes, values) {
+                if name == kAXChildrenAttribute {
+                    childElements = value as? [AXUIElement] ?? []
+                } else if CFGetTypeID(value) == AXValueGetTypeID() {
+                    // A missing attribute comes back as an AXError value. Storing it
+                    // keeps a search from reading it again.
+                    attributes[name] = .null
+                } else if name == kAXEnabledAttribute {
+                    attributes[name] = (value as? Bool).map(AttributeValue.bool) ?? .null
+                } else if let text = value as? String {
+                    attributes[name] = .string(text)
+                } else if let text = value as? NSAttributedString {
+                    attributes[name] = .string(text.string)
+                } else {
+                    attributes[name] = .null
+                }
+            }
+        } else {
+            childElements = Element(element).attribute(Attribute<[AXUIElement]>(kAXChildrenAttribute)) ?? []
+        }
+        if skipsMenuBar, attributes[kAXRoleAttribute]?.stringValue == kAXMenuBarRole { return }
+        let read = Element(element, attributes: attributes.isEmpty ? nil : attributes, children: nil, actions: nil)
+        let position = snapshot.elements.count
+        snapshot.elements.append(read)
+        snapshot.ends.append(position + 1)
+        snapshot.positions[read] = position
+        // Action discovery never needs message history.
+        if clean(attributes[kAXIdentifierAttribute]?.stringValue ?? "") == "ChatMessagesTableView" { return }
+        for child in childElements { try walk(child, depth: depth + 1) }
+        snapshot.ends[position] = snapshot.elements.count
+    }
+    try walk(root.underlyingElement, depth: 0)
+    snapshots.append(snapshot)
+    return (snapshot, 0..<snapshot.elements.count)
+}
+
 @MainActor
 private func find(_ root: Element, matching: @MainActor (Element) -> Bool) throws -> [Element] {
-    var results: [Element] = []
-    var visited: [Element] = []
-    @MainActor func walk(_ element: Element, depth: Int) throws {
-        guard depth < 30 else { return }
-        guard !visited.contains(element) else { return }
-        guard visited.count < 5000 else { throw WhatsAppError("accessibility tree is too large") }
-        visited.append(element)
-        if matching(element) { results.append(element) }
-        // Action discovery never needs message history.
-        if clean(element.identifier() ?? "") == "ChatMessagesTableView" { return }
-        for child in children(element) { try walk(child, depth: depth + 1) }
+    let (snapshot, range) = try snapshot(root)
+    return snapshot.elements[range].filter { matching($0) }
+}
+
+// An element's children as read by its snapshot, in AXChildren order. Children cut off
+// by the snapshot's depth limit are read directly.
+@MainActor
+private func snapshotChildren(_ element: Element) throws -> [Element] {
+    let (snapshot, range) = try snapshot(element)
+    var result: [Element] = []
+    var position = range.lowerBound + 1
+    while position < range.upperBound {
+        result.append(snapshot.elements[position])
+        position = snapshot.ends[position]
     }
-    try walk(root, depth: 0)
-    return results
+    return result.isEmpty ? children(element) : result
+}
+
+// Position and size in one read.
+@MainActor
+private func bounds(_ element: Element) -> CGRect? {
+    var values: CFArray?
+    guard AXUIElementCopyMultipleAttributeValues(
+        element.underlyingElement, [kAXPositionAttribute, kAXSizeAttribute] as CFArray, [], &values) == .success,
+        let values = values as? [AnyObject], values.count == 2,
+        CFGetTypeID(values[0]) == AXValueGetTypeID(), CFGetTypeID(values[1]) == AXValueGetTypeID() else { return nil }
+    var origin = CGPoint.zero
+    var size = CGSize.zero
+    guard AXValueGetValue(values[0] as! AXValue, .cgPoint, &origin),
+          AXValueGetValue(values[1] as! AXValue, .cgSize, &size) else { return nil }
+    return CGRect(origin: origin, size: size)
 }
 
 @MainActor
@@ -107,7 +202,7 @@ private func select(_ roots: [Element], request: Request) throws -> Element? {
             let description = clean(element.descriptionText() ?? "")
             if let role = request.role, element.role() != role { return false }
             return request.identifiers?.contains(identifier) == true
-                || (request.titlePrefix.map { title.hasPrefix($0) } ?? false)
+                || (request.titlePrefixes?.contains { title.hasPrefix($0) } ?? false)
                 || (request.description.map { description == $0 || description.hasPrefix($0 + ",") || title == $0 || title.hasPrefix($0 + ",") } ?? false)
                 || (request.descriptions?.contains { description == $0 || description.hasPrefix($0 + ",") || title == $0 || title.hasPrefix($0 + ",") } ?? false)
                 || (request.descriptionPrefix.map { description.hasPrefix($0) || title.hasPrefix($0) } ?? false)
@@ -115,7 +210,7 @@ private func select(_ roots: [Element], request: Request) throws -> Element? {
         }) where !matches.contains(match) { matches.append(match) }
     }
     let enabled = matches.filter { ($0.isEnabled()) != false }
-    let label = request.identifiers?.joined(separator: "/") ?? request.titlePrefix ?? request.description ?? request.descriptions?.joined(separator: "/") ?? request.descriptionSuffix ?? "control"
+    let label = request.identifiers?.joined(separator: "/") ?? request.titlePrefixes?.joined(separator: "/") ?? request.description ?? request.descriptions?.joined(separator: "/") ?? request.descriptionSuffix ?? "control"
     guard !matches.isEmpty else { return nil }
     if let index = request.index {
         guard index > 0, index <= matches.count else { throw WhatsAppError("\(label) #\(index) is unavailable") }
@@ -147,14 +242,29 @@ private func activate(_ bundleId: String) async throws -> NSRunningApplication {
         }
     }
     guard let app else { throw WhatsAppError("application did not launch") }
-    app.unhide()
-    app.activate()
-    let deadline = Date(timeIntervalSinceNow: 2)
     func isFrontmost() -> Bool {
         app.isActive && workspace.frontmostApplication?.processIdentifier == app.processIdentifier
     }
-    while !isFrontmost() && !app.isTerminated && Date() < deadline {
-        try await Task.sleep(for: .milliseconds(20))
+    // Both properties are key-value observable. Observing them before activating means
+    // an activation right after the request still wakes the wait.
+    let (changes, continuation) = AsyncStream.makeStream(of: Void.self, bufferingPolicy: .bufferingNewest(1))
+    let observations = [
+        app.observe(\.isActive) { _, _ in continuation.yield() },
+        app.observe(\.isTerminated) { _, _ in continuation.yield() },
+        workspace.observe(\.frontmostApplication) { _, _ in continuation.yield() },
+    ]
+    let timeout = Task {
+        try? await Task.sleep(for: .seconds(2))
+        continuation.finish()
+    }
+    defer {
+        timeout.cancel()
+        observations.forEach { $0.invalidate() }
+    }
+    app.unhide()
+    app.activate()
+    if !isFrontmost() {
+        for await _ in changes where isFrontmost() || app.isTerminated { break }
     }
     guard isFrontmost(), !app.isTerminated else { throw WhatsAppError("application did not become active") }
     return app
@@ -178,7 +288,7 @@ private func contains(_ application: Element, selectors: [Selector]) throws -> B
 
 @MainActor
 private func frame(_ element: Element) throws -> CGRect {
-    guard let frame = element.frame() else { throw WhatsAppError("control has no accessible bounds") }
+    guard let frame = bounds(element) else { throw WhatsAppError("control has no accessible bounds") }
     guard frame.origin.x.isFinite, frame.origin.y.isFinite, frame.width.isFinite, frame.height.isFinite,
           frame.width > 0, frame.height > 0 else { throw WhatsAppError("control is not visible") }
     return frame
@@ -259,16 +369,18 @@ private func deviceControl(_ application: Element, request: Request) throws -> E
 private func scopedRoots(_ application: Element, request: Request) throws -> [Element]? {
     guard let scope = request.scope else { return [application] }
     let anchors = try find(application) { clean($0.identifier() ?? "") == scope }
-    if let role = request.scopeAncestorRole {
+    // The nearest ancestor with any of the roles, such as a dialog that is a popover in
+    // one place and a sheet in another.
+    if let roles = request.scopeAncestorRoles ?? request.scopeAncestorRole.map({ [$0] }) {
         var roots: [Element] = []
         for anchor in anchors {
             var current = anchor.parent()
             var depth = 0
-            while let element = current, element.role() != role, depth < 16 {
+            while let element = current, !roles.contains(element.role() ?? ""), depth < 16 {
                 current = element.parent()
                 depth += 1
             }
-            if let root = current, root.role() == role, !roots.contains(root) { roots.append(root) }
+            if let root = current, roles.contains(root.role() ?? ""), !roots.contains(root) { roots.append(root) }
         }
         return roots.isEmpty ? nil : roots
     }
@@ -320,7 +432,7 @@ private func groupPermissionsPoint(_ root: Element) throws -> CGPoint? {
     // not substitute its action for the inaccessible permissions control.
     let occupied = try find(root) {
         ($0.isActionSupported(kAXPressAction) || $0.role() == kAXStaticTextRole)
-            && ($0.frame()?.contains(point) == true)
+            && (bounds($0)?.contains(point) == true)
     }
     guard occupied.isEmpty else { return nil }
     return point
@@ -333,9 +445,23 @@ private let pageUp = "AXScrollUpByPage", pageDown = "AXScrollDownByPage"
 // can scroll; a list that fits on screen offers neither.
 @MainActor
 private func scrollArea(_ root: Element) throws -> Element? {
-    func pages(_ element: Element) -> Bool { element.isActionSupported(pageUp) || element.isActionSupported(pageDown) }
+    func pages(_ element: Element) -> Bool {
+        let actions = element.supportedActions() ?? []
+        return actions.contains(pageUp) || actions.contains(pageDown)
+    }
     if pages(root) { return root }
-    let areas = try find(root) { pages($0) && !($0.parent().map(pages) ?? false) }
+    let (snapshot, range) = try snapshot(root)
+    var areas: [Element] = []
+    var position = range.lowerBound + 1
+    while position < range.upperBound {
+        let element = snapshot.elements[position]
+        if pages(element) {
+            areas.append(element)
+            position = snapshot.ends[position]
+        } else {
+            position += 1
+        }
+    }
     guard areas.count <= 1 else { throw WhatsAppError("ambiguous scroll area") }
     return areas.first
 }
@@ -353,7 +479,17 @@ private struct PageScan {
     private var down = false
 
     @MainActor private static func layout(_ list: Element) -> [String] {
-        [String(describing: list.frame())] + children(list).map { "\($0.role() ?? "")|\(String(describing: $0.frame()))" }
+        let names = [kAXRoleAttribute, kAXPositionAttribute, kAXSizeAttribute] as CFArray
+        return [String(describing: bounds(list))] + children(list).map { row in
+            var values: CFArray?
+            guard AXUIElementCopyMultipleAttributeValues(row.underlyingElement, names, [], &values) == .success,
+                  let values = values as? [AnyObject], values.count == 3 else { return "" }
+            var origin = CGPoint.zero
+            var size = CGSize.zero
+            if CFGetTypeID(values[1]) == AXValueGetTypeID() { AXValueGetValue(values[1] as! AXValue, .cgPoint, &origin) }
+            if CFGetTypeID(values[2]) == AXValueGetTypeID() { AXValueGetValue(values[2] as! AXValue, .cgSize, &size) }
+            return "\(values[0] as? String ?? "")|\(CGRect(origin: origin, size: size))"
+        }
     }
 
     @MainActor mutating func settled(_ list: Element) -> Bool {
@@ -369,6 +505,7 @@ private struct PageScan {
 
     @MainActor mutating func page(_ area: Element, _ action: String) throws {
         let start = Self.layout(area)
+        defer { invalidateSnapshots() }
         do { try area.performAction(action) }
         catch let error as AccessibilitySystemError {
             throw WhatsAppError("\(action) failed (AX \(error.axError.rawValue))")
@@ -384,10 +521,17 @@ private struct PageScan {
             // it the action does nothing. AXScrollToVisible is synchronous: showing
             // the topmost exposed element (the table header in Info) uncovers any row
             // above it under the navigation bar, until none remains.
+            let before = Self.layout(area)
             _ = try? top.performAction("AXScrollToVisible")
-            if children(area).first == top { down = true }
-            previous = nil
-            return true
+            invalidateSnapshots()
+            let atTop = children(area).first == top
+            if atTop { down = true }
+            // A list that was already at its top has not moved, so the page just read
+            // still holds and paging down can start from it.
+            guard atTop, Self.layout(area) == before else {
+                previous = nil
+                return true
+            }
         }
         if !down, !downOnly, area.isActionSupported(pageUp) {
             try page(area, pageUp)
@@ -407,7 +551,10 @@ private struct PageScan {
 // sibling element, so any hit inside the list counts.
 @MainActor
 private func reachable(_ target: Element, in list: Element, application: Element) -> Bool {
-    if target.isActionSupported("AXScrollToVisible") { _ = try? target.performAction("AXScrollToVisible") }
+    if target.isActionSupported("AXScrollToVisible") {
+        _ = try? target.performAction("AXScrollToVisible")
+        invalidateSnapshots()
+    }
     guard let point = activationPoint(target) else { return false }
     var hit: AXUIElement?
     guard AXUIElementCopyElementAtPosition(application.underlyingElement, Float(point.x), Float(point.y), &hit) == .success,
@@ -420,6 +567,63 @@ private func reachable(_ target: Element, in list: Element, application: Element
         current = element.parent()
     }
     return false
+}
+
+private typealias GetWindowNumber = @convention(c) (AXUIElement, UnsafeMutablePointer<CGWindowID>) -> AXError
+// HIServices SPI that also maps an element inside a window to that window's number.
+private let windowNumberOf: GetWindowNumber? = dlsym(UnsafeMutableRawPointer(bitPattern: -2), "_AXUIElementGetWindow")
+    .map { unsafeBitCast($0, to: GetWindowNumber.self) }
+
+@MainActor
+private func windowNumber(_ element: Element) -> CGWindowID? {
+    var number: CGWindowID = 0
+    guard let windowNumberOf, windowNumberOf(element.underlyingElement, &number) == .success, number != 0 else { return nil }
+    return number
+}
+
+// Catalyst draws sheets and action sheets in their own windows, which grow and fade in
+// for about 0.2 s while accessibility already reports their final frames. A tap at a
+// control's activation point meanwhile lands wherever the growing window happens to be,
+// which in WhatsApp 26.38.74 pressed another action of the same sheet. The window's own
+// accessibility element (the outermost one drawn in it) has the final frame. Once every
+// edge of the drawn window is within a quarter of the control's size of that frame,
+// every point drawn in the window is too, so the tap lands inside the control.
+private struct Placement {
+    let window: CGWindowID
+    let final: CGRect
+    let tolerance: CGFloat
+}
+
+@MainActor
+private func placement(_ element: Element) -> Placement? {
+    guard let number = windowNumber(element) else { return nil }
+    var outermost = element
+    while let parent = outermost.parent(), windowNumber(parent) == number { outermost = parent }
+    guard let final = bounds(outermost), let control = bounds(element) else { return nil }
+    return Placement(window: number, final: final, tolerance: max(2, min(control.width, control.height) / 4))
+}
+
+private func placed(_ placement: Placement) -> Bool {
+    guard let window = (CGWindowListCopyWindowInfo(.optionIncludingWindow, placement.window) as? [[String: Any]])?.first,
+          let drawn = (window[kCGWindowBounds as String] as? NSDictionary).flatMap({ CGRect(dictionaryRepresentation: $0) })
+    else { return false }
+    let final = placement.final, tolerance = placement.tolerance
+    return abs(drawn.minX - final.minX) <= tolerance && abs(drawn.minY - final.minY) <= tolerance
+        && abs(drawn.maxX - final.maxX) <= tolerance && abs(drawn.maxY - final.maxY) <= tolerance
+}
+
+// Waits until a control's window has opened around it. Only the window's drawn bounds
+// change meanwhile, and the WindowServer announces no change to them, so they are
+// compared once per display frame. A control in a window that is already open costs one
+// comparison.
+@MainActor
+private func awaitPlacement(_ element: Element, deadline: Date) async throws -> Bool {
+    guard let placement = placement(element) else { return true }
+    while !placed(placement) {
+        guard Date() < deadline else { return false }
+        try await Task.sleep(for: .milliseconds(8))
+    }
+    return true
 }
 
 @MainActor
@@ -455,11 +659,11 @@ private struct MemberCount {
         } else if let known = rows.lazy.compactMap({ [counted] row in counted.first { $0.row == row } }).first {
             section.append(known)
         } else { return nil }
-        guard let first = rows.firstIndex(of: section[0].row), var bottom = section[0].row.frame()?.maxY else { return nil }
+        guard let first = rows.firstIndex(of: section[0].row), var bottom = bounds(section[0].row)?.maxY else { return nil }
         var members = section[0].members
         var ended = false
         for row in rows[(first + 1)...] {
-            guard let rowFrame = row.frame(), abs(rowFrame.minY - bottom) <= 1 else { ended = true; break }
+            guard let rowFrame = bounds(row), abs(rowFrame.minY - bottom) <= 1 else { ended = true; break }
             let member = (children(row).first ?? row).attribute(Attribute<String>(kAXValueAttribute)) == nil
             if member { members += 1 }
             section.append(Row(row: row, members: members, member: member))
@@ -491,12 +695,12 @@ private func participantControl(_ application: Element, request: Request) throws
     guard tables.count <= 1 else { throw WhatsAppError("multiple group member pickers are open") }
     guard let table = tables.first else { return nil }
     let identifiers = ["ParticipantPicker_ContactCell", "ParticipantPicker_SuggestedContactCell"]
-    let rows = children(table).filter { identifiers.contains(clean($0.identifier() ?? "")) }
+    let rows = try snapshotChildren(table).filter { identifiers.contains(clean($0.identifier() ?? "")) }
     guard index <= rows.count else { throw WhatsAppError("group member #\(index) is not loaded; scroll the member picker into view") }
     let row = rows[index - 1]
     // The row and its switch share an ID. Count each direct row once, then
     // invoke its switch, keeping headings and selection chips out of numbering.
-    let target = children(row).first { identifiers.contains(clean($0.identifier() ?? "")) && $0.isActionSupported(kAXPressAction) } ?? row
+    let target = try snapshotChildren(row).first { identifiers.contains(clean($0.identifier() ?? "")) && $0.isActionSupported(kAXPressAction) } ?? row
     guard target.isEnabled() != false else { throw WhatsAppError("group member #\(index) is disabled") }
     return target
 }
@@ -504,8 +708,8 @@ private func participantControl(_ application: Element, request: Request) throws
 // Catalyst exposes loaded chat rows as direct buttons (the open chat as text).
 // Filter and archive cells are containers and must not shift numbered positions.
 @MainActor
-private func chatRows(_ table: Element) -> [Element] {
-    children(table).filter {
+private func chatRows(_ table: Element) throws -> [Element] {
+    try snapshotChildren(table).filter {
         !clean($0.identifier() ?? "").hasPrefix("ChatListView_")
             && ($0.role() == kAXButtonRole || clean($0.help() ?? "").contains("Double tap to open chat"))
     }
@@ -576,7 +780,24 @@ private final class Wakeups: Sendable {
 private let changeNotifications = [
     kAXLayoutChangedNotification, kAXValueChangedNotification, kAXSelectedChildrenChangedNotification,
     kAXCreatedNotification, kAXUIElementDestroyedNotification, kAXFocusedUIElementChangedNotification,
+    kAXFocusedWindowChangedNotification, kAXMainWindowChangedNotification, kAXWindowCreatedNotification,
 ]
+
+@MainActor
+private func focusedWindow(_ application: Element) -> Element? {
+    application.attribute(Attribute<AXUIElement>(kAXFocusedWindowAttribute)).map(Element.init)
+}
+
+// A chat opened in its own window (Open in new window) has a content root with this
+// identifier filling the window. The main window's root is unnamed and holds the
+// sidebar and chat list, also while a sheet hides them from accessibility.
+@MainActor
+private func isChatWindow(_ window: Element) -> Bool {
+    children(window).contains { root in
+        clean(root.identifier() ?? "") == "Chat_Window"
+            || children(root).contains { clean($0.identifier() ?? "") == "Chat_Window" }
+    }
+}
 
 // Runs `check`, then runs it again on each accessibility notification WhatsApp
 // posts, until it returns true. The deadline only bounds an action WhatsApp ignored.
@@ -610,8 +831,11 @@ private func awaitChange(processId: pid_t, deadline: Date, _ check: @MainActor (
         context.release()
     }
     // Observing first means a change right after this check still wakes the loop.
+    // Each check reads the tree afresh.
+    invalidateSnapshots()
     if try check() { return true }
     for await _ in wakeups {
+        invalidateSnapshots()
         if try check() { return true }
     }
     return false
@@ -661,15 +885,22 @@ private func focusedElement(_ application: Element) -> Element? {
 
 // Info's Search button focuses the chat's search field only after Info has animated
 // away, and a closing Info can give focus back to the composer after the menu
-// focused the field. Focus on another control is returned to the field with a tap;
-// focus on the window itself means WhatsApp has not finished the transition.
+// focused the field. Focus on another control is returned to the field with a tap.
+// After the action opened the bar or closed Info, focus on the window itself means
+// WhatsApp has not finished the transition. A bar that was already open has no
+// transition, so its field is tapped wherever focus is.
 @MainActor
-private func awaitSearchFocus(_ application: Element, processId: pid_t) async throws -> Bool {
+private func awaitSearchFocus(_ application: Element, processId: pid_t, transitioning: Bool) async throws -> Bool {
     try await awaitChange(processId: processId, deadline: Date(timeIntervalSinceNow: 3)) {
-        guard let field = try chatSearchField(application), let focus = focusedElement(application) else { return false }
+        guard let field = try chatSearchField(application) else { return false }
+        let focus = focusedElement(application)
         if focus == field { return true }
-        if focus.role() != kAXWindowRole, focus.attribute(Attribute<String>(kAXSubroleAttribute)) != "iOSContentGroup" {
-            _ = try? field.performAction(.press)
+        let settled = focus.map {
+            $0.role() != kAXWindowRole && $0.attribute(Attribute<String>(kAXSubroleAttribute)) != "iOSContentGroup"
+        } ?? false
+        if settled || !transitioning, (try? field.performAction(.press)) == nil {
+            // A field without a press action can still be focused directly.
+            AXUIElementSetAttributeValue(field.underlyingElement, kAXFocusedAttribute as CFString, kCFBooleanTrue)
         }
         return false
     }
@@ -687,7 +918,7 @@ private let oKey: CGKeyCode = 0x1F // kVK_ANSI_O
 private func openChat(_ table: Element, index: Int, processId: pid_t) throws {
     // Catalyst exposes only on-screen rows. A list without page actions fits on
     // screen, so its rows are the whole filter and a missing position is reported.
-    let loaded = chatRows(table).count
+    let loaded = try chatRows(table).count
     if index > loaded, try scrollArea(table) == nil {
         throw WhatsAppError("chat #\(index) is unavailable; this filter shows \(loaded)")
     }
@@ -716,8 +947,12 @@ private func postShortcuts(_ keys: [(CGKeyCode, CGEventFlags)], processId: pid_t
 private func perform(bundleId: String, requests: [Request]) async throws -> String {
     guard AXPermissionHelpers.hasAccessibilityPermissions() else { throw WhatsAppError("Chord needs Accessibility permission") }
     let app = try await activate(bundleId)
+    invalidateSnapshots()
+    defer { invalidateSnapshots() }
     let application = AXApp(app).element
     application.setMessagingTimeout(2)
+    // Whether an earlier step changed WhatsApp's UI, which may still be transitioning.
+    var acted = false
     for (index, request) in requests.enumerated() {
         let scrolls = request.scroll == true || request.kind == .member
         let deadline = Date(timeIntervalSinceNow: scrolls ? 5 : 2)
@@ -725,6 +960,7 @@ private func perform(bundleId: String, requests: [Request]) async throws -> Stri
         var scan = PageScan()
         var members = MemberCount()
         var covered = false
+        var opening = false
         var disabled: Disabled?
         search: while target == nil {
             // Navigation animations can finish after AXPress returns. Recheck
@@ -748,6 +984,10 @@ private func perform(bundleId: String, requests: [Request]) async throws -> Stri
                 guard popovers.count <= 1 else { throw WhatsAppError("multiple call device popovers are open") }
                 target = popovers.first
                 if target == nil { break search }
+            case .mainWindow:
+                // Nothing to do while a window other than a chat window has focus.
+                if let window = focusedWindow(application), !isChatWindow(window) { break search }
+                fallthrough
             case .menu:
                 if let bar = application.menuBar() {
                     guard let scope = request.scope else { throw WhatsAppError("missing menu scope") }
@@ -764,7 +1004,17 @@ private func perform(bundleId: String, requests: [Request]) async throws -> Stri
                 }
                 guard roots.count == 1 else { throw WhatsAppError("ambiguous list scope") }
                 let area = try scrollArea(roots[0])
-                guard scan.settled(area ?? roots[0]) else { break }
+                let settled = scan.settled(area ?? roots[0])
+                // A control that is already listed is pressed at once, while its list or
+                // sheet may still be moving: AX frames are final positions, and the hit
+                // test confirms that the tap lands on it. Paging, member counting and the
+                // permissions row's position need a settled page.
+                if !settled, request.kind == .element {
+                    if let found = try select(roots, request: request),
+                       reachable(found, in: area ?? roots[0], application: application) { target = found }
+                    break
+                }
+                guard settled else { break }
                 if request.kind == .member {
                     guard let position = request.index, position > 0 else { throw WhatsAppError("group member index must be positive") }
                     target = try members.control(area ?? roots[0], index: position, canScrollDown: area?.isActionSupported(pageDown) == true)
@@ -776,13 +1026,13 @@ private func perform(bundleId: String, requests: [Request]) async throws -> Stri
                     target = nil
                     covered = true
                     // Page toward a control that AXScrollToVisible did not reveal.
-                    if let area, let point = activationPoint(found), let viewport = area.frame() ?? roots[0].frame() {
+                    if let area, let point = activationPoint(found), let viewport = bounds(area) ?? bounds(roots[0]) {
                         let action = point.y > viewport.midY ? pageDown : pageUp
                         if area.isActionSupported(action) { try scan.page(area, action) }
                     }
                 } else if request.kind == .groupPermissions, let point = try groupPermissionsPoint(roots[0]) {
-                    guard index == requests.count - 1 else { throw WhatsAppError("permissions click must be the final native step") }
-                    return try clickTarget(roots[0], point: point, processId: app.processIdentifier)
+                    guard try await awaitPlacement(roots[0], deadline: deadline) else { opening = true; break }
+                    return try clickTarget(roots[0], point: point, processId: app.processIdentifier, next: index + 1)
                 } else if let area, !(try scan.advance(area, downOnly: members.anchored)) {
                     // Every page of the list has been read.
                     if request.optional == true { break search }
@@ -793,7 +1043,7 @@ private func perform(bundleId: String, requests: [Request]) async throws -> Stri
             case .chat:
                 guard let index = request.index, index > 0 else { throw WhatsAppError("chat index must be positive") }
                 if let table = try chatList(application) {
-                    let rows = chatRows(table)
+                    let rows = try chatRows(table)
                     guard rows.count >= index else { throw WhatsAppError("chat #\(index) is not loaded; scroll the chat list into view") }
                     target = rows[index - 1]
                 }
@@ -811,6 +1061,16 @@ private func perform(bundleId: String, requests: [Request]) async throws -> Stri
                 target = nil
                 disabled = error
             }
+            // Menu items (including pop-up menus), cancels and shortcuts do not tap a point;
+            // every other control waits until its sheet or popover window has finished opening.
+            switch request.kind {
+            case .menu, .mainWindow, .verify, .dismissPopover, .filterSelected, .openChat, .openWindow, .searchChat: break
+            default:
+                if let found = target, found.role() != kAXMenuItemRole, try await !awaitPlacement(found, deadline: deadline) {
+                    target = nil
+                    opening = true
+                }
+            }
             if target == nil {
                 if Date() >= deadline {
                     if request.optional == true { break search }
@@ -818,9 +1078,11 @@ private func perform(bundleId: String, requests: [Request]) async throws -> Stri
                     let label = request.missing ?? describe(request)
                     if request.kind == .verify { throw WhatsAppError("\(label) did not open") }
                     if covered { throw WhatsAppError("\(label) is covered or off screen; scroll it into view") }
+                    if opening { throw WhatsAppError("\(label) did not finish opening") }
                     throw WhatsAppError("\(label) is unavailable in the current window or app version")
                 }
                 try await Task.sleep(for: .milliseconds(25))
+                invalidateSnapshots()
             }
         }
         guard let target else { continue }
@@ -834,42 +1096,69 @@ private func perform(bundleId: String, requests: [Request]) async throws -> Stri
         if request.kind == .openChat {
             guard let position = request.index, position > 0 else { throw WhatsAppError("chat index must be positive") }
             try openChat(target, index: position, processId: app.processIdentifier)
+            acted = true
+            invalidateSnapshots()
+            continue
+        }
+        if request.kind == .mainWindow {
+            // A row press or chat shortcut in the main window would otherwise race the
+            // switch from a chat window. Focus changes post notifications; the wait ends
+            // when a window other than a chat window has focus.
+            do { try target.performAction(.press) }
+            catch let error as AccessibilitySystemError {
+                throw WhatsAppError("open_main_window failed (AX \(error.axError.rawValue))")
+            }
+            acted = true
+            invalidateSnapshots()
+            guard try await awaitChange(processId: app.processIdentifier, deadline: deadline, {
+                focusedWindow(application).map { !isChatWindow($0) } ?? false
+            }) else { throw WhatsAppError("WhatsApp's main window did not come forward") }
             continue
         }
         if request.kind == .openWindow {
             // "Open in new window" (⌥⌘O) does not depend on the chat's toolbar, whose
             // More menu WhatsApp hides while the chat's search bar is open.
             try postShortcuts([(oKey, [.maskCommand, .maskAlternate])], processId: app.processIdentifier)
+            acted = true
+            invalidateSnapshots()
             continue
         }
         if request.kind == .searchChat {
-            guard try await awaitSearchFocus(application, processId: app.processIdentifier) else {
+            guard try await awaitSearchFocus(application, processId: app.processIdentifier, transitioning: acted) else {
                 throw WhatsAppError("the chat's search field did not take focus; open a chat first")
             }
+            invalidateSnapshots()
             continue
         }
         if request.kind == .filter {
             // Pressing the selected chip deselects it, and WhatsApp can then show All.
             if selectedState(target) == true { continue }
-            if target.isActionSupported("AXScrollToVisible") { _ = try? target.performAction("AXScrollToVisible") }
+            if target.isActionSupported("AXScrollToVisible") {
+                _ = try? target.performAction("AXScrollToVisible")
+                invalidateSnapshots()
+            }
             if let point = activationPoint(target), !hits(target, at: point, application: application) {
-                guard index == requests.count - 1, let uncovered = uncoveredPoint(target, application: application) else {
+                guard let uncovered = uncoveredPoint(target, application: application) else {
                     throw WhatsAppError("the \(describe(request)) filter is covered; widen WhatsApp's window")
                 }
-                return try clickTarget(target, point: uncovered, processId: app.processIdentifier)
+                return try clickTarget(target, point: uncovered, processId: app.processIdentifier, next: index + 1)
             }
         }
         if request.kind == .dismissPopover {
             guard target.isActionSupported(kAXCancelAction) else { throw WhatsAppError("device popover cannot be dismissed; close it first") }
             try target.performAction(kAXCancelAction)
+            acted = true
+            invalidateSnapshots()
             continue
         }
         if request.click == true || !target.isActionSupported(kAXPressAction) {
-            guard request.kind != .menu, index == requests.count - 1 else { throw WhatsAppError("control has no press action") }
-            return try clickTarget(target, processId: app.processIdentifier)
+            guard request.kind != .menu else { throw WhatsAppError("control has no press action") }
+            return try clickTarget(target, processId: app.processIdentifier, next: index + 1)
         }
         // Never retry a dispatched press: AX cannotComplete can mean the callback
         // ran even though its reply timed out.
+        defer { invalidateSnapshots() }
+        acted = true
         do {
             try target.performAction(.press)
         } catch let error as AccessibilitySystemError {
@@ -882,11 +1171,12 @@ private func perform(bundleId: String, requests: [Request]) async throws -> Stri
 private func describe(_ request: Request) -> String {
     if request.kind == .member { return "group member #\(request.index ?? 0)" }
     return request.identifiers?.joined(separator: "/") ?? request.description ?? request.descriptions?.joined(separator: "/")
-        ?? request.titlePrefix ?? request.descriptionPrefix ?? request.descriptionSuffix ?? "chat list"
+        ?? request.titlePrefixes?.joined(separator: "/") ?? request.descriptionPrefix ?? request.descriptionSuffix ?? "chat list"
 }
 
+// JS performs the window-targeted click, then resumes the action at step `next`.
 @MainActor
-private func clickTarget(_ element: Element, point: CGPoint? = nil, processId: pid_t) throws -> String {
+private func clickTarget(_ element: Element, point: CGPoint? = nil, processId: pid_t, next: Int) throws -> String {
     guard let window = element.attribute(Attribute<AXUIElement>(kAXWindowAttribute)).map(Element.init) else { throw WhatsAppError("control has no containing window") }
     let bounds = try frame(window)
     let control = try frame(element)
@@ -894,6 +1184,7 @@ private func clickTarget(_ element: Element, point: CGPoint? = nil, processId: p
     guard point.x.isFinite, point.y.isFinite, bounds.contains(point) else { throw WhatsAppError("control is outside the visible window; scroll it into view") }
     let data = try JSONSerialization.data(withJSONObject: [
         "processId": processId,
+        "next": next,
         "point": ["x": point.x, "y": point.y],
         "bounds": ["x": bounds.minX, "y": bounds.minY, "width": bounds.width, "height": bounds.height],
     ])
