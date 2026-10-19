@@ -164,6 +164,9 @@ settings:
 
 catalogs:
   default:
+    '@keychord/config':
+      specifier: ^0.0.11
+      version: 0.0.11
     '@keychord/tsconfig':
       specifier: ^0.0.6
       version: 0.0.6
@@ -173,9 +176,6 @@ catalogs:
     vite-plus:
       specifier: ^1.2.0
       version: 1.2.0
-
-overrides:
-  '@keychord/config': link:../config
 
 importers:
 
@@ -228,8 +228,8 @@ importers:
         specifier: workspace:*
         version: link:../chordtest
       '@keychord/config':
-        specifier: link:../../../config
-        version: link:../../../config
+        specifier: 'catalog:'
+        version: 0.0.11
 
   '@keychord/chords-betterdisplay':
     dependencies:
@@ -247,8 +247,8 @@ importers:
         specifier: workspace:*
         version: link:../chordtest
       '@keychord/config':
-        specifier: link:../../../config
-        version: link:../../../config
+        specifier: 'catalog:'
+        version: 0.0.11
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -265,8 +265,8 @@ importers:
         specifier: workspace:*
         version: link:../chordtest
       '@keychord/config':
-        specifier: link:../../../config
-        version: link:../../../config
+        specifier: 'catalog:'
+        version: 0.0.11
 
   '@keychord/chords-chromium':
     dependencies:
@@ -290,8 +290,8 @@ importers:
         specifier: workspace:*
         version: link:../chordtest
       '@keychord/config':
-        specifier: link:../../../config
-        version: link:../../../config
+        specifier: 'catalog:'
+        version: 0.0.11
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -311,8 +311,8 @@ importers:
         specifier: workspace:*
         version: link:../chordtest
       '@keychord/config':
-        specifier: link:../../../config
-        version: link:../../../config
+        specifier: 'catalog:'
+        version: 0.0.11
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -348,8 +348,8 @@ importers:
         specifier: workspace:*
         version: link:../chordtest
       '@keychord/config':
-        specifier: link:../../../config
-        version: link:../../../config
+        specifier: 'catalog:'
+        version: 0.0.11
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -366,8 +366,8 @@ importers:
         specifier: workspace:*
         version: link:../chordtest
       '@keychord/config':
-        specifier: link:../../../config
-        version: link:../../../config
+        specifier: 'catalog:'
+        version: 0.0.11
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -381,8 +381,8 @@ importers:
         specifier: workspace:*
         version: link:../chordtest
       '@keychord/config':
-        specifier: link:../../../config
-        version: link:../../../config
+        specifier: 'catalog:'
+        version: 0.0.11
 
   '@keychord/chords-instagram':
     devDependencies:
@@ -390,8 +390,8 @@ importers:
         specifier: workspace:*
         version: link:../chordtest
       '@keychord/config':
-        specifier: link:../../../config
-        version: link:../../../config
+        specifier: 'catalog:'
+        version: 0.0.11
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -418,8 +418,8 @@ importers:
         specifier: workspace:*
         version: link:../chordtest
       '@keychord/config':
-        specifier: link:../../../config
-        version: link:../../../config
+        specifier: 'catalog:'
+        version: 0.0.11
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -433,8 +433,8 @@ importers:
         specifier: workspace:*
         version: link:../chordtest
       '@keychord/config':
-        specifier: link:../../../config
-        version: link:../../../config
+        specifier: 'catalog:'
+        version: 0.0.11
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -448,8 +448,8 @@ importers:
         specifier: workspace:*
         version: link:../chordtest
       '@keychord/config':
-        specifier: link:../../../config
-        version: link:../../../config
+        specifier: 'catalog:'
+        version: 0.0.11
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -463,8 +463,8 @@ importers:
         specifier: workspace:*
         version: link:../chordtest
       '@keychord/config':
-        specifier: link:../../../config
-        version: link:../../../config
+        specifier: 'catalog:'
+        version: 0.0.11
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -481,8 +481,8 @@ importers:
         specifier: workspace:*
         version: link:../chordtest
       '@keychord/config':
-        specifier: link:../../../config
-        version: link:../../../config
+        specifier: 'catalog:'
+        version: 0.0.11
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -500,7 +500,7 @@ importers:
         version: 5.0.12
       js-yaml:
         specifier: latest
-        version: 5.4.3
+        version: 5.5.0
       just-zip-it:
         specifier: latest
         version: 3.2.0
@@ -509,8 +509,8 @@ importers:
         specifier: workspace:*
         version: link:../chordtest
       '@keychord/config':
-        specifier: link:../../../config
-        version: link:../../../config
+        specifier: 'catalog:'
+        version: 0.0.11
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -530,8 +530,8 @@ importers:
         specifier: workspace:*
         version: link:../chordtest
       '@keychord/config':
-        specifier: link:../../../config
-        version: link:../../../config
+        specifier: 'catalog:'
+        version: 0.0.11
       '@types/bun':
         specifier: ^1.4.3
         version: 1.4.3
@@ -545,8 +545,8 @@ importers:
         specifier: workspace:*
         version: link:../chordtest
       '@keychord/config':
-        specifier: link:../../../config
-        version: link:../../../config
+        specifier: 'catalog:'
+        version: 0.0.11
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -567,7 +567,7 @@ importers:
         version: 5.0.12
       js-yaml:
         specifier: latest
-        version: 5.4.3
+        version: 5.5.0
       just-zip-it:
         specifier: latest
         version: 3.2.0
@@ -576,8 +576,8 @@ importers:
         specifier: workspace:*
         version: link:../chordtest
       '@keychord/config':
-        specifier: link:../../../config
-        version: link:../../../config
+        specifier: 'catalog:'
+        version: 0.0.11
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -595,8 +595,8 @@ importers:
         specifier: workspace:*
         version: link:../chordtest
       '@keychord/config':
-        specifier: link:../../../config
-        version: link:../../../config
+        specifier: 'catalog:'
+        version: 0.0.11
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -614,8 +614,8 @@ importers:
         specifier: workspace:*
         version: link:../chordtest
       '@keychord/config':
-        specifier: link:../../../config
-        version: link:../../../config
+        specifier: 'catalog:'
+        version: 0.0.11
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -629,8 +629,8 @@ importers:
         specifier: workspace:*
         version: link:../chordtest
       '@keychord/config':
-        specifier: link:../../../config
-        version: link:../../../config
+        specifier: 'catalog:'
+        version: 0.0.11
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -644,8 +644,8 @@ importers:
         specifier: workspace:*
         version: link:../chordtest
       '@keychord/config':
-        specifier: link:../../../config
-        version: link:../../../config
+        specifier: 'catalog:'
+        version: 0.0.11
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -659,8 +659,8 @@ importers:
         specifier: workspace:*
         version: link:../chordtest
       '@keychord/config':
-        specifier: link:../../../config
-        version: link:../../../config
+        specifier: 'catalog:'
+        version: 0.0.11
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -956,6 +956,10 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
+
+  '@keychord/config@0.0.11':
+    resolution: {integrity: sha512-LLkodasV0ANIWQ4y4u3PzNns+ycQ9VPLs7EjB5ej+yVgpJulyQ6uzRTtYbYRieiKo4IXrdqQI49pIuSgWhAVJA==}
+    hasBin: true
 
   '@keychord/tsconfig@0.0.6':
     resolution: {integrity: sha512-TwU3agMUhTzTbfoHKtzJQKwzpzQpjje3Z+6i7FrSuZLBygTZq/W9j0SI+6IlmuTnf0whgbLBOukJJ4K51V4wAw==}
@@ -1840,6 +1844,9 @@ packages:
   argparse@2.0.1:
     resolution: {integrity: sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q==}
 
+  argparse@3.0.3:
+    resolution: {integrity: sha512-Sn98ftV3KfsO8xfLPHG6oT8y+b0yvbrLgZjgPDXsharNY15tTAjqIsIju4S32nl6/iEUNNE4v+yL2Zhm8ooP3w==}
+
   aria-query@5.3.0:
     resolution: {integrity: sha512-b0P0sZPKtyu8HkeRAfCq0IfURZK+SuwMjY1UXGBU27wpAiTwQAIlq56IbIO+ytk/JjS1fMR14ee5WBBfKi5J6A==}
 
@@ -2063,8 +2070,8 @@ packages:
     resolution: {integrity: sha512-SFNOvSJ+Dgf/9An904Yx+CgSlIPCkIpao4qo51lpee25TIRejdH3rhR4EZMGoNx3/TP3O+wzWuiTFl4sqbltzA==}
     hasBin: true
 
-  js-yaml@5.4.3:
-    resolution: {integrity: sha512-yzzNtgczwgoVHNigCyKTXcQJU4Y8t/ikU4UxXW0BvrLfHTGWZhsNcOT2s/a7vn81/4KqVnNmHjaUEPlvWnNwVw==}
+  js-yaml@5.5.0:
+    resolution: {integrity: sha512-paNr4LFIFPjeeSmwNYdrb8FafLLG/Cr2Af3GjbsHJ5CxIjH4r0c2emlmRdAtpPAieP1gRVzk6buBbVP5gBMGAg==}
     hasBin: true
 
   json-with-bigint@3.5.12:
@@ -2685,6 +2692,11 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.6.0
 
+  '@keychord/config@0.0.11':
+    dependencies:
+      node-swift: 1.5.1
+      smol-toml: 1.9.1
+
   '@keychord/tsconfig@0.0.6': {}
 
   '@nodelib/fs.scandir@2.1.5':
@@ -3278,6 +3290,8 @@ snapshots:
 
   argparse@2.0.1: {}
 
+  argparse@3.0.3: {}
+
   aria-query@5.3.0:
     dependencies:
       dequal: 2.0.3
@@ -3503,9 +3517,9 @@ snapshots:
     dependencies:
       argparse: 2.0.1
 
-  js-yaml@5.4.3:
+  js-yaml@5.5.0:
     dependencies:
-      argparse: 2.0.1
+      argparse: 3.0.3
 
   json-with-bigint@3.5.12: {}
 
