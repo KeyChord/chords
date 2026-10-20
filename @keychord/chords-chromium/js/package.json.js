@@ -1,6 +1,10 @@
 //#region package.json
 var name = "@keychord/chords-chromium";
+var displayName = "Chromium Chords";
 var version = "0.0.0";
+var description =
+  "Chords for Google Chrome and other Chromium-based browsers, including Brave, Edge, Opera and Vivaldi.";
+var categories = ["Browsers"];
 var repository = {
   type: "git",
   url: "https://github.com/KeyChord/chords-chromium",
@@ -810,20 +814,6 @@ var chords = {
         },
       },
     },
-    openai: {
-      atlas: {
-        "macos.toml": {
-          name: "ChatGPT Atlas",
-          on: {
-            js: {
-              file: "chrome.js",
-              args: ["/Applications/ChatGPT Atlas.app"],
-            },
-          },
-          import: [{ file: "base.toml" }],
-        },
-      },
-    },
     operasoftware: {
       Opera: {
         "macos.toml": {
@@ -856,7 +846,10 @@ var chords = {
 };
 var package_default = {
   name,
+  displayName,
   version,
+  description,
+  categories,
   repository,
   type,
   dependencies,
@@ -866,10 +859,13 @@ var package_default = {
 };
 //#endregion
 export {
+  categories,
   chords,
   package_default as default,
   dependencies,
+  description,
   devDependencies,
+  displayName,
   name,
   packageManager,
   repository,

@@ -1,5 +1,8 @@
 //#region package.json
 var name = "@keychord/chords-monitors";
+var displayName = "Monitor Chords";
+var description = "Focus monitors by number, order or direction.";
+var categories = ["Window Management"];
 var repository = {
 	"type": "git",
 	"url": "https://github.com/KeyChord/chords-monitors"
@@ -51,6 +54,9 @@ var chords = { "macos.toml": {
 } };
 var package_default = {
 	name,
+	displayName,
+	description,
+	categories,
 	repository,
 	type,
 	scripts,
@@ -59,4 +65,4 @@ var package_default = {
 	chords
 };
 //#endregion
-export { chords, package_default as default, devDependencies, name, packageManager, repository, scripts, type };
+export { categories, chords, package_default as default, description, devDependencies, displayName, name, packageManager, repository, scripts, type };

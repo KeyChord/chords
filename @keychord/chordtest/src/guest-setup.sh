@@ -6,9 +6,9 @@ case "$(/usr/sbin/sysctl -n hw.model)" in
 esac
 export PATH="$HOME/.bun/bin:$HOME/.vite-plus/bin:$HOME/.vite-plus/0.1.15/bin:$HOME/.vite-plus/0.1.15:/opt/homebrew/opt/node@24/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
 
-if ! command -v bun >/dev/null || [ "$(bun --version)" != "1.4.3" ]; then
+if ! command -v bun >/dev/null || [ "$(bun --version)" != "1.4.4" ]; then
   curl -fsSL https://bun.com/install -o /tmp/chords-install-bun.sh
-  bash /tmp/chords-install-bun.sh bun-v1.4.3
+  bash /tmp/chords-install-bun.sh bun-v1.4.4
 fi
 if ! command -v vp >/dev/null; then
   curl -fsSL https://vite.plus -o /tmp/chords-install-vp.sh

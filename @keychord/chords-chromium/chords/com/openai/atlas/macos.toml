@@ -1,8 +1,0 @@
-name = 'ChatGPT Atlas'
-
-[on.js]
-file = 'chrome.js'
-args = ['/Applications/ChatGPT Atlas.app']
-
-[[import]]
-file = 'base.toml'

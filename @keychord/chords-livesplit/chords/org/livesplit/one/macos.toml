@@ -1,0 +1,11 @@
+name = 'LiveSplit One'
+# The macOS release is a bare executable without a bundle identifier. Its `.app` bundle uses
+# org.livesplit.one, so this file covers both.
+executables = ['LiveSplit One']
+
+[on.livesplit]
+file = 'livesplit.js'
+
+[chords]
+
+'v,tm' = { name = 'Vary Setting: Time Milliseconds', '@input:livesplit' = ['TOGGLE_MILLISECONDS'] }

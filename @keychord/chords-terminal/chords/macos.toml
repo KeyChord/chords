@@ -1,4 +1,5 @@
 name = 'Terminal'
 
 [chords]
-'/w' = { name = 'Warp', command = 'Open Warp', shell = '''open -a 'Warp'''' }
+# Default terminal launcher can be overridden by other packages.
+'/t' = { name = 'Terminal', shell = 'open -a Terminal' }

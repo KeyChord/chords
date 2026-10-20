@@ -1,5 +1,10 @@
 {
   "name": "@keychord/chords-spaces",
+  "displayName": "Spaces Chords",
+  "description": "Switch between macOS Spaces by direction or desktop number.",
+  "categories": [
+    "Window Management"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/KeyChord/chords-spaces"

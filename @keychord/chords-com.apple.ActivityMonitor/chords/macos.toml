@@ -1,0 +1,4 @@
+name = 'Activity Monitor'
+
+[chords]
+'/am' = { name = 'Activity Monitor', shell = '''open -a 'Activity Monitor'''' }

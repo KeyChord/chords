@@ -1,34 +1,30 @@
 # @keychord/chords-terminal
 
-Chord package for popular terminals.
+Tab chords for basic terminals. Warp has its own package,
+[`chords-warp`](../chords-warp).
 
-> [!NOTE]
-> This section is largely AI-written, so parts of it may not be fully accurate. It will be replaced with a hand-written version when I get the time.
+| Chord | Result |
+| --- | --- |
+| `/t` (global) | Open Terminal |
+| `t1` … `t8` | Switch to tab 1 … 8 (Command-1 … Command-8) |
+| `t9` | Switch to tab 9 (Command-9), in Terminal only |
 
-## Supported terminals
+Every terminal below imports the shared [tab chords](./chords/base.toml), which press each
+terminal's default shortcut:
 
-- [Warp](./chords/dev/warp/Warp-Stable/macos.toml) (`dev.warp.Warp-Stable`): chords for find (`f`),
-  blocks (`b`), commands (`c`), bookmarks (`m`), tabs (`t`), splits and scrolling (`s`), pane
-  resizing (`r`), font size and full screen (`z`), panels (`p`), and input (`i`). Most of them
-  press Warp's default keyboard shortcuts, so they assume Warp's default keybindings. The rest
-  (`f[`, `f]`, `su`, `sl`, `slu`, `sld`, `zr`, `zf`, `im`) press the key bound to their Warp action in
-  `~/.warp/keybindings.yaml`, and do nothing if there is none.
-- `/w` (global): open Warp.
+- [Terminal](./chords/com/apple/Terminal/macos.toml) (`com.apple.Terminal`): turn on
+  Settings → General → **Use ⌘-1 through ⌘-9 to switch tabs**.
+- [iTerm2](./chords/com/googlecode/iterm2/macos.toml) (`com.googlecode.iterm2`)
+- [Ghostty](./chords/com/mitchellh/ghostty/macos.toml) (`com.mitchellh.ghostty`)
+- [WezTerm](./chords/com/github/wez/wezterm/macos.toml) (`com.github.wez.wezterm`)
+- [Alacritty](./chords/org/alacritty/macos.toml) (`org.alacritty`): tabs need Alacritty 0.13 or later.
+- [Hyper](./chords/co/zeit/hyper/macos.toml) (`co.zeit.hyper`)
 
-When Chord loads the package, the Warp handler re-saves `~/.warp/keybindings.yaml`, creating it
-if needed. Existing bindings are kept, but comments and formatting are not.
+These terminals use Command-9 for their last tab rather than tab 9, so only Terminal binds
+`t9`. kitty isn't included: its Command-1 … Command-9 select split panes, not tabs.
 
-## Install
+To install it, add the `KeyChord/chords` monorepo under Settings → Chords → Chord Monorepos and
+tick `@keychord/chords-terminal`.
 
-In [Chord](https://github.com/KeyChord/Chord), open Settings → Chords → **Chord Monorepos** →
-**Add Monorepo**, enter `KeyChord/chords`, then tick `@keychord/chords-terminal` under
-**Packages to use**. That loads the version documented here. Settings → Browse also lists this
-package, but that adds its standalone repository, which can be older than this readme.
-
-## Development
-
-Run `vp pack` to build the `js/` directory:
-
-```shell
-vp pack
-```
+Build with `vp pack`. Run `vp run test` for Bun tests or
+`vp run test:macos -- @keychord/chords-terminal` from the monorepo root for VM tests.

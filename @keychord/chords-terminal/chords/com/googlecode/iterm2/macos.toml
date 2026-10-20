@@ -1,0 +1,4 @@
+name = 'iTerm2'
+
+[[import]]
+file = 'base.toml'

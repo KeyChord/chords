@@ -1,6 +1,11 @@
 {
   "name": "@keychord/chords-click",
+  "displayName": "Click Chords",
   "version": "0.0.0",
+  "description": "Mouse clicks, drags and pointer moves by coordinates, in the focused window or on the screen.",
+  "categories": [
+    "Input"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/KeyChord/chords-click"

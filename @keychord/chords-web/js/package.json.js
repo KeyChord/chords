@@ -1,5 +1,8 @@
 //#region package.json
 var name = "@keychord/chords-web";
+var displayName = "Web Chords";
+var description = "Global chords for the active tab in Chrome, Brave, Edge or Arc, such as scrolling.";
+var categories = ["Browsers"];
 var repository = {
 	"type": "git",
 	"url": "https://github.com/KeyChord/chords-web"
@@ -97,6 +100,9 @@ var chords = { "macos.toml": {
 } };
 var package_default = {
 	name,
+	displayName,
+	description,
+	categories,
 	repository,
 	type,
 	dependencies,
@@ -105,4 +111,4 @@ var package_default = {
 	chords
 };
 //#endregion
-export { chords, package_default as default, dependencies, devDependencies, name, packageManager, repository, type };
+export { categories, chords, package_default as default, dependencies, description, devDependencies, displayName, name, packageManager, repository, type };

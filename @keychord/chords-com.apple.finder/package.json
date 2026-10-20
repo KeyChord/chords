@@ -1,0 +1,22 @@
+{
+  "name": "@keychord/chords-com.apple.finder",
+  "displayName": "Finder Chords",
+  "version": "0.0.0",
+  "description": "Chords for Finder and file open and save dialogs.",
+  "categories": [
+    "macOS"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KeyChord/chords-com.apple.finder"
+  },
+  "type": "module",
+  "scripts": {
+    "test": "bun test --isolate"
+  },
+  "devDependencies": {
+    "@keychord/chordtest": "workspace:*",
+    "@keychord/config": "catalog:"
+  },
+  "packageManager": "pnpm@12.11.2"
+}

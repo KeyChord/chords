@@ -1,0 +1,5 @@
+# Tabs need Alacritty 0.13 or later.
+name = 'Alacritty'
+
+[[import]]
+file = 'base.toml'

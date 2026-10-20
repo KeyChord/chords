@@ -1,0 +1,25 @@
+{
+  "name": "@keychord/chords-com.apple.ActivityMonitor",
+  "displayName": "Activity Monitor Chords",
+  "version": "0.0.0",
+  "description": "Chords for Activity Monitor (com.apple.ActivityMonitor).",
+  "categories": [
+    "macOS"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KeyChord/chords-com.apple.ActivityMonitor"
+  },
+  "type": "module",
+  "scripts": {
+    "test": "bun test --isolate"
+  },
+  "dependencies": {
+    "@keychord/chords-menu": "workspace:*"
+  },
+  "devDependencies": {
+    "@keychord/chordtest": "workspace:*",
+    "@keychord/config": "catalog:"
+  },
+  "packageManager": "pnpm@12.11.2"
+}

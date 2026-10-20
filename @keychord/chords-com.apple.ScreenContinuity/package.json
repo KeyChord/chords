@@ -1,0 +1,28 @@
+{
+  "name": "@keychord/chords-com.apple.ScreenContinuity",
+  "displayName": "iPhone Mirroring Chords",
+  "version": "0.0.0",
+  "description": "Chords for iPhone Mirroring (com.apple.ScreenContinuity).",
+  "categories": [
+    "macOS"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KeyChord/chords-com.apple.ScreenContinuity"
+  },
+  "type": "module",
+  "scripts": {
+    "test": "bun test --isolate"
+  },
+  "dependencies": {
+    "@keychord/chords-click": "workspace:*"
+  },
+  "devDependencies": {
+    "@keychord/chords-com.apple.Safari": "workspace:*",
+    "@keychord/chordtest": "workspace:*",
+    "@keychord/config": "catalog:",
+    "@keychord/tsconfig": "catalog:",
+    "@types/bun": "latest"
+  },
+  "packageManager": "pnpm@12.11.2"
+}

@@ -1,5 +1,10 @@
 {
   "name": "@keychord/chords-windows",
+  "displayName": "Window Chords",
+  "description": "Resize, minimize, hide and quit the focused window or app, or move it to another Space.",
+  "categories": [
+    "Window Management"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/KeyChord/chords-windows"

@@ -148,7 +148,7 @@ var require_lib = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 //#region \0keychord-native:web
 var require__keychord_native_web = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const nativeRequire = createRequire(import.meta.url);
-	const nativeFiles = { "darwin-arm64": new URL("native/aarch64-apple-darwin/web/web-ab4a68ec66eb.node", import.meta.url).href };
+	const nativeFiles = { "darwin-arm64": new URL("native/aarch64-apple-darwin/web/web-8ab93a9c58f4.node", import.meta.url).href };
 	const nativeTarget = process.platform + "-" + process.arch;
 	const nativeFile = nativeFiles[nativeTarget];
 	if (!nativeFile) throw new Error("[chord-native] web has no addon for " + nativeTarget);

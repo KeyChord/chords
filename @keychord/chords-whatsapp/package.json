@@ -1,5 +1,10 @@
 {
   "name": "@keychord/chords-whatsapp",
+  "displayName": "WhatsApp Chords",
+  "description": "Chords for the native WhatsApp app, covering chats, Info, groups, calls, settings and more.",
+  "categories": [
+    "Social"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/KeyChord/chords-whatsapp"

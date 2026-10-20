@@ -1,6 +1,11 @@
 {
   "name": "@keychord/chords-modifiers",
+  "displayName": "Modifier Chords",
   "version": "0.0.0",
+  "description": "Global chords that press a keyboard shortcut in whichever app is focused.",
+  "categories": [
+    "Input"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/KeyChord/chords-modifiers"

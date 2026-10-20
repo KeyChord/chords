@@ -1,5 +1,10 @@
 {
   "name": "@keychord/chords-jetbrains",
+  "displayName": "JetBrains Chords",
+  "description": "Chords for JetBrains IDEs, including IntelliJ IDEA, PyCharm, GoLand, WebStorm and RustRover.",
+  "categories": [
+    "Editors"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/KeyChord/chords-jetbrains"

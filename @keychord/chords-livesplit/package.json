@@ -1,0 +1,25 @@
+{
+  "name": "@keychord/chords-livesplit",
+  "displayName": "LiveSplit Chords",
+  "description": "Chords for the LiveSplit One desktop app.",
+  "categories": [
+    "Utilities"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KeyChord/chords-livesplit"
+  },
+  "type": "module",
+  "scripts": {
+    "build:bridge": "bun scripts/build-bridge.ts",
+    "test": "bun test --isolate"
+  },
+  "devDependencies": {
+    "@keychord/chordtest": "workspace:*",
+    "@keychord/config": "catalog:",
+    "@keychord/tsconfig": "catalog:",
+    "@types/bun": "^1.4.3",
+    "happy-dom": "^21.0.1"
+  },
+  "packageManager": "pnpm@12.11.2"
+}

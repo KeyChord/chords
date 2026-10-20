@@ -1,0 +1,22 @@
+{
+  "name": "@keychord/chords-com.apple.AccessibilityInspector",
+  "displayName": "Accessibility Inspector Chords",
+  "version": "0.0.0",
+  "description": "Chords for Accessibility Inspector (com.apple.AccessibilityInspector).",
+  "categories": [
+    "macOS"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KeyChord/chords-com.apple.AccessibilityInspector"
+  },
+  "type": "module",
+  "scripts": {
+    "test": "bun test --isolate"
+  },
+  "devDependencies": {
+    "@keychord/chordtest": "workspace:*",
+    "@keychord/config": "catalog:"
+  },
+  "packageManager": "pnpm@12.11.2"
+}

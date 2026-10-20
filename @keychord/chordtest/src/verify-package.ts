@@ -15,7 +15,6 @@ if (getAppWindows("dev.keychord.chordtest.nonexistent").length)
   throw new Error("Unexpected fixture app");
 
 const definitions = [...new Bun.Glob("chords/**/*.toml").scanSync({ cwd: root })];
-if (await Bun.file(join(root, "chordpack.toml")).exists()) definitions.push("chordpack.toml");
 if (!definitions.length && manifest.name !== "@keychord/chordtest")
   throw new Error("Package has no chord definitions");
 for (const path of definitions) {

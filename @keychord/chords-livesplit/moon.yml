@@ -1,0 +1,15 @@
+$schema: "https://moonrepo.dev/schemas/project.json"
+
+layer: library
+language: typescript
+
+tasks:
+  # The bridge is injected into LiveSplit One, not loaded by Chord, so it is a plain
+  # Objective-C dylib rather than a NodeSwift addon.
+  build-native:
+    command: "bun scripts/build-bridge.ts"
+    inputs:
+      - "native/**/*"
+      - "scripts/build-bridge.ts"
+    outputs:
+      - "target"

@@ -1,6 +1,11 @@
 {
   "name": "@keychord/chords-raycast",
+  "displayName": "Raycast Chords",
   "version": "0.0.0",
+  "description": "Chords for Raycast: open a query's first result and move through results, pages and sections.",
+  "categories": [
+    "Utilities"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/KeyChord/chords-raycast"

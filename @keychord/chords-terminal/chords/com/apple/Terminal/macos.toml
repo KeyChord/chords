@@ -1,0 +1,8 @@
+# Needs Settings > General > "Use ⌘-1 through ⌘-9 to switch tabs".
+name = 'Terminal'
+
+[[import]]
+file = 'base.toml'
+
+[chords]
+'t9' = { name = 'Tab 9', shortcut = 'cmd+9' }

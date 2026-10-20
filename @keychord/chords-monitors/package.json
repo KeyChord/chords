@@ -1,5 +1,10 @@
 {
   "name": "@keychord/chords-monitors",
+  "displayName": "Monitor Chords",
+  "description": "Focus monitors by number, order or direction.",
+  "categories": [
+    "Window Management"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/KeyChord/chords-monitors"

@@ -1,5 +1,10 @@
 {
   "name": "@keychord/chords-betterdisplay",
+  "displayName": "BetterDisplay Chords",
+  "description": "Set the resolution of the display under the pointer with BetterDisplay.",
+  "categories": [
+    "Utilities"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/KeyChord/chords-betterdisplay"

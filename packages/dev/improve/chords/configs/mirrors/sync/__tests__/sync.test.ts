@@ -2,17 +2,17 @@ import { existsSync, mkdtempSync, mkdirSync, rmSync, symlinkSync, writeFileSync 
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { execaSync } from "@chord/com.npmjs.execa";
-import { expect, test, onTestFinished, vi } from "@chord/com.npmjs.vite-plus/test";
+import { expect, test, onTestFinished, mock, spyOn } from "bun:test";
 import { syncMirrors } from "#sync-mirrors";
 
-function fixture() {
+function fixture(name = "new-package") {
   const root = mkdtempSync(join(tmpdir(), "chords-sync-"));
   onTestFinished(() => rmSync(root, { recursive: true, force: true }));
   const source = join(root, "source");
   const base = join(source, "@keychord");
-  const addon = join(base, "new-package");
+  const addon = join(base, name);
   const remotes = join(root, "remotes");
-  const remote = join(remotes, "new-package");
+  const remote = join(remotes, name);
   mkdirSync(addon, { recursive: true });
   mkdirSync(remotes);
   const env = {
@@ -37,15 +37,15 @@ function fixture() {
   const git = execaSync({ cwd: source, env });
   git("git", ["init", "-b", "main"]);
   // No repository.url: adding the directory must be sufficient.
-  writeFileSync(join(addon, "package.json"), JSON.stringify({ name: "@keychord/new-package" }));
+  writeFileSync(join(addon, "package.json"), JSON.stringify({ name: `@keychord/${name}` }));
   writeFileSync(join(addon, "feature.txt"), "committed content");
   writeFileSync(join(addon, "run.sh"), "#!/bin/sh\nexit 0\n", { mode: 0o755 });
   symlinkSync("feature.txt", join(addon, "linked.txt"));
   git("git", ["add", "."]);
   git("git", ["commit", "-m", "Source change"]);
-  git("git", ["tag", "new-package-js-v1.2.3"]);
+  git("git", ["tag", `${name}-js-v1.2.3`]);
   git("git", ["tag", "other-package-js-v9.9.9"]);
-  const request = vi.fn<typeof fetch>(async (input, init) => {
+  const request = mock<typeof fetch>(async (input, init) => {
     const path = new URL(String(input)).pathname;
     if (init?.method === "GET") {
       return new Response("{}", { status: existsSync(remote) ? 200 : 404 });
@@ -87,6 +87,14 @@ test.each([false, true])("automatically provisions mirrors only in CI (%s)", asy
   });
   const update = request.mock.calls.find(([, init]) => init?.method === "PATCH");
   expect(JSON.parse(String(update?.[1]?.body))).toMatchObject({ default_branch: "main" });
+});
+
+test("only chord package mirrors are tagged with the chordpack topic", async () => {
+  const { env, request } = fixture("chords-example");
+  await syncMirrors(env, request);
+  const topics = request.mock.calls.find(([, init]) => init?.method === "PUT");
+  expect(new URL(String(topics?.[0])).pathname).toBe("/repos/KeyChord/chords-example/topics");
+  expect(JSON.parse(String(topics?.[1]?.body))).toEqual({ names: ["chordpack"] });
 });
 
 test("reruns discard mirror commits and moved tags without incorporating dirty source files", async () => {
@@ -144,8 +152,8 @@ test.each([401, 403, 500])(
   "API errors fail without attempting repository creation (%s)",
   async (status) => {
     const { remote, env } = fixture();
-    const request = vi.fn<typeof fetch>(async () => new Response("{}", { status }));
-    const log = vi.spyOn(console, "error").mockImplementation(() => {});
+    const request = mock<typeof fetch>(async () => new Response("{}", { status }));
+    const log = spyOn(console, "error").mockImplementation(() => {});
     onTestFinished(() => log.mockRestore());
     await expect(syncMirrors(env, request)).rejects.toThrow("Failed to sync mirrors: new-package");
     expect(request).toHaveBeenCalledTimes(1);

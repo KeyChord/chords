@@ -1,6 +1,11 @@
 {
   "name": "@keychord/chords-menu",
+  "displayName": "Menu Chords",
   "version": "0.0.2",
+  "description": "Chords for app menus, menu bar extras, Control Center and menu bar visibility, in whichever app is focused.",
+  "categories": [
+    "macOS"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/KeyChord/chords-menu"

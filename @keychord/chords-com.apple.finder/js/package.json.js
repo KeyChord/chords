@@ -1,0 +1,274 @@
+//#region package.json
+var name = "@keychord/chords-com.apple.finder";
+var displayName = "Finder Chords";
+var version = "0.0.0";
+var description = "Chords for Finder and file open and save dialogs.";
+var categories = ["macOS"];
+var repository = {
+  type: "git",
+  url: "https://github.com/KeyChord/chords-com.apple.finder",
+};
+var type = "module";
+var scripts = { test: "bun test --isolate" };
+var devDependencies = {
+  "@keychord/chordtest": "workspace:*",
+  "@keychord/config": "catalog:",
+};
+var packageManager = "pnpm@12.11.2";
+var chords = {
+  com: {
+    apple: {
+      finder: {
+        "macos.toml": {
+          name: "Finder",
+          chords: {
+            "?g": { name: "Goto" },
+            gr: {
+              name: "Goto Recents",
+              shortcut: "cmd+shift+f",
+            },
+            gd: {
+              name: "Goto Downloads",
+              shortcut: "cmd+opt+l",
+            },
+            gdo: {
+              name: "Goto Documents",
+              shortcut: "cmd+shift+o",
+            },
+            gde: {
+              name: "Goto Desktop",
+              shortcut: "cmd+shift+d",
+            },
+            gh: {
+              name: "Goto Home",
+              shortcut: "cmd+shift+h",
+            },
+            gc: {
+              name: "Goto Computer",
+              shortcut: "cmd+shift+c",
+            },
+            gad: {
+              name: "Goto AirDrop",
+              shortcut: "cmd+shift+r",
+            },
+            gn: {
+              name: "Goto Network",
+              shortcut: "cmd+shift+k",
+            },
+            gid: {
+              name: "Goto iCloud Drive",
+              shortcut: "cmd+shift+i",
+            },
+            gs: {
+              name: "Goto Shared",
+              shortcut: "cmd+shift+s",
+            },
+            ga: {
+              name: "Goto Applications",
+              shortcut: "cmd+shift+a",
+            },
+            gu: {
+              name: "Goto Utilities",
+              shortcut: "cmd+shift+u",
+            },
+            gf: {
+              name: "Goto Folder",
+              shortcut: "cmd+shift+g",
+            },
+            gt: {
+              name: "Goto Trash",
+              shell: '  osascript -e \'tell application "Finder"\n    open trash\n  end tell\n',
+            },
+            "?d": { name: "Directory" },
+            du: {
+              name: "Directory: Up",
+              shortcut: "cmd+up",
+            },
+            duw: {
+              name: "Directory: Up Window",
+              shortcut: "ctrl+cmd+up",
+            },
+            "?f": { name: "File" },
+            fa: { name: "File: Alias" },
+            fe: {
+              name: "File: Eject",
+              shortcut: "cmd+e",
+            },
+            fc: { name: "File: Compress" },
+            fr: { name: "File: Rename" },
+            ft: {
+              name: "File: Trash",
+              shortcut: "cmd+delete",
+            },
+            fd: {
+              name: "File: Duplicate",
+              shortcut: "cmd+d",
+            },
+            fq: {
+              name: "File: Quick Look",
+              shortcut: "cmd+y",
+            },
+            fo: {
+              name: "File: Open",
+              shortcut: "cmd+down",
+            },
+            "?a": { name: "as" },
+            ai: {
+              name: "as Icons",
+              shortcut: "cmd+1",
+            },
+            al: {
+              name: "as List",
+              shortcut: "cmd+2",
+            },
+            ac: {
+              name: "as Columns",
+              shortcut: "cmd+3",
+            },
+            ag: {
+              name: "as Gallery",
+              shortcut: "cmd+4",
+            },
+            "?s": { name: "Sort" },
+            sn: {
+              name: "Sort: Name",
+              shortcut: "cmd+opt+ctrl+1",
+            },
+            sk: {
+              name: "Sort: Kind",
+              shortcut: "cmd+opt+ctrl+2",
+            },
+            so: {
+              name: "Sort: Opened Date",
+              shortcut: "cmd+opt+ctrl+3",
+            },
+            sa: {
+              name: "Sort: Added Date",
+              shortcut: "cmd+opt+ctrl+4",
+            },
+            sm: {
+              name: "Sort: Modified Date",
+              shortcut: "cmd+opt+ctrl+5",
+            },
+            sc: {
+              name: "Sort: Created Date",
+              shortcut: "cmd+opt+ctrl+6",
+            },
+            ss: {
+              name: "Sort: Size",
+              shortcut: "cmd+opt+ctrl+7",
+            },
+            st: {
+              name: "Sort: Tags",
+              shortcut: "cmd+opt+ctrl+8",
+            },
+            "?c": { name: "Clean" },
+            cn: {
+              name: "Clean: Name",
+              shortcut: "cmd+opt+1",
+            },
+            ck: {
+              name: "Clean: Kind",
+              shortcut: "cmd+opt+2",
+            },
+            cm: {
+              name: "Clean: Modified Date",
+              shortcut: "cmd+opt+5",
+            },
+            cc: { name: "Clean: Created Date" },
+            cs: {
+              name: "Clean: Size",
+              shortcut: "cmd+opt+6",
+            },
+            ct: {
+              name: "Clean: Tags",
+              shortcut: "cmd+opt+7",
+            },
+            "?t": { name: "Toggle" },
+            ta: {
+              name: "Tabs: All",
+              shortcut: "cmd+shift+backslash",
+            },
+            tg: {
+              name: "Toggle: Groups",
+              shortcut: "cmd+ctrl+0",
+            },
+            tt: {
+              name: "Toggle: Tabs",
+              shortcut: "cmd+shift+t",
+            },
+            th: {
+              name: "Toggle: Hidden",
+              shortcut: "cmd+shift+.",
+            },
+            ts: {
+              name: "Toggle Sidebar",
+              shortcut: "cmd+ctrl+s",
+            },
+            tp: {
+              name: "Toggle Preview",
+              shortcut: "cmd+shift+p",
+            },
+            tb: {
+              name: "Toggle Status Bar",
+              shortcut: "cmd+/",
+            },
+            to: {
+              name: "Toggle Toolbar",
+              shortcut: "cmd+opt+t",
+            },
+            "t/": {
+              name: "Toggle Path Bar",
+              shortcut: "cmd+opt+p",
+            },
+            te: {
+              name: "Trash: Empty",
+              shortcut: "shift+cmd+delete",
+            },
+            tef: {
+              name: "Trash: Empty Force",
+              shortcut: "opt+shift+cmd+delete",
+            },
+          },
+        },
+      },
+    },
+  },
+  "macos.toml": {
+    name: "Finder",
+    chords: {
+      "/f": {
+        name: "Finder",
+        shell: "open -a Finder",
+      },
+    },
+  },
+};
+var package_default = {
+  name,
+  displayName,
+  version,
+  description,
+  categories,
+  repository,
+  type,
+  scripts,
+  devDependencies,
+  packageManager,
+  chords,
+};
+//#endregion
+export {
+  categories,
+  chords,
+  package_default as default,
+  description,
+  devDependencies,
+  displayName,
+  name,
+  packageManager,
+  repository,
+  scripts,
+  type,
+  version,
+};

@@ -1,0 +1,208 @@
+//#region package.json
+var name = "@keychord/chords-com.apple.systempreferences";
+var displayName = "System Preferences Chords";
+var version = "0.0.0";
+var description = "Chords for System Preferences (com.apple.systempreferences).";
+var categories = ["macOS"];
+var repository = {
+  type: "git",
+  url: "https://github.com/KeyChord/chords-com.apple.systempreferences",
+};
+var type = "module";
+var scripts = { test: "bun test --isolate" };
+var devDependencies = {
+  "@keychord/chordtest": "workspace:*",
+  "@keychord/config": "catalog:",
+  "@keychord/tsconfig": "catalog:",
+  "@types/bun": "latest",
+};
+var packageManager = "pnpm@12.11.2";
+var chords = {
+  com: {
+    apple: {
+      systempreferences: {
+        "macos.toml": {
+          name: "System Preferences",
+          on: { appearance: { file: "systempreferences.js" } },
+          chords: {
+            "?g": { name: "Goto" },
+            gaa: {
+              name: "Goto: Apple Account",
+              shell: "open 'x-apple.systempreferences:com.apple.systempreferences.AppleIDSettings'",
+            },
+            gwi: {
+              name: "Goto: Wi-fi",
+              shell: "open 'x-apple.systempreferences:com.apple.wifi-settings-extension'",
+            },
+            gbl: {
+              name: "Goto: Bluetooth",
+              shell: "open 'x-apple.systempreferences:com.apple.BluetoothSettings'",
+            },
+            gne: {
+              name: "Goto: Network",
+              shell: "open 'x-apple.systempreferences:com.apple.Network-Settings.extension'",
+            },
+            gvp: {
+              name: "Goto: VPN",
+              shell:
+                "open 'x-apple.systempreferences:com.apple.NetworkExtensionSettingsUI.NESettingsUIExtension'",
+            },
+            gba: {
+              name: "Goto: Battery",
+              shell: "open 'x-apple.systempreferences:com.apple.Battery-Settings.extension'",
+            },
+            gge: {
+              name: "Goto: General",
+              shell: "open 'x-apple.systempreferences:com.apple.systempreferences.GeneralSettings'",
+            },
+            gac: {
+              name: "Goto: Accessibility",
+              shell: "open 'x-apple.systempreferences:com.apple.Accessibility-Settings.extension'",
+            },
+            gap: {
+              name: "Goto: Appearance",
+              shell: "open 'x-apple.systempreferences:com.apple.Appearance-Settings.extension'",
+            },
+            gai: {
+              name: "Goto: Apple Intelligence",
+              shell: "open 'x-apple.systempreferences:com.apple.Siri-Settings.extension'",
+            },
+            gdd: {
+              name: "Goto: Desktop & Dock",
+              shell: "open 'x-apple.systempreferences:com.apple.Desktop-Settings.extension'",
+            },
+            gdi: {
+              name: "Goto: Displays",
+              shell: "open 'x-apple.systempreferences:com.apple.Displays-Settings.extension'",
+            },
+            gmb: {
+              name: "Goto: Menu Bar",
+              shell: "open 'x-apple.systempreferences:com.apple.ControlCenter-Settings.extension'",
+            },
+            gsp: {
+              name: "Goto: Spotlight",
+              shell: "open 'x-apple.systempreferences:com.apple.Spotlight-Settings.extension'",
+            },
+            gwa: {
+              name: "Goto: Wallpaper",
+              shell: "open 'x-apple.systempreferences:com.apple.Wallpaper-Settings.extension'",
+            },
+            gno: {
+              name: "Goto: Notifications",
+              shell: "open 'x-apple.systempreferences:com.apple.Notifications-Settings.extension'",
+            },
+            gso: {
+              name: "Goto: Sound",
+              shell: "open 'x-apple.systempreferences:com.apple.Sound-Settings.extension'",
+            },
+            gfo: {
+              name: "Goto: Focus",
+              shell: "open 'x-apple.systempreferences:com.apple.Focus-Settings.extension'",
+            },
+            gst: {
+              name: "Goto: Screen Time",
+              shell: "open 'x-apple.systempreferences:com.apple.Screen-Time-Settings.extension'",
+            },
+            gls: {
+              name: "Goto: Lock Screen",
+              shell: "open 'x-apple.systempreferences:com.apple.Lock-Screen-Settings.extension'",
+            },
+            gps: {
+              name: "Goto: Privacy & Security",
+              shell:
+                "open 'x-apple.systempreferences:com.apple.settings.PrivacySecurity.extension'",
+            },
+            gtp: {
+              name: "Goto: Touch ID & Password",
+              shell: "open 'x-apple.systempreferences:com.apple.Touch-ID-Settings.extension'",
+            },
+            gup: {
+              name: "Goto: Users & Groups",
+              shell: "open 'x-apple.systempreferences:com.apple.Users-Groups-Settings.extension'",
+            },
+            gia: {
+              name: "Goto: Internet Accounts",
+              shell:
+                "open 'x-apple.systempreferences:com.apple.Internet-Accounts-Settings.extension'",
+            },
+            ggc: {
+              name: "Goto: Game Center",
+              shell: "open 'x-apple.systempreferences:com.apple.Game-Center-Settings.extension'",
+            },
+            gic: {
+              name: "Goto: iCloud",
+              shell:
+                "open 'x-apple.systempreferences:com.apple.systempreferences.AppleIDSettings:icloud'",
+            },
+            gwp: {
+              name: "Goto: Wallet & (Apple) Pay",
+              shell: "open 'x-apple.systempreferences:com.apple.WalletSettingsExtension'",
+            },
+            gke: {
+              name: "Goto: Keyboard",
+              shell: "open 'x-apple.systempreferences:com.apple.Keyboard-Settings.extension'",
+            },
+            gtr: {
+              name: "Goto: Trackpad",
+              shell: "open 'x-apple.systempreferences:com.apple.Trackpad-Settings.extension'",
+            },
+            gpr: {
+              name: "Goto: Printers",
+              shell: "open 'x-apple.systempreferences:com.apple.Print-Scan-Settings.extension'",
+            },
+            "?ap": { name: "Appearance" },
+            apa: {
+              name: "Appearance: Auto",
+              "@input:appearance": ["AUTO"],
+            },
+            apd: {
+              name: "Appearance: Dark",
+              "@input:appearance": ["DARK"],
+            },
+            apl: {
+              name: "Appearance: Light",
+              "@input:appearance": ["LIGHT"],
+            },
+          },
+        },
+      },
+    },
+  },
+  "macos.toml": {
+    name: "System Preferences",
+    chords: {
+      "/,": {
+        name: "System Preferences",
+        shell: "open -b com.apple.systempreferences",
+      },
+    },
+  },
+};
+var package_default = {
+  name,
+  displayName,
+  version,
+  description,
+  categories,
+  repository,
+  type,
+  scripts,
+  devDependencies,
+  packageManager,
+  chords,
+};
+//#endregion
+export {
+  categories,
+  chords,
+  package_default as default,
+  description,
+  devDependencies,
+  displayName,
+  name,
+  packageManager,
+  repository,
+  scripts,
+  type,
+  version,
+};

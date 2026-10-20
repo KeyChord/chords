@@ -1,0 +1,30 @@
+{
+  "name": "@keychord/chords-com.apple.Safari",
+  "displayName": "Safari Chords",
+  "version": "0.0.0",
+  "description": "Chords for Safari (com.apple.Safari).",
+  "categories": [
+    "macOS"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KeyChord/chords-com.apple.Safari"
+  },
+  "type": "module",
+  "exports": {
+    "./safari": "./js/safari.js"
+  },
+  "scripts": {
+    "test": "bun test --isolate"
+  },
+  "dependencies": {
+    "@keychord/chords-menu": "workspace:*"
+  },
+  "devDependencies": {
+    "@keychord/chordtest": "workspace:*",
+    "@keychord/config": "catalog:",
+    "@keychord/tsconfig": "catalog:",
+    "@types/bun": "latest"
+  },
+  "packageManager": "pnpm@12.11.2"
+}

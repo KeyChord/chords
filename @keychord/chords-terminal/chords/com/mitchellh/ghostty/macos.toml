@@ -1,0 +1,4 @@
+name = 'Ghostty'
+
+[[import]]
+file = 'base.toml'

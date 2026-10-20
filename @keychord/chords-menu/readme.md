@@ -5,8 +5,7 @@
 
 One package for macOS application menus, menu-bar extras, Control Center, and menu-bar
 visibility. Its chords work in whichever app is focused. [Chord](https://github.com/KeyChord/Chord)
-installs this package by default as part of its default chordpack, from its pinned
-`KeyChord/chords-menu` repository. To use the monorepo's current version documented here
+installs this package by default, from its pinned `KeyChord/chords-menu` repository. To use the monorepo's current version documented here
 instead, open Settings → Chords → **Chord Monorepos** → **Add Monorepo**, enter
 `KeyChord/chords`, tick `@keychord/chords-menu` under **Packages to use**, and remove the
 `KeyChord/chords-menu` entry under **Chord Repos**.

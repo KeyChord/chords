@@ -1,6 +1,11 @@
 {
   "name": "@keychord/chords-chromium",
+  "displayName": "Chromium Chords",
   "version": "0.0.0",
+  "description": "Chords for Google Chrome and other Chromium-based browsers, including Brave, Edge, Opera and Vivaldi.",
+  "categories": [
+    "Browsers"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/KeyChord/chords-chromium"

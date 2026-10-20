@@ -1,6 +1,11 @@
 {
   "name": "@keychord/chords-vscode",
+  "displayName": "VSCode Chords",
   "version": "0.0.0",
+  "description": "Chords for VSCode and its forks, including Cursor.",
+  "categories": [
+    "Editors"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/KeyChord/chords-vscode"

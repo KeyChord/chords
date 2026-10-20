@@ -1,0 +1,18 @@
+$schema: "https://moonrepo.dev/schemas/project.json"
+
+layer: library
+language: typescript
+
+tasks:
+  build-native:
+    deps:
+      - "chords-menu:build-native"
+    command: "vp pack"
+    inputs:
+      - "Sources/**/*"
+      - "src/swift/**/*"
+      - "Package.swift"
+      - "package.json"
+      - "vite.config.ts"
+    outputs:
+      - "target"

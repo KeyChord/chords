@@ -1,5 +1,10 @@
 {
   "name": "@keychord/chords-spotify",
+  "displayName": "Spotify Chords",
+  "description": "Chords for the Spotify desktop app.",
+  "categories": [
+    "Media"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/KeyChord/chords-spotify"

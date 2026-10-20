@@ -1,5 +1,10 @@
 {
   "name": "@keychord/chords-chord",
+  "displayName": "Chord Controls",
+  "description": "Chord's own controls in the 0 namespace, always loaded by Chord.",
+  "categories": [
+    "Chord"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/KeyChord/chords-chord"

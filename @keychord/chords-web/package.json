@@ -1,5 +1,10 @@
 {
   "name": "@keychord/chords-web",
+  "displayName": "Web Chords",
+  "description": "Global chords for the active tab in Chrome, Brave, Edge or Arc, such as scrolling.",
+  "categories": [
+    "Browsers"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/KeyChord/chords-web"

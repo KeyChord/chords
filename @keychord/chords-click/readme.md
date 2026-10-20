@@ -98,7 +98,7 @@ moves, resizes, disappears, or a click fails. No additional native addon is need
 
 Other chord packages can reuse `click.js`, optionally passing a bundle ID to the
 builder to target a specific app. The iPhone Mirroring handler in
-[`chords-com.apple`](https://github.com/KeyChord/chords/tree/main/@keychord/chords-com.apple)
+[`chords-com.apple.ScreenContinuity`](https://github.com/KeyChord/chords/tree/main/@keychord/chords-com.apple.ScreenContinuity)
 shares the parser and click routine while retaining its connection checks.
 
 Run `vp run test:macos -- @keychord/chords-click` from the workspace root after

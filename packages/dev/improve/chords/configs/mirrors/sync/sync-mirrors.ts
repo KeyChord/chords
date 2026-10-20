@@ -109,6 +109,11 @@ export async function syncMirrors(
         git("git", ["push", "--force", url, "refs/heads/main:refs/heads/main", ...tagRefs]);
         // An empty repository cannot select main as its default until after the push.
         await api(repo, "PATCH", { ...settings, default_branch: "main" });
+        // Chord's Browse page links to a GitHub search for this topic. Like the settings
+        // above, the mirror's topics are managed here and replaced on every sync.
+        if (name.startsWith("chords-")) {
+          await api(`${repo}/topics`, "PUT", { names: ["chordpack"] });
+        }
       }
       console.log(`Completed ${name}: ${git("git", ["rev-parse", "HEAD"]).stdout}`);
     } catch (error) {

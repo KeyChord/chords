@@ -5,11 +5,13 @@ $schema: "https://moonrepo.dev/schemas/workspace.json"
 projects:
   chords-menu: "@keychord/chords-menu"
   chords-web: "@keychord/chords-web"
-  chords-com.apple: "@keychord/chords-com.apple"
+  chords-com.apple.Safari: "@keychord/chords-com.apple.Safari"
+  chords-com.apple.ScreenContinuity: "@keychord/chords-com.apple.ScreenContinuity"
   chords-dock: "@keychord/chords-dock"
   chords-windows: "@keychord/chords-windows"
   chords-monitors: "@keychord/chords-monitors"
   chords-navigation: "@keychord/chords-navigation"
+  chords-livesplit: "@keychord/chords-livesplit"
 
 vcs:
   defaultBranch: main

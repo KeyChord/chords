@@ -1,0 +1,4 @@
+name = 'WezTerm'
+
+[[import]]
+file = 'base.toml'

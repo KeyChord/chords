@@ -13,9 +13,18 @@ These packages run in [Chord](https://github.com/KeyChord/Chord). Download
 (Apple Silicon only), grant Accessibility access on first launch, then press
 Caps Lock + Space (the activation shortcut) to start a chord.
 
-On first launch Chord installs its default chordpack, which includes
-`@keychord/chords-chord`, `@keychord/chords-menu` and `@keychord/chords-com.apple`
-at pinned revisions.
+On first launch Chord installs a few default packages at pinned revisions, including
+`@keychord/chords-chord`, `@keychord/chords-menu` and `@keychord/chords-com.apple`.
+
+In the current monorepo, Apple app bindings live in packages named after their
+exact bundle IDs: `chords-com.apple.AccessibilityInspector`,
+`chords-com.apple.ActivityMonitor`, `chords-com.apple.Safari`,
+`chords-com.apple.ScreenContinuity`, `chords-com.apple.systempreferences`, and
+`chords-com.apple.finder` (formerly `chords-finder`). Terminal's chords live in
+`chords-terminal`, alongside other basic terminals; Warp has its own `chords-warp`.
+`chords-com.apple` retains the empty app stubs. Enable the individual app packages
+when using the current monorepo; Chord's pinned default packages still contain the
+combined package.
 
 To install any other package from this repo:
 
@@ -24,8 +33,8 @@ To install any other package from this repo:
    you tick one.
 
 Use **Sync Latest** on the monorepo to update it later. Settings → Browse also
-offers one-click **Add Repo** for a few curated packages (`chords-chromium`,
-`chords-vscode`, `chords-jetbrains`, `chords-terminal`, `chords-aerospace`). Those
+offers one-click **Install** for a few curated packages (`chords-chromium`,
+`chords-vscode`, `chords-jetbrains`, `chords-terminal`, `chords-warp`, `chords-aerospace`). Those
 install the package's [mirror repository](#repository-mirrors), which can lag behind
 this monorepo, so add the monorepo instead when you want the current version.
 
@@ -37,7 +46,7 @@ remove them under **Chord Repos** if you want the monorepo's versions of those t
 packages.
 
 To change one of the default chords (for example `/b`, which opens Safari from
-`@keychord/chords-com.apple`), override the package that defines it with a local
+`@keychord/chords-com.apple.Safari` in the current monorepo), override the package that defines it with a local
 copy, using **Link Local Folder** on its repo, and edit the chord there. Binding the
 same sequence in a different package isn't a reliable override: when two packages
 define the same chord, Chord doesn't consistently pick the same one.

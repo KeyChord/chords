@@ -1,0 +1,4 @@
+name = 'System Preferences'
+
+[chords]
+'/,' = { name = 'System Preferences', shell = 'open -b com.apple.systempreferences' }

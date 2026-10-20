@@ -1,5 +1,10 @@
 {
   "name": "@keychord/chords-instagram",
+  "displayName": "Instagram Chords",
+  "description": "Chords for Instagram installed as a web app from Brave.",
+  "categories": [
+    "Social"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/KeyChord/chords-instagram"

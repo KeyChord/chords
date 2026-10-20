@@ -1,5 +1,8 @@
 //#region package.json
 var name = "@keychord/chords-dock";
+var displayName = "Dock Chords";
+var description = "Move keyboard focus to the macOS Dock and between its apps.";
+var categories = ["macOS"];
 var repository = {
 	"type": "git",
 	"url": "https://github.com/KeyChord/chords-dock"
@@ -396,6 +399,9 @@ var chords = {
 };
 var package_default = {
 	name,
+	displayName,
+	description,
+	categories,
 	repository,
 	type,
 	scripts,
@@ -404,4 +410,4 @@ var package_default = {
 	chords
 };
 //#endregion
-export { chords, package_default as default, devDependencies, name, packageManager, repository, scripts, type };
+export { categories, chords, package_default as default, description, devDependencies, displayName, name, packageManager, repository, scripts, type };

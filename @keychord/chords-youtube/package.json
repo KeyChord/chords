@@ -1,5 +1,10 @@
 {
   "name": "@keychord/chords-youtube",
+  "displayName": "YouTube Chords",
+  "description": "Chords for YouTube installed as a web app from Brave.",
+  "categories": [
+    "Media"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/KeyChord/chords-youtube"
