@@ -26,10 +26,14 @@ name = 'Finder'
 'duw' = { name = 'Directory: Up Window', shortcut = 'ctrl+cmd+up' }
 
 '?f' = { name = 'File' }
-'fa' = { name = 'File: Alias' }
+'fa' = { name = 'File: Alias', shortcut = 'ctrl+cmd+a' }
 'fe' = { name = 'File: Eject', shortcut = 'cmd+e' }
-'fc' = { name = 'File: Compress' }
-'fr' = { name = 'File: Rename' }
+'fc' = { name = 'File: Compress', shell = '''
+  osascript -e 'tell application "System Events" to tell process "Finder" to click (first menu item of menu 1 of menu bar item "File" of menu bar 1 whose name starts with "Compress" and name does not contain "password")'
+''' }
+'fr' = { name = 'File: Rename', shell = '''
+  osascript -e 'tell application "System Events" to tell process "Finder" to click (first menu item of menu 1 of menu bar item "File" of menu bar 1 whose name starts with "Rename")'
+''' }
 'ft' = { name = 'File: Trash', shortcut = 'cmd+delete' }
 'fd' = { name = 'File: Duplicate', shortcut = 'cmd+d' }
 'fq' = { name = 'File: Quick Look', shortcut = 'cmd+y' }
@@ -55,7 +59,9 @@ name = 'Finder'
 'cn' = { name = 'Clean: Name', shortcut = 'cmd+opt+1' }
 'ck' = { name = 'Clean: Kind', shortcut = 'cmd+opt+2' }
 'cm' = { name = 'Clean: Modified Date', shortcut = 'cmd+opt+5' }
-'cc' = { name = 'Clean: Created Date' }
+'cc' = { name = 'Clean: Created Date', shell = '''
+  osascript -e 'tell application "System Events" to tell process "Finder" to click (menu item "Date Created" of menu 1 of menu item "Clean Up By" of menu 1 of menu bar item "View" of menu bar 1)'
+''' }
 'cs' = { name = 'Clean: Size', shortcut = 'cmd+opt+6' }
 'ct' = { name = 'Clean: Tags', shortcut = 'cmd+opt+7' }
 

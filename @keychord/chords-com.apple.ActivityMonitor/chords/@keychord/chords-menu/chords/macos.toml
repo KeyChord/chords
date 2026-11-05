@@ -112,8 +112,8 @@ file = 'visibility.js'
 '=wiv' = { name = 'Tray Wi-Fi: Vary On/Off', '@input:tray' = ['WIFI', 'TOGGLE'] }
 
 '=q' = { name = 'Force Quit', shortcut = 'opt+cmd+esc' }
-'=ls' = { name = 'Lock Screen', shortcut = 'opt+cmd+esc' }
-'=lo' = { name = 'Log Out', shortcut = 'ctrl+cmd+q' }
+'=ls' = { name = 'Lock Screen', shortcut = 'ctrl+cmd+q' }
+'=lo' = { name = 'Log Out', shortcut = 'shift+cmd+q' }
 '=lq' = { name = 'Log Quit', shortcut = 'opt+shift+cmd+q' }
 
 '?=b' = { name = 'Brightness' }

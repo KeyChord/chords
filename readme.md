@@ -9,9 +9,10 @@ live in `packages/`.
 ## Installing packages
 
 These packages run in [Chord](https://github.com/KeyChord/Chord). Download
-`Chord-aarch64.dmg` from the [latest release](https://github.com/KeyChord/Chord/releases/latest)
-(Apple Silicon only), grant Accessibility access on first launch, then press
-Caps Lock + Space (the activation shortcut) to start a chord.
+`Chord-aarch64.dmg` (Apple silicon) or `Chord-x86_64.dmg` (Intel) from the
+[latest release](https://github.com/KeyChord/Chord/releases/latest), grant Accessibility
+access on first launch, then press Caps Lock + Space (the activation shortcut) to start a
+chord. Packages with native add-ons are built for Apple silicon only so far.
 
 On first launch Chord installs a few default packages at pinned revisions, including
 `@keychord/chords-chord`, `@keychord/chords-menu` and `@keychord/chords-com.apple`.
