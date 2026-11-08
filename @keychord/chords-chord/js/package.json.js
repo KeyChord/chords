@@ -1,5 +1,8 @@
 //#region package.json
 var name = "@keychord/chords-chord";
+var displayName = "Chord Controls";
+var description = "Chord's own controls in the 0 namespace, always loaded by Chord.";
+var categories = ["Chord"];
 var repository = {
   type: "git",
   url: "https://github.com/KeyChord/chords-chord",
@@ -18,6 +21,7 @@ var chords = {
           name: "Chords",
           chords: {
             '?"1-9"': { name: "Repeat count" },
+            "?/": { name: "Launch" },
             "?0": { name: "Chord" },
             "0,": {
               name: "Chord: Settings",
@@ -96,6 +100,9 @@ var chords = {
 };
 var package_default = {
   name,
+  displayName,
+  description,
+  categories,
   repository,
   type,
   devDependencies,
@@ -104,9 +111,12 @@ var package_default = {
 };
 //#endregion
 export {
+  categories,
   chords,
   package_default as default,
+  description,
   devDependencies,
+  displayName,
   name,
   packageManager,
   repository,

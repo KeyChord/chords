@@ -165,8 +165,8 @@ settings:
 catalogs:
   default:
     '@keychord/config':
-      specifier: ^0.0.11
-      version: 0.0.11
+      specifier: ^0.0.12
+      version: 0.0.12
     '@keychord/tsconfig':
       specifier: ^0.0.6
       version: 0.0.6
@@ -207,7 +207,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.11
+        version: 0.0.12
 
   '@keychord/chords-betterdisplay':
     dependencies:
@@ -226,7 +226,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.11
+        version: 0.0.12
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -244,7 +244,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.11
+        version: 0.0.12
 
   '@keychord/chords-chromium':
     dependencies:
@@ -269,7 +269,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.11
+        version: 0.0.12
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -290,7 +290,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.11
+        version: 0.0.12
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -305,7 +305,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.11
+        version: 0.0.12
 
   '@keychord/chords-com.apple.AccessibilityInspector':
     devDependencies:
@@ -314,7 +314,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.11
+        version: 0.0.12
 
   '@keychord/chords-com.apple.ActivityMonitor':
     dependencies:
@@ -327,7 +327,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.11
+        version: 0.0.12
 
   '@keychord/chords-com.apple.Safari':
     dependencies:
@@ -340,7 +340,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.11
+        version: 0.0.12
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -362,7 +362,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.11
+        version: 0.0.12
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -377,7 +377,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.11
+        version: 0.0.12
 
   '@keychord/chords-com.apple.systempreferences':
     devDependencies:
@@ -386,7 +386,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.11
+        version: 0.0.12
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -404,7 +404,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.11
+        version: 0.0.12
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -419,7 +419,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.11
+        version: 0.0.12
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -447,7 +447,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.11
+        version: 0.0.12
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -462,7 +462,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.11
+        version: 0.0.12
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -480,7 +480,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.11
+        version: 0.0.12
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -495,7 +495,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.11
+        version: 0.0.12
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -510,7 +510,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.11
+        version: 0.0.12
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -528,7 +528,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.11
+        version: 0.0.12
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -556,7 +556,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.11
+        version: 0.0.12
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -577,7 +577,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.11
+        version: 0.0.12
       '@types/bun':
         specifier: ^1.4.3
         version: 1.4.3
@@ -592,7 +592,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.11
+        version: 0.0.12
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -610,7 +610,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.11
+        version: 0.0.12
 
   '@keychord/chords-vscode':
     dependencies:
@@ -623,7 +623,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.11
+        version: 0.0.12
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -648,7 +648,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.11
+        version: 0.0.12
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -670,7 +670,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.11
+        version: 0.0.12
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -685,7 +685,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.11
+        version: 0.0.12
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -700,7 +700,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.11
+        version: 0.0.12
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -715,7 +715,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.11
+        version: 0.0.12
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -1012,8 +1012,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
-  '@keychord/config@0.0.11':
-    resolution: {integrity: sha512-LLkodasV0ANIWQ4y4u3PzNns+ycQ9VPLs7EjB5ej+yVgpJulyQ6uzRTtYbYRieiKo4IXrdqQI49pIuSgWhAVJA==}
+  '@keychord/config@0.0.12':
+    resolution: {integrity: sha512-UINsdlO2NWTrrYR3SXScrrNnE6TSIvf4UY1YGLCZ8x+u/Pg6ZYSyizCgDcGeSUSCOe+MblkavxVgMFJikEFm5A==}
     hasBin: true
 
   '@keychord/tsconfig@0.0.6':
@@ -2522,7 +2522,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.6.0
 
-  '@keychord/config@0.0.11':
+  '@keychord/config@0.0.12':
     dependencies:
       node-swift: 1.5.1
       smol-toml: 1.9.1

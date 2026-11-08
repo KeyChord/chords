@@ -34,8 +34,7 @@ To install any other package from this repo:
    you tick one.
 
 Use **Sync Latest** on the monorepo to update it later. Settings → Browse also
-offers one-click **Install** for a few curated packages (`chords-chromium`,
-`chords-vscode`, `chords-jetbrains`, `chords-terminal`, `chords-warp`, `chords-aerospace`). Those
+offers one-click **Install** for every package here that Chord doesn't install by default. Those
 install the package's [mirror repository](#repository-mirrors), which can lag behind
 this monorepo, so add the monorepo instead when you want the current version.
 
@@ -61,7 +60,7 @@ You can use these Chord Packages as templates for creating your own chords. See 
 In the default chord package, these are the categories assigned to the global chords (which must start with a non-alphanumeric character). If you want to define your own custom global chord which doesn't fit into any of the following categories, you should prefer the `,` prefix.
 
 `,` User-Defined Global Chords\
-`/` Global General-Purpose/Custom Commands\
+`/` Launch\
 `=` Menu / Tray / System Shortcuts\
 `.` Mouse / Keyboard (e.g. modifiers)\
 `;` Web\
