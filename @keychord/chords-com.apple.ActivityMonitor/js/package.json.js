@@ -136,11 +136,11 @@ var chords = {
             },
             "=ls": {
               name: "Lock Screen",
-              shortcut: "opt+cmd+esc",
+              shortcut: "ctrl+cmd+q",
             },
             "=lo": {
               name: "Log Out",
-              shortcut: "ctrl+cmd+q",
+              shortcut: "shift+cmd+q",
             },
             "=lq": {
               name: "Log Quit",
@@ -472,12 +472,7 @@ var chords = {
   },
   "macos.toml": {
     name: "Activity Monitor",
-    chords: {
-      "/am": {
-        name: "Activity Monitor",
-        shell: "open -a 'Activity Monitor'",
-      },
-    },
+    chords: {},
   },
 };
 var package_default = {

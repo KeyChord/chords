@@ -1,10 +1,14 @@
 //#region package.json
 var name = "@keychord/chords-aerospace";
+var displayName = "AeroSpace Chords";
+var description = "Global chords that run commands for the AeroSpace tiling window manager.";
+var categories = ["Window Management"];
 var repository = {
 	"type": "git",
 	"url": "https://github.com/KeyChord/chords-aerospace"
 };
 var type = "module";
+var scripts = { "test": "bun test --isolate" };
 var devDependencies = {
 	"@keychord/chordtest": "workspace:*",
 	"@keychord/config": "catalog:"
@@ -13,730 +17,354 @@ var packageManager = "pnpm@12.11.2";
 var chords = { "macos.toml": {
 	"name": "AeroSpace",
 	"meta": { "$wrap": false },
+	"placeholders": { "p": {
+		"name": "Window management prefix",
+		"default": ";"
+	} },
 	"chords": {
-		".q": {
+		"<p>q": {
 			"name": "Quit Window",
 			"shell": "aerospace close"
 		},
-		".qa": {
-			"name": "Quit All But Current",
-			"shell": "aerospace close-all-windows-but-current"
-		},
-		".v": {
-			"name": "Vary On/Off",
+		"<p>v": {
+			"name": "Vary: AeroSpace On/Off",
 			"shell": "aerospace enable toggle"
 		},
-		".wf": {
-			"name": "Workspace: Flatten",
-			"shell": "aerospace enable toggle"
-		},
-		".w": {
-			"name": "Focus: West",
+		"<p>w": {
+			"name": "West (Window)",
 			"shell": "aerospace focus left"
 		},
-		".e": {
-			"name": "Focus: East",
+		"<p>e": {
+			"name": "East (Window)",
 			"shell": "aerospace focus right"
 		},
-		".n": {
-			"name": "Focus: North",
+		"<p>n": {
+			"name": "North (Window)",
 			"shell": "aerospace focus up"
 		},
-		".s": {
-			"name": "Focus: South",
+		"<p>s": {
+			"name": "South (Window)",
 			"shell": "aerospace focus down"
 		},
-		".wi": {
-			"name": "Focus: West, Ignore floating",
-			"shell": "aerospace focus left"
+		"<p>]": {
+			"name": "Next (Window)",
+			"shell": "aerospace focus dfs-next"
 		},
-		".ei": {
-			"name": "Focus: East, Ignore floating",
-			"shell": "aerospace focus right"
+		"<p>[": {
+			"name": "Previous (Window)",
+			"shell": "aerospace focus dfs-prev"
 		},
-		".ni": {
-			"name": "Focus: North, Ignore floating",
-			"shell": "aerospace focus up"
-		},
-		".si": {
-			"name": "Focus: South, Ignore floating",
-			"shell": "aerospace focus down"
-		},
-		".l": {
-			"name": "Move: Left",
+		"<p>l": {
+			"name": "Left (Move Window)",
 			"shell": "aerospace move left"
 		},
-		".d": {
-			"name": "Move: Down",
-			"shell": "aerospace move down"
-		},
-		".u": {
-			"name": "Move: Up",
-			"shell": "aerospace move up"
-		},
-		".r": {
-			"name": "Move: Right",
+		"<p>r": {
+			"name": "Right (Move Window)",
 			"shell": "aerospace move right"
 		},
-		"?.c": { "name": "Cursor" },
-		".cd": {
-			"name": "Cursor: Display",
-			"aerospace": "aerospace move-mouse monitor-force-center"
+		"<p>u": {
+			"name": "Up (Move Window)",
+			"shell": "aerospace move up"
 		},
-		".cw": {
-			"name": "Cursor: Window",
-			"aerospace": "aerospace move-mouse window-force-center"
+		"<p>d": {
+			"name": "Down (Move Window)",
+			"shell": "aerospace move down"
 		},
-		".[": {
-			"name": "Focus Previous",
-			"shell": "aerospace focus-back-and-forth || aerospace workspace-back-and-forth"
-		},
-		"?.d": { "name": "Display" },
-		".dw": {
-			"name": "Display: West",
-			"shell": "aerospace focus-monitor --wrap-around left"
-		},
-		".de": {
-			"name": "Display: East",
-			"shell": "aerospace focus-monitor --wrap-around right"
-		},
-		".dn": {
-			"name": "Display: North",
-			"shell": "aerospace focus-monitor --wrap-around up"
-		},
-		".ds": {
-			"name": "Display: South",
-			"shell": "aerospace focus-monitor --wrap-around down"
-		},
-		".d[": {
-			"name": "Display: Prev",
-			"shell": "aerospace focus-monitor --wrap-around prev"
-		},
-		".d]": {
-			"name": "Display: Next",
-			"shell": "aerospace focus-monitor --wrap-around next"
-		},
-		".zf": {
-			"name": "Zoom: Fullscreen",
-			"shell": "aerospace fullscreen"
-		},
-		".zfn": {
-			"name": "Zoom: Fullscreen Native",
-			"shell": "aerospace macos-native-fullscreen"
-		},
-		".zm": {
-			"name": "Zoom: Minimize",
-			"shell": "aerospace macos-native-minimize"
-		},
-		".jl": {
+		"?<p>j": { "name": "Join" },
+		"<p>jl": {
 			"name": "Join: Left",
 			"shell": "aerospace join-with left"
 		},
-		".jr": {
+		"<p>jr": {
 			"name": "Join: Right",
 			"shell": "aerospace join-with right"
 		},
-		".ju": {
+		"<p>ju": {
 			"name": "Join: Up",
 			"shell": "aerospace join-with up"
 		},
-		".jd": {
+		"<p>jd": {
 			"name": "Join: Down",
 			"shell": "aerospace join-with down"
 		},
-		".lf": {
-			"name": "Layout: Floating",
-			"shell": "aerospace layout accordion"
+		"<p>jx": {
+			"name": "Join: Unjoin All (Flatten Workspace)",
+			"shell": "aerospace flatten-workspace-tree"
 		},
-		".lm": {
-			"name": "Layout: Managed",
-			"shell": "aerospace layout tiling"
+		"?<p>v": { "name": "Vary" },
+		"<p>vf": {
+			"name": "Vary: Floating",
+			"shell": "aerospace layout floating tiling"
 		},
-		".lt": {
-			"name": "Layout: Tiling",
-			"shell": "aerospace layout tiling"
+		"<p>vs": {
+			"name": "Vary: Stacked (Accordion)",
+			"shell": "aerospace layout accordion tiles"
 		},
-		".la": {
-			"name": "Layout: According",
-			"shell": "aerospace layout tiling"
+		"<p>vo": {
+			"name": "Vary: Orientation",
+			"shell": "aerospace layout horizontal vertical"
 		},
-		".lh": {
-			"name": "Layout: Horizontal",
-			"shell": "aerospace layout tiling"
+		"?<p>z": { "name": "Zoom" },
+		"<p>zf": {
+			"name": "Zoom: Fullscreen",
+			"shell": "aerospace fullscreen --no-outer-gaps"
 		},
-		".lht": {
-			"name": "Layout: Horizontal Tiles",
-			"shell": "aerospace layout tiling"
+		"<p>zg": {
+			"name": "Zoom: Fullscreen Within Gaps",
+			"shell": "aerospace fullscreen"
 		},
-		".lha": {
-			"name": "Layout: Horizontal Accordion",
-			"shell": "aerospace layout tiling"
+		"?<p>r": { "name": "Resize" },
+		"<p>r=": {
+			"name": "Resize: Increase",
+			"shell": "aerospace resize smart +50"
 		},
-		".lvt": {
-			"name": "Layout: Vertical Tiles",
-			"shell": "aerospace layout tiling"
+		"<p>r-": {
+			"name": "Resize: Decrease",
+			"shell": "aerospace resize smart -50"
 		},
-		".lva": {
-			"name": "Layout: Vertical Accordion",
-			"shell": "aerospace layout tiling"
+		"<p>rw=": {
+			"name": "Resize: Increase Width",
+			"shell": "aerospace resize width +50"
 		},
-		".dl": {
-			"name": "Display move: Left",
-			"shell": "aerospace move-node-to-monitor --wrap-around left"
+		"<p>rw-": {
+			"name": "Resize: Decrease Width",
+			"shell": "aerospace resize width -50"
 		},
-		".dr": {
-			"name": "Display move: Right",
-			"shell": "aerospace move-node-to-monitor --wrap-around right"
+		"<p>rh=": {
+			"name": "Resize: Increase Height",
+			"shell": "aerospace resize height +50"
 		},
-		".du": {
-			"name": "Display move: Up",
-			"shell": "aerospace move-node-to-monitor --wrap-around up"
+		"<p>rh-": {
+			"name": "Resize: Decrease Height",
+			"shell": "aerospace resize height -50"
 		},
-		".dd": {
-			"name": "Display move: Down",
-			"shell": "aerospace move-node-to-monitor --wrap-around down"
+		"<p>b": {
+			"name": "Balance Sizes",
+			"shell": "aerospace balance-sizes"
 		},
-		".dk": {
-			"name": "Display move: Back",
-			"shell": "aerospace move-node-to-monitor --wrap-around prev"
+		"?<p>l": { "name": "Left / Layout" },
+		"<p>lt": {
+			"name": "Layout: Tiles",
+			"shell": "aerospace layout --root tiles"
 		},
-		".df": {
-			"name": "Display move: Forward",
-			"shell": "aerospace move-node-to-monitor --wrap-around next"
+		"<p>ls": {
+			"name": "Layout: Stack (Accordion)",
+			"shell": "aerospace layout --root accordion"
 		},
-		"?.m": { "name": "Move to workspace" },
-		".m[": {
-			"name": "Move: Workspace Previous",
-			"shell": "aerospace move-node-to-workspace prev"
+		"<p>lf": {
+			"name": "Layout: Floating (Window)",
+			"shell": "aerospace layout floating"
 		},
-		".m]": {
-			"name": "Move: Workspace Next",
-			"shell": "aerospace move-node-to-workspace next"
+		"?<p>w": { "name": "Workspace" },
+		"<p>w]": {
+			"name": "Workspace: Next",
+			"shell": "aerospace workspace --no-stdin next"
 		},
-		".m0": {
-			"name": "Move: Workspace 0",
-			"shell": "aerospace move-node-to-workspace 0"
+		"<p>w[": {
+			"name": "Workspace: Previous",
+			"shell": "aerospace workspace --no-stdin prev"
 		},
-		".m1": {
-			"name": "Move: Workspace 1",
-			"shell": "aerospace move-node-to-workspace 1"
+		"<p>wk": {
+			"name": "Workspace: Back (Last Used)",
+			"shell": "aerospace workspace-back-and-forth"
 		},
-		".m2": {
-			"name": "Move: Workspace 2",
-			"shell": "aerospace move-node-to-workspace 2"
-		},
-		".m3": {
-			"name": "Move: Workspace 3",
-			"shell": "aerospace move-node-to-workspace 3"
-		},
-		".m4": {
-			"name": "Move: Workspace 4",
-			"shell": "aerospace move-node-to-workspace 4"
-		},
-		".m5": {
-			"name": "Move: Workspace 5",
-			"shell": "aerospace move-node-to-workspace 5"
-		},
-		".m6": {
-			"name": "Move: Workspace 6",
-			"shell": "aerospace move-node-to-workspace 6"
-		},
-		".m7": {
-			"name": "Move: Workspace 7",
-			"shell": "aerospace move-node-to-workspace 7"
-		},
-		".m8": {
-			"name": "Move: Workspace 8",
-			"shell": "aerospace move-node-to-workspace 8"
-		},
-		".m9": {
-			"name": "Move: Workspace 9",
-			"shell": "aerospace move-node-to-workspace 9"
-		},
-		".ma": {
-			"name": "Move: Workspace A",
-			"shell": "aerospace move-node-to-workspace a"
-		},
-		".mb": {
-			"name": "Move: Workspace B",
-			"shell": "aerospace move-node-to-workspace b"
-		},
-		".mc": {
-			"name": "Move: Workspace C",
-			"shell": "aerospace move-node-to-workspace c"
-		},
-		".md": {
-			"name": "Move: Workspace D",
-			"shell": "aerospace move-node-to-workspace d"
-		},
-		".me": {
-			"name": "Move: Workspace E",
-			"shell": "aerospace move-node-to-workspace e"
-		},
-		".mf": {
-			"name": "Move: Workspace F",
-			"shell": "aerospace move-node-to-workspace f"
-		},
-		".mg": {
-			"name": "Move: Workspace G",
-			"shell": "aerospace move-node-to-workspace g"
-		},
-		".mh": {
-			"name": "Move: Workspace H",
-			"shell": "aerospace move-node-to-workspace h"
-		},
-		".mi": {
-			"name": "Move: Workspace I",
-			"shell": "aerospace move-node-to-workspace i"
-		},
-		".mj": {
-			"name": "Move: Workspace J",
-			"shell": "aerospace move-node-to-workspace j"
-		},
-		".mk": {
-			"name": "Move: Workspace K",
-			"shell": "aerospace move-node-to-workspace k"
-		},
-		".ml": {
-			"name": "Move: Workspace L",
-			"shell": "aerospace move-node-to-workspace l"
-		},
-		".mm": {
-			"name": "Move: Workspace M",
-			"shell": "aerospace move-node-to-workspace m"
-		},
-		".mn": {
-			"name": "Move: Workspace N",
-			"shell": "aerospace move-node-to-workspace n"
-		},
-		".mo": {
-			"name": "Move: Workspace O",
-			"shell": "aerospace move-node-to-workspace o"
-		},
-		".mp": {
-			"name": "Move: Workspace P",
-			"shell": "aerospace move-node-to-workspace p"
-		},
-		".mq": {
-			"name": "Move: Workspace Q",
-			"shell": "aerospace move-node-to-workspace q"
-		},
-		".mr": {
-			"name": "Move: Workspace R",
-			"shell": "aerospace move-node-to-workspace r"
-		},
-		".ms": {
-			"name": "Move: Workspace S",
-			"shell": "aerospace move-node-to-workspace s"
-		},
-		".mt": {
-			"name": "Move: Workspace T",
-			"shell": "aerospace move-node-to-workspace t"
-		},
-		".mu": {
-			"name": "Move: Workspace U",
-			"shell": "aerospace move-node-to-workspace u"
-		},
-		".mv": {
-			"name": "Move: Workspace V",
-			"shell": "aerospace move-node-to-workspace v"
-		},
-		".mw": {
-			"name": "Move: Workspace W",
-			"shell": "aerospace move-node-to-workspace w"
-		},
-		".mx": {
-			"name": "Move: Workspace X",
-			"shell": "aerospace move-node-to-workspace x"
-		},
-		".my": {
-			"name": "Move: Workspace Y",
-			"shell": "aerospace move-node-to-workspace y"
-		},
-		".mz": {
-			"name": "Move: Workspace Z",
-			"shell": "aerospace move-node-to-workspace z"
-		},
-		"?.f": { "name": "Focus Workspace" },
-		".f[": {
-			"name": "Focus Workspace: Previous",
-			"shell": "aerospace workspace prev"
-		},
-		".f]": {
-			"name": "Focus Workspace: Next",
-			"shell": "aerospace workspace next"
-		},
-		".f0": {
-			"name": "Focus Workspace: 0",
+		"<p>w0": {
+			"name": "Workspace: 0",
 			"shell": "aerospace workspace 0"
 		},
-		".f1": {
-			"name": "Focus Workspace: 1",
+		"<p>w1": {
+			"name": "Workspace: 1",
 			"shell": "aerospace workspace 1"
 		},
-		".f2": {
-			"name": "Focus Workspace: 2",
+		"<p>w2": {
+			"name": "Workspace: 2",
 			"shell": "aerospace workspace 2"
 		},
-		".f3": {
-			"name": "Focus Workspace: 3",
+		"<p>w3": {
+			"name": "Workspace: 3",
 			"shell": "aerospace workspace 3"
 		},
-		".f4": {
-			"name": "Focus Workspace: 4",
+		"<p>w4": {
+			"name": "Workspace: 4",
 			"shell": "aerospace workspace 4"
 		},
-		".f5": {
-			"name": "Focus Workspace: 5",
+		"<p>w5": {
+			"name": "Workspace: 5",
 			"shell": "aerospace workspace 5"
 		},
-		".f6": {
-			"name": "Focus Workspace: 6",
+		"<p>w6": {
+			"name": "Workspace: 6",
 			"shell": "aerospace workspace 6"
 		},
-		".f7": {
-			"name": "Focus Workspace: 7",
+		"<p>w7": {
+			"name": "Workspace: 7",
 			"shell": "aerospace workspace 7"
 		},
-		".f8": {
-			"name": "Focus Workspace: 8",
+		"<p>w8": {
+			"name": "Workspace: 8",
 			"shell": "aerospace workspace 8"
 		},
-		".f9": {
-			"name": "Focus Workspace: 9",
+		"<p>w9": {
+			"name": "Workspace: 9",
 			"shell": "aerospace workspace 9"
 		},
-		".fa": {
-			"name": "Focus Workspace: A",
-			"shell": "aerospace workspace A"
-		},
-		".fb": {
-			"name": "Focus Workspace: B",
-			"shell": "aerospace workspace B"
-		},
-		".fc": {
-			"name": "Focus Workspace: C",
-			"shell": "aerospace workspace C"
-		},
-		".fd": {
-			"name": "Focus Workspace: D",
-			"shell": "aerospace workspace D"
-		},
-		".fe": {
-			"name": "Focus Workspace: E",
-			"shell": "aerospace workspace E"
-		},
-		".ff": {
-			"name": "Focus Workspace: F",
-			"shell": "aerospace workspace F"
-		},
-		".fg": {
-			"name": "Focus Workspace: G",
-			"shell": "aerospace workspace G"
-		},
-		".fh": {
-			"name": "Focus Workspace: H",
-			"shell": "aerospace workspace H"
-		},
-		".fi": {
-			"name": "Focus Workspace: I",
-			"shell": "aerospace workspace I"
-		},
-		".fj": {
-			"name": "Focus Workspace: J",
-			"shell": "aerospace workspace J"
-		},
-		".fk": {
-			"name": "Focus Workspace: K",
-			"shell": "aerospace workspace K"
-		},
-		".fl": {
-			"name": "Focus Workspace: L",
-			"shell": "aerospace workspace L"
-		},
-		".fm": {
-			"name": "Focus Workspace: M",
-			"shell": "aerospace workspace M"
-		},
-		".fn": {
-			"name": "Focus Workspace: N",
-			"shell": "aerospace workspace N"
-		},
-		".fo": {
-			"name": "Focus Workspace: O",
-			"shell": "aerospace workspace O"
-		},
-		".fp": {
-			"name": "Focus Workspace: P",
-			"shell": "aerospace workspace P"
-		},
-		".fq": {
-			"name": "Focus Workspace: Q",
-			"shell": "aerospace workspace Q"
-		},
-		".fr": {
-			"name": "Focus Workspace: R",
-			"shell": "aerospace workspace R"
-		},
-		".fs": {
-			"name": "Focus Workspace: S",
-			"shell": "aerospace workspace S"
-		},
-		".ft": {
-			"name": "Focus Workspace: T",
-			"shell": "aerospace workspace T"
-		},
-		".fu": {
-			"name": "Focus Workspace: U",
-			"shell": "aerospace workspace U"
-		},
-		".fv": {
-			"name": "Focus Workspace: V",
-			"shell": "aerospace workspace V"
-		},
-		".fw": {
-			"name": "Focus Workspace: W",
-			"shell": "aerospace workspace W"
-		},
-		".fx": {
-			"name": "Focus Workspace: X",
-			"shell": "aerospace workspace X"
-		},
-		".fy": {
-			"name": "Focus Workspace: Y",
-			"shell": "aerospace workspace Y"
-		},
-		".fz": {
-			"name": "Focus Workspace: Z",
-			"shell": "aerospace workspace Z"
-		},
-		".t": { "name": "Teleport (move workspace to monitor)" },
-		".tl": {
-			"name": "Teleport: Left",
+		"<p>wl": {
+			"name": "Workspace: Left (Display)",
 			"shell": "aerospace move-workspace-to-monitor left"
 		},
-		".tr": {
-			"name": "Teleport: Right",
+		"<p>wr": {
+			"name": "Workspace: Right (Display)",
 			"shell": "aerospace move-workspace-to-monitor right"
 		},
-		".tu": {
-			"name": "Teleport: Up",
+		"<p>wu": {
+			"name": "Workspace: Up (Display)",
 			"shell": "aerospace move-workspace-to-monitor up"
 		},
-		".td": {
-			"name": "Teleport: Down",
+		"<p>wd": {
+			"name": "Workspace: Down (Display)",
 			"shell": "aerospace move-workspace-to-monitor down"
 		},
-		".t[": {
-			"name": "Teleport: Previous",
-			"shell": "aerospace move-workspace-to-monitor prev"
+		"?<p>m": { "name": "Move Window" },
+		"<p>m0": {
+			"name": "Move: (Workspace) 0",
+			"shell": "aerospace move-node-to-workspace 0"
 		},
-		".t]": {
-			"name": "Teleport: Next",
-			"shell": "aerospace move-workspace-to-monitor next"
+		"<p>m1": {
+			"name": "Move: (Workspace) 1",
+			"shell": "aerospace move-node-to-workspace 1"
 		},
-		"?.,": { "name": "Config" },
-		".,r": { "name": "Config: Reload" },
-		"?.r": { "name": "Resize" },
-		".rl": { "name": "Resize: Left" },
-		".rr": { "name": "Resize: Right" },
-		".ru": { "name": "Resize: Up" },
-		".rd": { "name": "Resize: Down" },
-		".r-": {
-			"name": "Resize: Decrease",
-			"shell": "aerospace resize smart -10"
+		"<p>m2": {
+			"name": "Move: (Workspace) 2",
+			"shell": "aerospace move-node-to-workspace 2"
 		},
-		".r=": {
-			"name": "Resize: Increase",
-			"shell": "aerospace resize smart +10"
+		"<p>m3": {
+			"name": "Move: (Workspace) 3",
+			"shell": "aerospace move-node-to-workspace 3"
 		},
-		".rs": {
-			"name": "Resize: Shrink",
-			"shell": "aerospace resize smart-opposite -10"
+		"<p>m4": {
+			"name": "Move: (Workspace) 4",
+			"shell": "aerospace move-node-to-workspace 4"
 		},
-		".re": {
-			"name": "Resize: Expand",
-			"shell": "aerospace resize smart-opposite +10"
+		"<p>m5": {
+			"name": "Move: (Workspace) 5",
+			"shell": "aerospace move-node-to-workspace 5"
 		},
-		"?.s": { "name": "Swap" },
-		".sl": {
-			"name": "Swap: Left",
-			"shell": "aerospace swap left"
+		"<p>m6": {
+			"name": "Move: (Workspace) 6",
+			"shell": "aerospace move-node-to-workspace 6"
 		},
-		".sr": {
-			"name": "Swap: Right",
-			"shell": "aerospace swap right"
+		"<p>m7": {
+			"name": "Move: (Workspace) 7",
+			"shell": "aerospace move-node-to-workspace 7"
 		},
-		".su": {
-			"name": "Swap: Up",
-			"shell": "aerospace swap up"
+		"<p>m8": {
+			"name": "Move: (Workspace) 8",
+			"shell": "aerospace move-node-to-workspace 8"
 		},
-		".sd": {
-			"name": "Swap: Down",
-			"shell": "aerospace swap down"
+		"<p>m9": {
+			"name": "Move: (Workspace) 9",
+			"shell": "aerospace move-node-to-workspace 9"
 		},
-		".s]": {
-			"name": "Swap: Next",
-			"shell": "aerospace swap dfs-next"
+		"<p>ml": {
+			"name": "Move: Left (Display)",
+			"shell": "aerospace move-node-to-monitor left"
 		},
-		".s[": {
-			"name": "Swap: Previous",
-			"shell": "aerospace swap dfs-prev"
+		"<p>mr": {
+			"name": "Move: Right (Display)",
+			"shell": "aerospace move-node-to-monitor right"
 		},
-		"?.p": { "name": "Present (summon) workspace" },
-		".p0": {
-			"name": "Present workspace: 0",
-			"aerospace": "aerospace summon-workspace 0"
+		"<p>mu": {
+			"name": "Move: Up (Display)",
+			"shell": "aerospace move-node-to-monitor up"
 		},
-		".p1": {
-			"name": "Present workspace: 1",
-			"aerospace": "aerospace summon-workspace 1"
+		"<p>md": {
+			"name": "Move: Down (Display)",
+			"shell": "aerospace move-node-to-monitor down"
 		},
-		".p2": {
-			"name": "Present workspace: 2",
-			"aerospace": "aerospace summon-workspace 2"
+		"?<p>f": { "name": "Follow Window to Workspace" },
+		"<p>f0": {
+			"name": "Follow: (to workspace) 0",
+			"shell": "aerospace move-node-to-workspace --focus-follows-window 0"
 		},
-		".p3": {
-			"name": "Present workspace: 3",
-			"aerospace": "aerospace summon-workspace 3"
+		"<p>f1": {
+			"name": "Follow: (to workspace) 1",
+			"shell": "aerospace move-node-to-workspace --focus-follows-window 1"
 		},
-		".p4": {
-			"name": "Present workspace: 4",
-			"aerospace": "aerospace summon-workspace 4"
+		"<p>f2": {
+			"name": "Follow: (to workspace) 2",
+			"shell": "aerospace move-node-to-workspace --focus-follows-window 2"
 		},
-		".p5": {
-			"name": "Present workspace: 5",
-			"aerospace": "aerospace summon-workspace 5"
+		"<p>f3": {
+			"name": "Follow: (to workspace) 3",
+			"shell": "aerospace move-node-to-workspace --focus-follows-window 3"
 		},
-		".p6": {
-			"name": "Present workspace: 6",
-			"aerospace": "aerospace summon-workspace 6"
+		"<p>f4": {
+			"name": "Follow: (to workspace) 4",
+			"shell": "aerospace move-node-to-workspace --focus-follows-window 4"
 		},
-		".p7": {
-			"name": "Present workspace: 7",
-			"aerospace": "aerospace summon-workspace 7"
+		"<p>f5": {
+			"name": "Follow: (to workspace) 5",
+			"shell": "aerospace move-node-to-workspace --focus-follows-window 5"
 		},
-		".p8": {
-			"name": "Present workspace: 8",
-			"aerospace": "aerospace summon-workspace 8"
+		"<p>f6": {
+			"name": "Follow: (to workspace) 6",
+			"shell": "aerospace move-node-to-workspace --focus-follows-window 6"
 		},
-		".p9": {
-			"name": "Present workspace: 9",
-			"aerospace": "aerospace summon-workspace 9"
+		"<p>f7": {
+			"name": "Follow: (to workspace) 7",
+			"shell": "aerospace move-node-to-workspace --focus-follows-window 7"
 		},
-		".pa": {
-			"name": "Present workspace: A",
-			"aerospace": "aerospace summon-workspace a"
+		"<p>f8": {
+			"name": "Follow: (to workspace) 8",
+			"shell": "aerospace move-node-to-workspace --focus-follows-window 8"
 		},
-		".pb": {
-			"name": "Present workspace: B",
-			"aerospace": "aerospace summon-workspace b"
+		"<p>f9": {
+			"name": "Follow: (to workspace) 9",
+			"shell": "aerospace move-node-to-workspace --focus-follows-window 9"
 		},
-		".pc": {
-			"name": "Present workspace: C",
-			"aerospace": "aerospace summon-workspace c"
+		"?<p>d": { "name": "Display" },
+		"<p>dw": {
+			"name": "Display: West",
+			"shell": "aerospace focus-monitor left"
 		},
-		".pd": {
-			"name": "Present workspace: D",
-			"aerospace": "aerospace summon-workspace d"
+		"<p>de": {
+			"name": "Display: East",
+			"shell": "aerospace focus-monitor right"
 		},
-		".pe": {
-			"name": "Present workspace: E",
-			"aerospace": "aerospace summon-workspace e"
+		"<p>dn": {
+			"name": "Display: North",
+			"shell": "aerospace focus-monitor up"
 		},
-		".pf": {
-			"name": "Present workspace: F",
-			"aerospace": "aerospace summon-workspace f"
+		"<p>ds": {
+			"name": "Display: South",
+			"shell": "aerospace focus-monitor down"
 		},
-		".pg": {
-			"name": "Present workspace: G",
-			"aerospace": "aerospace summon-workspace g"
+		"?<p>,": { "name": "AeroSpace Config" },
+		"<p>,r": {
+			"name": "AeroSpace: Reload",
+			"shell": "aerospace reload-config"
 		},
-		".ph": {
-			"name": "Present workspace: H",
-			"aerospace": "aerospace summon-workspace h"
+		"<p>,p": {
+			"name": "AeroSpace: Play (Start)",
+			"shell": "aerospace enable on"
 		},
-		".pi": {
-			"name": "Present workspace: I",
-			"aerospace": "aerospace summon-workspace i"
-		},
-		".pj": {
-			"name": "Present workspace: J",
-			"aerospace": "aerospace summon-workspace j"
-		},
-		".pk": {
-			"name": "Present workspace: K",
-			"aerospace": "aerospace summon-workspace k"
-		},
-		".pl": {
-			"name": "Present workspace: L",
-			"aerospace": "aerospace summon-workspace l"
-		},
-		".pm": {
-			"name": "Present workspace: M",
-			"aerospace": "aerospace summon-workspace m"
-		},
-		".pn": {
-			"name": "Present workspace: N",
-			"aerospace": "aerospace summon-workspace n"
-		},
-		".po": {
-			"name": "Present workspace: O",
-			"aerospace": "aerospace summon-workspace o"
-		},
-		".pp": {
-			"name": "Present workspace: P",
-			"aerospace": "aerospace summon-workspace p"
-		},
-		".pq": {
-			"name": "Present workspace: Q",
-			"aerospace": "aerospace summon-workspace q"
-		},
-		".pr": {
-			"name": "Present workspace: R",
-			"aerospace": "aerospace summon-workspace r"
-		},
-		".ps": {
-			"name": "Present workspace: S",
-			"aerospace": "aerospace summon-workspace s"
-		},
-		".pt": {
-			"name": "Present workspace: T",
-			"aerospace": "aerospace summon-workspace t"
-		},
-		".pu": {
-			"name": "Present workspace: U",
-			"aerospace": "aerospace summon-workspace u"
-		},
-		".pv": {
-			"name": "Present workspace: V",
-			"aerospace": "aerospace summon-workspace v"
-		},
-		".pw": {
-			"name": "Present workspace: W",
-			"aerospace": "aerospace summon-workspace w"
-		},
-		".px": {
-			"name": "Present workspace: X",
-			"aerospace": "aerospace summon-workspace x"
-		},
-		".py": {
-			"name": "Present workspace: Y",
-			"aerospace": "aerospace summon-workspace y"
-		},
-		".pz": {
-			"name": "Present workspace: Z",
-			"aerospace": "aerospace summon-workspace z"
+		"<p>,h": {
+			"name": "AeroSpace: Halt (Stop)",
+			"shell": "aerospace enable off"
 		}
 	}
 } };
 var package_default = {
 	name,
+	displayName,
+	description,
+	categories,
 	repository,
 	type,
+	scripts,
 	devDependencies,
 	packageManager,
 	chords
 };
 //#endregion
-export { chords, package_default as default, devDependencies, name, packageManager, repository, type };
+export { categories, chords, package_default as default, description, devDependencies, displayName, name, packageManager, repository, scripts, type };

@@ -48,9 +48,21 @@ var chords = {
               shortcut: "cmd+ctrl+right",
             },
             "?v": { name: "Vary" },
-            va: { name: "Vary Auto-Interact" },
-            vc: { name: "Vary Class" },
-            vi: { name: "Vary Ignored" },
+            va: {
+              name: "Vary Auto-Interact",
+              shell:
+                '  osascript -e \'tell application "System Events" to tell process "Accessibility Inspector" to click (first menu item of menu 1 of menu bar item "Inspection" of menu bar 1 whose name contains "Auto-Interact")\'\n',
+            },
+            vc: {
+              name: "Vary Class",
+              shell:
+                '  osascript -e \'tell application "System Events" to tell process "Accessibility Inspector" to click (first menu item of menu 1 of menu bar item "Inspection" of menu bar 1 whose name contains "Class Name")\'\n',
+            },
+            vi: {
+              name: "Vary Ignored",
+              shell:
+                '  osascript -e \'tell application "System Events" to tell process "Accessibility Inspector" to click (first menu item of menu 1 of menu bar item "Inspection" of menu bar 1 whose name contains "Ignored Elements")\'\n',
+            },
           },
         },
       },
@@ -58,7 +70,7 @@ var chords = {
   },
   "macos.toml": {
     name: "Accessibility Inspector",
-    chords: { "/ai": { name: "Accessibility Inspector" } },
+    chords: {},
   },
 };
 var package_default = {

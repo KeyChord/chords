@@ -1,6 +1,10 @@
 //#region package.json
 var name = "@keychord/chords-menu";
+var displayName = "Menu Chords";
 var version = "0.0.2";
+var description =
+  "Chords for app menus, menu bar extras, Control Center and menu bar visibility, in whichever app is focused.";
+var categories = ["macOS"];
 var repository = {
   type: "git",
   url: "https://github.com/KeyChord/chords-menu",
@@ -258,7 +262,10 @@ var chords = {
 };
 var package_default = {
   name,
+  displayName,
   version,
+  description,
+  categories,
   repository,
   type,
   imports,
@@ -269,9 +276,12 @@ var package_default = {
 };
 //#endregion
 export {
+  categories,
   chords,
   package_default as default,
+  description,
   devDependencies,
+  displayName,
   imports,
   name,
   packageManager,

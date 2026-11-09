@@ -1,0 +1,444 @@
+//#region package.json
+var name = "@keychord/chords-rift";
+var displayName = "Rift Chords";
+var description = "Global chords that run commands for the Rift tiling window manager.";
+var categories = ["Window Management"];
+var repository = {
+	"type": "git",
+	"url": "https://github.com/KeyChord/chords-rift"
+};
+var type = "module";
+var scripts = {
+	"test": "bun test --isolate",
+	"test:live": "CHORD_RIFT_LIVE_TEST=1 bun test __tests__/rift.live.test.ts"
+};
+var devDependencies = {
+	"@keychord/chordtest": "workspace:*",
+	"@keychord/config": "catalog:",
+	"@keychord/tsconfig": "catalog:",
+	"@types/bun": "^1.4.3"
+};
+var packageManager = "pnpm@12.11.2";
+var chords = { "macos.toml": {
+	"name": "Rift",
+	"meta": { "$wrap": false },
+	"placeholders": { "p": {
+		"name": "Window management prefix",
+		"default": ";"
+	} },
+	"on": { "rift": { "file": "rift.js" } },
+	"chords": {
+		"<p>q": {
+			"name": "Quit Window",
+			"shell": "rift-cli execute window close"
+		},
+		"<p>v": {
+			"name": "Vary: Manage This Space",
+			"shell": "rift-cli execute space toggle-activated"
+		},
+		"<p>w": {
+			"name": "West (Window)",
+			"shell": "rift-cli execute window focus left"
+		},
+		"<p>e": {
+			"name": "East (Window)",
+			"shell": "rift-cli execute window focus right"
+		},
+		"<p>n": {
+			"name": "North (Window)",
+			"shell": "rift-cli execute window focus up"
+		},
+		"<p>s": {
+			"name": "South (Window)",
+			"shell": "rift-cli execute window focus down"
+		},
+		"<p>m": {
+			"name": "Master (Window)",
+			"@input:rift": ["FOCUS_MASTER"]
+		},
+		"<p>]": {
+			"name": "Next (Window)",
+			"shell": "rift-cli execute window next"
+		},
+		"<p>[": {
+			"name": "Previous (Window)",
+			"shell": "rift-cli execute window prev"
+		},
+		"<p>l": {
+			"name": "Left (Move Window)",
+			"shell": "rift-cli execute layout move-node left"
+		},
+		"<p>r": {
+			"name": "Right (Move Window)",
+			"shell": "rift-cli execute layout move-node right"
+		},
+		"<p>u": {
+			"name": "Up (Move Window)",
+			"shell": "rift-cli execute layout move-node up"
+		},
+		"<p>d": {
+			"name": "Down (Move Window)",
+			"shell": "rift-cli execute layout move-node down"
+		},
+		"<p>p": {
+			"name": "Promote to Master (Move Window)",
+			"shell": "rift-cli execute layout promote-to-master"
+		},
+		"?<p>j": { "name": "Join" },
+		"<p>jl": {
+			"name": "Join: Left",
+			"shell": "rift-cli execute layout join-window left"
+		},
+		"<p>jr": {
+			"name": "Join: Right",
+			"shell": "rift-cli execute layout join-window right"
+		},
+		"<p>ju": {
+			"name": "Join: Up",
+			"shell": "rift-cli execute layout join-window up"
+		},
+		"<p>jd": {
+			"name": "Join: Down",
+			"shell": "rift-cli execute layout join-window down"
+		},
+		"<p>jx": {
+			"name": "Join: Unjoin",
+			"shell": "rift-cli execute layout unjoin"
+		},
+		"?<p>v": { "name": "Vary" },
+		"<p>vf": {
+			"name": "Vary: Floating",
+			"shell": "rift-cli execute window toggle-float"
+		},
+		"<p>vs": {
+			"name": "Vary: Stacked",
+			"shell": "rift-cli execute layout toggle-stack"
+		},
+		"<p>vo": {
+			"name": "Vary: Orientation",
+			"shell": "rift-cli execute layout toggle-orientation"
+		},
+		"?<p>z": { "name": "Zoom" },
+		"<p>zf": {
+			"name": "Zoom: Fullscreen",
+			"shell": "rift-cli execute window toggle-fullscreen"
+		},
+		"<p>zg": {
+			"name": "Zoom: Fullscreen Within Gaps",
+			"shell": "rift-cli execute window toggle-fullscreen-within-gaps"
+		},
+		"?<p>r": { "name": "Resize" },
+		"<p>r=": {
+			"name": "Resize: Increase",
+			"shell": "rift-cli execute window resize-grow --orientation smart"
+		},
+		"<p>r-": {
+			"name": "Resize: Decrease",
+			"shell": "rift-cli execute window resize-shrink --orientation smart"
+		},
+		"<p>rw=": {
+			"name": "Resize: Increase Width",
+			"shell": "rift-cli execute window resize-grow --orientation horizontal"
+		},
+		"<p>rw-": {
+			"name": "Resize: Decrease Width",
+			"shell": "rift-cli execute window resize-shrink --orientation horizontal"
+		},
+		"<p>rh=": {
+			"name": "Resize: Increase Height",
+			"shell": "rift-cli execute window resize-grow --orientation vertical"
+		},
+		"<p>rh-": {
+			"name": "Resize: Decrease Height",
+			"shell": "rift-cli execute window resize-shrink --orientation vertical"
+		},
+		"<p>b": {
+			"name": "Balance Sizes",
+			"shell": "rift-cli execute layout balance"
+		},
+		"?<p>l": { "name": "Left / Layout" },
+		"<p>lt": {
+			"name": "Layout: Traditional",
+			"shell": "rift-cli execute workspace set-layout traditional"
+		},
+		"<p>lb": {
+			"name": "Layout: BSP",
+			"shell": "rift-cli execute workspace set-layout bsp"
+		},
+		"<p>ls": {
+			"name": "Layout: Stack",
+			"shell": "rift-cli execute workspace set-layout stack"
+		},
+		"<p>lm": {
+			"name": "Layout: Master (Stack)",
+			"shell": "rift-cli execute workspace set-layout master_stack"
+		},
+		"<p>lml": {
+			"name": "Layout: Master Left",
+			"shell": "rift-cli execute config set settings.layout.master_stack.master_side left && rift-cli execute workspace set-layout master_stack"
+		},
+		"<p>lmr": {
+			"name": "Layout: Master Right",
+			"shell": "rift-cli execute config set settings.layout.master_stack.master_side right && rift-cli execute workspace set-layout master_stack"
+		},
+		"<p>lc": {
+			"name": "Layout: Scrolling Columns",
+			"shell": "rift-cli execute workspace set-layout scrolling"
+		},
+		"<p>lf": {
+			"name": "Layout: Floating",
+			"shell": "rift-cli execute workspace set-layout floating"
+		},
+		"?<p>lm": { "name": "Layout: Master" },
+		"<p>lmp": {
+			"name": "Master: Promote Window",
+			"shell": "rift-cli execute layout promote-to-master"
+		},
+		"<p>lms": {
+			"name": "Master: Swap With Stack",
+			"shell": "rift-cli execute layout swap-master-stack"
+		},
+		"<p>lm=": {
+			"name": "Master: Increase Ratio",
+			"shell": "rift-cli execute layout adjust-master-ratio 0.05"
+		},
+		"<p>lm-": {
+			"name": "Master: Decrease Ratio",
+			"shell": "rift-cli execute layout adjust-master-ratio -- -0.05"
+		},
+		"?<p>lmc": { "name": "Master: Count" },
+		"<p>lmc=": {
+			"name": "Master: Increase Count",
+			"shell": "rift-cli execute layout adjust-master-count 1"
+		},
+		"<p>lmc-": {
+			"name": "Master: Decrease Count",
+			"shell": "rift-cli execute layout adjust-master-count -- -1"
+		},
+		"?<p>c": { "name": "Column" },
+		"<p>cc": {
+			"name": "Column: Center",
+			"shell": "rift-cli execute layout center-selection"
+		},
+		"?<p>cw": { "name": "Column: Width Preset" },
+		"<p>cw]": {
+			"name": "Column: Next Width Preset",
+			"shell": "rift-cli execute layout switch-preset-column-width"
+		},
+		"<p>cw[": {
+			"name": "Column: Previous Width Preset",
+			"shell": "rift-cli execute layout switch-preset-column-width --backwards"
+		},
+		"?<p>w": { "name": "Workspace" },
+		"<p>w]": {
+			"name": "Workspace: Next",
+			"shell": "rift-cli execute workspace next"
+		},
+		"<p>w[": {
+			"name": "Workspace: Previous",
+			"shell": "rift-cli execute workspace prev"
+		},
+		"<p>wk": {
+			"name": "Workspace: Back (Last Used)",
+			"shell": "rift-cli execute workspace last"
+		},
+		"<p>w0": {
+			"name": "Workspace: 0",
+			"shell": "rift-cli execute workspace switch 0"
+		},
+		"<p>w1": {
+			"name": "Workspace: 1",
+			"shell": "rift-cli execute workspace switch 1"
+		},
+		"<p>w2": {
+			"name": "Workspace: 2",
+			"shell": "rift-cli execute workspace switch 2"
+		},
+		"<p>w3": {
+			"name": "Workspace: 3",
+			"shell": "rift-cli execute workspace switch 3"
+		},
+		"<p>w4": {
+			"name": "Workspace: 4",
+			"shell": "rift-cli execute workspace switch 4"
+		},
+		"<p>w5": {
+			"name": "Workspace: 5",
+			"shell": "rift-cli execute workspace switch 5"
+		},
+		"<p>w6": {
+			"name": "Workspace: 6",
+			"shell": "rift-cli execute workspace switch 6"
+		},
+		"<p>w7": {
+			"name": "Workspace: 7",
+			"shell": "rift-cli execute workspace switch 7"
+		},
+		"<p>w8": {
+			"name": "Workspace: 8",
+			"shell": "rift-cli execute workspace switch 8"
+		},
+		"<p>w9": {
+			"name": "Workspace: 9",
+			"shell": "rift-cli execute workspace switch 9"
+		},
+		"<p>wl": {
+			"name": "Workspace: Left (Display)",
+			"shell": "rift-cli execute display move-workspace --direction left"
+		},
+		"<p>wr": {
+			"name": "Workspace: Right (Display)",
+			"shell": "rift-cli execute display move-workspace --direction right"
+		},
+		"<p>wu": {
+			"name": "Workspace: Up (Display)",
+			"shell": "rift-cli execute display move-workspace --direction up"
+		},
+		"<p>wd": {
+			"name": "Workspace: Down (Display)",
+			"shell": "rift-cli execute display move-workspace --direction down"
+		},
+		"?<p>m": { "name": "Move Window" },
+		"<p>m0": {
+			"name": "Move: (Workspace) 0",
+			"shell": "rift-cli execute workspace move-window 0"
+		},
+		"<p>m1": {
+			"name": "Move: (Workspace) 1",
+			"shell": "rift-cli execute workspace move-window 1"
+		},
+		"<p>m2": {
+			"name": "Move: (Workspace) 2",
+			"shell": "rift-cli execute workspace move-window 2"
+		},
+		"<p>m3": {
+			"name": "Move: (Workspace) 3",
+			"shell": "rift-cli execute workspace move-window 3"
+		},
+		"<p>m4": {
+			"name": "Move: (Workspace) 4",
+			"shell": "rift-cli execute workspace move-window 4"
+		},
+		"<p>m5": {
+			"name": "Move: (Workspace) 5",
+			"shell": "rift-cli execute workspace move-window 5"
+		},
+		"<p>m6": {
+			"name": "Move: (Workspace) 6",
+			"shell": "rift-cli execute workspace move-window 6"
+		},
+		"<p>m7": {
+			"name": "Move: (Workspace) 7",
+			"shell": "rift-cli execute workspace move-window 7"
+		},
+		"<p>m8": {
+			"name": "Move: (Workspace) 8",
+			"shell": "rift-cli execute workspace move-window 8"
+		},
+		"<p>m9": {
+			"name": "Move: (Workspace) 9",
+			"shell": "rift-cli execute workspace move-window 9"
+		},
+		"<p>ml": {
+			"name": "Move: Left (Display)",
+			"shell": "rift-cli execute display move-window --direction left"
+		},
+		"<p>mr": {
+			"name": "Move: Right (Display)",
+			"shell": "rift-cli execute display move-window --direction right"
+		},
+		"<p>mu": {
+			"name": "Move: Up (Display)",
+			"shell": "rift-cli execute display move-window --direction up"
+		},
+		"<p>md": {
+			"name": "Move: Down (Display)",
+			"shell": "rift-cli execute display move-window --direction down"
+		},
+		"?<p>f": { "name": "Follow Window to Workspace" },
+		"<p>f0": {
+			"name": "Follow: (to workspace) 0",
+			"shell": "rift-cli execute workspace move-window 0 --follow"
+		},
+		"<p>f1": {
+			"name": "Follow: (to workspace) 1",
+			"shell": "rift-cli execute workspace move-window 1 --follow"
+		},
+		"<p>f2": {
+			"name": "Follow: (to workspace) 2",
+			"shell": "rift-cli execute workspace move-window 2 --follow"
+		},
+		"<p>f3": {
+			"name": "Follow: (to workspace) 3",
+			"shell": "rift-cli execute workspace move-window 3 --follow"
+		},
+		"<p>f4": {
+			"name": "Follow: (to workspace) 4",
+			"shell": "rift-cli execute workspace move-window 4 --follow"
+		},
+		"<p>f5": {
+			"name": "Follow: (to workspace) 5",
+			"shell": "rift-cli execute workspace move-window 5 --follow"
+		},
+		"<p>f6": {
+			"name": "Follow: (to workspace) 6",
+			"shell": "rift-cli execute workspace move-window 6 --follow"
+		},
+		"<p>f7": {
+			"name": "Follow: (to workspace) 7",
+			"shell": "rift-cli execute workspace move-window 7 --follow"
+		},
+		"<p>f8": {
+			"name": "Follow: (to workspace) 8",
+			"shell": "rift-cli execute workspace move-window 8 --follow"
+		},
+		"<p>f9": {
+			"name": "Follow: (to workspace) 9",
+			"shell": "rift-cli execute workspace move-window 9 --follow"
+		},
+		"?<p>d": { "name": "Display" },
+		"<p>dw": {
+			"name": "Display: West",
+			"shell": "rift-cli execute display focus --direction left"
+		},
+		"<p>de": {
+			"name": "Display: East",
+			"shell": "rift-cli execute display focus --direction right"
+		},
+		"<p>dn": {
+			"name": "Display: North",
+			"shell": "rift-cli execute display focus --direction up"
+		},
+		"<p>ds": {
+			"name": "Display: South",
+			"shell": "rift-cli execute display focus --direction down"
+		},
+		"?<p>,": { "name": "Rift Config" },
+		"<p>,r": {
+			"name": "Rift: Reload",
+			"shell": "rift-cli execute config reload"
+		},
+		"<p>,p": {
+			"name": "Rift: Play (Start)",
+			"shell": "rift-cli execute config reload"
+		},
+		"<p>,h": {
+			"name": "Rift: Halt (Stop)",
+			"shell": "rift-cli execute config reload"
+		}
+	}
+} };
+var package_default = {
+	name,
+	displayName,
+	description,
+	categories,
+	repository,
+	type,
+	scripts,
+	devDependencies,
+	packageManager,
+	chords
+};
+//#endregion
+export { categories, chords, package_default as default, description, devDependencies, displayName, name, packageManager, repository, scripts, type };

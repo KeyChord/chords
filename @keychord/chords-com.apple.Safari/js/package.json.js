@@ -497,10 +497,7 @@ var chords = {
 	} } } },
 	"macos.toml": {
 		"name": "Safari",
-		"chords": { "/b": {
-			"name": "Browser (Safari)",
-			"shell": "open -a Safari"
-		} }
+		"chords": {}
 	}
 };
 var package_default = {

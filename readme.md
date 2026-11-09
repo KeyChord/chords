@@ -45,8 +45,8 @@ monorepo). Between GitHub repos, the pinned default `KeyChord/chords-menu` and
 remove them under **Chord Repos** if you want the monorepo's versions of those two
 packages.
 
-To change one of the default chords (for example `/b`, which opens Safari from
-`@keychord/chords-com.apple.Safari` in the current monorepo), override the package that defines it with a local
+To change one of the default chords (for example `/f`, which opens Finder from
+`@keychord/chords-com.apple.finder` in the current monorepo), override the package that defines it with a local
 copy, using **Link Local Folder** on its repo, and edit the chord there. Binding the
 same sequence in a different package isn't a reliable override: when two packages
 define the same chord, Chord doesn't consistently pick the same one.

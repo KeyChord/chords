@@ -3,7 +3,12 @@
 > [!NOTE]
 > This document is largely AI-written, so parts of it may not be fully accurate. It will be replaced with a hand-written version when I get the time.
 
-Global `;` chords that send JavaScript to the active tab of the front window in Google Chrome,
+> [!WARNING]
+> Disabled for now: every chord in [`chords/macos.toml`](./chords/macos.toml) is commented out,
+> because the window-manager packages (AeroSpace, Rift) now use the `;` prefix. The table below
+> lists the chords as they were.
+
+Chords that send JavaScript to the active tab of the front window in Google Chrome,
 Brave Browser, Microsoft Edge, or Arc. To install, in [Chord](https://github.com/KeyChord/Chord)
 open Settings → Chords → **Chord Monorepos** → **Add Monorepo**, enter `KeyChord/chords`, then
 tick `@keychord/chords-web` under **Packages to use**.

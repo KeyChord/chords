@@ -10,6 +10,9 @@
     "url": "https://github.com/KeyChord/chords-aerospace"
   },
   "type": "module",
+  "scripts": {
+    "test": "bun test --isolate"
+  },
   "devDependencies": {
     "@keychord/chordtest": "workspace:*",
     "@keychord/config": "catalog:"

@@ -1,4 +1,3 @@
 name = 'Accessibility Inspector'
 
 [chords]
-'/ai' = { name = 'Accessibility Inspector', shell = 'open -b com.apple.AccessibilityInspector' }

@@ -1,0 +1,24 @@
+{
+  "name": "@keychord/chords-rift",
+  "displayName": "Rift Chords",
+  "description": "Global chords that run commands for the Rift tiling window manager.",
+  "categories": [
+    "Window Management"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KeyChord/chords-rift"
+  },
+  "type": "module",
+  "scripts": {
+    "test": "bun test --isolate",
+    "test:live": "CHORD_RIFT_LIVE_TEST=1 bun test __tests__/rift.live.test.ts"
+  },
+  "devDependencies": {
+    "@keychord/chordtest": "workspace:*",
+    "@keychord/config": "catalog:",
+    "@keychord/tsconfig": "catalog:",
+    "@types/bun": "^1.4.3"
+  },
+  "packageManager": "pnpm@12.11.2"
+}
