@@ -73,16 +73,16 @@ afterEach(() => {
   useRealTimers();
 });
 
-test("// captures the entire query and loads the TypeScript handler's generated module", () => {
+test("/ captures the entire query as a fallback and loads the TypeScript handler's generated module", () => {
   const source = readFileSync(new URL("../chords/macos.toml", import.meta.url), "utf8");
   expect(source).toMatch(/\[on\.raycast\]\s+file = 'raycast\.js'/);
-  const binding = source.match(/^'([^']+)' = .*'@input:raycast' = \['(\$1)'\]/m);
+  const binding = source.match(/^'([^']+)' = .*fallback = true, '@input:raycast' = \['(\$1)'\]/m);
   expect(binding).not.toBeNull();
   const pattern = chordPattern(binding![1]);
-  for (const query of ["", "calculator", "1+2", "foo/bar.(baz)", "'quoted'", "café 🧮"]) {
-    expect(pattern.exec(`//${query}`)?.[1]).toBe(query);
+  for (const query of ["", "calculator", "1+2", "foo/bar.(baz)", "'quoted'", "café 🧮", "/clips"]) {
+    expect(pattern.exec(`/${query}`)?.[1]).toBe(query);
   }
-  for (const input of ["/r", "/calculator", "calculator", "x//calculator"]) {
+  for (const input of ["calculator", "x/calculator", ""]) {
     expect(pattern.test(input)).toBe(false);
   }
   expect(source).not.toContain("shell =");

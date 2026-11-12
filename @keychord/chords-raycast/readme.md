@@ -8,9 +8,13 @@ package, in [Chord](https://github.com/KeyChord/Chord) open Settings → Chords 
 **Chord Monorepos** → **Add Monorepo**, enter `KeyChord/chords`, then tick
 `@keychord/chords-raycast` under **Packages to use**.
 
-Use `//<query>` to activate Raycast's first result. For example, `//calculator`
+Use `/<query>` to activate Raycast's first result. For example, `/calculator`
 searches for `calculator` and opens its first match. Complete the chord using
-Chord's usual completion key. `//` alone opens Raycast.
+Chord's usual completion key. `/` alone opens Raycast.
+
+This launcher is a fallback chord: any other `/` chord, such as `/f` for Finder or
+`/t` for Terminal, still runs instead. Because installed packages override Chord's
+built-in ones, it also takes over `/<query>` from the built-in Spotlight launcher.
 
 While Raycast is focused, these chords press its keyboard shortcuts:
 
@@ -38,7 +42,7 @@ file = "raycast.js"
 args = [5000, { clips = "raycast://extensions/raycast/clipboard-history/clipboard-history" }]
 ```
 
-`//clips` then uses Raycast's URL handler without opening Root Search or loading
+`/clips` then uses Raycast's URL handler without opening Root Search or loading
 our Accessibility addon. Copy a command's canonical URL using Raycast's Copy
 Deeplink action. Arguments, context, fallback text and launch type in the URL are
 preserved. Raycast may show its own launch-confirmation prompt. URL delivery
