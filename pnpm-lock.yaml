@@ -370,6 +370,21 @@ importers:
         specifier: latest
         version: 1.4.3
 
+  '@keychord/chords-com.apple.Spotlight':
+    devDependencies:
+      '@keychord/chordtest':
+        specifier: workspace:*
+        version: link:../chordtest
+      '@keychord/config':
+        specifier: 'catalog:'
+        version: 0.0.12
+      '@keychord/tsconfig':
+        specifier: 'catalog:'
+        version: 0.0.6
+      '@types/bun':
+        specifier: latest
+        version: 1.4.3
+
   '@keychord/chords-com.apple.finder':
     devDependencies:
       '@keychord/chordtest':

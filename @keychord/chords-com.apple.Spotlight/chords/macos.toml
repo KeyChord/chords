@@ -1,0 +1,13 @@
+name = 'Spotlight'
+
+# `fallback` needs Chord 0.2.5; older versions would let this launcher take over every `/` chord.
+[meta]
+version = '>=0.2.5'
+
+[on.spotlight]
+file = 'spotlight.js'
+
+[chords]
+# Chord's built-in `/` launcher. As a fallback it runs only when no other chord matches, so `/f`
+# still opens Finder, and an installed launcher such as Raycast's replaces it.
+'/(.*)' = { name = 'Spotlight: Search $1', fallback = true, '@input:spotlight' = ['$1'] }

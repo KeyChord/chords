@@ -1,0 +1,27 @@
+{
+  "name": "@keychord/chords-com.apple.Spotlight",
+  "displayName": "Spotlight Chords",
+  "version": "0.0.0",
+  "description": "Chord's built-in launcher: `/<query>` opens Spotlight's top result for the query.",
+  "categories": [
+    "macOS"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KeyChord/chords-com.apple.Spotlight"
+  },
+  "type": "module",
+  "imports": {
+    "#/*": "./src/js/*"
+  },
+  "scripts": {
+    "test": "bun test --isolate"
+  },
+  "devDependencies": {
+    "@keychord/chordtest": "workspace:*",
+    "@keychord/config": "catalog:",
+    "@keychord/tsconfig": "catalog:",
+    "@types/bun": "latest"
+  },
+  "packageManager": "pnpm@12.11.2"
+}
