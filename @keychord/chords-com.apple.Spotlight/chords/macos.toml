@@ -2,7 +2,7 @@ name = 'Spotlight'
 
 # `fallback` needs Chord 0.2.5; older versions would let this launcher take over every `/` chord.
 [meta]
-version = '>=0.2.5'
+chord = '>=0.2.5'
 
 [on.spotlight]
 file = 'spotlight.js'
