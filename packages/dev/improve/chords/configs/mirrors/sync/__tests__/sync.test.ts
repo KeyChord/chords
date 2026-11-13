@@ -137,6 +137,30 @@ test("reruns discard mirror commits and moved tags without incorporating dirty s
   expect(show("show", "main:replacement.txt")).toBe("new source content");
 });
 
+test("a source commit that leaves a package unchanged keeps its mirror commit", async () => {
+  const { root, addon, remote, git, env, request } = fixture();
+  await syncMirrors(env, request);
+  const show = (...args: string[]) => git("git", ["--git-dir", remote, ...args]).stdout;
+  const first = show("rev-parse", "main");
+
+  // A change elsewhere in the monorepo: Chord must not see this mirror as updated.
+  writeFileSync(join(root, "source", "readme.md"), "elsewhere");
+  git("git", ["add", "."]);
+  git("git", ["commit", "-m", "Change something else"]);
+  const log = spyOn(console, "log");
+  onTestFinished(() => log.mockRestore());
+  await syncMirrors(env, request);
+  expect(show("rev-parse", "main")).toBe(first);
+  expect(log.mock.calls.flat()).toContain("Unchanged new-package; keeping its mirror commit");
+  expect(log.mock.calls.flat()).toContain(`Completed new-package: ${first}`);
+
+  writeFileSync(join(addon, "feature.txt"), "changed content");
+  git("git", ["commit", "-am", "Change the package"]);
+  await syncMirrors(env, request);
+  expect(show("rev-parse", "main")).not.toBe(first);
+  expect(show("show", "main:feature.txt")).toBe("changed content");
+});
+
 test("missing credentials or a non-main ref fail before any remote access", async () => {
   const { env, request } = fixture();
   await expect(syncMirrors({ ...env, API_TOKEN_GITHUB: "" }, request)).rejects.toThrow(

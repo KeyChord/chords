@@ -64,6 +64,8 @@ export async function syncMirrors(
         encoding: "buffer",
       }).stdout;
       const git = execaSync({ cwd: scratch, env: gitEnv });
+      // The commit the mirror ends up on, when the sync keeps its existing one.
+      let mirrorCommit: string | undefined;
       git("tar", ["-xf", "-"], { input: archive });
       git("git", ["init", "-b", "main", "."]);
       git("git", ["add", "--force", "--all"]);
@@ -105,8 +107,26 @@ export async function syncMirrors(
         if ((await api(repo)).status === 404) {
           await api("/orgs/KeyChord/repos", "POST", { name, private: false, ...settings });
         }
-        // The mirror is never a parent. Force replaces divergent or unrelated history.
-        git("git", ["push", "--force", url, "refs/heads/main:refs/heads/main", ...tagRefs]);
+        // A package this source commit didn't change keeps its mirror commit. Chord offers an
+        // installed package an update when its mirror's commit changes, so a new commit must
+        // always mean new contents. A release tag still needs a commit to point at.
+        let unchanged = false;
+        if (tagRefs.length === 0) {
+          const fetched = git("git", ["fetch", "--depth=1", url, "refs/heads/main"], {
+            reject: false,
+          });
+          unchanged =
+            fetched.exitCode === 0 &&
+            git("git", ["rev-parse", "FETCH_HEAD^{tree}"]).stdout ===
+              git("git", ["rev-parse", "HEAD^{tree}"]).stdout;
+        }
+        if (unchanged) {
+          mirrorCommit = git("git", ["rev-parse", "FETCH_HEAD"]).stdout;
+          console.log(`Unchanged ${name}; keeping its mirror commit`);
+        } else {
+          // The mirror is never a parent. Force replaces divergent or unrelated history.
+          git("git", ["push", "--force", url, "refs/heads/main:refs/heads/main", ...tagRefs]);
+        }
         // An empty repository cannot select main as its default until after the push.
         await api(repo, "PATCH", { ...settings, default_branch: "main" });
         // Chord's Browse page links to a GitHub search for this topic. Like the settings
@@ -115,7 +135,7 @@ export async function syncMirrors(
           await api(`${repo}/topics`, "PUT", { names: ["chordpack"] });
         }
       }
-      console.log(`Completed ${name}: ${git("git", ["rev-parse", "HEAD"]).stdout}`);
+      console.log(`Completed ${name}: ${mirrorCommit ?? git("git", ["rev-parse", "HEAD"]).stdout}`);
     } catch (error) {
       console.error(`::error::Mirror ${name} failed`, error);
       failures.push(name);
