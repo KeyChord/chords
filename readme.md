@@ -113,7 +113,7 @@ root file.
 `v` Vary (i.e. toggle, on/off)\
 `x` No\
 `y` Yes\
-`j` Just (filler character for one-word actions, e.g. `sj` = "Search: Just Search")
+`j` Jump (i.e. focus)
 
 `[` Previous\
 `]` Next\
