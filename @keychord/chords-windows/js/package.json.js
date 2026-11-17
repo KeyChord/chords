@@ -1,5 +1,6 @@
 //#region package.json
 var name = "@keychord/chords-windows";
+var version = "0.0.1";
 var displayName = "Window Chords";
 var description = "Resize, minimize, hide and quit the focused window or app, or move it to another Space.";
 var categories = ["Window Management"];
@@ -18,159 +19,196 @@ var devDependencies = {
 var packageManager = "pnpm@12.11.2";
 var chords = { "macos.toml": {
 	"name": "macOS Windows",
+	"meta": { "chord": ">=0.3.0" },
 	"on": { "window": { "file": "window.js" } },
+	"placeholders": { "<>": {
+		"name": "Window prefix",
+		"default": "w"
+	} },
 	"chords": {
-		"?/w": { "name": "Window" },
-		"/wl": {
+		"?<>": { "name": "Window" },
+		"<>l": {
 			"name": "Window: left",
 			"@input:window": ["PRESET", "LEFT"]
 		},
-		"/wr": {
+		"<>r": {
 			"name": "Window: right",
 			"@input:window": ["PRESET", "RIGHT"]
 		},
-		"/wt": {
+		"<>t": {
 			"name": "Window: top",
 			"@input:window": ["PRESET", "TOP"]
 		},
-		"/wb": {
+		"<>b": {
 			"name": "Window: bottom",
 			"@input:window": ["PRESET", "BOTTOM"]
 		},
-		"/wtl": {
+		"<>tl": {
 			"name": "Window: top-left",
 			"@input:window": ["PRESET", "TOP_LEFT"]
 		},
-		"/wtr": {
+		"<>tr": {
 			"name": "Window: top-right",
 			"@input:window": ["PRESET", "TOP_RIGHT"]
 		},
-		"/wbl": {
+		"<>bl": {
 			"name": "Window: bottom-left",
 			"@input:window": ["PRESET", "BOTTOM_LEFT"]
 		},
-		"/wbr": {
+		"<>br": {
 			"name": "Window: bottom-right",
 			"@input:window": ["PRESET", "BOTTOM_RIGHT"]
 		},
-		"/wlr": {
+		"<>lr": {
 			"name": "Window: horizontal",
 			"@input:window": ["PRESET", "HORIZONTAL"]
 		},
-		"/wrl": {
+		"<>rl": {
 			"name": "Window: horizontal",
 			"@input:window": ["PRESET", "HORIZONTAL"]
 		},
-		"/wtb": {
+		"<>tb": {
 			"name": "Window: vertical",
 			"@input:window": ["PRESET", "VERTICAL"]
 		},
-		"/wbt": {
+		"<>bt": {
 			"name": "Window: vertical",
 			"@input:window": ["PRESET", "VERTICAL"]
 		},
-		"/wf": {
+		"<>f": {
 			"name": "Window: fill",
 			"@input:window": ["PRESET", "FILL"]
 		},
-		"/wc": {
+		"<>c": {
 			"name": "Window: center",
 			"@input:window": ["PRESET", "CENTER"]
 		},
-		"?/wpx": { "name": "Window: Position, X" },
-		"/wpx(.+)": {
+		"?<>px": { "name": "Window: Position, X" },
+		"<>px(.+)": {
 			"name": "Window: Position, X (Set)",
-			"@input:window": ["POSITION", "$1"]
+			"@input:window": [
+				"POSITION",
+				"$1",
+				"X"
+			]
 		},
-		"?/wpy": { "name": "Window: Position, Y" },
-		"/wpy(.+)": {
+		"?<>py": { "name": "Window: Position, Y" },
+		"<>py(.+)": {
 			"name": "Window: Position, Y (Set)",
-			"@input:window": ["POSITION", "$1"]
+			"@input:window": [
+				"POSITION",
+				"$1",
+				"Y"
+			]
 		},
-		"?/wp": { "name": "Window: Position" },
-		"/wp(.+)": {
+		"?<>p": { "name": "Window: Position" },
+		"<>p([^xy].*)": {
 			"name": "Window: Position (Set)",
 			"@input:window": ["POSITION", "$1"]
 		},
-		"?/wdw": { "name": "Window: Dimensions, Width" },
-		"/wdw([^=-].*)": {
+		"?<>dw": { "name": "Window: Dimensions, Width" },
+		"<>dw([^=-].*)": {
 			"name": "Window: Dimensions, Width (Set)",
-			"@input:window": ["DIMENSIONS", "$1"]
+			"@input:window": [
+				"DIMENSIONS",
+				"$1",
+				"WIDTH"
+			]
 		},
-		"?/wdw=": { "name": "Window: Dimensions, Width (Increase)" },
-		"/wdw=([0-9]?)": {
+		"?<>dw=": { "name": "Window: Dimensions, Width (Increase)" },
+		"<>dw=([0-9]?)": {
 			"name": "Window: Dimensions, Width (Increase)",
-			"@input:window": ["DIMENSIONS_INCREASE", "$1"]
+			"@input:window": [
+				"DIMENSIONS_INCREASE",
+				"$1",
+				"WIDTH"
+			]
 		},
-		"?/wdw-": { "name": "Window: Dimensions, Width (Decrease)" },
-		"/wdw-([0-9]?)": {
+		"?<>dw-": { "name": "Window: Dimensions, Width (Decrease)" },
+		"<>dw-([0-9]?)": {
 			"name": "Window: Dimensions, Width (Decrease)",
-			"@input:window": ["DIMENSIONS_DECREASE", "$1"]
+			"@input:window": [
+				"DIMENSIONS_DECREASE",
+				"$1",
+				"WIDTH"
+			]
 		},
-		"?/wdh": { "name": "Window: Dimensions, Height" },
-		"/wdh([^=-].*)": {
+		"?<>dh": { "name": "Window: Dimensions, Height" },
+		"<>dh([^=-].*)": {
 			"name": "Window: Dimensions, Height (Set)",
-			"@input:window": ["DIMENSIONS", "$1"]
+			"@input:window": [
+				"DIMENSIONS",
+				"$1",
+				"HEIGHT"
+			]
 		},
-		"?/wdh=": { "name": "Window: Dimensions, Height (Increase)" },
-		"/wdh=([0-9]?)": {
+		"?<>dh=": { "name": "Window: Dimensions, Height (Increase)" },
+		"<>dh=([0-9]?)": {
 			"name": "Window: Dimensions, Height (Increase)",
-			"@input:window": ["DIMENSIONS_INCREASE", "$1"]
+			"@input:window": [
+				"DIMENSIONS_INCREASE",
+				"$1",
+				"HEIGHT"
+			]
 		},
-		"?/wdh-": { "name": "Window: Dimensions, Height (Decrease)" },
-		"/wdh-([0-9]?)": {
+		"?<>dh-": { "name": "Window: Dimensions, Height (Decrease)" },
+		"<>dh-([0-9]?)": {
 			"name": "Window: Dimensions, Height (Decrease)",
-			"@input:window": ["DIMENSIONS_DECREASE", "$1"]
+			"@input:window": [
+				"DIMENSIONS_DECREASE",
+				"$1",
+				"HEIGHT"
+			]
 		},
-		"?/wd": { "name": "Window: Dimensions" },
-		"/wd([^wh=-].*)": {
+		"?<>d": { "name": "Window: Dimensions" },
+		"<>d([^wh=-].*)": {
 			"name": "Window: Dimensions (Set)",
 			"@input:window": ["DIMENSIONS", "$1"]
 		},
-		"?/wd=": { "name": "Window: Dimensions (Increase)" },
-		"/wd=([0-9]?)": {
+		"?<>d=": { "name": "Window: Dimensions (Increase)" },
+		"<>d=([0-9]?)": {
 			"name": "Window: Dimensions (Increase)",
 			"@input:window": ["DIMENSIONS_INCREASE", "$1"]
 		},
-		"?/wd-": { "name": "Window: Dimensions (Decrease)" },
-		"/wd-([0-9]?)": {
+		"?<>d-": { "name": "Window: Dimensions (Decrease)" },
+		"<>d-([0-9]?)": {
 			"name": "Window: Dimensions (Decrease)",
 			"@input:window": ["DIMENSIONS_DECREASE", "$1"]
 		},
-		"/w([0-9\\s-]+)": {
+		"<>([0-9\\s-]+)": {
 			"name": "Window: Dimensions + Position",
 			"@input:window": ["FRAME", "$1"]
 		},
-		"?/ws": { "name": "Window: Space" },
-		"/ws(\\d+)": {
+		"?<>s": { "name": "Window: Space" },
+		"<>s(\\d+)": {
 			"name": "Window: Space $1 (Move)",
 			"@input:window": ["SPACE", "$1"]
 		},
-		"/ws]": {
+		"<>s]": {
 			"name": "Window: Space (Next)",
 			"@input:window": ["SPACE", "NEXT"]
 		},
-		"/ws[": {
+		"<>s[": {
 			"name": "Window: Space (Previous)",
 			"@input:window": ["SPACE", "PREVIOUS"]
 		},
-		"/wh": {
+		"<>h": {
 			"name": "Window: Hide",
 			"shortcut": "cmd+h"
 		},
-		"/wm": {
+		"<>m": {
 			"name": "Window: Minimize",
 			"shortcut": "cmd+m"
 		},
-		"/wq": {
+		"<>q": {
 			"name": "Window: Quit",
 			"shortcut": "cmd+q"
 		},
-		"/w[": {
+		"<>[": {
 			"name": "Window: Previous",
 			"@input:window": ["CYCLE", "PREVIOUS"]
 		},
-		"/w]": {
+		"<>]": {
 			"name": "Window: Next",
 			"@input:window": ["CYCLE", "NEXT"]
 		}
@@ -178,6 +216,7 @@ var chords = { "macos.toml": {
 } };
 var package_default = {
 	name,
+	version,
 	displayName,
 	description,
 	categories,
@@ -189,4 +228,4 @@ var package_default = {
 	chords
 };
 //#endregion
-export { categories, chords, package_default as default, description, devDependencies, displayName, name, packageManager, repository, scripts, type };
+export { categories, chords, package_default as default, description, devDependencies, displayName, name, packageManager, repository, scripts, type, version };

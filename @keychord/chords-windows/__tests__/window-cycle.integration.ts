@@ -17,10 +17,10 @@ const handler = buildWindowHandler();
 const definition = Bun.TOML.parse(
   await Bun.file(new URL("../chords/macos.toml", import.meta.url)).text(),
 ) as any;
-async function step(input: "/w[" | "/w]") {
+async function step(input: ";w[" | ";w]") {
   const before = (await state()).keyWindow;
-  const args = definition.chords[input]["@input:window"];
-  await handler.call({ focusedAppId: appId, input }, args[0], args[1]);
+  const args = definition.chords[input.replace(/^;w/, "<>")]["@input:window"];
+  await handler.call({ focusedAppId: appId, input }, ...args);
   const result = await waitFor(async () => {
     const current = await state();
     return current.frontmostAppId === appId && current.keyWindow !== before ? current : undefined;
@@ -31,23 +31,23 @@ async function step(input: "/w[" | "/w]") {
   return result.keyWindow;
 }
 // The captured app is behind another app, with all three windows overlapping.
-const forward = [await step("/w]"), await step("/w]"), await step("/w]")];
+const forward = [await step(";w]"), await step(";w]"), await step(";w]")];
 assert.equal(new Set(forward).size, 3);
-assert.equal(await step("/w]"), forward[0]);
-assert.equal(await step("/w["), forward[2]);
-assert.equal(await step("/w["), forward[1]);
-assert.equal(await step("/w["), forward[0]);
+assert.equal(await step(";w]"), forward[0]);
+assert.equal(await step(";w["), forward[2]);
+assert.equal(await step(";w["), forward[1]);
+assert.equal(await step(";w["), forward[0]);
 await Bun.write(output + ".command", "close:" + forward[1]);
 await waitFor(async () =>
   (await state()).windows.find((window) => window.title === forward[1])?.visible === false
     ? true
     : undefined,
 );
-assert.equal(await step("/w]"), forward[2]);
-assert.equal(await step("/w]"), forward[0]);
+assert.equal(await step(";w]"), forward[2]);
+assert.equal(await step(";w]"), forward[0]);
 await Bun.write(output + ".command", "add:Four");
 await waitFor(async () => ((await state()).keyWindow === "Four" ? true : undefined));
-const updated = [await step("/w]"), await step("/w]"), await step("/w]")];
+const updated = [await step(";w]"), await step(";w]"), await step(";w]")];
 assert.deepEqual(new Set(updated), new Set([forward[0], forward[2], "Four"]));
 await Bun.write(output + ".command", "minimize:" + forward[2]);
 await waitFor(async () =>
@@ -55,7 +55,7 @@ await waitFor(async () =>
     ? true
     : undefined,
 );
-const remaining = [await step("/w]"), await step("/w]")];
+const remaining = [await step(";w]"), await step(";w]")];
 assert.deepEqual(new Set(remaining), new Set([forward[0], "Four"]));
 await Bun.write(output + ".command", "close:" + forward[0]);
 await waitFor(async () => {

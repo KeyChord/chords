@@ -1,7 +1,7 @@
 {
   "name": "@keychord/chords-modifiers",
   "displayName": "Modifier Chords",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Global chords that press a keyboard shortcut in whichever app is focused.",
   "categories": [
     "Input"

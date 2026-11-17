@@ -1,5 +1,8 @@
 name = 'macOS Dock'
 
+[meta]
+chord = '>=0.3.0'
+
 [on.menu]
 file = '@keychord/chords-menu/js/menu.js'
 
@@ -9,11 +12,16 @@ file = 'dock.js'
 [on.application]
 file = 'application.js'
 
+# Every chord starts with `<>`, which Chord replaces with the prefix chosen in Settings → Chords
+# → Placeholders or inherits the global symbol before its letter.
+[placeholders]
+"<>" = { name = 'Dock prefix', default = 'd' }
+
 [chords]
-'?/d' = { name = "Dock" }
-'/dw[' = { name = 'Dock: Previous App', '@input:application' = ['PREVIOUS'] }
-'/dw]' = { name = 'Dock: Next App', '@input:application' = ['NEXT'] }
-'/dv' = { name = 'Dock: Vary (On/Off)', shortcut = 'ctrl+f3' }
-'/d(\d+)' = { name = 'Dock > Focus $1', '@input:dock' = ['$1'] }
-'/d.(\d+).' = { name = 'Dock > Click @ Item $1', '@input:dock' = ['$1'] }
-'/d.,(\d+)' = { name = 'Dock > Right Click @ Item $1', '@input:dock' = ['$1', 'RIGHT'] }
+'?<>' = { name = "Dock" }
+'<>w[' = { name = 'Dock: Previous App', '@input:application' = ['PREVIOUS'] }
+'<>w]' = { name = 'Dock: Next App', '@input:application' = ['NEXT'] }
+'<>v' = { name = 'Dock: Vary (On/Off)', shortcut = 'ctrl+f3' }
+'<>(\d+)' = { name = 'Dock > Focus $1', '@input:dock' = ['$1'] }
+'<>.(\d+).' = { name = 'Dock > Click @ Item $1', '@input:dock' = ['$1'] }
+'<>.,(\d+)' = { name = 'Dock > Right Click @ Item $1', '@input:dock' = ['$1', 'RIGHT'] }

@@ -1,6 +1,10 @@
 import { readFileSync } from "node:fs";
 import { click, getAppWindows, getScreenBounds, mouse } from "chord";
-import { chordPattern } from "@keychord/chordtest/patterns";
+import {
+  chordPattern,
+  expandPlaceholders,
+  type ChordPlaceholders,
+} from "@keychord/chordtest/patterns";
 import { afterEach, beforeEach, expect, test } from "bun:test";
 import {
   advanceTimersByTimeAsync,
@@ -17,24 +21,25 @@ const window = { windowId: 123, processId: 456, bounds, title: "First window" };
 const clickMock = mocked(click);
 const windowsMock = mocked(getAppWindows);
 const source = readFileSync(new URL("../chords/macos.toml", import.meta.url), "utf8");
+const { placeholders } = Bun.TOML.parse(source) as { placeholders: ChordPlaceholders };
 const bindings = Array.from(
   source.matchAll(/^'([^']+)' = .*'@input:click' = \['(\$\d+)', '(COMMAND)'\]/gm),
   ([, pattern, argument, defaultClick]) => ({
-    pattern: chordPattern(pattern),
+    pattern: chordPattern(pattern, placeholders),
     argument,
     defaultClick: defaultClick as "COMMAND",
   }),
 );
 const namedChords = [
-  { prefix: ".", name: "Click", action: "click" },
-  { prefix: "..", name: "Double Click", action: "click", clickCount: 2 },
-  { prefix: ".,", name: "Right Click", action: "click", button: "right" },
-  { prefix: ".;", name: "Middle Click", action: "click", button: "middle" },
-  { prefix: ".-", name: "Drag", action: "down", button: "left" },
-  { prefix: ".,-", name: "Right Drag", action: "down", button: "right" },
-  { prefix: ".;-", name: "Middle Drag", action: "down", button: "middle" },
-  { prefix: ".=", name: "Move Mouse", action: "move" },
-  { prefix: "./", name: "Global Mouse", action: "click", global: true },
+  { prefix: ";c", name: "Click", action: "click" },
+  { prefix: ";c.", name: "Double Click", action: "click", clickCount: 2 },
+  { prefix: ";c,", name: "Right Click", action: "click", button: "right" },
+  { prefix: ";c;", name: "Middle Click", action: "click", button: "middle" },
+  { prefix: ";c-", name: "Drag", action: "down", button: "left" },
+  { prefix: ";c,-", name: "Right Drag", action: "down", button: "right" },
+  { prefix: ";c;-", name: "Middle Drag", action: "down", button: "middle" },
+  { prefix: ";c=", name: "Move Mouse", action: "move" },
+  { prefix: ";c/", name: "Global Mouse", action: "click", global: true },
 ] as const;
 function capturedClick(input: string) {
   const matches = bindings.flatMap(({ pattern, argument, defaultClick }) => {
@@ -57,8 +62,9 @@ afterEach(() => {
 test("every named chord in macos.toml has a behavior test", () => {
   const definitions = Array.from(
     source.matchAll(/^'\?([^']+)' = \{ name = '([^']+)' \}/gm),
-    ([, prefix, name]) => ({ prefix, name }),
+    ([, prefix, name]) => ({ prefix: expandPlaceholders(prefix, placeholders), name }),
   );
+  expect(placeholders).toEqual({ "<>": { name: "Mouse prefix", default: "c" } });
   expect(definitions).toEqual(namedChords.map(({ prefix, name }) => ({ prefix, name })));
   expect(source).toContain("name = 'Mouse', '@input:click' = ['$1', 'COMMAND']");
 });
@@ -103,15 +109,16 @@ test("one mouse binding captures commands and leaves application prefixes unmatc
   expect(source).toMatch(/\[on\.click\]\s+file = 'click\.js'/);
   expect(bindings).toHaveLength(1);
   for (const input of [
-    ".",
-    ".m",
-    ".c",
-    ".a",
-    ".f",
-    ".s",
-    ".a-c",
-    ".af-c",
-    ".b20l5",
+    ";c",
+    ";cm",
+    ";cc",
+    ";ca",
+    ";cf",
+    ";cs",
+    ";ca-c",
+    ";caf-c",
+    ";cb20l5",
+    ".13",
     "x13",
     "t13",
   ]) {
@@ -124,7 +131,7 @@ test("one mouse binding captures commands and leaves application prefixes unmatc
 test("the documented sequence forwards all five clicks in order", async () => {
   useFakeTimers();
   const sequence = "20b5-53/07/00r20b65";
-  const captured = capturedClick("." + sequence);
+  const captured = capturedClick(";c" + sequence);
   expect(captured.sequence).toBe(sequence);
   const action = buildClickHandler().call(
     { focusedAppId: "dev.fixture" },
@@ -151,7 +158,7 @@ test("the documented sequence forwards all five clicks in order", async () => {
       moveCursor: true,
     });
 });
-test.each([".1313", ".20l5", ".30r180b", ".20t5", ".0-"])(
+test.each([";c1313", ";c20l5", ";c30r180b", ";c20t5", ";c0-"])(
   "compact, edge and pixel coordinates reach the handler: %s",
   async (input) => {
     useFakeTimers();
@@ -160,16 +167,16 @@ test.each([".1313", ".20l5", ".30r180b", ".20t5", ".0-"])(
     await runAllTimersAsync();
     await action;
     const points =
-      input === ".1313"
+      input === ";c1313"
         ? [
             { x: 30, y: 180 },
             { x: 30, y: 180 },
           ]
-        : input === ".20l5"
+        : input === ";c20l5"
           ? [{ x: 20, y: 300 }]
-          : input === ".30r180b"
+          : input === ";c30r180b"
             ? [{ x: 270, y: 420 }]
-            : input === ".0-"
+            : input === ";c0-"
               ? [{ x: 299, y: 0 }]
               : [{ x: 150, y: 20 }];
     expect(click).toHaveBeenCalledTimes(points.length);
@@ -183,10 +190,10 @@ test.each([".1313", ".20l5", ".30r180b", ".20t5", ".0-"])(
   },
 );
 test.each([
-  ["..-9,9228", ["DOUBLE", "RIGHT", "DOUBLE"]],
-  [".,0l9;9228", ["RIGHT", "MIDDLE", "RIGHT"]],
-  [".;0l9.9228", ["MIDDLE", "LEFT", "MIDDLE"]],
-  [".0l9..9228", ["LEFT", "DOUBLE", "LEFT"]],
+  [";c.-9,9228", ["DOUBLE", "RIGHT", "DOUBLE"]],
+  [";c,0l9;9228", ["RIGHT", "MIDDLE", "RIGHT"]],
+  [";c;0l9.9228", ["MIDDLE", "LEFT", "MIDDLE"]],
+  [";c0l9..9228", ["LEFT", "DOUBLE", "LEFT"]],
 ] as const)("one-click overrides reset to the initial click type: %s", async (input, kinds) => {
   useFakeTimers();
   const captured = capturedClick(input);
@@ -212,14 +219,14 @@ test.each([
   }
 });
 test.each([
-  [".", "LEFT"],
-  ["..", "DOUBLE"],
-  [".,", "RIGHT"],
-  [".;", "MIDDLE"],
+  [";c", "LEFT"],
+  [";c.", "DOUBLE"],
+  [";c,", "RIGHT"],
+  [";c;", "MIDDLE"],
 ] as const)("mixed-fraction pairs retain the initial click type: %s", async (prefix, kind) => {
   useFakeTimers();
   const captured = capturedClick(prefix + "91/21/23/4");
-  expect(captured.sequence).toBe(prefix.slice(1) + "91/21/23/4");
+  expect(captured.sequence).toBe(prefix.slice(";c".length) + "91/21/23/4");
   const action = buildClickHandler("dev.fixture")(captured.sequence, captured.defaultClick);
   await runAllTimersAsync();
   await action;
@@ -373,9 +380,9 @@ test("window lookup errors propagate without breaking later invocations", async 
 });
 
 test.each([
-  [".-1328", "left"],
-  [".,-1328", "right"],
-  [".;-1328", "middle"],
+  [";c-1328", "left"],
+  [";c,-1328", "right"],
+  [";c;-1328", "middle"],
 ] as const)("%s drags with one press and releases at the final point", async (input, button) => {
   useFakeTimers();
   const captured = capturedClick(input);
@@ -578,7 +585,7 @@ test("dash coordinates and the trailing hold are unambiguous after complete pair
   expect(points("0-")).toEqual([{ x: 199, y: 200, click: "LEFT" }]);
 });
 
-test.each(["-13junk", "=131", "/13junk", "/=/13", "-=13", "=;13", ".13-"])(
+test.each(["-13junk", "=131", "/13junk", "/=/13", "-=13", "=;13", ";c13-"])(
   "malformed mouse commands reject before sending input: %s",
   async (sequence) => {
     await expect(buildClickHandler("dev.fixture")(sequence, "COMMAND")).rejects.toThrow(TypeError);

@@ -1,8 +1,18 @@
 name = 'BetterDisplay'
 
+[meta]
+chord = '>=0.3.0'
+
 [on.monitor]
 file = 'monitor.js'
 
+# The same prefix as @keychord/chords-monitors, whose `<>` has the same default: `<>d` sets
+# the dimensions of the monitor that `<>1`, `<>]` and the rest focus.
+# Every chord starts with `<>`, which Chord replaces with the prefix chosen in Settings → Chords
+# → Placeholders or inherits the global symbol before its letter.
+[placeholders]
+"<>" = { name = 'Monitor prefix', default = 'm' }
+
 [chords]
-'?/md' = { name = 'Monitor: Dimensions' }
-'/md(.+)' = { name = 'Monitor: Dimensions (Set)', '@input:monitor' = ['$1'] }
+'?<>d' = { name = 'Monitor: Dimensions' }
+'<>d(.+)' = { name = 'Monitor: Dimensions (Set)', '@input:monitor' = ['$1'] }

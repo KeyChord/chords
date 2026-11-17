@@ -1,7 +1,7 @@
 //#region package.json
 var name = "@keychord/chords-com.apple.Spotlight";
 var displayName = "Spotlight Chords";
-var version = "0.0.0";
+var version = "0.0.1";
 var description = "Chord's built-in launcher: `/<query>` opens Spotlight's top result for the query.";
 var categories = ["macOS"];
 var repository = {
@@ -20,13 +20,20 @@ var devDependencies = {
 var packageManager = "pnpm@12.11.2";
 var chords = { "macos.toml": {
 	"name": "Spotlight",
-	"meta": { "version": ">=0.2.5" },
+	"meta": { "chord": ">=0.3.0" },
 	"on": { "spotlight": { "file": "spotlight.js" } },
-	"chords": { "/(.*)": {
-		"name": "Spotlight: Search $1",
-		"fallback": true,
-		"@input:spotlight": ["$1"]
-	} }
+	"placeholders": { "<>": {
+		"name": "Spotlight prefix",
+		"default": "/"
+	} },
+	"chords": {
+		"?<>": { "name": "Launch" },
+		"<>(.*)": {
+			"name": "Spotlight: Search $1",
+			"fallback": true,
+			"@input:spotlight": ["$1"]
+		}
+	}
 } };
 var package_default = {
 	name,

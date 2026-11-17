@@ -1,7 +1,7 @@
 //#region package.json
 var name = "@keychord/chords-menu";
 var displayName = "Menu Chords";
-var version = "0.0.2";
+var version = "0.0.3";
 var description = "Chords for app menus, menu bar extras, Control Center and menu bar visibility, in whichever app is focused.";
 var categories = ["macOS"];
 var repository = {
@@ -20,6 +20,7 @@ var devDependencies = {
 var packageManager = "pnpm@12.11.2";
 var chords = { "macos.toml": {
 	"name": "macOS Menu Bar",
+	"meta": { "chord": ">=0.3.0" },
 	"on": {
 		"menu": {
 			"file": "menu.js",
@@ -29,45 +30,49 @@ var chords = { "macos.toml": {
 		"select": { "file": "selection.js" },
 		"visibility": { "file": "visibility.js" }
 	},
+	"placeholders": { "<>": {
+		"name": "Menu bar prefix",
+		"default": "b"
+	} },
 	"chords": {
-		"?=": { "name": "Menu/Tray" },
-		"?=[": { "name": "Menu Bar: Menus By Index" },
-		"?=/": { "name": "Menu Bar: Search" },
-		"=[([a-z]+(?:-[a-z]+)*[0-9]*).": {
+		"?<>": { "name": "Menu Bar" },
+		"?<>[": { "name": "Menu Bar: Menus By Index" },
+		"?<>/": { "name": "Menu Bar: Search" },
+		"<>[([a-z]+(?:-[a-z]+)*[0-9]*).": {
 			"name": "Menu Bar: by letter",
 			"@input:menu": ["BY_LETTERS", "$1"]
 		},
-		"=/(.+)": {
+		"<>/(.+)": {
 			"name": "Menu Bar: Search $1",
 			"@input:menu": ["SEARCH", "$1"]
 		},
-		"?=0": { "name": "Menu Bar: Apple Logo" },
-		"?=\"1-9\"": { "name": "Tray: Select Icon" },
-		"?=-": { "name": "Menu Bar: Notch / Tray From Right" },
-		"?=-\"1-9\"": { "name": "Tray: Select From Right" },
-		"?=]": { "name": "Menu Bar: Tray Icons" },
-		"=([\\[\\]]?-?(?:0|[1-9][0-9]*)[lr]?[\\[\\]]*[.,]?)": {
+		"?<>0": { "name": "Menu Bar: Apple Logo" },
+		"?<>\"1-9\"": { "name": "Tray: Select Icon" },
+		"?<>-": { "name": "Menu Bar: Notch / Tray From Right" },
+		"?<>-\"1-9\"": { "name": "Tray: Select From Right" },
+		"?<>]": { "name": "Menu Bar: Tray Icons" },
+		"<>([\\[\\]]?-?(?:0|[1-9][0-9]*)[lr]?[\\[\\]]*[.,]?)": {
 			"name": "Menu Bar: Select / Click Item",
 			"@keydown:select": ["KEYDOWN", "$1"],
 			"@input:select": ["INPUT", "$1"]
 		},
-		"=-": {
+		"<>-": {
 			"name": "Menu Bar: Click Notch",
 			"@input:tray": ["NOTCH"]
 		},
-		"=p": {
+		"<>p": {
 			"name": "Tray: Power / Battery",
 			"@input:tray": ["BATTERY"]
 		},
-		"=c": {
+		"<>c": {
 			"name": "Tray: Control Center",
 			"@input:tray": ["CONTROL_CENTER"]
 		},
-		"=cd": {
+		"<>cd": {
 			"name": "Tray: Control Center > Display",
 			"@input:tray": ["CONTROL_CENTER", "DISPLAY"]
 		},
-		"=cd-": {
+		"<>cd-": {
 			"name": "Tray: Control Center > Display > Decrease",
 			"@input:tray": [
 				"CONTROL_CENTER",
@@ -75,7 +80,7 @@ var chords = { "macos.toml": {
 				"DECREASE"
 			]
 		},
-		"=cd=": {
+		"<>cd=": {
 			"name": "Tray: Control Center > Display > Increase",
 			"@input:tray": [
 				"CONTROL_CENTER",
@@ -83,7 +88,7 @@ var chords = { "macos.toml": {
 				"INCREASE"
 			]
 		},
-		"=cd.": {
+		"<>cd.": {
 			"name": "Tray: Control Center > Display > Click",
 			"@input:tray": [
 				"CONTROL_CENTER",
@@ -91,7 +96,7 @@ var chords = { "macos.toml": {
 				"CLICK"
 			]
 		},
-		"=cdd": {
+		"<>cdd": {
 			"name": "Tray: Control Center > Display > Dark Mode",
 			"@input:tray": [
 				"CONTROL_CENTER",
@@ -99,7 +104,7 @@ var chords = { "macos.toml": {
 				"DARK_MODE"
 			]
 		},
-		"=cdn": {
+		"<>cdn": {
 			"name": "Tray: Control Center > Display > Night Shift",
 			"@input:tray": [
 				"CONTROL_CENTER",
@@ -107,7 +112,7 @@ var chords = { "macos.toml": {
 				"NIGHT_SHIFT"
 			]
 		},
-		"=cdt": {
+		"<>cdt": {
 			"name": "Tray: Control Center > Display > True Tone",
 			"@input:tray": [
 				"CONTROL_CENTER",
@@ -115,7 +120,7 @@ var chords = { "macos.toml": {
 				"TRUE_TONE"
 			]
 		},
-		"=cds": {
+		"<>cds": {
 			"name": "Tray: Control Center > Display > Settings",
 			"@input:tray": [
 				"CONTROL_CENTER",
@@ -123,11 +128,11 @@ var chords = { "macos.toml": {
 				"SETTINGS"
 			]
 		},
-		"=cs": {
+		"<>cs": {
 			"name": "Tray: Control Center > Sound",
 			"@input:tray": ["CONTROL_CENTER", "SOUND"]
 		},
-		"=cs-": {
+		"<>cs-": {
 			"name": "Tray: Control Center > Sound > Decrease",
 			"@input:tray": [
 				"CONTROL_CENTER",
@@ -135,7 +140,7 @@ var chords = { "macos.toml": {
 				"DECREASE"
 			]
 		},
-		"=cs=": {
+		"<>cs=": {
 			"name": "Tray: Control Center > Sound > Increase",
 			"@input:tray": [
 				"CONTROL_CENTER",
@@ -143,7 +148,7 @@ var chords = { "macos.toml": {
 				"INCREASE"
 			]
 		},
-		"=cs.": {
+		"<>cs.": {
 			"name": "Tray: Control Center > Sound > Click",
 			"@input:tray": [
 				"CONTROL_CENTER",
@@ -151,71 +156,79 @@ var chords = { "macos.toml": {
 				"CLICK"
 			]
 		},
-		"=s": {
-			"name": "Tray: Spotlight",
-			"shortcut": "cmd+space"
-		},
-		"=t": {
+		"<>t": {
 			"name": "Tray: Time & Date",
 			"@input:tray": ["DATE_TIME"]
 		},
-		"?=wi": { "name": "Tray Wi-Fi" },
-		"=wi": {
+		"?<>cw": { "name": "Tray Wi-Fi" },
+		"<>cw": {
 			"name": "Tray: Wi-Fi",
 			"@input:tray": ["WIFI"]
 		},
-		"=wiv": {
+		"<>cwv": {
 			"name": "Tray Wi-Fi: Vary On/Off",
 			"@input:tray": ["WIFI", "TOGGLE"]
 		},
-		"=q": {
+		"<>q": {
 			"name": "Force Quit",
 			"shortcut": "opt+cmd+esc"
 		},
-		"=ls": {
+		"<>ls": {
 			"name": "Lock Screen",
-			"shortcut": "opt+cmd+esc"
-		},
-		"=lo": {
-			"name": "Log Out",
 			"shortcut": "ctrl+cmd+q"
 		},
-		"=lq": {
+		"<>lo": {
+			"name": "Log Out",
+			"shortcut": "shift+cmd+q"
+		},
+		"<>lq": {
 			"name": "Log Quit",
 			"shortcut": "opt+shift+cmd+q"
 		},
-		"?=b": { "name": "Brightness" },
-		"=bu": {
+		"?<>b": { "name": "Brightness" },
+		"<>bu": {
 			"name": "Brightness Up",
 			"shortcut": "BrightnessUp"
 		},
-		"=bd": {
+		"<>bd": {
 			"name": "Brightness Down",
 			"shortcut": "BrightnessDown"
 		},
-		"=v": {
+		"<>v": {
 			"name": "Menu Bar: Show / Hide",
 			"@input:visibility": []
 		},
-		"?=v": { "name": "Menu Bar Visibility / Volume" },
-		"=vu": {
+		"?<>v": { "name": "Menu Bar Visibility / Volume" },
+		"<>vu": {
 			"name": "Volume Up",
 			"shortcut": "AudioVolumeUp"
 		},
-		"=vd": {
+		"<>vd": {
 			"name": "Volume Down",
 			"shortcut": "AudioVolumeDown"
 		},
-		"=vm": {
+		"<>vm": {
 			"name": "Volume Mute",
 			"shortcut": "AudioVolumeMute"
 		},
-		"?=w": { "name": "Window Menu" },
-		"=w": {
+		"?<>w": { "name": "Window" },
+		"<>w": {
 			"name": "Window Menu",
 			"@input:menu": ["BY_PATH", ["Window"]]
 		},
-		"=wl": {
+		"<>wq": {
+			"name": "Window: Quit",
+			"shortcut": "cmd+q"
+		},
+		"<>wh": {
+			"name": "Window: Hide",
+			"shortcut": "cmd+h"
+		},
+		"<>wm": {
+			"name": "Window: Minimize",
+			"shortcut": "cmd+m"
+		},
+		"<>wl": {
 			"name": "Window Menu: Left",
 			"@input:menu": ["BY_PATH", [
 				"Window",
@@ -223,7 +236,7 @@ var chords = { "macos.toml": {
 				"Left"
 			]]
 		},
-		"=wr": {
+		"<>wr": {
 			"name": "Window Menu: Right",
 			"@input:menu": ["BY_PATH", [
 				"Window",
@@ -231,7 +244,7 @@ var chords = { "macos.toml": {
 				"Right"
 			]]
 		},
-		"=wt": {
+		"<>wt": {
 			"name": "Window Menu: Top",
 			"@input:menu": ["BY_PATH", [
 				"Window",
@@ -239,7 +252,7 @@ var chords = { "macos.toml": {
 				"Top"
 			]]
 		},
-		"=wb": {
+		"<>wb": {
 			"name": "Window Menu: Bottom",
 			"@input:menu": ["BY_PATH", [
 				"Window",
@@ -247,7 +260,7 @@ var chords = { "macos.toml": {
 				"Bottom"
 			]]
 		},
-		"=wtl": {
+		"<>wtl": {
 			"name": "Window Menu: Top Left",
 			"@input:menu": ["BY_PATH", [
 				"Window",
@@ -255,7 +268,7 @@ var chords = { "macos.toml": {
 				"Top Left"
 			]]
 		},
-		"=wtr": {
+		"<>wtr": {
 			"name": "Window Menu: Top Right",
 			"@input:menu": ["BY_PATH", [
 				"Window",
@@ -263,7 +276,7 @@ var chords = { "macos.toml": {
 				"Top Right"
 			]]
 		},
-		"=wbl": {
+		"<>wbl": {
 			"name": "Window Menu: Bottom Left",
 			"@input:menu": ["BY_PATH", [
 				"Window",
@@ -271,7 +284,7 @@ var chords = { "macos.toml": {
 				"Bottom Left"
 			]]
 		},
-		"=wbr": {
+		"<>wbr": {
 			"name": "Window Menu: Bottom Right",
 			"@input:menu": ["BY_PATH", [
 				"Window",
@@ -279,7 +292,7 @@ var chords = { "macos.toml": {
 				"Bottom Right"
 			]]
 		},
-		"=wlr": {
+		"<>wlr": {
 			"name": "Window Menu: Left & Right",
 			"@input:menu": ["BY_PATH", [
 				"Window",
@@ -287,7 +300,7 @@ var chords = { "macos.toml": {
 				"Left & Right"
 			]]
 		},
-		"=wrl": {
+		"<>wrl": {
 			"name": "Window Menu: Right & Left",
 			"@input:menu": ["BY_PATH", [
 				"Window",
@@ -295,7 +308,7 @@ var chords = { "macos.toml": {
 				"Right & Left"
 			]]
 		},
-		"=wtb": {
+		"<>wtb": {
 			"name": "Window Menu: Top & Bottom",
 			"@input:menu": ["BY_PATH", [
 				"Window",
@@ -303,7 +316,7 @@ var chords = { "macos.toml": {
 				"Top & Bottom"
 			]]
 		},
-		"=wbt": {
+		"<>wbt": {
 			"name": "Window Menu: Bottom & Top",
 			"@input:menu": ["BY_PATH", [
 				"Window",
@@ -311,7 +324,7 @@ var chords = { "macos.toml": {
 				"Bottom & Top"
 			]]
 		},
-		"=wq": {
+		"<>wx": {
 			"name": "Window Menu: Quarters",
 			"@input:menu": ["BY_PATH", [
 				"Window",
@@ -319,7 +332,7 @@ var chords = { "macos.toml": {
 				"Quarters"
 			]]
 		},
-		"=ws[": {
+		"<>wo": {
 			"name": "Window Menu: Return to Previous Size",
 			"@input:menu": ["BY_PATH", [
 				"Window",
@@ -327,19 +340,19 @@ var chords = { "macos.toml": {
 				"Return to Previous Size"
 			]]
 		},
-		"=wz": {
+		"<>wz": {
 			"name": "Window Menu: Zoom",
 			"@input:menu": ["BY_PATH", ["Window", "Zoom"]]
 		},
-		"=wf": {
+		"<>wf": {
 			"name": "Window Menu: Fill",
 			"@input:menu": ["BY_PATH", ["Window", "Fill"]]
 		},
-		"=wc": {
+		"<>wc": {
 			"name": "Window Menu: Center",
 			"@input:menu": ["BY_PATH", ["Window", "Center"]]
 		},
-		"=wfl": {
+		"<>wfl": {
 			"name": "Window Menu: Left of Screen",
 			"@input:menu": ["BY_PATH", [
 				"Window",
@@ -347,7 +360,7 @@ var chords = { "macos.toml": {
 				"Left of Screen"
 			]]
 		},
-		"=wfr": {
+		"<>wfr": {
 			"name": "Window Menu: Right of Screen",
 			"@input:menu": ["BY_PATH", [
 				"Window",
@@ -355,7 +368,7 @@ var chords = { "macos.toml": {
 				"Right of Screen"
 			]]
 		},
-		"=waf": {
+		"<>waf": {
 			"name": "Window Menu: Bring All to Front",
 			"@input:menu": ["BY_PATH", ["Window", "Bring All to Front"]]
 		}

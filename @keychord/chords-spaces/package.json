@@ -1,6 +1,7 @@
 {
   "name": "@keychord/chords-spaces",
   "displayName": "Spaces Chords",
+  "version": "0.0.1",
   "description": "Switch between macOS Spaces by direction or desktop number.",
   "categories": [
     "Window Management"

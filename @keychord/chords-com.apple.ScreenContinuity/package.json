@@ -1,7 +1,7 @@
 {
   "name": "@keychord/chords-com.apple.ScreenContinuity",
   "displayName": "iPhone Mirroring Chords",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Chords for iPhone Mirroring (com.apple.ScreenContinuity).",
   "categories": [
     "macOS"

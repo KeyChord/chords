@@ -19,6 +19,14 @@ Define symbol-prefixed global chords and their hints in each package's root
 `chords/macos.toml`, alongside any handlers they use. Application-specific
 alphanumeric chords belong in the nested application/bundle-ID folders.
 
+Global bindings and hints start with the package's `<>` placeholder. Declare a letter,
+for example `"<>" = { name = 'Window prefix', default = 'w' }` with keys like `'<>l'`.
+Chord prepends the user's **Default Global Prefix for Placeholders** from Settings → Chords.
+Finder, System Settings, Spotlight, and Raycast declare the literal default `/`.
+Users can override either kind of default in the package's Placeholders section.
+`@keychord/chordtest`'s `global-chords.test.ts` enforces the convention and checks for
+collisions at the defaults.
+
 Always single-quote binding keys in TOML `[chords]` tables, even when bare keys
 would be valid (for example, `'fr'`). Oxfmt preserves these quotes with `vp fmt`.
 

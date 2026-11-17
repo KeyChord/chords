@@ -1,5 +1,6 @@
 //#region package.json
 var name = "@keychord/chords-chord";
+var version = "0.0.1";
 var displayName = "Chord Controls";
 var description = "Chord's own controls in the 0 namespace, always loaded by Chord.";
 var categories = ["Chord"];
@@ -21,7 +22,6 @@ var chords = {
           name: "Chords",
           chords: {
             '?"1-9"': { name: "Repeat count" },
-            "?/": { name: "Launch" },
             "?0": { name: "Chord" },
             "0,": {
               name: "Chord: Settings",
@@ -100,6 +100,7 @@ var chords = {
 };
 var package_default = {
   name,
+  version,
   displayName,
   description,
   categories,
@@ -121,4 +122,5 @@ export {
   packageManager,
   repository,
   type,
+  version,
 };

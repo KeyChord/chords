@@ -1,12 +1,19 @@
 name = 'Navigation'
 
+[meta]
+chord = '>=0.3.0'
+
 [on.navigation]
 file = 'navigation.js'
 
+# Every chord starts with `<>`, which Chord replaces with the prefix chosen in Settings → Chords
+# → Placeholders or inherits the global symbol before its letter.
+[placeholders]
+"<>" = { name = 'Navigation prefix', default = 'n' }
+
 [chords]
-'?[' = { name = 'Navigation: Back / Dismiss' }
-'?]' = { name = 'Navigation: Continue / Options' }
-'[[' = { name = 'Navigation: Back / Escape', '@input:navigation' = ['PREVIOUS'] }
-']]' = { name = 'Navigation: Next / Continue', '@input:navigation' = ['NEXT'] }
-'[x' = { name = 'Navigation: Close Dialog', '@input:navigation' = ['CLOSE'] }
-'](\d+)' = { name = 'Navigation: Option $1', '@input:navigation' = ['OPTION', '$1'] }
+'?<>' = { name = 'Navigation' }
+'<>[' = { name = 'Navigation: Back / Escape', '@input:navigation' = ['PREVIOUS'] }
+'<>]' = { name = 'Navigation: Next / Continue', '@input:navigation' = ['NEXT'] }
+'<>x' = { name = 'Navigation: Close Dialog', '@input:navigation' = ['CLOSE'] }
+'<>(\d+)' = { name = 'Navigation: Option $1', '@input:navigation' = ['OPTION', '$1'] }

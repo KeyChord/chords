@@ -1,5 +1,9 @@
 import { afterEach, expect, mock, test } from "bun:test";
-import { chordPattern } from "@keychord/chordtest/patterns";
+import {
+  chordPattern,
+  expandPlaceholders,
+  type ChordPlaceholders,
+} from "@keychord/chordtest/patterns";
 import buildMenuHandler, { type MenuAction, type MenuArguments } from "../src/js/menu";
 
 type Binding = {
@@ -10,11 +14,12 @@ type Binding = {
   "@input:visibility"?: [];
   shortcut?: string;
 };
-const bindings = (
-  Bun.TOML.parse(await Bun.file(new URL("../chords/macos.toml", import.meta.url)).text()) as {
-    chords: Record<string, Binding>;
-  }
-).chords;
+const { chords, placeholders } = Bun.TOML.parse(
+  await Bun.file(new URL("../chords/macos.toml", import.meta.url)).text(),
+) as { chords: Record<string, Binding>; placeholders: ChordPlaceholders };
+const bindings = Object.fromEntries(
+  Object.entries(chords).map(([key, binding]) => [expandPlaceholders(key, placeholders), binding]),
+);
 const trayBindings = bindings;
 const menuBindings = Object.entries(bindings).filter(([, binding]) => binding["@input:menu"]);
 
@@ -40,15 +45,15 @@ afterEach(() => {
 });
 
 test.each([
-  ["=[f.", "BY_LETTERS", "f"],
-  ["=[w.", "BY_LETTERS", "w"],
-  ["=[c.", "BY_LETTERS", "c"],
-  ["=[hh.", "BY_LETTERS", "hh"],
-  ["=[zo12.", "BY_LETTERS", "zo12"],
-  ["=[z-o2.", "BY_LETTERS", "z-o2"],
-  ["=/Zoom", "SEARCH", "Zoom"],
-  ["=/Window > Move & Resize", "SEARCH", "Window > Move & Resize"],
-  ["=/100% … 日本語", "SEARCH", "100% … 日本語"],
+  [";b[f.", "BY_LETTERS", "f"],
+  [";b[w.", "BY_LETTERS", "w"],
+  [";b[c.", "BY_LETTERS", "c"],
+  [";b[hh.", "BY_LETTERS", "hh"],
+  [";b[zo12.", "BY_LETTERS", "zo12"],
+  [";b[z-o2.", "BY_LETTERS", "z-o2"],
+  [";b/Zoom", "SEARCH", "Zoom"],
+  [";b/Window > Move & Resize", "SEARCH", "Window > Move & Resize"],
+  [";b/100% … 日本語", "SEARCH", "100% … 日本語"],
 ])("%s dispatches %s %s with the captured application", async (sequence, action, value) => {
   const nativeAction = mock().mockResolvedValue(undefined);
   mock.module("../src/js/menu.node", () => ({ default: { runMenuAction: nativeAction } }));
@@ -68,27 +73,26 @@ test.each([
 test("tray selection, menu indexes, letter queries, and named actions have distinct bindings", () => {
   for (const [sequence, owner] of [
     ...[
-      "=0",
-      "=1",
-      "=78.",
-      "=10l].",
-      "=10r[.",
-      "=-1.",
-      "=-10l.",
-      "=[0.",
-      "=[1.",
-      "=[-1.",
-      "=]1.",
-      "=]-1.",
-      "=c",
-      "=wi",
-      "=s",
-      "=v",
-      "=-",
+      ";b0",
+      ";b1",
+      ";b78.",
+      ";b10l].",
+      ";b10r[.",
+      ";b-1.",
+      ";b-10l.",
+      ";b[0.",
+      ";b[1.",
+      ";b[-1.",
+      ";b]1.",
+      ";b]-1.",
+      ";bc",
+      ";bcw",
+      ";bv",
+      ";b-",
     ].map((sequence) => [sequence, "TRAY"]),
-    ..."abcdefghijklmnopqrstuvwxyz".split("").map((letter) => ["=[" + letter + ".", "MENU"]),
-    ["=[hh.", "MENU"],
-    ["=[z-o2.", "MENU"],
+    ..."abcdefghijklmnopqrstuvwxyz".split("").map((letter) => [";b[" + letter + ".", "MENU"]),
+    [";b[hh.", "MENU"],
+    [";b[z-o2.", "MENU"],
   ]) {
     const matches = [
       ...menuBindings.map(([pattern]) => ({ pattern, owner: "MENU" })),
@@ -107,10 +111,37 @@ test("tray selection, menu indexes, letter queries, and named actions have disti
       sequence,
     ).toEqual([owner]);
   }
-  for (const sequence of ["=f", "=wi", "=[f", "=[hh", "=/", "=[H.", "=00", "=01", "=010", "==c"]) {
+  for (const sequence of [
+    ";bf",
+    ";bcw",
+    ";b[f",
+    ";b[hh",
+    ";b/",
+    ";b[H.",
+    ";b00",
+    ";b01",
+    ";b010",
+    ";b=c",
+  ]) {
     expect(menuBindings.some(([pattern]) => chordPattern(pattern).test(sequence))).toBe(false);
   }
-  expect(trayBindings["?=0"].name).toContain("Apple");
+  expect(trayBindings["?;b0"].name).toContain("Apple");
+});
+
+// `;bw` is the window scope: Window-menu actions plus these application shortcuts.
+const applicationShortcuts: Record<string, string> = {
+  ";bwq": "cmd+q",
+  ";bwh": "cmd+h",
+  ";bwm": "cmd+m",
+};
+
+test(";bwq, ;bwh and ;bwm quit, hide and minimize with the application shortcuts", () => {
+  for (const [chord, shortcut] of Object.entries(applicationShortcuts))
+    expect(bindings[chord]).toEqual({ name: expect.any(String), shortcut });
+  // Force Quit uses ;bq.
+  expect(bindings[";bq"].shortcut).toBe("opt+cmd+esc");
+  for (const chord of [";bh", ";bm", ";bs", ";bwi", ";bwiv", ";bws["])
+    expect(bindings[chord]).toBeUndefined();
 });
 
 test("Window-menu chords invoke exact menu paths and share the unified menu-bar addon", async () => {
@@ -118,7 +149,7 @@ test("Window-menu chords invoke exact menu paths and share the unified menu-bar 
   mock.module("../src/js/menu.node", () => ({ default: { runMenuAction: nativeAction } }));
   const menu = buildMenuHandler();
   const windows = Object.entries(bindings).filter(
-    ([chord]) => chord.startsWith("=w") && chord !== "=wi" && chord !== "=wiv",
+    ([chord]) => chord.startsWith(";bw") && !(chord in applicationShortcuts),
   );
   expect(windows.length).toBeGreaterThan(15);
   for (const [chord, binding] of windows) {
@@ -131,5 +162,5 @@ test("Window-menu chords invoke exact menu paths and share the unified menu-bar 
     expect(nativeAction).toHaveBeenLastCalledWith("dev.fixture", "BY_PATH", JSON.stringify(path));
     expect(chordPattern(chord).test(chord)).toBe(true);
   }
-  expect(bindings["=w"]["@input:menu"]).toEqual(["BY_PATH", ["Window"]]);
+  expect(bindings[";bw"]["@input:menu"]).toEqual(["BY_PATH", ["Window"]]);
 });

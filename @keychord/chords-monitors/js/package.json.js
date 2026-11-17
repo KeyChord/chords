@@ -1,5 +1,6 @@
 //#region package.json
 var name = "@keychord/chords-monitors";
+var version = "0.0.1";
 var displayName = "Monitor Chords";
 var description = "Focus monitors by number, order or direction.";
 var categories = ["Window Management"];
@@ -18,35 +19,40 @@ var devDependencies = {
 var packageManager = "pnpm@12.11.2";
 var chords = { "macos.toml": {
 	"name": "macOS Monitors",
+	"meta": { "chord": ">=0.3.0" },
 	"on": { "monitor": { "file": "monitor.js" } },
+	"placeholders": { "<>": {
+		"name": "Monitor prefix",
+		"default": "m"
+	} },
 	"chords": {
-		"?/m": { "name": "Monitors" },
-		"?/m\"#\"": { "name": "Monitor: Focus #" },
-		"/m([1-9]\\d*)": {
+		"?<>": { "name": "Monitors" },
+		"?<>\"1-9\"": { "name": "Monitor: Focus #" },
+		"<>([1-9]\\d*)": {
 			"name": "Monitor: Focus $1",
 			"@input:monitor": ["$1"]
 		},
-		"/m[": {
+		"<>[": {
 			"name": "Monitor: Previous",
 			"@input:monitor": ["PREVIOUS"]
 		},
-		"/m]": {
+		"<>]": {
 			"name": "Monitor: Next",
 			"@input:monitor": ["NEXT"]
 		},
-		"/ml": {
+		"<>l": {
 			"name": "Monitor: Left",
 			"@input:monitor": ["LEFT"]
 		},
-		"/mr": {
+		"<>r": {
 			"name": "Monitor: Right",
 			"@input:monitor": ["RIGHT"]
 		},
-		"/mt": {
+		"<>t": {
 			"name": "Monitor: Top",
 			"@input:monitor": ["UP"]
 		},
-		"/mb": {
+		"<>b": {
 			"name": "Monitor: Bottom",
 			"@input:monitor": ["DOWN"]
 		}
@@ -54,6 +60,7 @@ var chords = { "macos.toml": {
 } };
 var package_default = {
 	name,
+	version,
 	displayName,
 	description,
 	categories,
@@ -65,4 +72,4 @@ var package_default = {
 	chords
 };
 //#endregion
-export { categories, chords, package_default as default, description, devDependencies, displayName, name, packageManager, repository, scripts, type };
+export { categories, chords, package_default as default, description, devDependencies, displayName, name, packageManager, repository, scripts, type, version };

@@ -128,7 +128,7 @@ function parseWindowDimensions(action, expression) {
 //#region src/js/window.ts
 function buildWindowHandler() {
 	let pending = Promise.resolve();
-	return function window(action, expression) {
+	return function window(action, expression, axis) {
 		let request;
 		const windowId = this?.focusedWindowId ?? null;
 		try {
@@ -147,10 +147,10 @@ function buildWindowHandler() {
 				pending = result.catch(() => {});
 				return result;
 			}
-			const axis = /^(?:\/)?(?:wd([wh])|wp([xy]))/.exec(this?.input ?? "");
-			if (axis && (action === "DIMENSIONS" || action === "DIMENSIONS_INCREASE" || action === "DIMENSIONS_DECREASE" || action === "POSITION")) {
+			if (axis !== void 0) {
+				if (!(action === "POSITION" ? axis === "X" || axis === "Y" : (action === "DIMENSIONS" || action === "DIMENSIONS_INCREASE" || action === "DIMENSIONS_DECREASE") && (axis === "WIDTH" || axis === "HEIGHT"))) throw new TypeError(`Unknown ${action} axis ${JSON.stringify(axis)}`);
 				const { height: value } = parseWindowDimensions(action, `h${expression}`);
-				request = JSON.stringify(axis[1] === "w" || axis[2] === "x" ? { width: value } : { height: value });
+				request = JSON.stringify(axis === "WIDTH" || axis === "X" ? { width: value } : { height: value });
 			} else request = JSON.stringify(parseWindowDimensions(action, expression));
 		} catch (error) {
 			if (error instanceof TypeError) error.message += ` (received ${JSON.stringify(this?.input ?? expression)})`;

@@ -8,71 +8,75 @@ on the screen. It works with any app; Chord needs Accessibility permission. To i
 it, add the `KeyChord/chords` monorepo under Settings → Chords → Chord Monorepos and
 tick `@keychord/chords-click`.
 
+Every chord starts with the package's `<>` prefix, `;c` by default. To reach them with fewer
+keys, choose another prefix under Settings → Chords → **Placeholders**: with `.`, `;c13` becomes `.13`. The examples
+below use the default.
+
 ## Coordinates
 
-Start with `.` and enter x/y coordinate pairs from the
-top left. Each bare digit is one coordinate in tenths: `.13` clicks 10% across and
-30% down; `.1313` clicks that position twice. Within coordinate pairs, `-` means 0%, `1`–`9` mean 10%–90%, and `0` means
+Start with `;c` and enter x/y coordinate pairs from the
+top left. Each bare digit is one coordinate in tenths: `;c13` clicks 10% across and
+30% down; `;c1313` clicks that position twice. Within coordinate pairs, `-` means 0%, `1`–`9` mean 10%–90%, and `0` means
 100%. Far-edge coordinates land on the last pixel inside the window.
 
 Add `/` and one digit to refine a shorthand coordinate by tenths of its unit:
 `1/2` means 12%, `9/5` means 95%, and `-/2` means 2%. The digit after `/` is
-always consumed as part of that coordinate; `/0` adds zero. `.91/2` clicks
-(90%, 12%), and `.91/21/23/4` clicks (90%, 12%), then (12%, 34%).
+always consumed as part of that coordinate; `/0` adds zero. `;c91/2` clicks
+(90%, 12%), and `;c91/21/23/4` clicks (90%, 12%), then (12%, 34%).
 
 A direction suffix makes the whole number an exact pixel offset: `20l` means
 20 pixels from the left, `20r` from the right, `20t` from the top, and `20b` from
-the bottom. `.20l5` clicks x=20 pixels, y=50%. `.20b5` clicks halfway across and
+the bottom. `;c20l5` clicks x=20 pixels, y=50%. `;c20b5` clicks halfway across and
 20 pixels above the bottom. Exact values may include decimals and use macOS
 logical points, independent of Retina scale. Explicit directions may appear in
 either axis order. Each pair must contain one horizontal and one vertical coordinate.
 
 Pairs run together without separators. Pixel offsets consume the complete number
 before their direction suffix. Use `/0` on a shorthand coordinate immediately
-before a pixel amount to keep the two numbers distinct: `.13/020l5` clicks
+before a pixel amount to keep the two numbers distinct: `;c13/020l5` clicks
 (10%, 30%), then (20px, 50%). `/` is exclusively a fractional suffix.
 
-Choose the initial click type with `.` (left), `..` (double), `.,` (right), or
-`.;` (middle). Inside the sequence, `.`, `..`, `,`, and `;` override only the
+Choose the initial click type with `;c` (left), `;c.` (double), `;c,` (right), or
+`;c;` (middle). Inside the sequence, `.`, `..`, `,`, and `;` override only the
 next coordinate pair. Later pairs return to the initial click type. For example,
-`..-9,9228` double-clicks (0%, 90%), right-clicks
+`;c.-9,9228` double-clicks (0%, 90%), right-clicks
 (90%, 20%), then double-clicks (20%, 80%).
 
-Use `.-` to drag with the left button, `.,-` with the right button, or `.;-`
+Use `;c-` to drag with the left button, `;c,-` with the right button, or `;c;-`
 with the middle button. The first pair presses the button; the remaining pairs
-move while it stays down. `.-1328` drags from (10%, 30%) to (20%, 80%), then
+move while it stays down. `;c-1328` drags from (10%, 30%) to (20%, 80%), then
 releases. An internal `.-`, `.,-`, or `.;-` starts a drag at the next pair and
 continues through following bare pairs. An explicit click marker ends that drag.
 
 End a complete sequence with an extra `-` to leave the button down:
-`.-1328-` keeps the drag held, and `.13-` presses at (10%, 30%) and stays held.
+`;c-1328-` keeps the drag held, and `;c13-` presses at (10%, 30%) and stays held.
 A later movement sequence continues the held drag and releases when it finishes,
 unless it also ends with `-`. An ordinary click releases the held button before
 clicking. Failures, including invalid coordinates or a missing window in the next
 command, and package worker shutdown also release it. A double-click
 cannot end with a hold marker.
 
-Use `.=13` to move the pointer to (10%, 30%) without clicking. `.=1328` visits
+Use `;c=13` to move the pointer to (10%, 30%) without clicking. `;c=1328` visits
 both positions. When a button is already held, these moves continue the drag.
 
-Use `./` for screen coordinates: `./55` clicks the center of the display
+Use `;c/` for screen coordinates: `;c/55` clicks the center of the display
 containing the pointer at the start of the sequence. Percentages, `/n` refinements,
 and pixel edge offsets use that display's bounds. These are ordinary global mouse
 events, so they reach the visible app at that point and can change focus.
-Combine modifiers as `./=55` (move globally), `./-1328` (drag globally), or
-`./;-1328` (middle-button drag globally). `.=/55` and `.-/1328`
+Combine modifiers as `;c/=55` (move globally), `;c/-1328` (drag globally), or
+`;c/;-1328` (middle-button drag globally). `;c=/55` and `;c-/1328`
 also support screen scope. Window-scoped commands continue to target the captured
 app's window even when covered.
 
 Because a `-` immediately after the command/button prefix starts a drag, write `0l`
-to begin a normal click with a zero horizontal offset: `.0l9`, `.,0l9`, or
-`.;0l9`. Dashes inside pairs remain zero coordinates: `.0-` still clicks the
+to begin a normal click with a zero horizontal offset: `;c0l9`, `;c,0l9`, or
+`;c;0l9`. Dashes inside pairs remain zero coordinates: `;c0-` still clicks the
 top-right edge. A trailing `-` is a hold only after a complete coordinate pair.
 
 The five-click example is:
 
 ```text
-.20b5-53/07/00r20b65
+;c20b5-53/07/00r20b65
 ```
 
 It clicks 20 pixels above the bottom at the horizontal center, halfway down at the

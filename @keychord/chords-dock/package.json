@@ -1,6 +1,7 @@
 {
   "name": "@keychord/chords-dock",
   "displayName": "Dock Chords",
+  "version": "0.0.1",
   "description": "Move keyboard focus to the macOS Dock and between its apps.",
   "categories": [
     "macOS"

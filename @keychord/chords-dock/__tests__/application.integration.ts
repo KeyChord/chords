@@ -36,12 +36,12 @@ const handler = buildApplicationHandler();
 const definition = Bun.TOML.parse(
   await Bun.file(new URL("../chords/macos.toml", import.meta.url)).text(),
 ) as any;
-async function step(input: "/dw[" | "/dw]", captured = true) {
+async function step(input: ";dw[" | ";dw]", captured = true) {
   const before = (await state()).frontmostAppId;
   phase = `${input} from ${before}`;
   await handler.call(
     captured ? { focusedAppId: before } : undefined,
-    definition.chords[input]["@input:application"][0],
+    definition.chords[input.replace(/^;d/, "<>")]["@input:application"][0],
   );
   const result = await observed(async () => {
     const current = await state();
@@ -53,7 +53,7 @@ async function step(input: "/dw[" | "/dw]", captured = true) {
 }
 const forward = [currentId];
 for (let count = 0; count < 30; count++) {
-  const next = await step("/dw]", count !== 0);
+  const next = await step(";dw]", count !== 0);
   if (next === currentId) break;
   assert.ok(!forward.includes(next), `App ${next} repeated before completing the cycle`);
   forward.push(next);
@@ -63,19 +63,19 @@ assert.ok(forward.includes(firstId), "An app without windows remains switchable"
 assert.ok(forward.includes(hiddenId), "Hidden apps remain switchable");
 assert.equal((await state(hiddenOutput)).hidden, false);
 for (const expected of forward.slice(1).reverse().concat(currentId)) {
-  assert.equal(await step("/dw["), expected);
+  assert.equal(await step(";dw["), expected);
 }
 // An ordinary activation starts a new cycle with that app at the front.
 await Bun.write(currentOutput + ".command", "activate:" + firstId);
 phase = "manually activate windowless app";
 await observed(async () => ((await state()).frontmostAppId === firstId ? true : undefined));
-assert.equal(await step("/dw]"), currentId);
-assert.equal(await step("/dw["), firstId);
+assert.equal(await step(";dw]"), currentId);
+assert.equal(await step(";dw["), firstId);
 await assert.rejects(
   handler.call({ focusedAppId: "dev.keychord.nonexistent" }, "NEXT"),
   /not running/,
 );
-await step("/dw]");
+await step(";dw]");
 const hiddenPID = Number(await Bun.file(hiddenOutput + ".pid").text());
 await Bun.write(hiddenOutput + ".command", "quit");
 phase = "wait for app exit";
@@ -90,7 +90,7 @@ await observed(() => {
 });
 const afterExit = (await state()).frontmostAppId;
 for (let count = 0; count < 30; count++) {
-  const next = await step("/dw]");
+  const next = await step(";dw]");
   assert.notEqual(next, hiddenId);
   if (next === afterExit) break;
 }

@@ -1,24 +1,32 @@
 name = 'Modifier Keys'
 
+[meta]
+chord = '>=0.3.0'
+
 [on.keys]
 file = 'keys.js'
 
+# Every chord starts with `<>`, which Chord replaces with the prefix chosen in Settings → Chords
+# → Placeholders or inherits the global symbol before its letter.
+[placeholders]
+"<>" = { name = 'Modifier keys prefix', default = 'k' }
+
 [chords]
-'?.' = { name = 'Click / Modifiers' }
+'?<>' = { name = 'Modifiers' }
 
 # The first modifier precedes one regular key; additional modifiers follow in any order.
-# Examples: .mv sends Command+V; .mvs sends Command+Shift+V; .mcsa sends Command+Shift+Alt+C.
-'?.m' = { name = 'Meta (Command)' }
-'.(m.[acfms]*)' = { name = 'Meta (Cmd) Combo', '@input:keys' = ['$1'] }
+# Examples: ;kmv sends Command+V; ;kmvs sends Command+Shift+V; ;kmcsa sends Command+Shift+Alt+C.
+'?<>m' = { name = 'Meta (Command)' }
+'<>(m.[acfms]*)' = { name = 'Meta (Cmd) Combo', '@input:keys' = ['$1'] }
 
-'?.c' = { name = 'Control' }
-'.(c.[acfms]*)' = { name = 'Control Combo', '@input:keys' = ['$1'] }
+'?<>c' = { name = 'Control' }
+'<>(c.[acfms]*)' = { name = 'Control Combo', '@input:keys' = ['$1'] }
 
-'?.a' = { name = 'Alt (Option)' }
-'.(a.[acfms]*)' = { name = 'Alt Combo', '@input:keys' = ['$1'] }
+'?<>a' = { name = 'Alt (Option)' }
+'<>(a.[acfms]*)' = { name = 'Alt Combo', '@input:keys' = ['$1'] }
 
-'?.f' = { name = 'Fn' }
-'.(f.[acfms]*)' = { name = 'Fn Combo', '@input:keys' = ['$1'] }
+'?<>f' = { name = 'Fn' }
+'<>(f.[acfms]*)' = { name = 'Fn Combo', '@input:keys' = ['$1'] }
 
-'?.s' = { name = 'Shift' }
-'.(s.[acfms]*)' = { name = 'Shift Combo', '@input:keys' = ['$1'] }
+'?<>s' = { name = 'Shift' }
+'<>(s.[acfms]*)' = { name = 'Shift Combo', '@input:keys' = ['$1'] }

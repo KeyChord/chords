@@ -1,7 +1,7 @@
 {
   "name": "@keychord/chords-com.apple.AccessibilityInspector",
   "displayName": "Accessibility Inspector Chords",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Chords for Accessibility Inspector (com.apple.AccessibilityInspector).",
   "categories": [
     "macOS"

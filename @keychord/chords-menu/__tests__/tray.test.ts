@@ -1,5 +1,9 @@
 import { beforeEach, expect, mock, test } from "bun:test";
-import { chordPattern } from "@keychord/chordtest/patterns";
+import {
+  chordPattern,
+  expandPlaceholders,
+  type ChordPlaceholders,
+} from "@keychord/chordtest/patterns";
 import type { TrayAction } from "../src/js/tray";
 
 const nativeAction = mock(async (_type: string, _value: string, _action: string) => {});
@@ -22,9 +26,10 @@ const handler = buildHandler();
 const { default: buildSelectionHandler, parseMenuBarSelection } =
   await import("../src/js/selection");
 const select = buildSelectionHandler();
-const { chords: bindings } = Bun.TOML.parse(
+const { chords, placeholders } = Bun.TOML.parse(
   await Bun.file(new URL("../chords/macos.toml", import.meta.url)).text(),
 ) as {
+  placeholders: ChordPlaceholders;
   chords: Record<
     string,
     {
@@ -38,6 +43,9 @@ const { chords: bindings } = Bun.TOML.parse(
     }
   >;
 };
+const bindings = Object.fromEntries(
+  Object.entries(chords).map(([key, binding]) => [expandPlaceholders(key, placeholders), binding]),
+);
 const selectionBindings = Object.entries(bindings).filter(
   ([, binding]) => binding["@keydown:select"],
 );
@@ -68,7 +76,7 @@ test("bare indexes select tray icons and explicit menu/tray prefixes keep their 
     for (let index = 1; index <= 9; index++) {
       for (const fromEnd of [false, true]) {
         for (const rightClick of [false, true]) {
-          await dispatch("=" + prefix + (fromEnd ? "-" : "") + index + (rightClick ? "," : "."));
+          await dispatch(";b" + prefix + (fromEnd ? "-" : "") + index + (rightClick ? "," : "."));
           expect(nativeSelection).toHaveBeenLastCalledWith(
             undefined,
             scope,
@@ -83,8 +91,8 @@ test("bare indexes select tray icons and explicit menu/tray prefixes keep their 
   expect(openAddon).toHaveBeenCalledTimes(1);
 });
 
-test("=78. previews 7, then 8, and clicks 8 once", async () => {
-  for (const sequence of ["=7", "=78", "=78."]) await dispatch(sequence);
+test(";b78. previews 7, then 8, and clicks 8 once", async () => {
+  for (const sequence of [";b7", ";b78", ";b78."]) await dispatch(sequence);
   await select.call({ event: { type: "keydown", key: "CapsLock", repeat: false } }, "INPUT", "78.");
   expect(nativeSelection.mock.calls).toEqual([
     [undefined, "TRAY", "6", "", ""],
@@ -95,35 +103,35 @@ test("=78. previews 7, then 8, and clicks 8 once", async () => {
 
 test("Apple is zero; l/r uses the full number and bracket steps keep the selected scope", async () => {
   for (const [sequence, scope, index, steps] of [
-    ["=0", "MENU", "0", ""],
-    ["=[0", "MENU", "0", ""],
-    ["=10l", "TRAY", "9", ""],
-    ["=10l]", "TRAY", "9", "]"],
-    ["=10l][", "TRAY", "9", "]["],
-    ["=10r", "TRAY", "-10", ""],
-    ["=10r]", "TRAY", "-10", "]"],
-    ["=10r[", "TRAY", "-10", "["],
-    ["=-78", "TRAY", "-8", ""],
-    ["=]1", "TRAY", "0", ""],
-    ["=]10l", "TRAY", "9", ""],
-    ["=]-1", "TRAY", "-1", ""],
-    ["=[-1", "MENU", "-1", ""],
+    [";b0", "MENU", "0", ""],
+    [";b[0", "MENU", "0", ""],
+    [";b10l", "TRAY", "9", ""],
+    [";b10l]", "TRAY", "9", "]"],
+    [";b10l][", "TRAY", "9", "]["],
+    [";b10r", "TRAY", "-10", ""],
+    [";b10r]", "TRAY", "-10", "]"],
+    [";b10r[", "TRAY", "-10", "["],
+    [";b-78", "TRAY", "-8", ""],
+    [";b]1", "TRAY", "0", ""],
+    [";b]10l", "TRAY", "9", ""],
+    [";b]-1", "TRAY", "-1", ""],
+    [";b[-1", "MENU", "-1", ""],
   ]) {
     await dispatch(sequence);
     expect(nativeSelection).toHaveBeenLastCalledWith(undefined, scope, index, steps, "");
   }
-  await dispatch("=0.");
+  await dispatch(";b0.");
   expect(nativeSelection).toHaveBeenLastCalledWith(undefined, "MENU", "0", "", "LEFT");
 });
 
 test("Backspace restores a selection without clicking; repeat and modifier events cannot click", async () => {
-  await dispatch("=78.");
+  await dispatch(";b78.");
   nativeSelection.mockClear();
-  await dispatch("=78.", ".", true);
-  await dispatch("=78.", "Shift");
+  await dispatch(";b78.", ".", true);
+  await dispatch(";b78.", "Shift");
   expect(nativeSelection).not.toHaveBeenCalled();
-  await dispatch("=78", "Backspace");
-  await dispatch("=7", "Backspace");
+  await dispatch(";b78", "Backspace");
+  await dispatch(";b7", "Backspace");
   expect(nativeSelection.mock.calls).toEqual([
     [undefined, "TRAY", "7", "", ""],
     [undefined, "TRAY", "6", "", ""],
@@ -146,18 +154,18 @@ test("invalid full indexes cannot click; letters, notch, and named actions never
   }
   expect(nativeSelection).not.toHaveBeenCalled();
   for (const sequence of [
-    "=00",
-    "=01",
-    "=010",
-    "=f",
-    "=wi",
-    "==c",
-    "=7.,",
-    "=[f.",
-    "=/f.",
-    "=-",
-    "=]",
-    "=[",
+    ";b00",
+    ";b01",
+    ";b010",
+    ";bf",
+    ";bcw",
+    ";b=c",
+    ";b7.,",
+    ";b[f.",
+    ";b/f.",
+    ";b-",
+    ";b]",
+    ";b[",
   ]) {
     expect(
       selectionBindings.some(([pattern]) => chordPattern(pattern).test(sequence)),
@@ -179,26 +187,26 @@ test("invalid full indexes cannot click; letters, notch, and named actions never
 });
 
 test("bare minus clicks the notch only when input completes", async () => {
-  expect(bindings["=-"]["@input:tray"]).toEqual(["NOTCH"]);
-  expect(bindings["=-"]["@keydown:select"]).toBeUndefined();
+  expect(bindings[";b-"]["@input:tray"]).toEqual(["NOTCH"]);
+  expect(bindings[";b-"]["@keydown:select"]).toBeUndefined();
   await handler("NOTCH");
   expect(nativeAction).toHaveBeenCalledWith("NOTCH", "", "");
 });
 
 const controlCenterBindings: [string, TrayAction][] = [
-  ["=c", ["CONTROL_CENTER"]],
-  ["=cd", ["CONTROL_CENTER", "DISPLAY"]],
-  ["=cd-", ["CONTROL_CENTER", "DISPLAY", "DECREASE"]],
-  ["=cd=", ["CONTROL_CENTER", "DISPLAY", "INCREASE"]],
-  ["=cd.", ["CONTROL_CENTER", "DISPLAY", "CLICK"]],
-  ["=cdd", ["CONTROL_CENTER", "DISPLAY", "DARK_MODE"]],
-  ["=cdn", ["CONTROL_CENTER", "DISPLAY", "NIGHT_SHIFT"]],
-  ["=cdt", ["CONTROL_CENTER", "DISPLAY", "TRUE_TONE"]],
-  ["=cds", ["CONTROL_CENTER", "DISPLAY", "SETTINGS"]],
-  ["=cs", ["CONTROL_CENTER", "SOUND"]],
-  ["=cs-", ["CONTROL_CENTER", "SOUND", "DECREASE"]],
-  ["=cs=", ["CONTROL_CENTER", "SOUND", "INCREASE"]],
-  ["=cs.", ["CONTROL_CENTER", "SOUND", "CLICK"]],
+  [";bc", ["CONTROL_CENTER"]],
+  [";bcd", ["CONTROL_CENTER", "DISPLAY"]],
+  [";bcd-", ["CONTROL_CENTER", "DISPLAY", "DECREASE"]],
+  [";bcd=", ["CONTROL_CENTER", "DISPLAY", "INCREASE"]],
+  [";bcd.", ["CONTROL_CENTER", "DISPLAY", "CLICK"]],
+  [";bcdd", ["CONTROL_CENTER", "DISPLAY", "DARK_MODE"]],
+  [";bcdn", ["CONTROL_CENTER", "DISPLAY", "NIGHT_SHIFT"]],
+  [";bcdt", ["CONTROL_CENTER", "DISPLAY", "TRUE_TONE"]],
+  [";bcds", ["CONTROL_CENTER", "DISPLAY", "SETTINGS"]],
+  [";bcs", ["CONTROL_CENTER", "SOUND"]],
+  [";bcs-", ["CONTROL_CENTER", "SOUND", "DECREASE"]],
+  [";bcs=", ["CONTROL_CENTER", "SOUND", "INCREASE"]],
+  [";bcs.", ["CONTROL_CENTER", "SOUND", "CLICK"]],
 ];
 
 for (const [chord, args] of controlCenterBindings) {
@@ -216,15 +224,15 @@ test("all Control Center entries have executable bindings", () => {
   expect(entries.map(([chord]) => chord).sort()).toEqual(
     controlCenterBindings.map(([chord]) => chord).sort(),
   );
-  expect(bindings["=cd."].name).toEndWith("Click");
-  expect(bindings["=cds"].name).toEndWith("Settings");
+  expect(bindings[";bcd."].name).toEndWith("Click");
+  expect(bindings[";bcds"].name).toEndWith("Settings");
 });
 
 for (const [chord, args] of [
-  ["=p", ["BATTERY"]],
-  ["=t", ["DATE_TIME"]],
-  ["=wi", ["WIFI"]],
-  ["=wiv", ["WIFI", "TOGGLE"]],
+  [";bp", ["BATTERY"]],
+  [";bt", ["DATE_TIME"]],
+  [";bcw", ["WIFI"]],
+  [";bcwv", ["WIFI", "TOGGLE"]],
 ] satisfies [string, TrayAction][]) {
   test(`${chord} routes its system tray command`, async () => {
     expect(bindings[chord]["@input:tray"]).toEqual(args);
@@ -233,9 +241,8 @@ for (const [chord, args] of [
   });
 }
 
-test("Spotlight has a shortcut and every non-category chord has an action", () => {
-  expect(bindings["=s"].shortcut).toBe("cmd+space");
-  const placeholders = Object.entries(bindings).filter(
+test("every non-category chord has an action", () => {
+  const unactionable = Object.entries(bindings).filter(
     ([chord, binding]) =>
       !chord.startsWith("?") &&
       !binding["@input:tray"] &&
@@ -244,7 +251,7 @@ test("Spotlight has a shortcut and every non-category chord has an action", () =
       !binding["@input:menu"] &&
       !binding.shortcut,
   );
-  expect(placeholders).toEqual([]);
+  expect(unactionable).toEqual([]);
 });
 
 for (const index of [NaN, Infinity, -Infinity, 0.5, Number.MAX_SAFE_INTEGER + 1]) {
@@ -263,8 +270,8 @@ test("native failures reach the caller", async () => {
 });
 
 test("visibility chord invokes its own handler without colliding with volume chords", () => {
-  expect(bindings["=v"]["@input:visibility"]).toEqual([]);
-  expect(bindings["=vu"].shortcut).toBe("AudioVolumeUp");
-  expect(bindings["=vd"].shortcut).toBe("AudioVolumeDown");
-  expect(bindings["=vm"].shortcut).toBe("AudioVolumeMute");
+  expect(bindings[";bv"]["@input:visibility"]).toEqual([]);
+  expect(bindings[";bvu"].shortcut).toBe("AudioVolumeUp");
+  expect(bindings[";bvd"].shortcut).toBe("AudioVolumeDown");
+  expect(bindings[";bvm"].shortcut).toBe("AudioVolumeMute");
 });

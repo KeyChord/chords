@@ -58,7 +58,7 @@ const bindings = Object.entries(toml.chords).filter(
 );
 async function invokeChord(input: string) {
   const matches = bindings.flatMap(([pattern, binding]) => {
-    const capture = chordPattern(pattern).exec(input);
+    const capture = chordPattern(pattern, toml.placeholders).exec(input);
     return capture ? [{ capture, binding: binding as any }] : [];
   });
   assert.equal(matches.length, 1);
@@ -66,10 +66,10 @@ async function invokeChord(input: string) {
   const args = binding["@input:click"];
   assert.equal(args.length, 2);
   const sequence = capture[Number(args[0].slice(1))];
-  assert.equal(sequence, input.slice(1));
+  assert.equal(sequence, input.slice(";c".length));
   await handler.call(context, sequence, args[1]);
 }
-await invokeChord(".20b5-53/07/00r20b65");
+await invokeChord(";c20b5-53/07/00r20b65");
 await until(async () => (await state()).events.length === 10);
 const clicked = await state();
 assert.deepEqual(
@@ -101,12 +101,12 @@ let eventCount = 10;
 const topLeft = { x: 30, y: 20 };
 const bottomRight = { x: 250, y: 560 };
 for (const [input, points] of [
-  [".50r40b30l20t", [bottomRight, topLeft]],
-  [".30l20t50r40b", [topLeft, bottomRight]],
-  [".20t30l40b50r", [topLeft, bottomRight]],
-  [".40b50r20t30l", [bottomRight, topLeft]],
+  [";c50r40b30l20t", [bottomRight, topLeft]],
+  [";c30l20t50r40b", [topLeft, bottomRight]],
+  [";c20t30l40b50r", [topLeft, bottomRight]],
+  [";c40b50r20t30l", [bottomRight, topLeft]],
   [
-    ".91/21/23/4",
+    ";c91/21/23/4",
     [
       { x: 270, y: 72 },
       { x: 36, y: 204 },
@@ -126,7 +126,7 @@ for (const [input, points] of [
 }
 console.log("click fixture: direction suffixes and mixed fractions run without separators");
 
-await invokeChord("..-9,9228");
+await invokeChord(";c.-9,9228");
 eventCount += 10;
 await until(async () => (await state()).events.length === eventCount);
 const doubleEvents = (await state()).events.slice(-10);
@@ -144,7 +144,7 @@ assert.deepEqual(
     { x: 60, y: 480, button: 0, clickCount: 2 },
   ],
 );
-await invokeChord(".;0l9.9228");
+await invokeChord(";c;0l9.9228");
 eventCount += 6;
 await until(async () => (await state()).events.length === eventCount);
 assert.deepEqual(
@@ -190,9 +190,9 @@ assert.deepEqual(
 console.log("click fixture: overlapping sequences passed");
 
 for (const [input, button] of [
-  [".-1328", 0],
-  [".,-1328", 1],
-  [".;-1328", 2],
+  [";c-1328", 0],
+  [";c,-1328", 1],
+  [";c;-1328", 2],
 ] as const) {
   await invokeChord(input);
   eventCount += 3;
@@ -206,12 +206,12 @@ for (const [input, button] of [
     ],
   );
 }
-await invokeChord(".-1355-");
+await invokeChord(";c-1355-");
 eventCount += 2;
 await until(async () => (await state()).events.length === eventCount);
 await Bun.sleep(100);
 assert.equal((await state()).events.at(-1)!.phase, "DRAG");
-await invokeChord(".=28");
+await invokeChord(";c=28");
 eventCount += 2;
 await until(async () => (await state()).events.length === eventCount);
 assert.deepEqual(
@@ -221,7 +221,7 @@ assert.deepEqual(
     { phase: "up", x: 60, y: 480 },
   ],
 );
-await invokeChord(".=55");
+await invokeChord(";c=55");
 await Bun.sleep(100);
 assert.equal((await state()).events.length, eventCount);
 assert.deepEqual((await state()).cursor, { x: initialBounds.x + 150, y: initialBounds.y + 300 });
@@ -229,14 +229,14 @@ assert.equal((await state()).frontmostAppId, coverId);
 assert.equal((await state(coverOutput)).events.length, 0);
 
 for (const [input, button] of [
-  [".13-", 0],
-  [".,13-", 1],
-  [".;13-", 2],
+  [";c13-", 0],
+  [";c,13-", 1],
+  [";c;13-", 2],
 ] as const) {
   await invokeChord(input);
   eventCount += 1;
   await until(async () => (await state()).events.length === eventCount);
-  await assert.rejects(invokeChord(".13junk"), /coordinate/);
+  await assert.rejects(invokeChord(";c13junk"), /coordinate/);
   eventCount += 1;
   await until(async () => (await state()).events.length === eventCount);
   assert.deepEqual(
@@ -247,10 +247,10 @@ for (const [input, button] of [
     ],
   );
 }
-await invokeChord(".-13-");
+await invokeChord(";c-13-");
 eventCount += 1;
 await until(async () => (await state()).events.length === eventCount);
-await assert.rejects(invokeChord(".=301l5"), /outside/);
+await assert.rejects(invokeChord(";c=301l5"), /outside/);
 eventCount += 1;
 await until(async () => (await state()).events.length === eventCount);
 assert.deepEqual(
@@ -261,7 +261,7 @@ console.log("click fixture: preflight failures release latched left/right/middle
 
 // Move globally without clicks or focus changes, then click the covering fixture globally.
 const screen = getScreenBounds();
-await invokeChord("./=55");
+await invokeChord(";c/=55");
 await until(async () => (await state()).cursor.x === screen.x + screen.width / 2);
 assert.deepEqual((await state()).cursor, {
   x: screen.x + screen.width / 2,
@@ -270,7 +270,7 @@ assert.deepEqual((await state()).cursor, {
 assert.equal((await state()).events.length, eventCount);
 const coverBounds = getAppWindows(coverId)[0].bounds;
 const globalPoint = `${coverBounds.x - screen.x + 30}l${coverBounds.y - screen.y + 20}t`;
-await invokeChord(`./${globalPoint}`);
+await invokeChord(`;c/${globalPoint}`);
 await until(async () => (await state(coverOutput)).events.length === 2);
 assert.deepEqual(
   (await state(coverOutput)).events.map(({ phase, x, y }) => ({ phase, x, y })),
@@ -281,9 +281,9 @@ assert.deepEqual(
 );
 let coverEventCount = 2;
 for (const [prefix, button, count] of [
-  ["./.", 0, 2],
-  ["./,", 1, 1],
-  ["./;", 2, 1],
+  [";c/.", 0, 2],
+  [";c/,", 1, 1],
+  [";c/;", 2, 1],
 ] as const) {
   await invokeChord(prefix + globalPoint);
   coverEventCount += count * 2;
@@ -300,9 +300,9 @@ for (const [prefix, button, count] of [
 }
 const globalEnd = `${coverBounds.x - screen.x + 60}l${coverBounds.y - screen.y + 40}t`;
 for (const [prefix, button] of [
-  ["./-", 0],
-  ["./,-", 1],
-  ["./;-", 2],
+  [";c/-", 0],
+  [";c/,-", 1],
+  [";c/;-", 2],
 ] as const) {
   await invokeChord(prefix + globalPoint + globalEnd);
   coverEventCount += 3;

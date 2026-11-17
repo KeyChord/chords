@@ -1,10 +1,15 @@
 //#region package.json
 var name = "@keychord/chords-spotify";
+var version = "0.0.1";
+var displayName = "Spotify Chords";
+var description = "Chords for the Spotify desktop app.";
+var categories = ["Media"];
 var repository = {
   type: "git",
   url: "https://github.com/KeyChord/chords-spotify",
 };
 var type = "module";
+var scripts = { test: "bun test --isolate" };
 var devDependencies = {
   "@chord/com.npmjs.types__node": "workspace:*",
   "@keychord/chordtest": "workspace:*",
@@ -188,19 +193,29 @@ var chords = {
 };
 var package_default = {
   name,
+  version,
+  displayName,
+  description,
+  categories,
   repository,
   type,
+  scripts,
   devDependencies,
   packageManager,
   chords,
 };
 //#endregion
 export {
+  categories,
   chords,
   package_default as default,
+  description,
   devDependencies,
+  displayName,
   name,
   packageManager,
   repository,
+  scripts,
   type,
+  version,
 };

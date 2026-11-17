@@ -1,7 +1,7 @@
 {
   "name": "@keychord/chords-com.apple.Safari",
   "displayName": "Safari Chords",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Chords for Safari (com.apple.Safari).",
   "categories": [
     "macOS"

@@ -19,7 +19,7 @@ export type ClickPosition = {
   hold?: boolean;
 };
 
-/** Parse modifiers immediately after the initial dot; / inside a pair still refines it. */
+/** Parse leading mouse modifiers. A slash inside a pair refines its coordinate. */
 export function parseMouseCommand(command: string): {
   positions: ClickPosition[];
   global: boolean;

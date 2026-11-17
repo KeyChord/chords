@@ -1,6 +1,7 @@
 {
   "name": "@keychord/chords-spotify",
   "displayName": "Spotify Chords",
+  "version": "0.0.1",
   "description": "Chords for the Spotify desktop app.",
   "categories": [
     "Media"

@@ -1,7 +1,7 @@
 //#region package.json
 var name = "@keychord/chords-chromium";
 var displayName = "Chromium Chords";
-var version = "0.0.0";
+var version = "0.0.1";
 var description =
   "Chords for Google Chrome and other Chromium-based browsers, including Brave, Edge, Opera and Vivaldi.";
 var categories = ["Browsers"];

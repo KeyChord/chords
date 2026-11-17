@@ -1,7 +1,7 @@
 //#region package.json
 var name = "@keychord/chords-com.apple.systempreferences";
 var displayName = "System Preferences Chords";
-var version = "0.0.0";
+var version = "0.0.1";
 var description = "Chords for System Preferences (com.apple.systempreferences).";
 var categories = ["macOS"];
 var repository = {
@@ -170,8 +170,15 @@ var chords = {
   },
   "macos.toml": {
     name: "System Preferences",
+    meta: { chord: ">=0.3.0" },
+    placeholders: {
+      "<>": {
+        name: "System Settings prefix",
+        default: "/",
+      },
+    },
     chords: {
-      "/,": {
+      "<>,": {
         name: "System Preferences",
         shell: "open -b com.apple.systempreferences",
       },

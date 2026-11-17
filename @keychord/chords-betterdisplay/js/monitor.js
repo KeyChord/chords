@@ -246,7 +246,7 @@ async function pointerDisplay(command) {
 		"--identifier=name"
 	])).split(",").map(managedTarget);
 	const targets = new Set(resolved);
-	if (targets.size !== 1 || targets.has(void 0)) throw new Error("Move the pointer to a physical display or a virtual screen created by /md");
+	if (targets.size !== 1 || targets.has(void 0)) throw new Error("Move the pointer to a physical display or a virtual screen this package created");
 	return [...targets][0];
 }
 function singleValue(output) {

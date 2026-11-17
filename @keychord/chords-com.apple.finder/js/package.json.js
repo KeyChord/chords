@@ -1,7 +1,7 @@
 //#region package.json
 var name = "@keychord/chords-com.apple.finder";
 var displayName = "Finder Chords";
-var version = "0.0.0";
+var version = "0.0.1";
 var description = "Chords for Finder and file open and save dialogs.";
 var categories = ["macOS"];
 var repository = {
@@ -89,13 +89,24 @@ var chords = {
               shortcut: "ctrl+cmd+up",
             },
             "?f": { name: "File" },
-            fa: { name: "File: Alias" },
+            fa: {
+              name: "File: Alias",
+              shortcut: "ctrl+cmd+a",
+            },
             fe: {
               name: "File: Eject",
               shortcut: "cmd+e",
             },
-            fc: { name: "File: Compress" },
-            fr: { name: "File: Rename" },
+            fc: {
+              name: "File: Compress",
+              shell:
+                '  osascript -e \'tell application "System Events" to tell process "Finder" to click (first menu item of menu 1 of menu bar item "File" of menu bar 1 whose name starts with "Compress" and name does not contain "password")\'\n',
+            },
+            fr: {
+              name: "File: Rename",
+              shell:
+                '  osascript -e \'tell application "System Events" to tell process "Finder" to click (first menu item of menu 1 of menu bar item "File" of menu bar 1 whose name starts with "Rename")\'\n',
+            },
             ft: {
               name: "File: Trash",
               shortcut: "cmd+delete",
@@ -175,7 +186,11 @@ var chords = {
               name: "Clean: Modified Date",
               shortcut: "cmd+opt+5",
             },
-            cc: { name: "Clean: Created Date" },
+            cc: {
+              name: "Clean: Created Date",
+              shell:
+                '  osascript -e \'tell application "System Events" to tell process "Finder" to click (menu item "Date Created" of menu 1 of menu item "Clean Up By" of menu 1 of menu bar item "View" of menu bar 1)\'\n',
+            },
             cs: {
               name: "Clean: Size",
               shortcut: "cmd+opt+6",
@@ -236,8 +251,15 @@ var chords = {
   },
   "macos.toml": {
     name: "Finder",
+    meta: { chord: ">=0.3.0" },
+    placeholders: {
+      "<>": {
+        name: "Finder prefix",
+        default: "/",
+      },
+    },
     chords: {
-      "/f": {
+      "<>f": {
         name: "Finder",
         shell: "open -a Finder",
       },

@@ -1,5 +1,9 @@
 //#region package.json
 var name = "@keychord/chords-betterdisplay";
+var version = "0.0.1";
+var displayName = "BetterDisplay Chords";
+var description = "Set the resolution of the display under the pointer with BetterDisplay.";
+var categories = ["Utilities"];
 var repository = {
 	"type": "git",
 	"url": "https://github.com/KeyChord/chords-betterdisplay"
@@ -21,10 +25,15 @@ var devDependencies = {
 var packageManager = "pnpm@12.11.2";
 var chords = { "macos.toml": {
 	"name": "BetterDisplay",
+	"meta": { "chord": ">=0.3.0" },
 	"on": { "monitor": { "file": "monitor.js" } },
+	"placeholders": { "<>": {
+		"name": "Monitor prefix",
+		"default": "m"
+	} },
 	"chords": {
-		"?/md": { "name": "Monitor: Dimensions" },
-		"/md(.+)": {
+		"?<>d": { "name": "Monitor: Dimensions" },
+		"<>d(.+)": {
 			"name": "Monitor: Dimensions (Set)",
 			"@input:monitor": ["$1"]
 		}
@@ -32,6 +41,10 @@ var chords = { "macos.toml": {
 } };
 var package_default = {
 	name,
+	version,
+	displayName,
+	description,
+	categories,
 	repository,
 	type,
 	scripts,
@@ -41,4 +54,4 @@ var package_default = {
 	chords
 };
 //#endregion
-export { chords, package_default as default, dependencies, devDependencies, name, packageManager, repository, scripts, type };
+export { categories, chords, package_default as default, dependencies, description, devDependencies, displayName, name, packageManager, repository, scripts, type, version };

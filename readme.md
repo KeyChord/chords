@@ -45,11 +45,8 @@ monorepo). Between GitHub repos, the pinned default `KeyChord/chords-menu` and
 remove them under **Chord Repos** if you want the monorepo's versions of those two
 packages.
 
-To change one of the default chords (for example `/f`, which opens Finder from
-`@keychord/chords-com.apple.finder` in the current monorepo), override the package that defines it with a local
-copy, using **Link Local Folder** on its repo, and edit the chord there. Binding the
-same sequence in a different package isn't a reliable override: when two packages
-define the same chord, Chord doesn't consistently pick the same one.
+To change a chord's suffix or action, link a local copy of the package using
+**Link Local Folder** on its repo, then edit the chord there.
 
 ## Usage
 
@@ -57,18 +54,28 @@ You can use these Chord Packages as templates for creating your own chords. See 
 
 ## Default Global Keys
 
-In the default chord package, these are the categories assigned to the global chords (which must start with a non-alphanumeric character). If you want to define your own custom global chord which doesn't fit into any of the following categories, you should prefer the `,` prefix.
+Global chords work in every app. Packages that declare a prefix letter inherit **Default Global
+Prefix for Placeholders** under Settings → Chords. It starts at `;`, as shown below. To change
+one package's prefix, open its **Placeholders** section. For example, set **Mouse prefix** to
+`.` to enter `.13` for a click.
 
-`,` User-Defined Global Chords\
-`/` Launch\
-`=` Menu / Tray / System Shortcuts\
-`.` Mouse / Keyboard (e.g. modifiers)\
-`;` Web\
-`[`, `]` Global Navigation
+| Default prefix | Package or actions                                                      |
+| -------------- | ----------------------------------------------------------------------- |
+| `/`            | Finder (`/f`), System Settings (`/,`), and launcher search (`/<query>`) |
+| `;a`           | AeroSpace                                                               |
+| `;b`           | Menu bar, tray, Window menu, and system actions                         |
+| `;c`           | Click and mouse movement                                                |
+| `;d`           | Dock                                                                    |
+| `;k`           | Modifier keys                                                           |
+| `;m`           | Monitors and BetterDisplay                                              |
+| `;n`           | Navigation                                                              |
+| `;r`           | Rift                                                                    |
+| `;s`           | Spaces                                                                  |
+| `;w`           | Native window commands                                                  |
 
 > `'` is reserved for pass-through input (can appear anywhere in a chord)\
 > `\` is reserved for escape characters (can appear anywhere in a chord)\
-> `` ` `` isn't reserved, but is conventionally used for "config" (e.g. ``3`d2,i1`/w]`` waits 200 ms, then runs `/w]` (next window) three times, 100 ms apart)
+> `` ` `` isn't reserved, but is conventionally used for "config" (e.g. ``3`d2,i1`;w]`` waits 200 ms, then runs `;w]` (next window) three times, 100 ms apart)
 
 > [!NOTE]
 > This section is largely AI-written, so parts of it may not be fully accurate. It will be replaced with a hand-written version when I get the time.

@@ -1,28 +1,28 @@
 import { expect, mock, test } from "bun:test";
-import { chordPattern } from "@keychord/chordtest/patterns";
+import { chordPattern, type ChordPlaceholders } from "@keychord/chordtest/patterns";
 import { waitFor } from "@keychord/chordtest/test";
 import {
   parseWindowDimensions,
   type WindowAction,
   type WindowDimension,
 } from "../src/js/utils/window-dimensions";
-import buildWindowHandler, { type WindowHandlerAction } from "../src/js/window";
+import buildWindowHandler, { type WindowAxis, type WindowHandlerAction } from "../src/js/window";
 
 const divisor = (value: number): WindowDimension => ({ value, unit: "divisor" });
 const fraction = (value: number): WindowDimension => ({ value, unit: "fraction" });
 const pixels = (value: number): WindowDimension => ({ value, unit: "pixels" });
 
 test.each([
-  ["/ws1", "1"],
-  ["/ws12", "12"],
-  ["/ws]", "NEXT"],
-  ["/ws[", "PREVIOUS"],
+  [";ws1", "1"],
+  [";ws12", "12"],
+  [";ws]", "NEXT"],
+  [";ws[", "PREVIOUS"],
 ])("%s moves the captured application's window to the requested Space", async (input, target) => {
   const moveWindowToSpace = mock().mockResolvedValue(undefined);
   const runWindowAction = mock();
   mock.module("../src/js/window.node", () => ({ default: { moveWindowToSpace, runWindowAction } }));
   const matches = Object.entries(definition.chords).flatMap(([pattern, binding]) => {
-    const capture = chordPattern(pattern).exec(input);
+    const capture = chordPattern(pattern, definition.placeholders).exec(input);
     const args = binding["@input:window"];
     return capture && args
       ? [args.map((argument) => argument.replace(/\$(\d+)/g, (_, index) => capture[Number(index)]))]
@@ -70,7 +70,7 @@ test("Space moves wait for preceding window actions and retain their application
 
 test("repetitions act on the window Chord selected for the run, not the focused one", async () => {
   // Chord calls the built handler once per repetition with the same selected window,
-  // which focus leaves once `/ws]` moves it off the visible Space.
+  // which focus leaves once `;ws]` moves it off the visible Space.
   const moveWindowToSpace = mock().mockResolvedValue(undefined);
   const runWindowAction = mock().mockResolvedValue(undefined);
   const cycleWindows = mock().mockResolvedValue(undefined);
@@ -78,16 +78,16 @@ test("repetitions act on the window Chord selected for the run, not the focused 
     default: { moveWindowToSpace, runWindowAction, cycleWindows },
   }));
   const handler = buildWindowHandler();
-  const run = { focusedAppId: "dev.fixture", focusedWindowId: 42, input: "/ws]" };
+  const run = { focusedAppId: "dev.fixture", focusedWindowId: 42, input: ";ws]" };
   for (let repetition = 0; repetition < 3; repetition++) await handler.call(run, "SPACE", "NEXT");
   expect(moveWindowToSpace.mock.calls).toEqual(Array(3).fill(["dev.fixture", 42, "NEXT"]));
   for (let repetition = 0; repetition < 3; repetition++)
-    await handler.call({ ...run, input: "/wd=" }, "DIMENSIONS_INCREASE", "");
+    await handler.call({ ...run, input: ";wd=" }, "DIMENSIONS_INCREASE", "");
   expect(runWindowAction.mock.calls.map(([app, window]) => [app, window])).toEqual(
     Array(3).fill(["dev.fixture", 42]),
   );
   // Cycling advances from the window the previous repetition focused.
-  await handler.call({ ...run, input: "/w]" }, "CYCLE", "NEXT");
+  await handler.call({ ...run, input: ";w]" }, "CYCLE", "NEXT");
   expect(cycleWindows).toHaveBeenCalledWith("dev.fixture", "NEXT");
   for (const focusedWindowId of [-1, 1.5, Number.NaN])
     await expect(handler.call({ ...run, focusedWindowId }, "SPACE", "NEXT")).rejects.toThrow(
@@ -190,16 +190,41 @@ const definition = Bun.TOML.parse(
   await Bun.file(new URL("../chords/macos.toml", import.meta.url)).text(),
 ) as {
   on: Record<string, { file: string }>;
-  chords: Record<string, { "@input:window"?: [WindowHandlerAction, string]; shortcut?: string }>;
+  placeholders: ChordPlaceholders;
+  chords: Record<
+    string,
+    { "@input:window"?: [WindowHandlerAction, string, WindowAxis?]; shortcut?: string }
+  >;
 };
 
-test.each(["/wd22", "/wd-1", "/wdh1", "/wd200x200", "/wp22", "/wpr1", "/wp-1", "/wph-2"])(
+// Chord tries a file's chords in key order and runs the first one that matches.
+function resolve(input: string) {
+  for (const pattern of Object.keys(definition.chords).sort()) {
+    const args = definition.chords[pattern]["@input:window"];
+    const capture =
+      !pattern.startsWith("?") && chordPattern(pattern, definition.placeholders).exec(input);
+    if (capture && args)
+      return args.map((argument) =>
+        argument?.replace(/\$(\d+)/g, (_, index) => capture[Number(index)]),
+      ) as [WindowHandlerAction, string, WindowAxis?];
+  }
+  throw new Error(`No window chord matches ${input}`);
+}
+
+test("every chord and hint starts with the <> prefix, which defaults to ;w", () => {
+  expect(definition.placeholders).toEqual({ "<>": { name: "Window prefix", default: "w" } });
+  expect(
+    Object.keys(definition.chords).filter((key) => !key.replace(/^\?/, "").startsWith("<>")),
+  ).toEqual([]);
+});
+
+test.each([";wd22", ";wd-1", ";wdh1", ";wd200x200", ";wp22", ";wpr1", ";wp-1", ";wph-2"])(
   "%s dispatches the TOML capture to the native handler with the captured app",
   async (input) => {
     const native = mock().mockResolvedValue(undefined);
     mock.module("../src/js/window.node", () => ({ default: { runWindowAction: native } }));
     const bindings = Object.entries(definition.chords).flatMap(([pattern, binding]) => {
-      const capture = chordPattern(pattern).exec(input);
+      const capture = chordPattern(pattern, definition.placeholders).exec(input);
       return capture && binding["@input:window"]
         ? [{ capture, args: binding["@input:window"] }]
         : [];
@@ -207,13 +232,14 @@ test.each(["/wd22", "/wd-1", "/wdh1", "/wd200x200", "/wp22", "/wpr1", "/wp-1", "
     expect(bindings).toHaveLength(1);
     const {
       capture,
-      args: [action, argument],
+      args: [action, argument, axis],
     } = bindings[0];
     const expression = argument.replace(/\$(\d+)/g, (_, index) => capture[Number(index)]);
     await buildWindowHandler().call(
       { focusedAppId: "dev.keychord.fixture", input },
       action,
       expression,
+      axis,
     );
     expect(native).toHaveBeenCalledTimes(1);
     expect(native).toHaveBeenCalledWith(
@@ -221,7 +247,7 @@ test.each(["/wd22", "/wd-1", "/wdh1", "/wd200x200", "/wp22", "/wpr1", "/wp-1", "
       null,
       action,
       JSON.stringify(
-        input === "/wdh1"
+        input === ";wdh1"
           ? { height: divisor(1) }
           : parseWindowDimensions(action as WindowAction, expression),
       ),
@@ -231,7 +257,7 @@ test.each(["/wd22", "/wd-1", "/wdh1", "/wd200x200", "/wp22", "/wpr1", "/wp-1", "
 );
 
 test.each(
-  ["/wd", "/wdw", "/wdh"].flatMap((prefix) =>
+  [";wd", ";wdw", ";wdh"].flatMap((prefix) =>
     (
       [
         ["=", "DIMENSIONS_INCREASE", "", 1.1],
@@ -248,8 +274,8 @@ test.each(
       action,
       expression,
       expected: {
-        ...(prefix !== "/wdh" ? { width: fraction(scale) } : {}),
-        ...(prefix !== "/wdw" ? { height: fraction(scale) } : {}),
+        ...(prefix !== ";wdh" ? { width: fraction(scale) } : {}),
+        ...(prefix !== ";wdw" ? { height: fraction(scale) } : {}),
       },
     })),
   ),
@@ -259,7 +285,7 @@ test.each(
     const native = mock().mockResolvedValue(undefined);
     mock.module("../src/js/window.node", () => ({ default: { runWindowAction: native } }));
     const matches = Object.entries(definition.chords).flatMap(([pattern, binding]) => {
-      const capture = chordPattern(pattern).exec(input);
+      const capture = chordPattern(pattern, definition.placeholders).exec(input);
       return capture && binding["@input:window"]
         ? [{ capture, args: binding["@input:window"] }]
         : [];
@@ -269,21 +295,26 @@ test.each(
     expect(args[0]).toBe(action);
     const argument = args[1].replace(/\$(\d+)/g, (_, index) => capture[Number(index)]);
     expect(argument).toBe(expression);
-    await buildWindowHandler().call({ focusedAppId: "dev.fixture", input }, args[0], argument);
+    await buildWindowHandler().call(
+      { focusedAppId: "dev.fixture", input },
+      args[0],
+      argument,
+      args[2],
+    );
     expect(native).toHaveBeenCalledTimes(1);
     expect(native).toHaveBeenCalledWith("dev.fixture", null, action, JSON.stringify(expected));
   },
 );
 
-test.each(["/wd-0", "/wdw-0", "/wdh-0"])(
+test.each([";wd-0", ";wdw-0", ";wdh-0"])(
   "%s rejects a zero-sized result before calling native code",
   async (input) => {
     const native = mock();
     mock.module("../src/js/window.node", () => ({ default: { runWindowAction: native } }));
     const handler = buildWindowHandler();
-    await expect(handler.call({ input }, "DIMENSIONS_DECREASE", "0")).rejects.toThrow(
-      "100% decrease",
-    );
+    const args = resolve(input);
+    expect(args.slice(0, 2)).toEqual(["DIMENSIONS_DECREASE", "0"]);
+    await expect(handler.call({ input }, ...args)).rejects.toThrow("100% decrease");
     expect(native).not.toHaveBeenCalled();
   },
 );
@@ -298,13 +329,13 @@ test.each([
 });
 
 test.each([
-  ["/w[", "PREVIOUS"],
-  ["/w]", "NEXT"],
+  [";w[", "PREVIOUS"],
+  [";w]", "NEXT"],
 ])("%s cycles windows natively in the captured application", async (input, direction) => {
   const cycleWindows = mock().mockResolvedValue(undefined);
   const runWindowAction = mock();
   mock.module("../src/js/window.node", () => ({ default: { cycleWindows, runWindowAction } }));
-  const binding = definition.chords[input];
+  const binding = definition.chords[input.replace(/^;w/, "<>")];
   expect(binding.shortcut).toBeUndefined();
   expect(binding["@input:window"]).toEqual(["CYCLE", direction]);
   await buildWindowHandler().call(
@@ -360,22 +391,33 @@ test.each(["110", "11000", ".51100", "11x00", "00xx", "h1100"])(
 );
 
 test.each([
-  ["/wdw2", "DIMENSIONS", "2", { width: divisor(2) }],
-  ["/wdh1", "DIMENSIONS", "1", { height: divisor(1) }],
-  ["/wdh200x", "DIMENSIONS", "200x", { height: pixels(200) }],
-  ["/wpx-2", "POSITION", "-2", { width: divisor(-2) }],
-  ["/wpy4", "POSITION", "4", { height: divisor(4) }],
-  ["/wpy-200x", "POSITION", "-200x", { height: pixels(-200) }],
+  [";wdw2", "DIMENSIONS", "2", { width: divisor(2) }],
+  [";wdh1", "DIMENSIONS", "1", { height: divisor(1) }],
+  [";wdh200x", "DIMENSIONS", "200x", { height: pixels(200) }],
+  [";wpx-2", "POSITION", "-2", { width: divisor(-2) }],
+  [";wpy4", "POSITION", "4", { height: divisor(4) }],
+  [";wpy-200x", "POSITION", "-200x", { height: pixels(-200) }],
 ])("named axis %s changes only its named field", async (input, action, expression, expected) => {
   const native = mock().mockResolvedValue(undefined);
   mock.module("../src/js/window.node", () => ({ default: { runWindowAction: native } }));
-  await buildWindowHandler().call(
-    { input, focusedAppId: "dev.fixture" },
-    action as WindowAction,
-    expression,
-  );
+  const args = resolve(input);
+  expect(args.slice(0, 2)).toEqual([action, expression]);
+  await buildWindowHandler().call({ input, focusedAppId: "dev.fixture" }, ...args);
   expect(native).toHaveBeenCalledTimes(1);
   expect(native).toHaveBeenCalledWith("dev.fixture", null, action, JSON.stringify(expected));
+});
+
+test.each([
+  ["POSITION", "WIDTH"],
+  ["DIMENSIONS", "X"],
+  ["FRAME", "HEIGHT"],
+  ["DIMENSIONS", "DEPTH"],
+] as const)("%s rejects the %s axis before calling native code", async (action, axis) => {
+  const native = mock();
+  mock.module("../src/js/window.node", () => ({ default: { runWindowAction: native } }));
+  const handler = buildWindowHandler();
+  await expect(handler(action, "2", axis as WindowAxis)).rejects.toThrow(TypeError);
+  expect(native).not.toHaveBeenCalled();
 });
 
 test("invalid input never calls native code, and failed actions do not block the next chord", async () => {
@@ -411,30 +453,31 @@ test("overlapping actions are serialized and keep their own application context"
 
 test("native snapping replaces the platform tiling shortcuts", () => {
   for (const command of [
-    "/wl",
-    "/wr",
-    "/wt",
-    "/wb",
-    "/wtl",
-    "/wtr",
-    "/wbl",
-    "/wbr",
-    "/wlr",
-    "/wrl",
-    "/wtb",
-    "/wbt",
-    "/wc",
-    "/wf",
+    ";wl",
+    ";wr",
+    ";wt",
+    ";wb",
+    ";wtl",
+    ";wtr",
+    ";wbl",
+    ";wbr",
+    ";wlr",
+    ";wrl",
+    ";wtb",
+    ";wbt",
+    ";wc",
+    ";wf",
   ]) {
-    expect(definition.chords[command].shortcut).toBeUndefined();
-    expect(definition.chords[command]["@input:window"]?.[0]).toBe("PRESET");
+    const binding = definition.chords[command.replace(/^;w/, "<>")];
+    expect(binding.shortcut).toBeUndefined();
+    expect(binding["@input:window"]?.[0]).toBe("PRESET");
   }
 });
 
 test.each([
-  ["/wh", "cmd+h"],
-  ["/wm", "cmd+m"],
-  ["/wq", "cmd+q"],
+  [";wh", "cmd+h"],
+  [";wm", "cmd+m"],
+  [";wq", "cmd+q"],
 ])("%s keeps its application shortcut", (alias, shortcut) => {
-  expect(definition.chords[alias].shortcut).toBe(shortcut);
+  expect(definition.chords[alias.replace(/^;w/, "<>")].shortcut).toBe(shortcut);
 });

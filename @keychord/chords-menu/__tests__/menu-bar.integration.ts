@@ -3,7 +3,11 @@ import buildSelectionHandler from "../js/selection.js";
 import buildTrayHandler, { runMenuBarAction } from "../js/tray.js";
 import buildMenuHandler from "../js/menu.js";
 import buildVisibilityHandler from "../js/visibility.js";
-import { chordPattern } from "@keychord/chordtest/patterns";
+import {
+  chordPattern,
+  expandPlaceholders,
+  type ChordPlaceholders,
+} from "@keychord/chordtest/patterns";
 import { waitFor } from "@keychord/chordtest/macos";
 
 const app = process.env.MENU_BAR_FIXTURE_APP!;
@@ -102,10 +106,13 @@ await click("[3.", "opened:Format");
 await click("[1r.", "opened:Apple Tools");
 const menu = buildMenuHandler(app);
 // Dispatch letter search through the shipped TOML, including its terminating dot.
-const { chords: bindings } = Bun.TOML.parse(
+const { chords, placeholders } = Bun.TOML.parse(
   await Bun.file(new URL("../chords/macos.toml", import.meta.url)).text(),
-) as { chords: Record<string, any> };
-for (const sequence of ["=[f.", "=[z-o2."]) {
+) as { chords: Record<string, any>; placeholders: ChordPlaceholders };
+const bindings = Object.fromEntries(
+  Object.entries(chords).map(([key, binding]) => [expandPlaceholders(key, placeholders), binding]),
+);
+for (const sequence of [";b[f.", ";b[z-o2."]) {
   const matches = Object.entries(bindings).flatMap(([pattern, binding]: [string, any]) => {
     const match = chordPattern(pattern).exec(sequence);
     return match && binding["@input:menu"] ? [{ match, args: binding["@input:menu"] }] : [];

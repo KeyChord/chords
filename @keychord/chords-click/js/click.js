@@ -1,6 +1,6 @@
 import { click, getAppWindows, getScreenBounds, mouse } from "chord";
 //#region src/js/utils/click-sequence.ts
-/** Parse modifiers immediately after the initial dot; / inside a pair still refines it. */
+/** Parse leading mouse modifiers. A slash inside a pair refines its coordinate. */
 function parseMouseCommand(command) {
   let click = "LEFT";
   let global = false;

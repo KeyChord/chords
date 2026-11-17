@@ -1,5 +1,10 @@
 //#region package.json
 var name = "@keychord/chords-jetbrains";
+var version = "0.0.1";
+var displayName = "JetBrains Chords";
+var description =
+  "Chords for JetBrains IDEs, including IntelliJ IDEA, PyCharm, GoLand, WebStorm and RustRover.";
+var categories = ["Editors"];
 var repository = {
   type: "git",
   url: "https://github.com/KeyChord/chords-jetbrains",
@@ -1140,6 +1145,10 @@ var chords = {
 };
 var package_default = {
   name,
+  version,
+  displayName,
+  description,
+  categories,
   repository,
   type,
   dependencies,
@@ -1149,12 +1158,16 @@ var package_default = {
 };
 //#endregion
 export {
+  categories,
   chords,
   package_default as default,
   dependencies,
+  description,
   devDependencies,
+  displayName,
   name,
   packageManager,
   repository,
   type,
+  version,
 };

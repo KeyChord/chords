@@ -9,8 +9,8 @@ Type `/<query>` and complete the chord to open Spotlight's top result for the qu
 it into Spotlight and pressing Return does. `/calculator` opens Calculator, and `/2+3` opens
 Spotlight's calculation. `/` alone opens Spotlight.
 
-The launcher is a fallback chord, so any other `/` chord, such as `/f` for Finder or `/t` for
-Terminal, still runs instead. A launcher from an installed package, such as
+The launcher is a fallback chord, so the other `/` chords, `/f` for Finder and `/,` for
+System Settings, still run instead. A launcher from an installed package, such as
 [`@keychord/chords-raycast`](../chords-raycast), replaces it, because installed packages
 override built-in ones.
 

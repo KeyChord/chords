@@ -2,6 +2,8 @@ import addon from "./window.node";
 import { parseWindowDimensions, type WindowAction } from "./utils/window-dimensions";
 
 export type WindowHandlerAction = WindowAction | "CYCLE" | "SPACE";
+/** The single dimension (`WIDTH`, `HEIGHT`) or coordinate (`X`, `Y`) a named axis chord sets. */
+export type WindowAxis = "WIDTH" | "HEIGHT" | "X" | "Y";
 
 type WindowHandlerThis = { focusedAppId?: string; focusedWindowId?: number | null; input?: string };
 
@@ -11,9 +13,10 @@ export default function buildWindowHandler() {
     this: WindowHandlerThis | void,
     action: WindowHandlerAction,
     expression: string,
+    axis?: WindowAxis,
   ): Promise<void> {
     let request: string;
-    // Chord selects the window once per run, so every repetition of `3/ws]` or `3/wd=`
+    // Chord selects the window once per run, so every repetition of `3=ws]` or `3=wd=`
     // acts on it even after the first move shifts focus or the user switches windows.
     const windowId = this?.focusedWindowId ?? null;
     try {
@@ -40,19 +43,23 @@ export default function buildWindowHandler() {
         pending = result.catch(() => {});
         return result;
       }
-      // Named axis chords intentionally pass the same action/capture pair. Chord's
-      // entered input distinguishes width/height and X/Y after regex substitution.
-      const axis = /^(?:\/)?(?:wd([wh])|wp([xy]))/.exec(this?.input ?? "");
-      if (
-        axis &&
-        (action === "DIMENSIONS" ||
+      // Named axis chords pass their axis from the TOML, because the prefix before the typed
+      // input is the user's choice in Settings and can't be parsed back out of it.
+      if (axis !== undefined) {
+        const position = action === "POSITION";
+        const dimensions =
+          action === "DIMENSIONS" ||
           action === "DIMENSIONS_INCREASE" ||
-          action === "DIMENSIONS_DECREASE" ||
-          action === "POSITION")
-      ) {
+          action === "DIMENSIONS_DECREASE";
+        if (
+          !(position
+            ? axis === "X" || axis === "Y"
+            : dimensions && (axis === "WIDTH" || axis === "HEIGHT"))
+        )
+          throw new TypeError(`Unknown ${action} axis ${JSON.stringify(axis)}`);
         const { height: value } = parseWindowDimensions(action, `h${expression}`);
         request = JSON.stringify(
-          axis[1] === "w" || axis[2] === "x" ? { width: value } : { height: value },
+          axis === "WIDTH" || axis === "X" ? { width: value } : { height: value },
         );
       } else request = JSON.stringify(parseWindowDimensions(action, expression));
     } catch (error) {

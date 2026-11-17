@@ -1,6 +1,7 @@
 {
   "name": "@keychord/chords-navigation",
   "displayName": "Navigation Chords",
+  "version": "0.0.1",
   "description": "Go back, continue, dismiss dialogs and press numbered options in whichever app is focused, through Accessibility.",
   "categories": [
     "Input"

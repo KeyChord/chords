@@ -4,17 +4,21 @@
 > This document is largely AI-written, so parts of it may not be fully accurate. It will be replaced with a hand-written version when I get the time.
 
 Set the resolution of the display containing the pointer with
-[BetterDisplay](https://betterdisplay.pro/). This package owns `/md`;
+[BetterDisplay](https://betterdisplay.pro/). This package owns `;md`;
 [`chords-monitors`](https://github.com/KeyChord/chords/tree/main/@keychord/chords-monitors)
 provides monitor focusing.
 
 To install it, add the `KeyChord/chords` monorepo under Settings → Chords → Chord
 Monorepos and tick `@keychord/chords-betterdisplay`.
 
+Every chord starts with the package's `<>` prefix, `;m` by default. To reach them with fewer
+keys, choose another prefix under Settings → Chords → **Placeholders**, and use the same one as `@keychord/chords-monitors`. The examples
+below use the default.
+
 | Chord                 | Result                                                          |
 | --------------------- | --------------------------------------------------------------- |
-| `/md<width>x<height>` | Set a `<width>` × `<height>` desktop, e.g. `/md1440x1728`       |
-| `/md0`                | Remove this package's virtual screens for the pointer's display |
+| `;md<width>x<height>` | Set a `<width>` × `<height>` desktop, e.g. `;md1440x1728`       |
+| `;md0`                | Remove this package's virtual screens for the pointer's display |
 
 ## Requirements
 
@@ -35,14 +39,14 @@ BetterDisplay cannot apply the exact dimensions.
 
 Changes are serialized and checked after application. A failed switch attempts
 to restore the preceding native resolution and managed mirror. Switching to a
-native mode or using `/md0` removes only virtual screens created by this
+native mode or using `;md0` removes only virtual screens created by this
 package for that display. Other virtual screens are left alone. The reserved
 virtual-screen name format is `Chord /md <display UUID> <dimensions> <unique UUID>`.
 
 BetterDisplay owns the resulting configuration: it persists when Chord quits or
-reloads. Use `/md0` to return from a custom virtual desktop; it does not undo
+reloads. Use `;md0` to return from a custom virtual desktop; it does not undo
 a directly selected native mode. The handler also recognizes its mirrored
-virtual screen after a Chord restart, so subsequent `/md` commands keep targeting
+virtual screen after a Chord restart, so subsequent `;md` commands keep targeting
 the same physical display.
 
 The implementation uses BetterDisplay's [CLI API](https://betterdisplay.pro/guide/integration/cli-reference/)
