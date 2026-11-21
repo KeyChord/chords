@@ -1,85 +1,23 @@
-A monorepo of all the conventional chord packages.
+# Chord's (conventional) chords
 
-> [!NOTE]
-> This section is largely AI-written, so parts of it may not be fully accurate. It will be replaced with a hand-written version when I get the time.
+## Global Conventions 
 
-Chord packages live in `@keychord/`; workspace tooling and third-party wrappers
-live in `packages/`.
+`'` Reserved for entering "insert mode"\
+`\` Reserved for escape characters\
+`0` Reserved for Chord\
+`` ` `` Conventionally used for for "config" (e.g. ``3`d2,i1`/w]`` waits 200 ms, then runs `/w]` (next window) three times, 100 ms apart)
+`/` Recommended for launcher apps\
+`;` Default prefix for all other global actions (can be overriden)
 
-## Installing packages
+All other non-alphanumeric keys are free to be assigned to any global chords.
 
-These packages run in [Chord](https://github.com/KeyChord/Chord). Download
-`Chord-aarch64.dmg` (Apple silicon) or `Chord-x86_64.dmg` (Intel) from the
-[latest release](https://github.com/KeyChord/Chord/releases/latest), grant Accessibility
-access on first launch, then press Caps Lock + Space (the activation shortcut) to start a
-chord. Packages with native add-ons are built for Apple silicon only so far.
-
-On first launch Chord installs a few default packages at pinned revisions, including
-`@keychord/chords-chord`, `@keychord/chords-menu` and `@keychord/chords-com.apple`.
-
-In the current monorepo, Apple app bindings live in packages named after their
-exact bundle IDs: `chords-com.apple.AccessibilityInspector`,
-`chords-com.apple.ActivityMonitor`, `chords-com.apple.Safari`,
-`chords-com.apple.ScreenContinuity`, `chords-com.apple.systempreferences`, and
-`chords-com.apple.finder` (formerly `chords-finder`). Terminal's chords live in
-`chords-terminal`, alongside other basic terminals; Warp has its own `chords-warp`.
-`chords-com.apple` retains the empty app stubs. Enable the individual app packages
-when using the current monorepo; Chord's pinned default packages still contain the
-combined package.
-
-To install any other package from this repo:
-
-1. Open Settings → Chords → **Chord Monorepos** and use **Add Monorepo** with `KeyChord/chords`.
-2. Under **Packages to use**, tick the packages you want. Chord reloads as soon as
-   you tick one.
-
-Use **Sync Latest** on the monorepo to update it later. Settings → Browse also
-offers one-click **Install** for every package here that Chord doesn't install by default. Those
-install the package's [mirror repository](#repository-mirrors), which can lag behind
-this monorepo, so add the monorepo instead when you want the current version.
-
-When two sources provide the same package, local sources win over GitHub ones
-(Settings → Chords → Local Folders, a repo's **Link Local Folder**, or a linked local
-monorepo). Between GitHub repos, the pinned default `KeyChord/chords-menu` and
-`KeyChord/chords-com.apple` repos take precedence over the monorepo's copies, so
-remove them under **Chord Repos** if you want the monorepo's versions of those two
-packages.
-
-To change one of the default chords (for example `/f`, which opens Finder from
-`@keychord/chords-com.apple.finder` in the current monorepo), override the package that defines it with a local
-copy, using **Link Local Folder** on its repo, and edit the chord there. Binding the
-same sequence in a different package isn't a reliable override: when two packages
-define the same chord, Chord doesn't consistently pick the same one.
-
-## Usage
-
-You can use these Chord Packages as templates for creating your own chords. See [create-chord-package](https://github.com/KeyChord/create-chord-package) and Chord's [scripting.md](https://github.com/KeyChord/Chord/blob/dev/scripting.md) for detailed instructions. When defining your own chords, it's recommended to follow the conventions below.
-
-## Default Global Keys
-
-In the default chord package, these are the categories assigned to the global chords (which must start with a non-alphanumeric character). If you want to define your own custom global chord which doesn't fit into any of the following categories, you should prefer the `,` prefix.
-
-`,` User-Defined Global Chords\
-`/` Launch\
-`=` Menu / Tray / System Shortcuts\
-`.` Mouse / Keyboard (e.g. modifiers)\
-`;` Web\
-`[`, `]` Global Navigation
-
-> `'` is reserved for pass-through input (can appear anywhere in a chord)\
-> `\` is reserved for escape characters (can appear anywhere in a chord)\
-> `` ` `` isn't reserved, but is conventionally used for "config" (e.g. ``3`d2,i1`/w]`` waits 200 ms, then runs `/w]` (next window) three times, 100 ms apart)
-
-> [!NOTE]
-> This section is largely AI-written, so parts of it may not be fully accurate. It will be replaced with a hand-written version when I get the time.
-
-Define global chords and their hints in the package's root `chords/macos.toml`
+> Define global chords and their hints in the package's root `chords/macos.toml`
 (for example, `@keychord/chords-betterdisplay/chords/macos.toml`), with any
 handlers they use. Keep application-specific alphanumeric chords in nested
 application/bundle-ID folders. Package builds reject global chords outside the
 root file.
 
-## Conventions
+## Local Conventions
 
 `l` Left\
 `r` Right\
