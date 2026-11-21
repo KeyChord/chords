@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { expect, mock, test } from "bun:test";
-import { chordPattern } from "@keychord/chordtest/patterns";
+import { chordPattern, type ChordPlaceholders } from "@keychord/chordtest/patterns";
 import { waitFor } from "@keychord/chordtest/test";
 import buildMonitorHandler from "../src/js/monitor";
 
@@ -12,23 +12,33 @@ const definition = Bun.TOML.parse(
   await Bun.file(new URL("../chords/macos.toml", import.meta.url)).text(),
 ) as {
   on: Record<string, { file: string }>;
+  placeholders: ChordPlaceholders;
   chords: Record<string, { "@input:monitor"?: [string, string?]; shortcut?: string }>;
 };
 
+test("every chord and hint starts with the <> prefix, which defaults to ;m", () => {
+  expect(definition.placeholders).toEqual({
+    "<>": { name: "Monitor prefix", default: "m" },
+  });
+  expect(
+    Object.keys(definition.chords).filter((key) => !key.replace(/^\?/, "").startsWith("<>")),
+  ).toEqual([]);
+});
+
 test.each([
-  ["/m1", "1"],
-  ["/m12", "12"],
-  ["/m[", "PREVIOUS"],
-  ["/m]", "NEXT"],
-  ["/ml", "LEFT"],
-  ["/mr", "RIGHT"],
-  ["/mt", "UP"],
-  ["/mb", "DOWN"],
+  [";m1", "1"],
+  [";m12", "12"],
+  [";m[", "PREVIOUS"],
+  [";m]", "NEXT"],
+  [";ml", "LEFT"],
+  [";mr", "RIGHT"],
+  [";mt", "UP"],
+  [";mb", "DOWN"],
 ])("%s resolves one monitor action", async (input, expected) => {
   const native = mock().mockResolvedValue(undefined);
   mock.module("../src/js/monitor.node", () => ({ default: { focusMonitor: native } }));
   const matches = Object.entries(definition.chords).flatMap(([pattern, binding]) => {
-    const captures = chordPattern(pattern).exec(input);
+    const captures = chordPattern(pattern, definition.placeholders).exec(input);
     const args = binding["@input:monitor"];
     return captures && args ? [args[0].replace(/\$(\d+)/g, (_, i) => captures[Number(i)])] : [];
   });
@@ -75,10 +85,11 @@ test("monitor actions wait for the previous focus change before reading the poin
 });
 
 test("monitor focusing does not match minimize or invalid monitor numbers", () => {
-  for (const input of ["/m", "/m0", "/m01", "/m-1", "/m2extra"]) {
+  for (const input of [";m", ";m0", ";m01", ";m-1", ";m2extra"]) {
     expect(
       Object.entries(definition.chords).some(
-        ([pattern, binding]) => binding["@input:monitor"] && chordPattern(pattern).test(input),
+        ([pattern, binding]) =>
+          binding["@input:monitor"] && chordPattern(pattern, definition.placeholders).test(input),
       ),
     ).toBe(false);
   }
@@ -166,7 +177,7 @@ test("the native resolution API preserves the focus queue; /ms belongs to Better
     [2000, 200],
     [1920, 1080],
   ]);
-  expect(definition.chords["/ms(.+)"]).toBeUndefined();
+  expect(definition.chords["<>s(.+)"]).toBeUndefined();
   expect(definition.chords["?/ms"]).toBeUndefined();
 });
 

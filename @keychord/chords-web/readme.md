@@ -4,9 +4,8 @@
 > This document is largely AI-written, so parts of it may not be fully accurate. It will be replaced with a hand-written version when I get the time.
 
 > [!WARNING]
-> Disabled for now: every chord in [`chords/macos.toml`](./chords/macos.toml) is commented out,
-> because the window-manager packages (AeroSpace, Rift) now use the `;` prefix. The table below
-> lists the chords as they were.
+> Disabled for now: every chord in [`chords/macos.toml`](./chords/macos.toml) is commented out.
+> The table below shows the previous bindings. Re-enabling them requires a configurable `<>` prefix.
 
 Chords that send JavaScript to the active tab of the front window in Google Chrome,
 Brave Browser, Microsoft Edge, or Arc. To install, in [Chord](https://github.com/KeyChord/Chord)

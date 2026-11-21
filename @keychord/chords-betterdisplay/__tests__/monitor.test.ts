@@ -148,20 +148,28 @@ test("absolute sizes retain arbitrary aspect ratios", () => {
   expect(parseMonitorResolution("2000x200")).toBe("2000x200");
 });
 
-test("the BetterDisplay package owns /md, including exactly one reset binding", () => {
+test("the BetterDisplay package owns ;md, including exactly one reset binding", () => {
   const parse = (file: URL) => Bun.TOML.parse(readFileSync(file, "utf8")) as any;
   const definition = parse(new URL("../chords/macos.toml", import.meta.url));
   const monitors = parse(new URL("../../chords-monitors/chords/macos.toml", import.meta.url));
   expect(definition.on.monitor.file).toBe("monitor.js");
-  for (const input of ["/md1440x1728", "/md0"]) {
+  // Both packages default to the same prefix, so `;md` extends chords-monitors' `;m` chords.
+  expect(definition.placeholders).toEqual(monitors.placeholders);
+  for (const input of [";md1440x1728", ";md0"]) {
     const matches = Object.entries(definition.chords).filter(
       ([pattern, binding]) =>
-        (binding as Record<string, unknown>)["@input:monitor"] && chordPattern(pattern).test(input),
+        (binding as Record<string, unknown>)["@input:monitor"] &&
+        chordPattern(pattern, definition.placeholders).test(input),
     );
     expect(matches).toHaveLength(1);
+    const owned = Object.keys(monitors.chords).filter(
+      (pattern) =>
+        !pattern.startsWith("?") && chordPattern(pattern, monitors.placeholders).test(input),
+    );
+    expect(owned).toEqual([]);
   }
-  expect(monitors.chords["/md(.+)"]).toBeUndefined();
-  expect(monitors.chords["?/md"]).toBeUndefined();
+  expect(monitors.chords["<>d(.+)"]).toBeUndefined();
+  expect(monitors.chords["?<>d"]).toBeUndefined();
 });
 
 test("available modes use the physical display and current dimensions are a no-op", async () => {

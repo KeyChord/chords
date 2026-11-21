@@ -4,8 +4,7 @@ name = "Web chords"
 file = 'web.js'
 
 [chords]
-# Disabled for now: these used the `;` prefix, which the window-manager packages
-# (AeroSpace, Rift) now own. The `js` handler is unchanged.
+# These bindings are disabled. If re-enabled, declare a configurable `<>` prefix.
 # '?;i' = { name = "Input" }
 
 # ';i([^,.;]*)' = { name = "Input: Match", '@input:js' = ['PLACEHOLDER', '$1'] }

@@ -1,5 +1,9 @@
 //#region package.json
 var name = "@keychord/chords-whatsapp";
+var version = "0.0.1";
+var displayName = "WhatsApp Chords";
+var description = "Chords for the native WhatsApp app, covering chats, Info, groups, calls, settings and more.";
+var categories = ["Social"];
 var repository = {
 	"type": "git",
 	"url": "https://github.com/KeyChord/chords-whatsapp"
@@ -489,6 +493,10 @@ var chords = { "net": { "whatsapp": { "WhatsApp": { "macos.toml": {
 } } } } };
 var package_default = {
 	name,
+	version,
+	displayName,
+	description,
+	categories,
 	repository,
 	type,
 	scripts,
@@ -497,4 +505,4 @@ var package_default = {
 	chords
 };
 //#endregion
-export { chords, package_default as default, devDependencies, name, packageManager, repository, scripts, type };
+export { categories, chords, package_default as default, description, devDependencies, displayName, name, packageManager, repository, scripts, type, version };

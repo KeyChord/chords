@@ -23,6 +23,7 @@ test("chord dispatch uses SCREAMING_SNAKE_CASE for internal action identifiers",
           const record = index => entries.push({ file, handler, action: args[index] });
           if (["whatsapp", "spotify", "youtube", "instagram", "menu", "appearance", "select", "window", "navigation"].includes(handler)) record(0);
           if (handler === "window" && args[0] === "PRESET") record(1);
+          if (handler === "window" && args[2]) record(2);
           if (handler === "click") record(1);
           if (handler === "tray") {
             record(0);

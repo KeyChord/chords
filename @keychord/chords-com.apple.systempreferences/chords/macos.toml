@@ -1,4 +1,10 @@
 name = 'System Preferences'
 
+[meta]
+chord = '>=0.3.0'
+
+[placeholders]
+"<>" = { name = 'System Settings prefix', default = '/' }
+
 [chords]
-'/,' = { name = 'System Preferences', shell = 'open -b com.apple.systempreferences' }
+'<>,' = { name = 'System Preferences', shell = 'open -b com.apple.systempreferences' }

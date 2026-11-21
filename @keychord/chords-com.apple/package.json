@@ -1,7 +1,7 @@
 {
   "name": "@keychord/chords-com.apple",
   "displayName": "macOS App Stubs",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Empty chord stubs for pre-installed macOS apps. App bindings are provided by separate bundle-ID packages.",
   "categories": [
     "macOS"

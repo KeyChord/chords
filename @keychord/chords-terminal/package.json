@@ -1,7 +1,7 @@
 {
   "name": "@keychord/chords-terminal",
   "displayName": "Terminal Chords",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Tab chords for basic terminals: Terminal, iTerm2, Ghostty, WezTerm, Alacritty and Hyper.",
   "categories": [
     "Terminals"

@@ -2,12 +2,16 @@ name = 'Raycast'
 
 # `fallback` needs Chord 0.2.5; older versions would let this launcher take over every `/` chord.
 [meta]
-chord = '>=0.2.5'
+chord = '>=0.3.0'
 
 [on.raycast]
 file = 'raycast.js'
 
+[placeholders]
+"<>" = { name = 'Raycast prefix', default = '/' }
+
 [chords]
+'?<>' = { name = 'Launch' }
 # The `/` launcher. As a fallback it runs only when no other chord matches, so `/f` still opens
 # Finder. Installed packages override built-in ones, so it replaces the Spotlight launcher.
-'/(.*)' = { name = 'Raycast: Search $1', fallback = true, '@input:raycast' = ['$1'] }
+'<>(.*)' = { name = 'Raycast: Search $1', fallback = true, '@input:raycast' = ['$1'] }

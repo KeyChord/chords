@@ -1,7 +1,7 @@
 {
   "name": "@keychord/chords-menu",
   "displayName": "Menu Chords",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Chords for app menus, menu bar extras, Control Center and menu bar visibility, in whichever app is focused.",
   "categories": [
     "macOS"

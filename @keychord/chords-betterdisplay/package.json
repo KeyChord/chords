@@ -1,6 +1,7 @@
 {
   "name": "@keychord/chords-betterdisplay",
   "displayName": "BetterDisplay Chords",
+  "version": "0.0.1",
   "description": "Set the resolution of the display under the pointer with BetterDisplay.",
   "categories": [
     "Utilities"

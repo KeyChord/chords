@@ -1,7 +1,7 @@
 //#region package.json
 var name = "@keychord/chords-warp";
 var displayName = "Warp Chords";
-var version = "0.0.0";
+var version = "0.0.1";
 var description = "Chords for the Warp terminal.";
 var categories = ["Terminals"];
 var repository = {
@@ -373,11 +373,7 @@ var chords = {
 	} } } },
 	"macos.toml": {
 		"name": "Terminal",
-		"chords": { "/w": {
-			"name": "Warp",
-			"command": "Open Warp",
-			"shell": "open -a 'Warp'"
-		} }
+		"chords": {}
 	}
 };
 var package_default = {

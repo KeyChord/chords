@@ -1,7 +1,7 @@
 //#region package.json
 var name = "@keychord/chords-com.apple";
 var displayName = "macOS App Stubs";
-var version = "0.0.0";
+var version = "0.0.1";
 var description =
   "Empty chord stubs for pre-installed macOS apps. App bindings are provided by separate bundle-ID packages.";
 var categories = ["macOS"];

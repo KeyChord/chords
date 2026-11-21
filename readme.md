@@ -17,6 +17,27 @@ handlers they use. Keep application-specific alphanumeric chords in nested
 application/bundle-ID folders. Package builds reject global chords outside the
 root file.
 
+### Package prefixes
+
+Packages that declare a prefix letter use **Default Global Prefix for Placeholders** under Settings → Chords. To change one package's prefix, open its **Placeholders** section.
+
+| Default prefix | Package or actions                                                      |
+| -------------- | ----------------------------------------------------------------------- |
+| `/`            | Finder (`/f`), System Settings (`/,`), and launcher search (`/<query>`) |
+| `;a`           | AeroSpace                                                               |
+| `;b`           | Menu bar, tray, Window menu, and system actions                         |
+| `;c`           | Click and mouse movement                                                |
+| `;d`           | Dock                                                                    |
+| `;k`           | Modifier keys                                                           |
+| `;m`           | Monitors and BetterDisplay                                              |
+| `;n`           | Navigation                                                              |
+| `;r`           | Rift                                                                    |
+| `;s`           | Spaces                                                                  |
+| `;w`           | Native window commands                                                  |
+
+To change a chord's suffix or action, link a local copy of the package using
+**Link Local Folder** on its repo, then edit the chord there.
+
 ## Local Conventions
 
 `l` Left\

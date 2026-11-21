@@ -1,14 +1,20 @@
 //#region package.json
 var name = "@keychord/chords-youtube";
+var version = "0.0.1";
+var displayName = "YouTube Chords";
+var description = "Chords for YouTube installed as a web app from Brave.";
+var categories = ["Media"];
 var repository = {
   type: "git",
   url: "https://github.com/KeyChord/chords-youtube",
 };
 var type = "module";
+var scripts = { test: "bun test --isolate" };
 var devDependencies = {
   "@keychord/chordtest": "workspace:*",
   "@keychord/config": "catalog:",
   "@keychord/tsconfig": "catalog:",
+  "@types/bun": "^1.4.3",
   "happy-dom": "^21.0.1",
 };
 var packageManager = "pnpm@12.11.2";
@@ -74,19 +80,29 @@ var chords = {
 };
 var package_default = {
   name,
+  version,
+  displayName,
+  description,
+  categories,
   repository,
   type,
+  scripts,
   devDependencies,
   packageManager,
   chords,
 };
 //#endregion
 export {
+  categories,
   chords,
   package_default as default,
+  description,
   devDependencies,
+  displayName,
   name,
   packageManager,
   repository,
+  scripts,
   type,
+  version,
 };

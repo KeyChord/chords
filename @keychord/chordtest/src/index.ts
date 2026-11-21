@@ -1,5 +1,5 @@
 export { buildNativeAddon, hostTriple, loadNativeAddon } from "./native";
-export { chordPattern } from "./patterns";
+export { chordPattern, expandPlaceholders, type ChordPlaceholders } from "./patterns";
 export {
   installChordRuntime,
   isVirtualMac,

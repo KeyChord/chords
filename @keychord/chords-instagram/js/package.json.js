@@ -1,10 +1,15 @@
 //#region package.json
 var name = "@keychord/chords-instagram";
+var version = "0.0.1";
+var displayName = "Instagram Chords";
+var description = "Chords for Instagram installed as a web app from Brave.";
+var categories = ["Social"];
 var repository = {
   type: "git",
   url: "https://github.com/KeyChord/chords-instagram",
 };
 var type = "module";
+var scripts = { test: "bun test --isolate" };
 var devDependencies = {
   "@keychord/chordtest": "workspace:*",
   "@keychord/config": "catalog:",
@@ -86,19 +91,29 @@ var chords = {
 };
 var package_default = {
   name,
+  version,
+  displayName,
+  description,
+  categories,
   repository,
   type,
+  scripts,
   devDependencies,
   packageManager,
   chords,
 };
 //#endregion
 export {
+  categories,
   chords,
   package_default as default,
+  description,
   devDependencies,
+  displayName,
   name,
   packageManager,
   repository,
+  scripts,
   type,
+  version,
 };

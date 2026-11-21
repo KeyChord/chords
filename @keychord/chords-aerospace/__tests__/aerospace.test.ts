@@ -1,6 +1,10 @@
 import { join } from "node:path";
 import { expect, test } from "bun:test";
-import { chordPattern } from "@keychord/chordtest/patterns";
+import {
+  chordPattern,
+  expandPlaceholders,
+  type ChordPlaceholders,
+} from "@keychord/chordtest/patterns";
 
 type Binding = { name?: string; shell?: string; [key: string]: unknown };
 type ChordsFile = {
@@ -14,16 +18,16 @@ const definition = await read(join(root, "chords/macos.toml"));
 const rift = await read(join(root, "../chords-rift/chords/macos.toml"));
 const hints = Object.entries(definition.chords).filter(([input]) => input.startsWith("?"));
 const chords = Object.entries(definition.chords).filter(([input]) => !input.startsWith("?"));
-// Chord replaces `<p>` with the prefix chosen in Settings, or else this default.
-const prefix = definition.placeholders.p?.default ?? "";
-const expand = (input: string) => input.replace("<p>", prefix);
+// Chord replaces `<>` with the prefix chosen in Settings, or else this default.
+const prefix = expandPlaceholders("<>", definition.placeholders);
+const expand = (input: string) => input.replace("<>", prefix);
 
-test("every chord and hint starts with the <p> prefix, which defaults to ;", () => {
+test("every chord and hint starts with the <> prefix, which defaults to ;a", () => {
   expect(definition.placeholders).toEqual({
-    p: { name: "Window management prefix", default: ";" },
+    "<>": { name: "Window management prefix", default: "a" },
   });
   const unprefixed = Object.keys(definition.chords).filter(
-    (input) => !input.replace(/^\?/, "").startsWith("<p>"),
+    (input) => !input.replace(/^\?/, "").startsWith("<>"),
   );
   expect(unprefixed).toEqual([]);
 });
@@ -70,11 +74,11 @@ test("hints only name prefixes of real chords", () => {
 
 test("workspace digits are AeroSpace workspace names", () => {
   for (let index = 0; index <= 9; index++) {
-    expect(definition.chords[`<p>w${index}`].shell).toBe(`aerospace workspace ${index}`);
-    expect(definition.chords[`<p>m${index}`].shell).toBe(
+    expect(definition.chords[`<>w${index}`].shell).toBe(`aerospace workspace ${index}`);
+    expect(definition.chords[`<>m${index}`].shell).toBe(
       `aerospace move-node-to-workspace ${index}`,
     );
-    expect(definition.chords[`<p>f${index}`].shell).toBe(
+    expect(definition.chords[`<>f${index}`].shell).toBe(
       `aerospace move-node-to-workspace --focus-follows-window ${index}`,
     );
   }
@@ -93,11 +97,12 @@ test("no chord collides with another package that can be enabled alongside AeroS
     const { name } = (await manifest.json()) as { name?: string };
     if (!name?.startsWith("@keychord/") || alternatives.has(name)) continue;
     const other = Bun.TOML.parse(await Bun.file(join(packages, path)).text()) as {
+      placeholders?: ChordPlaceholders;
       chords?: Record<string, unknown>;
     };
     for (const key of Object.keys(other.chords ?? {})) {
       if (key.startsWith("?")) continue;
-      const pattern = chordPattern(key);
+      const pattern = chordPattern(key, other.placeholders);
       for (const [input] of chords)
         if (pattern.test(expand(input))) collisions.push(`${expand(input)} (${name})`);
     }

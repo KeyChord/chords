@@ -1,6 +1,6 @@
 import { beforeEach, expect, mock, test } from "bun:test";
 import { waitFor } from "@keychord/chordtest/test";
-import { chordPattern } from "@keychord/chordtest/patterns";
+import { chordPattern, type ChordPlaceholders } from "@keychord/chordtest/patterns";
 import type { NavigationAction } from "../src/js/navigation";
 
 const perform = mock();
@@ -9,9 +9,12 @@ const getAppWindows = mock();
 mock.module("../src/js/navigation.node", () => ({ default: { perform } }));
 mock.module("chord", () => ({ click, getAppWindows }));
 const { default: buildHandler } = await import("../src/js/navigation");
-const { chords } = Bun.TOML.parse(
+const { chords, placeholders } = Bun.TOML.parse(
   await Bun.file(new URL("../chords/macos.toml", import.meta.url)).text(),
-) as { chords: Record<string, { "@input:navigation"?: [NavigationAction, string?] }> };
+) as {
+  placeholders: ChordPlaceholders;
+  chords: Record<string, { "@input:navigation"?: [NavigationAction, string?] }>;
+};
 
 beforeEach(() => {
   perform.mockReset().mockResolvedValue("");
@@ -19,20 +22,25 @@ beforeEach(() => {
   getAppWindows.mockReset().mockReturnValue([]);
 });
 
+test("every chord and hint starts with the <> prefix, which defaults to ;n", () => {
+  expect(placeholders).toEqual({ "<>": { name: "Navigation prefix", default: "n" } });
+  expect(Object.keys(chords).filter((key) => !key.replace(/^\?/, "").startsWith("<>"))).toEqual([]);
+});
+
 test.each([
-  ["[[", "PREVIOUS"],
-  ["]]", "NEXT"],
-  ["[x", "CLOSE"],
-  ["]1", "OPTION", 1],
-  ["]12", "OPTION", 12],
+  [";n[", "PREVIOUS"],
+  [";n]", "NEXT"],
+  [";nx", "CLOSE"],
+  [";n1", "OPTION", 1],
+  [";n12", "OPTION", 12],
 ] as const)("%s resolves uniquely and targets the captured app", async (input, action, index) => {
   const matches = Object.entries(chords).filter(
-    ([pattern]) => !pattern.startsWith("?") && chordPattern(pattern).test(input),
+    ([pattern]) => !pattern.startsWith("?") && chordPattern(pattern, placeholders).test(input),
   );
   expect(matches).toHaveLength(1);
   const [pattern, binding] = matches[0];
   const args = binding["@input:navigation"]!;
-  const capture = chordPattern(pattern).exec(input)?.[1];
+  const capture = chordPattern(pattern, placeholders).exec(input)?.[1];
   await buildHandler().call({ focusedAppId: "dev.fixture" }, args[0], capture ?? args[1]);
   expect(perform).toHaveBeenCalledWith(
     "dev.fixture",

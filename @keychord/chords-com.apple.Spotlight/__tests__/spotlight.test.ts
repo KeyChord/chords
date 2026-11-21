@@ -1,7 +1,6 @@
-import { readFileSync } from "node:fs";
 import { afterEach, beforeEach, expect, mock, spyOn, test } from "bun:test";
 import { tap } from "chord";
-import { chordPattern } from "@keychord/chordtest/patterns";
+import { chordPattern, type ChordPlaceholders } from "@keychord/chordtest/patterns";
 import { mocked } from "@keychord/chordtest/test";
 import type { SpotlightSearch } from "../src/js/utils/native";
 
@@ -62,12 +61,19 @@ beforeEach(() => {
 
 afterEach(() => restoreSpawn());
 
-test("/ captures the whole query as a fallback chord for the handler", () => {
-  const source = readFileSync(new URL("../chords/macos.toml", import.meta.url), "utf8");
-  expect(source).toMatch(/\[on\.spotlight\]\s+file = 'spotlight\.js'/);
-  const binding = source.match(/^'([^']+)' = .*fallback = true, '@input:spotlight' = \['(\$1)'\]/m);
-  expect(binding).not.toBeNull();
-  const pattern = chordPattern(binding![1]);
+test("/ captures the whole query as a fallback chord for the handler", async () => {
+  const source = await Bun.file(new URL("../chords/macos.toml", import.meta.url)).text();
+  const { on, placeholders, chords } = Bun.TOML.parse(source) as {
+    on: Record<string, { file: string }>;
+    placeholders: ChordPlaceholders;
+    chords: Record<string, unknown>;
+  };
+  expect(on.spotlight.file).toBe("spotlight.js");
+  expect(chords["<>(.*)"]).toMatchObject({ fallback: true, "@input:spotlight": ["$1"] });
+  const pattern = chordPattern("<>(.*)", placeholders);
+  const remapped = chordPattern("<>(.*)", { ...placeholders, "<>": ";" });
+  expect(remapped.exec(";calculator")?.[1]).toBe("calculator");
+  expect(remapped.test("/calculator")).toBe(false);
   for (const query of ["", "calculator", "2+3", "foo/bar.(baz)", "café 🧮", "/x"]) {
     expect(pattern.exec(`/${query}`)?.[1]).toBe(query);
   }

@@ -13,21 +13,24 @@ const buildWhatsApp =
   builtWhatsApp as typeof import("../../chords-whatsapp/src/js/whatsapp").default;
 const handler = buildWhatsApp(targetId);
 const cover = buildWhatsApp(coverId);
-const { chords } = Bun.TOML.parse(
+const { chords, placeholders } = Bun.TOML.parse(
   await Bun.file(new URL("../chords/macos.toml", import.meta.url)).text(),
-) as { chords: Record<string, { "@input:navigation"?: [NavigationAction, string?] }> };
+) as {
+  placeholders: Record<string, { default: string }>;
+  chords: Record<string, { "@input:navigation"?: [NavigationAction, string?] }>;
+};
 
 async function navigate(action: NavigationAction, index?: string) {
   const input =
     action === "PREVIOUS"
-      ? "[["
+      ? ";n["
       : action === "NEXT"
-        ? "]]"
+        ? ";n]"
         : action === "CLOSE"
-          ? "[x"
-          : `]${index}`;
+          ? ";nx"
+          : `;n${index}`;
   const bindings = Object.entries(chords).filter(
-    ([key]) => !key.startsWith("?") && chordPattern(key).test(input),
+    ([key]) => !key.startsWith("?") && chordPattern(key, placeholders).test(input),
   );
   assert.equal(bindings.length, 1);
   const [key, binding] = bindings[0];
@@ -35,7 +38,7 @@ async function navigate(action: NavigationAction, index?: string) {
   await navigation.call(
     { focusedAppId: targetId },
     args[0],
-    args[1] === "$1" ? chordPattern(key).exec(input)![1] : args[1],
+    args[1] === "$1" ? chordPattern(key, placeholders).exec(input)![1] : args[1],
   );
 }
 

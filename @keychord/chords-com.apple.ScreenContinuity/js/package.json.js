@@ -1,7 +1,7 @@
 //#region package.json
 var name = "@keychord/chords-com.apple.ScreenContinuity";
 var displayName = "iPhone Mirroring Chords";
-var version = "0.0.0";
+var version = "0.0.1";
 var description = "Chords for iPhone Mirroring (com.apple.ScreenContinuity).";
 var categories = ["macOS"];
 var repository = {

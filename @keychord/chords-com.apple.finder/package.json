@@ -1,7 +1,7 @@
 {
   "name": "@keychord/chords-com.apple.finder",
   "displayName": "Finder Chords",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Chords for Finder and file open and save dialogs.",
   "categories": [
     "macOS"

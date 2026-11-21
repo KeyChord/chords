@@ -1,6 +1,5 @@
-import { readFileSync } from "node:fs";
 import { afterEach, beforeEach, expect, mock, spyOn, test } from "bun:test";
-import { chordPattern } from "@keychord/chordtest/patterns";
+import { chordPattern, type ChordPlaceholders } from "@keychord/chordtest/patterns";
 import {
   advanceTimersByTimeAsync,
   runAllTimersAsync,
@@ -73,12 +72,19 @@ afterEach(() => {
   useRealTimers();
 });
 
-test("/ captures the entire query as a fallback and loads the TypeScript handler's generated module", () => {
-  const source = readFileSync(new URL("../chords/macos.toml", import.meta.url), "utf8");
-  expect(source).toMatch(/\[on\.raycast\]\s+file = 'raycast\.js'/);
-  const binding = source.match(/^'([^']+)' = .*fallback = true, '@input:raycast' = \['(\$1)'\]/m);
-  expect(binding).not.toBeNull();
-  const pattern = chordPattern(binding![1]);
+test("/ captures the entire query as a fallback and loads the TypeScript handler's generated module", async () => {
+  const source = await Bun.file(new URL("../chords/macos.toml", import.meta.url)).text();
+  const { on, placeholders, chords } = Bun.TOML.parse(source) as {
+    on: Record<string, { file: string }>;
+    placeholders: ChordPlaceholders;
+    chords: Record<string, unknown>;
+  };
+  expect(on.raycast.file).toBe("raycast.js");
+  expect(chords["<>(.*)"]).toMatchObject({ fallback: true, "@input:raycast": ["$1"] });
+  const pattern = chordPattern("<>(.*)", placeholders);
+  const remapped = chordPattern("<>(.*)", { ...placeholders, "<>": ";" });
+  expect(remapped.exec(";calculator")?.[1]).toBe("calculator");
+  expect(remapped.test("/calculator")).toBe(false);
   for (const query of ["", "calculator", "1+2", "foo/bar.(baz)", "'quoted'", "café 🧮", "/clips"]) {
     expect(pattern.exec(`/${query}`)?.[1]).toBe(query);
   }

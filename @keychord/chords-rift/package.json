@@ -1,6 +1,7 @@
 {
   "name": "@keychord/chords-rift",
   "displayName": "Rift Chords",
+  "version": "0.0.1",
   "description": "Global chords that run commands for the Rift tiling window manager.",
   "categories": [
     "Window Management"

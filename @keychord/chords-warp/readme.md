@@ -14,7 +14,6 @@ Chord package for the [Warp](https://www.warp.dev/) terminal. For other terminal
   press Warp's default keyboard shortcuts, so they assume Warp's default keybindings. The rest
   (`f[`, `f]`, `su`, `sl`, `slu`, `sld`, `zr`, `zf`, `im`) press the key bound to their Warp action in
   `~/.warp/keybindings.yaml`, and do nothing if there is none.
-- `/w` (global): open Warp.
 
 When Chord loads the package, the Warp handler re-saves `~/.warp/keybindings.yaml`, creating it
 if needed. Existing bindings are kept, but comments and formatting are not.

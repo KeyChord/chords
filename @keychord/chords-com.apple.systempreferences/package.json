@@ -1,7 +1,7 @@
 {
   "name": "@keychord/chords-com.apple.systempreferences",
   "displayName": "System Preferences Chords",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Chords for System Preferences (com.apple.systempreferences).",
   "categories": [
     "macOS"

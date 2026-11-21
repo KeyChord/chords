@@ -1,89 +1,103 @@
 name = 'macOS Windows'
 
+[meta]
+chord = '>=0.3.0'
+
 [on.window]
 file = 'window.js'
+
+# Every chord starts with `<>`, which Chord replaces with the prefix chosen in Settings → Chords
+# → Placeholders or inherits the global symbol before its letter.
+[placeholders]
+"<>" = { name = 'Window prefix', default = 'w' }
 
 [chords]
 # Built-in macOS window management shortcuts
 # Can be overriden if using a dedicated window manager such as yabai, Aerospace, etc.
-'?/w' = { name = 'Window' }
+'?<>' = { name = 'Window' }
 
 # Native edge/corner snaps preserve size; stretch commands change one dimension.
-'/wl' = { name = 'Window: left', '@input:window' = ['PRESET', 'LEFT'] }
-'/wr' = { name = 'Window: right', '@input:window' = ['PRESET', 'RIGHT'] }
-'/wt' = { name = 'Window: top', '@input:window' = ['PRESET', 'TOP'] }
-'/wb' = { name = 'Window: bottom', '@input:window' = ['PRESET', 'BOTTOM'] }
-'/wtl' = { name = 'Window: top-left', '@input:window' = ['PRESET', 'TOP_LEFT'] }
-'/wtr' = { name = 'Window: top-right', '@input:window' = ['PRESET', 'TOP_RIGHT'] }
-'/wbl' = { name = 'Window: bottom-left', '@input:window' = ['PRESET', 'BOTTOM_LEFT'] }
-'/wbr' = { name = 'Window: bottom-right', '@input:window' = ['PRESET', 'BOTTOM_RIGHT'] }
-'/wlr' = { name = 'Window: horizontal', '@input:window' = ['PRESET', 'HORIZONTAL'] }
-'/wrl' = { name = 'Window: horizontal', '@input:window' = ['PRESET', 'HORIZONTAL'] }
-'/wtb' = { name = 'Window: vertical', '@input:window' = ['PRESET', 'VERTICAL'] }
-'/wbt' = { name = 'Window: vertical', '@input:window' = ['PRESET', 'VERTICAL'] }
-'/wf' = { name = 'Window: fill', '@input:window' = ['PRESET', 'FILL'] }
-'/wc' = { name = 'Window: center', '@input:window' = ['PRESET', 'CENTER'] }
+'<>l' = { name = 'Window: left', '@input:window' = ['PRESET', 'LEFT'] }
+'<>r' = { name = 'Window: right', '@input:window' = ['PRESET', 'RIGHT'] }
+'<>t' = { name = 'Window: top', '@input:window' = ['PRESET', 'TOP'] }
+'<>b' = { name = 'Window: bottom', '@input:window' = ['PRESET', 'BOTTOM'] }
+'<>tl' = { name = 'Window: top-left', '@input:window' = ['PRESET', 'TOP_LEFT'] }
+'<>tr' = { name = 'Window: top-right', '@input:window' = ['PRESET', 'TOP_RIGHT'] }
+'<>bl' = { name = 'Window: bottom-left', '@input:window' = ['PRESET', 'BOTTOM_LEFT'] }
+'<>br' = { name = 'Window: bottom-right', '@input:window' = ['PRESET', 'BOTTOM_RIGHT'] }
+'<>lr' = { name = 'Window: horizontal', '@input:window' = ['PRESET', 'HORIZONTAL'] }
+'<>rl' = { name = 'Window: horizontal', '@input:window' = ['PRESET', 'HORIZONTAL'] }
+'<>tb' = { name = 'Window: vertical', '@input:window' = ['PRESET', 'VERTICAL'] }
+'<>bt' = { name = 'Window: vertical', '@input:window' = ['PRESET', 'VERTICAL'] }
+'<>f' = { name = 'Window: fill', '@input:window' = ['PRESET', 'FILL'] }
+'<>c' = { name = 'Window: center', '@input:window' = ['PRESET', 'CENTER'] }
 
-'?/wpx' = { name = 'Window: Position, X' }
-'/wpx(.+)' = { name = 'Window: Position, X (Set)', '@input:window' = ['POSITION', '$1'] }
-'?/wpy' = { name = 'Window: Position, Y' }
-'/wpy(.+)' = { name = 'Window: Position, Y (Set)', '@input:window' = ['POSITION', '$1'] }
-'?/wp' = { name = 'Window: Position' }
-'/wp(.+)' = { name = 'Window: Position (Set)', '@input:window' = ['POSITION', '$1'] }
+'?<>px' = { name = 'Window: Position, X' }
+'<>px(.+)' = { name = 'Window: Position, X (Set)', '@input:window' = ['POSITION', '$1', 'X'] }
+'?<>py' = { name = 'Window: Position, Y' }
+'<>py(.+)' = { name = 'Window: Position, Y (Set)', '@input:window' = ['POSITION', '$1', 'Y'] }
+'?<>p' = { name = 'Window: Position' }
+'<>p([^xy].*)' = { name = 'Window: Position (Set)', '@input:window' = ['POSITION', '$1'] }
 
-'?/wdw' = { name = 'Window: Dimensions, Width' }
-'/wdw([^=-].*)' = { name = 'Window: Dimensions, Width (Set)', '@input:window' = [
+'?<>dw' = { name = 'Window: Dimensions, Width' }
+'<>dw([^=-].*)' = { name = 'Window: Dimensions, Width (Set)', '@input:window' = [
   'DIMENSIONS',
   '$1',
+  'WIDTH',
 ] }
-'?/wdw=' = { name = 'Window: Dimensions, Width (Increase)' }
-'/wdw=([0-9]?)' = { name = 'Window: Dimensions, Width (Increase)', '@input:window' = [
+'?<>dw=' = { name = 'Window: Dimensions, Width (Increase)' }
+'<>dw=([0-9]?)' = { name = 'Window: Dimensions, Width (Increase)', '@input:window' = [
   'DIMENSIONS_INCREASE',
   '$1',
+  'WIDTH',
 ] }
-'?/wdw-' = { name = 'Window: Dimensions, Width (Decrease)' }
-'/wdw-([0-9]?)' = { name = 'Window: Dimensions, Width (Decrease)', '@input:window' = [
+'?<>dw-' = { name = 'Window: Dimensions, Width (Decrease)' }
+'<>dw-([0-9]?)' = { name = 'Window: Dimensions, Width (Decrease)', '@input:window' = [
   'DIMENSIONS_DECREASE',
   '$1',
+  'WIDTH',
 ] }
-'?/wdh' = { name = 'Window: Dimensions, Height' }
-'/wdh([^=-].*)' = { name = 'Window: Dimensions, Height (Set)', '@input:window' = [
+'?<>dh' = { name = 'Window: Dimensions, Height' }
+'<>dh([^=-].*)' = { name = 'Window: Dimensions, Height (Set)', '@input:window' = [
   'DIMENSIONS',
   '$1',
+  'HEIGHT',
 ] }
-'?/wdh=' = { name = 'Window: Dimensions, Height (Increase)' }
-'/wdh=([0-9]?)' = { name = 'Window: Dimensions, Height (Increase)', '@input:window' = [
+'?<>dh=' = { name = 'Window: Dimensions, Height (Increase)' }
+'<>dh=([0-9]?)' = { name = 'Window: Dimensions, Height (Increase)', '@input:window' = [
+  'DIMENSIONS_INCREASE',
+  '$1',
+  'HEIGHT',
+] }
+'?<>dh-' = { name = 'Window: Dimensions, Height (Decrease)' }
+'<>dh-([0-9]?)' = { name = 'Window: Dimensions, Height (Decrease)', '@input:window' = [
+  'DIMENSIONS_DECREASE',
+  '$1',
+  'HEIGHT',
+] }
+'?<>d' = { name = 'Window: Dimensions' }
+'<>d([^wh=-].*)' = { name = 'Window: Dimensions (Set)', '@input:window' = ['DIMENSIONS', '$1'] }
+'?<>d=' = { name = 'Window: Dimensions (Increase)' }
+'<>d=([0-9]?)' = { name = 'Window: Dimensions (Increase)', '@input:window' = [
   'DIMENSIONS_INCREASE',
   '$1',
 ] }
-'?/wdh-' = { name = 'Window: Dimensions, Height (Decrease)' }
-'/wdh-([0-9]?)' = { name = 'Window: Dimensions, Height (Decrease)', '@input:window' = [
-  'DIMENSIONS_DECREASE',
-  '$1',
-] }
-'?/wd' = { name = 'Window: Dimensions' }
-'/wd([^wh=-].*)' = { name = 'Window: Dimensions (Set)', '@input:window' = ['DIMENSIONS', '$1'] }
-'?/wd=' = { name = 'Window: Dimensions (Increase)' }
-'/wd=([0-9]?)' = { name = 'Window: Dimensions (Increase)', '@input:window' = [
-  'DIMENSIONS_INCREASE',
-  '$1',
-] }
-'?/wd-' = { name = 'Window: Dimensions (Decrease)' }
-'/wd-([0-9]?)' = { name = 'Window: Dimensions (Decrease)', '@input:window' = [
+'?<>d-' = { name = 'Window: Dimensions (Decrease)' }
+'<>d-([0-9]?)' = { name = 'Window: Dimensions (Decrease)', '@input:window' = [
   'DIMENSIONS_DECREASE',
   '$1',
 ] }
 
-'/w([0-9\s-]+)' = { name = 'Window: Dimensions + Position', '@input:window' = ['FRAME', '$1'] }
+'<>([0-9\s-]+)' = { name = 'Window: Dimensions + Position', '@input:window' = ['FRAME', '$1'] }
 
-'?/ws' = { name = 'Window: Space' }
-'/ws(\d+)' = { name = 'Window: Space $1 (Move)', '@input:window' = ['SPACE', '$1'] }
-'/ws]' = { name = 'Window: Space (Next)', '@input:window' = ['SPACE', 'NEXT'] }
-'/ws[' = { name = 'Window: Space (Previous)', '@input:window' = ['SPACE', 'PREVIOUS'] }
+'?<>s' = { name = 'Window: Space' }
+'<>s(\d+)' = { name = 'Window: Space $1 (Move)', '@input:window' = ['SPACE', '$1'] }
+'<>s]' = { name = 'Window: Space (Next)', '@input:window' = ['SPACE', 'NEXT'] }
+'<>s[' = { name = 'Window: Space (Previous)', '@input:window' = ['SPACE', 'PREVIOUS'] }
 
-'/wh' = { name = 'Window: Hide', shortcut = 'cmd+h' }
-'/wm' = { name = 'Window: Minimize', shortcut = 'cmd+m' }
-'/wq' = { name = 'Window: Quit', shortcut = 'cmd+q' }
+'<>h' = { name = 'Window: Hide', shortcut = 'cmd+h' }
+'<>m' = { name = 'Window: Minimize', shortcut = 'cmd+m' }
+'<>q' = { name = 'Window: Quit', shortcut = 'cmd+q' }
 
-'/w[' = { name = 'Window: Previous', '@input:window' = ['CYCLE', 'PREVIOUS'] }
-'/w]' = { name = 'Window: Next', '@input:window' = ['CYCLE', 'NEXT'] }
+'<>[' = { name = 'Window: Previous', '@input:window' = ['CYCLE', 'PREVIOUS'] }
+'<>]' = { name = 'Window: Next', '@input:window' = ['CYCLE', 'NEXT'] }

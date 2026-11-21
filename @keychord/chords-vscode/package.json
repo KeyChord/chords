@@ -1,7 +1,7 @@
 {
   "name": "@keychord/chords-vscode",
   "displayName": "VSCode Chords",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Chords for VSCode and its forks, including Cursor.",
   "categories": [
     "Editors"

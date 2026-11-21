@@ -1,7 +1,7 @@
 //#region package.json
 var name = "@keychord/chords-raycast";
 var displayName = "Raycast Chords";
-var version = "0.0.0";
+var version = "0.0.1";
 var description = "Chords for Raycast: open a query's first result and move through results, pages and sections.";
 var categories = ["Utilities"];
 var repository = {
@@ -67,13 +67,20 @@ var chords = {
 	} } } },
 	"macos.toml": {
 		"name": "Raycast",
-		"meta": { "version": ">=0.2.5" },
+		"meta": { "chord": ">=0.3.0" },
 		"on": { "raycast": { "file": "raycast.js" } },
-		"chords": { "/(.*)": {
-			"name": "Raycast: Search $1",
-			"fallback": true,
-			"@input:raycast": ["$1"]
-		} }
+		"placeholders": { "<>": {
+			"name": "Raycast prefix",
+			"default": "/"
+		} },
+		"chords": {
+			"?<>": { "name": "Launch" },
+			"<>(.*)": {
+				"name": "Raycast: Search $1",
+				"fallback": true,
+				"@input:raycast": ["$1"]
+			}
+		}
 	}
 };
 var package_default = {

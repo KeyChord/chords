@@ -1,6 +1,7 @@
 {
   "name": "@keychord/chords-aerospace",
   "displayName": "AeroSpace Chords",
+  "version": "0.0.1",
   "description": "Global chords that run commands for the AeroSpace tiling window manager.",
   "categories": [
     "Window Management"

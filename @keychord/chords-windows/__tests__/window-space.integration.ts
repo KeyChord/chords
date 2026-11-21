@@ -30,7 +30,7 @@ const definition = Bun.TOML.parse(
 ) as any;
 async function invoke(input: string, index: number) {
   const matches = Object.entries(definition.chords).flatMap(([pattern, binding]) => {
-    const capture = chordPattern(pattern).exec(input);
+    const capture = chordPattern(pattern, definition.placeholders).exec(input);
     const args = (binding as any)["@input:window"] as string[] | undefined;
     return capture && args
       ? [args.map((arg) => arg.replace(/\$(\d+)/g, (_, i) => capture[Number(i)]))]
@@ -66,22 +66,22 @@ async function reached(index: number) {
 }
 const originalIndex = original.desktops.indexOf(original.spaces[0]) + 1;
 try {
-  await invoke("/ws1", 1);
+  await invoke(";ws1", 1);
   await assert.rejects(handler.call(selected, "SPACE", "PREVIOUS"), /no previous/);
-  await invoke("/ws2", 2);
-  await invoke("/ws]", 3);
-  await invoke("/ws[", 2);
-  await invoke(`/ws${original.desktops.length}`, original.desktops.length);
+  await invoke(";ws2", 2);
+  await invoke(";ws]", 3);
+  await invoke(";ws[", 2);
+  await invoke(`;ws${original.desktops.length}`, original.desktops.length);
   await assert.rejects(handler.call(selected, "SPACE", "NEXT"), /no next/);
   await assert.rejects(handler.call(selected, "SPACE", "9999"), /does not exist/);
-  await invoke("/ws1", 1);
-  // `2/ws]`: Chord calls the built handler once per repetition with the same window,
+  await invoke(";ws1", 1);
+  // `2;ws]`: Chord calls the built handler once per repetition with the same window,
   // including after the first move takes it off the visible Space, out of Accessibility.
   for (let repetition = 0; repetition < 2; repetition++)
-    await handler.call({ ...selected, input: "/ws]" }, "SPACE", "NEXT");
+    await handler.call({ ...selected, input: ";ws]" }, "SPACE", "NEXT");
   await reached(3);
 } finally {
-  await invoke(`/ws${originalIndex}`, originalIndex);
+  await invoke(`;ws${originalIndex}`, originalIndex);
 }
 console.log(
   "window-space-ok: numbered, next, previous, boundaries, selected window, repeats, geometry, no Space switch",

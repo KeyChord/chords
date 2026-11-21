@@ -47,10 +47,15 @@ const definition = Bun.TOML.parse(
   await Bun.file(new URL("../chords/macos.toml", import.meta.url)).text(),
 ) as { chords: Record<string, { shell?: string; "@input:rift"?: string[] }> };
 
-// These need a second display, or toggle Rift for the whole macOS Space, including the
-// windows on the user's other workspaces. `rift.test.ts` still parses them with rift-cli.
-const NOT_LIVE = new Set([";v", ...["w", "e", "n", "s", "l", "r", "u", "d"].map((d) => `;d${d}`)]);
-for (const direction of ["l", "r", "u", "d"]) NOT_LIVE.add(`;t${direction}`);
+// These need a second display, affect the whole macOS Space, or change the launchd service.
+// `rift.test.ts` still validates their command syntax with rift-cli.
+const NOT_LIVE = new Set([
+  "<>v",
+  "<>,p",
+  "<>,h",
+  ...["w", "e", "n", "s", "l", "r", "u", "d"].map((d) => `<>d${d}`),
+]);
+for (const direction of ["l", "r", "u", "d"]) NOT_LIVE.add(`<>t${direction}`);
 
 async function rift<T>(...args: string[]): Promise<T> {
   return JSON.parse((await runCommand(["rift-cli", ...args], { timeout: 15_000 })).stdout) as T;
@@ -60,7 +65,7 @@ const id = (window: WindowId) => `${window.pid}:${window.idx}`;
 
 /**
  * Rift's focused (main) window, when it is a fixture window. Window commands act on it, and
- * `;q` posts Command-W to its app. `query workspaces` can't tell: its `is_focused` falls back
+ * `;rq` posts Command-W to its app. `query workspaces` can't tell: its `is_focused` falls back
  * to a workspace's last-focused window. These two queries both report the main window itself.
  */
 async function fixtureFocus() {
@@ -127,13 +132,13 @@ const applied = (window: string, workspace: number) =>
 
 const ran = new Set<string>();
 async function chord(input: string) {
-  // Tests type the default prefix; the chords file spells it `<p>`.
-  const key = input.replace(/^;/, "<p>");
+  // Tests type the default prefix; the chords file spells it `<>`.
+  const key = input.replace(/^;r/, "<>");
   const shell = definition.chords[key]?.shell;
   if (!shell) throw new Error(`${input} has no shell command`);
   // Workspace switches and config reloads don't act on a window. Everything else waits until
   // Rift's focus is on the fixture, so a chord can never move or close the user's windows.
-  if (!/^\[(?:f|,)/.test(input))
+  if (!/^<>(?:f(?:\d|[[\]k])|,)/.test(key))
     await waitFor(fixtureFocus).catch(() => {
       throw new Error(`Stopped before ${input}: Rift's focused window isn't a fixture window`);
     });
@@ -141,9 +146,9 @@ async function chord(input: string) {
   ran.add(key);
 }
 const riftHandler = buildRiftHandler();
-/** Runs a chord bound to the `rift` handler (`;m`) as Chord would, after the same focus check. */
+/** Runs a chord bound to the `rift` handler (`;rm`) as Chord would, after the same focus check. */
 async function handled(input: string) {
-  const key = input.replace(/^;/, "<p>");
+  const key = input.replace(/^;r/, "<>");
   const args = definition.chords[key]?.["@input:rift"];
   if (!args) throw new Error(`${input} doesn't run the rift handler`);
   await waitFor(fixtureFocus).catch(() => {
@@ -254,7 +259,7 @@ test.skipIf(!live)(
     const home = before.find((workspace) => workspace.is_active)!;
     const homeFocus = home.windows.find((window) => window.is_focused);
     // Borrow the last two adjacent empty workspaces (extra, unnamed workspaces come last),
-    // so `;f]` from the scratch workspace reaches the spare one, never the user's windows.
+    // so `;rf]` from the scratch workspace reaches the spare one, never the user's windows.
     const empty = before.filter(
       (workspace) => !workspace.is_active && workspace.window_count === 0 && workspace.index <= 8,
     );
@@ -269,7 +274,7 @@ test.skipIf(!live)(
     const T = spare.index;
     const fixture = await buildFixture();
     try {
-      await chord(`;f${S}`);
+      await chord(`;rf${S}`);
       expect(await activeIndex()).toBe(S);
 
       fixture.launch();
@@ -280,50 +285,50 @@ test.skipIf(!live)(
       await focusWindow(windows[0]);
 
       // Focus and move in a horizontal split.
-      await chord(";lt");
+      await chord(";rlt");
       expect(await layoutMode(S)).toBe("traditional");
       for (let step = 0; step < 3; step++) {
-        await chord(";w");
+        await chord(";rw");
         await settled();
       }
       const row = await order("x");
       expect(await settled()).toBe(row[0]);
-      await chord(";e");
+      await chord(";re");
       expect(await settled()).toBe(row[1]);
-      await chord(";e");
+      await chord(";re");
       expect(await settled()).toBe(row[2]);
-      await chord(";w");
+      await chord(";rw");
       const middle = row[1];
       expect(await settled()).toBe(middle);
-      await chord(";g]");
+      await chord(";rg]");
       expect(await settled()).not.toBe(middle);
-      await chord(";g[");
+      await chord(";rg[");
       expect(await settled()).toBe(middle);
-      await chord(";r");
+      await chord(";rr");
       expect(await order("x")).toEqual([row[0], row[2], middle]);
-      await chord(";l");
+      await chord(";rl");
       expect(await order("x")).toEqual(row);
 
       // Resize and balance.
       const width = (await frameOf(middle)).size.width;
-      await chord(";rw=");
+      await chord(";rrw=");
       expect((await frameOf(middle)).size.width).toBeGreaterThan(width);
-      await chord(";b");
+      await chord(";r;");
       expect((await frameOf(middle)).size.width).toBeCloseTo(width, 0);
-      await chord(";rw-");
+      await chord(";rrw-");
       expect((await frameOf(middle)).size.width).toBeLessThan(width);
-      await chord(";b");
-      await chord(";r=");
+      await chord(";r;");
+      await chord(";rr=");
       const grown = (await frameOf(middle)).size.width;
       expect(grown).toBeGreaterThan(width);
-      await chord(";r-");
+      await chord(";rr-");
       expect((await frameOf(middle)).size.width).toBeLessThan(grown);
-      await chord(";b");
+      await chord(";r;");
 
       // Join, select the joined container and back, then unjoin.
       for (const [join, neighbour] of [
-        [";jr", row[2]],
-        [";jl", row[0]],
+        [";rjr", row[2]],
+        [";rjl", row[0]],
       ] as const) {
         await chord(join);
         const root = await tree();
@@ -334,50 +339,50 @@ test.skipIf(!live)(
             .map((node) => id(node.window_id!))
             .sort(),
         ).toEqual([middle, neighbour].sort());
-        await chord(";o");
+        await chord(";ro");
         const container = await selection();
         expect(container?.node_type).toBe("container");
         expect(leaves(container!).length).toBe(2);
-        await chord(";i");
+        await chord(";ri");
         expect(await settled()).toBe(middle);
-        await chord(";jx");
+        await chord(";rjx");
         expect(parentOf(await tree(), middle).children.length).toBe(3);
       }
 
       // Stacked containers.
       const kind = parentOf(await tree(), middle).layout_kind;
-      await chord(";vs");
+      await chord(";rvs");
       expect(parentOf(await tree(), middle).layout_kind).not.toBe(kind);
-      await chord(";vs");
+      await chord(";rvs");
       expect(parentOf(await tree(), middle).layout_kind).toBe(kind);
 
       // The same operations in a vertical split.
-      await chord(";vo");
+      await chord(";rvo");
       expect(parentOf(await tree(), middle).layout_kind).not.toBe(kind);
       for (let step = 0; step < 3; step++) {
-        await chord(";n");
+        await chord(";rn");
         await settled();
       }
       const column = await order("y");
       expect(await settled()).toBe(column[0]);
-      await chord(";s");
+      await chord(";rs");
       expect(await settled()).toBe(column[1]);
       const center = column[1];
-      await chord(";d");
+      await chord(";rd");
       expect(await order("y")).toEqual([column[0], column[2], center]);
-      await chord(";u");
+      await chord(";ru");
       expect(await order("y")).toEqual(column);
       const height = (await frameOf(center)).size.height;
-      await chord(";rh=");
+      await chord(";rrh=");
       expect((await frameOf(center)).size.height).toBeGreaterThan(height);
-      await chord(";rh-");
-      await chord(";b");
-      await chord(";rh-");
+      await chord(";rrh-");
+      await chord(";r;");
+      await chord(";rrh-");
       expect((await frameOf(center)).size.height).toBeLessThan(height);
-      await chord(";b");
+      await chord(";r;");
       for (const [join, neighbour] of [
-        [";jd", column[2]],
-        [";ju", column[0]],
+        [";rjd", column[2]],
+        [";rju", column[0]],
       ] as const) {
         await chord(join);
         expect(
@@ -385,47 +390,47 @@ test.skipIf(!live)(
             .map((node) => id(node.window_id!))
             .sort(),
         ).toEqual([center, neighbour].sort());
-        await chord(";jx");
+        await chord(";rjx");
       }
-      await chord(";vo");
+      await chord(";rvo");
       expect(parentOf(await tree(), center).layout_kind).toBe(kind);
 
       // Floating, and moving focus between the floating and tiled layers.
-      await chord(";vf");
+      await chord(";rvf");
       expect(
         (await fixtureWindows(S)).find((window) => id(window.id) === center)?.is_floating,
       ).toBe(true);
       expect(leaves(await tree()).length).toBe(2);
       await waitFor(async () => ((await fixtureFocus()) === center ? true : undefined));
-      await chord(";gf");
+      await chord(";rgf");
       const tiled = await waitFor(async () => {
         const window = await fixtureFocus();
         return window && window !== center ? window : undefined;
       });
       expect(leaves(await tree()).map((node) => id(node.window_id!))).toContain(tiled);
-      await chord(";gf");
+      await chord(";rgf");
       await waitFor(async () => ((await fixtureFocus()) === center ? true : undefined));
-      await chord(";vf");
+      await chord(";rvf");
       expect((await fixtureWindows(S)).every((window) => !window.is_floating)).toBe(true);
       expect(leaves(await tree()).length).toBe(3);
 
       // Fullscreen toggles.
       expect(await settled()).toBe(center);
-      await chord(";zf");
+      await chord(";rzf");
       expect((await selection())?.is_fullscreen).toBe(true);
-      await chord(";zf");
+      await chord(";rzf");
       expect((await selection())?.is_fullscreen).toBe(false);
-      await chord(";zg");
+      await chord(";rzg");
       expect((await selection())?.is_fullscreen_within_gaps).toBe(true);
-      await chord(";zg");
+      await chord(";rzg");
       expect((await selection())?.is_fullscreen_within_gaps).toBe(false);
 
       // Layout modes.
       for (const [input, mode] of [
-        [";lf", "floating"],
-        [";lb", "bsp"],
-        [";ls", "stack"],
-        [";lc", "scrolling"],
+        [";rlf", "floating"],
+        [";rlb", "bsp"],
+        [";rls", "stack"],
+        [";rlc", "scrolling"],
       ]) {
         await chord(input);
         expect(await layoutMode(S)).toBe(mode);
@@ -435,100 +440,100 @@ test.skipIf(!live)(
       const scrolled = await settled();
       await applied(scrolled, S);
       const columnWidth = (await frameOf(scrolled)).size.width;
-      await chord(";cw]");
+      await chord(";rcw]");
       const preset = (await frameOf(scrolled)).size.width;
       expect(preset).not.toBeCloseTo(columnWidth, 0);
-      await chord(";cw[");
+      await chord(";rcw[");
       expect((await frameOf(scrolled)).size.width).not.toBeCloseTo(preset, 0);
-      await chord(";cc");
-      await chord(";cc");
+      await chord(";rcc");
+      await chord(";rcc");
 
       // Master/stack.
-      await chord(";lm");
+      await chord(";rlm");
       expect(await layoutMode(S)).toBe("master_stack");
       const area = async (role: "master" | "stack") =>
         (await tree()).children.find((node) => node.role === role)!;
       const masters = leaves(await area("master")).length;
-      await chord(";lmc=");
+      await chord(";rlmc=");
       expect(leaves(await area("master")).length).toBe(masters + 1);
-      await chord(";lmc-");
+      await chord(";rlmc-");
       expect(leaves(await area("master")).length).toBe(masters);
       const masterWidth = (await area("master")).frame.size.width;
-      await chord(";lm=");
+      await chord(";rlm=");
       expect((await area("master")).frame.size.width).toBeGreaterThan(masterWidth);
-      await chord(";lm-");
+      await chord(";rlm-");
       expect((await area("master")).frame.size.width).toBeCloseTo(masterWidth, 0);
       const stacked = id(leaves(await area("stack"))[0].window_id!);
       await focusWindow(stacked);
       expect(await settled()).toBe(stacked);
-      await chord(";lmp");
+      await chord(";rlmp");
       expect(leaves(await area("master")).map((node) => id(node.window_id!))).toContain(stacked);
       const firstMaster = id(leaves(await area("master"))[0].window_id!);
       const firstStack = id(leaves(await area("stack"))[0].window_id!);
-      await chord(";lms");
+      await chord(";rlms");
       expect(id(leaves(await area("master"))[0].window_id!)).toBe(firstStack);
       expect(id(leaves(await area("stack"))[0].window_id!)).toBe(firstMaster);
-      // `;p` promotes like `;lmp`, and `;m` focuses the first master window.
+      // `;rp` promotes like `;rlmp`, and `;rm` focuses the first master window.
       const promoted = id(leaves(await area("stack"))[0].window_id!);
       await focusWindow(promoted);
       expect(await settled()).toBe(promoted);
-      await chord(";p");
+      await chord(";rp");
       expect(leaves(await area("master")).map((node) => id(node.window_id!))).toContain(promoted);
       const master = id(leaves(await area("master"))[0].window_id!);
       const stackedAgain = id(leaves(await area("stack"))[0].window_id!);
       await focusWindow(stackedAgain);
       expect(await settled()).toBe(stackedAgain);
-      await handled(";m");
+      await handled(";rm");
       expect(await settled()).toBe(master);
 
       // Workspaces.
       await settled();
-      await chord(`;m${T}`);
+      await chord(`;rm${T}`);
       // Rift then focuses another window here; a late focus event would switch back to it.
       await settled();
       expect(await activeIndex()).toBe(S);
       expect((await fixtureWindows(S)).length).toBe(2);
       const moved = (await fixtureWindows(T)).map((window) => id(window.id));
       expect(moved.length).toBe(1);
-      await chord(`;f${T}`);
+      await chord(`;rf${T}`);
       expect(await settled()).toBe(moved[0]);
       expect(await activeIndex()).toBe(T);
-      await chord(";fk");
+      await chord(";rfk");
       await settled();
       expect(await activeIndex()).toBe(S);
-      await chord(";fk");
+      await chord(";rfk");
       expect(await settled()).toBe(moved[0]);
       expect(await activeIndex()).toBe(T);
-      await chord(`;mf${S}`);
+      await chord(`;rmf${S}`);
       expect(await settled()).toBe(moved[0]);
       expect(await activeIndex()).toBe(S);
       expect((await fixtureWindows(S)).map((window) => id(window.id))).toContain(moved[0]);
       expect((await fixtureWindows(T)).length).toBe(0);
-      await chord(";f]");
+      await chord(";rf]");
       expect(await activeIndex()).toBe(T);
-      await chord(";f[");
+      await chord(";rf[");
       await settled();
       expect(await activeIndex()).toBe(S);
 
       // Config reload keeps the configuration.
       const config = await rift<unknown>("execute", "config", "get");
-      await chord(";,r");
+      await chord(";r,r");
       expect(await rift<unknown>("execute", "config", "get")).toEqual(config);
 
       // Quit the focused window last.
       const closing = await settled();
-      await chord(";q");
+      await chord(";rq");
       await waitFor(async () => {
         const remaining = (await fixtureWindows(S)).map((window) => id(window.id));
         return remaining.length === 2 && !remaining.includes(closing) ? true : undefined;
       }, 10_000).catch(async () => {
         throw new Error(
-          `;q did not close ${closing}; fixture key events:\n${await fixture.events()}`,
+          `;rq did not close ${closing}; fixture key events:\n${await fixture.events()}`,
         );
       });
 
       // Every chord kind ran, except the ones above; digits share one command per kind.
-      const kinds = (input: string) => input.replace(/^(\[(?:f|mf|m))\d$/, "$1N");
+      const kinds = (input: string) => input.replace(/^(<>(?:f|mf|m))\d$/, "$1N");
       const untested = Object.keys(definition.chords).filter(
         (input) =>
           !input.startsWith("?") &&

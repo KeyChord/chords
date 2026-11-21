@@ -12,8 +12,8 @@ Use `/<query>` to activate Raycast's first result. For example, `/calculator`
 searches for `calculator` and opens its first match. Complete the chord using
 Chord's usual completion key. `/` alone opens Raycast.
 
-This launcher is a fallback chord: any other `/` chord, such as `/f` for Finder or
-`/t` for Terminal, still runs instead. Because installed packages override Chord's
+This launcher is a fallback chord: the other `/` chords, `/f` for Finder and `/,` for
+System Settings, still run instead. Because installed packages override Chord's
 built-in ones, it also takes over `/<query>` from the built-in Spotlight launcher.
 
 While Raycast is focused, these chords press its keyboard shortcuts:

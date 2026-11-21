@@ -1,17 +1,25 @@
 name = 'Mouse'
 
+[meta]
+chord = '>=0.3.0'
+
 [on.click]
 file = 'click.js'
 
-[chords]
-'?.' = { name = 'Click' }
+# Every chord starts with `<>`, which Chord replaces with the prefix chosen in Settings → Chords
+# → Placeholders or inherits the global symbol before its letter.
+[placeholders]
+"<>" = { name = 'Mouse prefix', default = 'c' }
 
-'?..' = { name = 'Double Click' }
-'?.,' = { name = 'Right Click' }
-'?.;' = { name = 'Middle Click' }
-'?.-' = { name = 'Drag' }
-'?.,-' = { name = 'Right Drag' }
-'?.;-' = { name = 'Middle Drag' }
-'?.=' = { name = 'Move Mouse' }
-'?./' = { name = 'Global Mouse' }
-'.([.,;=/0-9-].*)' = { name = 'Mouse', '@input:click' = ['$1', 'COMMAND'] }
+[chords]
+'?<>' = { name = 'Click' }
+
+'?<>.' = { name = 'Double Click' }
+'?<>,' = { name = 'Right Click' }
+'?<>;' = { name = 'Middle Click' }
+'?<>-' = { name = 'Drag' }
+'?<>,-' = { name = 'Right Drag' }
+'?<>;-' = { name = 'Middle Drag' }
+'?<>=' = { name = 'Move Mouse' }
+'?<>/' = { name = 'Global Mouse' }
+'<>([.,;=/0-9-].*)' = { name = 'Mouse', '@input:click' = ['$1', 'COMMAND'] }

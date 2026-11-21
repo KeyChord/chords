@@ -5,7 +5,8 @@ import isUUID from "validator/lib/isUUID.js";
 type Command = (args: string[]) => Promise<string>;
 
 function managedTarget(name: string): string | undefined {
-  // Recognize the old /ms marker so existing virtual screens can still be replaced or reset.
+  // Virtual screens keep the `Chord /md` name marker, which predates the reassignable chord prefix,
+  // and the older /ms one, so existing screens can still be replaced or reset.
   const match = /^Chord \/m[ds] (\S+) [1-9]\d*x[1-9]\d* (\S+)$/.exec(name);
   return match && isUUID(match[1], "loose") && isUUID(match[2], "loose") ? match[1] : undefined;
 }
@@ -106,7 +107,9 @@ async function pointerDisplay(command: Command): Promise<string> {
   const resolved = names.split(",").map(managedTarget);
   const targets = new Set(resolved);
   if (targets.size !== 1 || targets.has(undefined)) {
-    throw new Error("Move the pointer to a physical display or a virtual screen created by /md");
+    throw new Error(
+      "Move the pointer to a physical display or a virtual screen this package created",
+    );
   }
   return [...targets][0]!;
 }

@@ -1,7 +1,32 @@
-/** Match literal chord keys surrounding parenthesized, JS-compatible regex sections. */
-export function chordPattern(raw: string): RegExp {
+/** Defaults may be literal key sequences or letters that inherit the global symbol. */
+export type ChordPlaceholders = Record<string, string | { name?: string; default?: string }>;
+
+/**
+ * The key with each declared `<>` or `<name>` replaced by its default, as Chord expands it when
+ * Settings sets no value. Undeclared tokens, such as a regex's named group, are left alone.
+ */
+export function expandPlaceholders(raw: string, placeholders: ChordPlaceholders = {}): string {
+  let expanded = raw;
+  for (const [name, declaration] of Object.entries(placeholders)) {
+    if (!/^<[^<>]*>$/.test(name)) {
+      throw new TypeError(`Invalid placeholder name ${JSON.stringify(name)}. Use the full token.`);
+    }
+    const value = typeof declaration === "string" ? declaration : declaration.default;
+    if (value === undefined) continue;
+    const sequence =
+      typeof declaration !== "string" && /^[a-z]$/i.test(value) ? `;${value.toLowerCase()}` : value;
+    expanded = expanded.replaceAll(name, () => sequence);
+  }
+  return expanded;
+}
+
+/**
+ * Match literal chord keys surrounding parenthesized, JS-compatible regex sections. Pass the
+ * file's `[placeholders]` to match the key as Chord binds it by default.
+ */
+export function chordPattern(raw: string, placeholders?: ChordPlaceholders): RegExp {
   const escape = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  let remaining = raw;
+  let remaining = expandPlaceholders(raw, placeholders);
   let pattern = "";
   while (remaining.includes("(")) {
     const start = remaining.indexOf("(");

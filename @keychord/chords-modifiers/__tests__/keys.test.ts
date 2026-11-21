@@ -1,14 +1,15 @@
 import { readFileSync } from "node:fs";
 import { tap } from "chord";
-import { chordPattern } from "@keychord/chordtest/patterns";
+import { chordPattern, type ChordPlaceholders } from "@keychord/chordtest/patterns";
 import { beforeEach, expect, test } from "bun:test";
 import { mocked } from "@keychord/chordtest/test";
 import buildKeysHandler, { modifierShortcut } from "../src/js/keys";
 
 const source = readFileSync(new URL("../chords/macos.toml", import.meta.url), "utf8");
+const { placeholders } = Bun.TOML.parse(source) as { placeholders: ChordPlaceholders };
 const bindings = Array.from(
   source.matchAll(/^'([^']+)' = .*'@input:keys' = \['(\$\d+)'\]/gm),
-  ([, pattern, argument]) => ({ pattern: chordPattern(pattern), argument }),
+  ([, pattern, argument]) => ({ pattern: chordPattern(pattern, placeholders), argument }),
 );
 const letters = ["a", "c", "f", "m", "s"];
 const nativeModifiers = ["alt", "ctrl", "fn", "cmd", "shift"];
@@ -45,24 +46,25 @@ beforeEach(() => {
 test("all five modifier entry points capture a key followed by optional modifiers", () => {
   expect(source).toMatch(/\[on\.keys\]\s+file = 'keys\.js'/);
   expect(bindings.map(({ pattern }) => pattern.source)).toEqual(
-    ["m", "c", "a", "f", "s"].map((entry) => chordPattern(`.(${entry}.[acfms]*)`).source),
+    ["m", "c", "a", "f", "s"].map((entry) => chordPattern(`;k(${entry}.[acfms]*)`).source),
   );
-  for (const letter of letters) expect(source).toContain(`'?.${letter}' = `);
+  expect(placeholders).toEqual({ "<>": { name: "Modifier keys prefix", default: "k" } });
+  for (const letter of letters) expect(source).toContain(`'?<>${letter}' = `);
 });
 
 test.each([
-  [".mv", "cmd+v"],
-  [".mvs", "cmd+shift+v"],
-  [".mcsa", "alt+cmd+shift+c"],
-  [".mcas", "alt+cmd+shift+c"],
-  [".ms", "cmd+s"],
-  [".mm", "cmd+m"],
-  [".mc", "cmd+c"],
-  [".ma", "cmd+a"],
-  [".mf", "cmd+f"],
-  [".cc", "ctrl+c"],
-  [".ss", "shift+s"],
-  [".m-", "cmd+-"],
+  [";kmv", "cmd+v"],
+  [";kmvs", "cmd+shift+v"],
+  [";kmcsa", "alt+cmd+shift+c"],
+  [";kmcas", "alt+cmd+shift+c"],
+  [";kms", "cmd+s"],
+  [";kmm", "cmd+m"],
+  [";kmc", "cmd+c"],
+  [";kma", "cmd+a"],
+  [";kmf", "cmd+f"],
+  [";kcc", "ctrl+c"],
+  [";kss", "shift+s"],
+  [";km-", "cmd+-"],
 ])("%s sends %s", (input, shortcut) => {
   buildKeysHandler()(capture(input));
   expect(tap).toHaveBeenCalledTimes(1);
@@ -70,47 +72,48 @@ test.each([
 });
 
 test.each(combinations)(
-  ".$entryv$suffix supports $modifiers with every suffix order",
+  ";k$entryv$suffix supports $modifiers with every suffix order",
   ({ entry, suffix, modifiers }) => {
     for (const ordering of permutations(suffix)) {
       mocked(tap).mockClear();
-      buildKeysHandler()(capture(`.${entry}v${ordering}`));
+      buildKeysHandler()(capture(`;k${entry}v${ordering}`));
       expect(tap).toHaveBeenCalledTimes(1);
       expect(tap).toHaveBeenCalledWith(`${modifiers}+v`);
     }
   },
 );
 
-test.each(letters)(".%s treats the next character as a literal regular key", (entry) => {
+test.each(letters)(";k%s treats the next character as a literal regular key", (entry) => {
   for (const key of regularKeys) {
     mocked(tap).mockClear();
-    buildKeysHandler()(capture(`.${entry}${key}`));
+    buildKeysHandler()(capture(`;k${entry}${key}`));
     expect(tap).toHaveBeenCalledTimes(1);
     expect(tap).toHaveBeenCalledWith(`${nativeModifiers[letters.indexOf(entry)]}+${key}`);
   }
 });
 
 test("repeated modifiers are applied only once, including the entry modifier", () => {
-  expect(modifierShortcut(capture(".mcsmasas"))).toBe("alt+cmd+shift+c");
-  expect(modifierShortcut(capture(".mvmmss"))).toBe("cmd+shift+v");
+  expect(modifierShortcut(capture(";kmcsmasas"))).toBe("alt+cmd+shift+c");
+  expect(modifierShortcut(capture(";kmvmmss"))).toBe("cmd+shift+v");
 });
 
 test.each([
-  ".",
-  ...letters.map((letter) => `.${letter}`),
-  ".mcv",
-  ".-x",
-  ".-",
+  ";k",
+  ...letters.map((letter) => `;k${letter}`),
+  ";kmcv",
+  ";k-x",
+  ";k-",
+  ".mv",
   ",mv",
   "xmv",
   "j.mv",
-  ".mvz",
-  ".m-v",
-  ".ms-v",
-  ".b20l30",
-  ".t20l30",
-  ".l30t20",
-  ".r30t20",
+  ";kmvz",
+  ";km-v",
+  ";kms-v",
+  ";kb20l30",
+  ";kt20l30",
+  ";kl30t20",
+  ";kr30t20",
 ])("modifier mappings leave incomplete, invalid, and click input unmatched: %s", (input) => {
   expect(bindings.some(({ pattern }) => pattern.test(input))).toBe(false);
 });

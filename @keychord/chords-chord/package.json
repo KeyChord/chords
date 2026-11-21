@@ -1,6 +1,7 @@
 {
   "name": "@keychord/chords-chord",
   "displayName": "Chord Controls",
+  "version": "0.0.1",
   "description": "Chord's own controls in the 0 namespace, always loaded by Chord.",
   "categories": [
     "Chord"

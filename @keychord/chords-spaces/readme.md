@@ -7,14 +7,18 @@ macOS Space navigation shortcuts for Chord. To install, in [Chord](https://githu
 open Settings → Chords → **Chord Monorepos** → **Add Monorepo**, enter `KeyChord/chords`, then
 tick `@keychord/chords-spaces` under **Packages to use**.
 
-To move the current window between Spaces, `chords-windows` provides `/ws<number>`,
-`/ws]` (next), and `/ws[` (previous).
+Every chord starts with the package's `<>` prefix, `;s` by default. To reach them with fewer
+keys, choose another prefix under Settings → Chords → **Placeholders**. The examples
+below use the default.
+
+To move the current window between Spaces, `chords-windows` provides `;ws<number>`,
+`;ws]` (next), and `;ws[` (previous).
 
 | Chord          | Result                           |
 | -------------- | -------------------------------- |
-| `/s[` or `/sl` | Switch to the Space on the left  |
-| `/s]` or `/sr` | Switch to the Space on the right |
-| `/s1` … `/s9`  | Switch to Desktop 1 … 9          |
+| `;s[` or `;sl` | Switch to the Space on the left  |
+| `;s]` or `;sr` | Switch to the Space on the right |
+| `;s1` … `;s9`  | Switch to Desktop 1 … 9          |
 
 Space commands use the standard Control–Left/Right and Control–1…9 shortcuts.
 Enable the matching actions under System Settings → Keyboard → Keyboard Shortcuts →

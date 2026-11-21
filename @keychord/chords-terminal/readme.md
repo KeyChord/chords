@@ -3,11 +3,10 @@
 Tab chords for basic terminals. Warp has its own package,
 [`chords-warp`](../chords-warp).
 
-| Chord | Result |
-| --- | --- |
-| `/t` (global) | Open Terminal |
-| `t1` … `t8` | Switch to tab 1 … 8 (Command-1 … Command-8) |
-| `t9` | Switch to tab 9 (Command-9), in Terminal only |
+| Chord       | Result                                        |
+| ----------- | --------------------------------------------- |
+| `t1` … `t8` | Switch to tab 1 … 8 (Command-1 … Command-8)   |
+| `t9`        | Switch to tab 9 (Command-9), in Terminal only |
 
 Every terminal below imports the shared [tab chords](./chords/base.toml), which press each
 terminal's default shortcut:

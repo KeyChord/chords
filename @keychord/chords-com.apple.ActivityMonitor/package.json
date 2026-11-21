@@ -1,7 +1,7 @@
 {
   "name": "@keychord/chords-com.apple.ActivityMonitor",
   "displayName": "Activity Monitor Chords",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Chords for Activity Monitor (com.apple.ActivityMonitor).",
   "categories": [
     "macOS"

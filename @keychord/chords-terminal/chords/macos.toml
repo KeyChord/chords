@@ -1,5 +1,3 @@
 name = 'Terminal'
 
 [chords]
-# Default terminal launcher can be overridden by other packages.
-'/t' = { name = 'Terminal', shell = 'open -a Terminal' }

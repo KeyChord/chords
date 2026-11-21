@@ -1,5 +1,9 @@
 //#region package.json
 var name = "@keychord/chords-livesplit";
+var version = "0.0.1";
+var displayName = "LiveSplit Chords";
+var description = "Chords for the LiveSplit One desktop app.";
+var categories = ["Utilities"];
 var repository = {
 	"type": "git",
 	"url": "https://github.com/KeyChord/chords-livesplit"
@@ -28,6 +32,10 @@ var chords = { "org": { "livesplit": { "one": { "macos.toml": {
 } } } } };
 var package_default = {
 	name,
+	version,
+	displayName,
+	description,
+	categories,
 	repository,
 	type,
 	scripts,
@@ -36,4 +44,4 @@ var package_default = {
 	chords
 };
 //#endregion
-export { chords, package_default as default, devDependencies, name, packageManager, repository, scripts, type };
+export { categories, chords, package_default as default, description, devDependencies, displayName, name, packageManager, repository, scripts, type, version };

@@ -1,6 +1,9 @@
 //#region package.json
 var name = "@keychord/chords-vscode";
-var version = "0.0.0";
+var displayName = "VSCode Chords";
+var version = "0.0.1";
+var description = "Chords for VSCode and its forks, including Cursor.";
+var categories = ["Editors"];
 var repository = {
   type: "git",
   url: "https://github.com/KeyChord/chords-vscode",
@@ -1366,7 +1369,10 @@ var chords = {
 };
 var package_default = {
   name,
+  displayName,
   version,
+  description,
+  categories,
   repository,
   type,
   dependencies,
@@ -1376,10 +1382,13 @@ var package_default = {
 };
 //#endregion
 export {
+  categories,
   chords,
   package_default as default,
   dependencies,
+  description,
   devDependencies,
+  displayName,
   name,
   packageManager,
   repository,

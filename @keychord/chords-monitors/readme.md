@@ -7,12 +7,16 @@ Native macOS monitor focusing for Chord. To install, in [Chord](https://github.c
 open Settings → Chords → **Chord Monorepos** → **Add Monorepo**, enter `KeyChord/chords`, then
 tick `@keychord/chords-monitors` under **Packages to use**.
 
+Every chord starts with the package's `<>` prefix, `;m` by default. To reach them with fewer
+keys, choose another prefix under Settings → Chords → **Placeholders**, and use the same one for `@keychord/chords-betterdisplay`. The examples
+below use the default.
+
 | Chord           | Result                                                                       |
 | --------------- | ---------------------------------------------------------------------------- |
-| `/m1`, `/m2`, … | Focus the numbered monitor (primary display first, then macOS display order) |
-| `/m[` / `/m]`   | Focus the previous / next monitor, wrapping at either end                    |
-| `/ml` / `/mr`   | Focus the nearest monitor to the left / right                                |
-| `/mt` / `/mb`   | Focus the nearest monitor above / below                                      |
+| `;m1`, `;m2`, … | Focus the numbered monitor (primary display first, then macOS display order) |
+| `;m[` / `;m]`   | Focus the previous / next monitor, wrapping at either end                    |
+| `;ml` / `;mr`   | Focus the nearest monitor to the left / right                                |
+| `;mt` / `;mb`   | Focus the nearest monitor above / below                                      |
 
 Monitor commands start from the display containing the pointer. They move the pointer
 to the target display's usable center and focus its frontmost accessible visible window,
@@ -20,6 +24,6 @@ without clicking or moving windows. On an empty display, only the pointer moves.
 Directional commands report an error when there is no monitor in that direction.
 Monitor focusing requires Accessibility access.
 
-Monitor resolution commands (`/md<width>x<height>`) are provided by
+Monitor resolution commands (`;md<width>x<height>`) are provided by
 [`@keychord/chords-betterdisplay`](https://github.com/KeyChord/chords/tree/main/@keychord/chords-betterdisplay), including
 custom desktop sizes through BetterDisplay virtual-screen mirroring.

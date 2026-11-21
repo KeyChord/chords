@@ -10,37 +10,42 @@ instead, open Settings → Chords → **Chord Monorepos** → **Add Monorepo**, 
 `KeyChord/chords`, tick `@keychord/chords-menu` under **Packages to use**, and remove the
 `KeyChord/chords-menu` entry under **Chord Repos**.
 
-`=/<text>` searches menu titles and complete menu paths using a case-insensitive,
+Set **Menu bar prefix** under Settings → Chords → **Placeholders** to change the
+prefix for these chords. The examples below use the default, `;b`.
+
+`;b/<text>` searches menu titles and complete menu paths using a case-insensitive,
 literal substring. Spaces, punctuation, numbers, and Unicode are accepted; no final
 dot is required. Exact matches and title prefixes take priority. Ambiguous results
 report the matching paths so the query can include a parent menu, for example
-`=/Window > Center`.
+`;b/Window > Center`.
 
-Letter abbreviations use `=[<letters>.`: `=[f.` selects File,
-`=[hh.` selects the second top-level menu starting with H. In expanded menus,
-`=[zo.`, `=[z2.`, and `=[z-o2.` select by prefix, occurrence, and word prefix.
+Letter abbreviations use `;b[<letters>.`: `;b[f.` selects File,
+`;b[hh.` selects the second top-level menu starting with H. In expanded menus,
+`;b[zo.`, `;b[z2.`, and `;b[z-o2.` select by prefix, occurrence, and word prefix.
 Letter queries exclude the Apple menu.
 
-`=w` opens Window. Window-menu commands use this prefix: `=wl`, `=wr`,
-`=wt`, `=wb`, corners `=wtl`/`=wtr`/`=wbl`/`=wbr`, arrangements `=wlr`/`=wrl`/`=wtb`/`=wbt`,
-`=wq` for Quarters, `=ws[` for Return to Previous Size, `=wz` for Zoom, `=wf` for Fill,
-`=wc` for Center, `=wfl`/`=wfr` for full-screen tiling, and `=waf` for Bring All to Front.
-They invoke exact Window-menu paths. Availability and labels depend on the application
-and macOS language. Native alignment/stretch commands live under `/w` in `chords-windows`.
+`;bw` opens the Window menu. `;bwq` quits the focused application
+(`cmd+q`), `;bwh` hides it (`cmd+h`) and `;bwm` minimizes its window (`cmd+m`). Window-menu
+commands use the same prefix: `;bwl`, `;bwr`, `;bwt`, `;bwb`, corners `;bwtl`/`;bwtr`/`;bwbl`/`;bwbr`,
+arrangements `;bwlr`/`;bwrl`/`;bwtb`/`;bwbt`, `;bwx` for Quarters, `;bwo` for Return to Previous
+Size, `;bwz` for Zoom, `;bwf` for Fill, `;bwc` for Center, `;bwfl`/`;bwfr` for full-screen tiling,
+and `;bwaf` for Bring All to Front. They invoke exact Window-menu paths. Availability and labels
+depend on the application and macOS language. `@keychord/chords-windows` provides
+native window commands under `;w`.
 
-Tray selection uses `=<index>` from the left and `=-<index>` from the right, starting
+Tray selection uses `;b<index>` from the left and `;b-<index>` from the right, starting
 at 1. Typing previews by moving the pointer; `.` clicks and `,` right-clicks. The last
-digit wins (`=78.` selects icon 8); `l`/`r` use full indexes (`=10l.` / `=10r.`).
-`=]1.` is an explicit tray alias. `=[<index>` selects application menus: `=[0.` is Apple,
-`=[1.` the application menu, and `=[-1.` the rightmost menu. Bare `=0` also selects Apple.
+digit wins (`;b78.` selects icon 8); `l`/`r` use full indexes (`;b10l.` / `;b10r.`).
+`;b]1.` is an explicit tray alias. `;b[<index>` selects application menus: `;b[0.` is Apple,
+`;b[1.` the application menu, and `;b[-1.` the rightmost menu. Bare `;b0` also selects Apple.
 After a number, `[`/`]` step within that group and stop at its edges. Backspace recomputes
 the selection; completing input does not click again.
 
-`=c` opens Control Center, `=p` Battery, `=t` Time & Date, `=wi` Wi-Fi, `=wiv` toggles
-Wi-Fi, and `=cdd` toggles Dark Mode. `=s` opens Spotlight. Bare `=-` clicks the main
-display's notch and rejects on displays without one. `=v` toggles automatic menu-bar
+`;bc` opens Control Center, `;bp` Battery, `;bt` Time & Date, `;bcw` Wi-Fi, `;bcwv` toggles
+Wi-Fi, and `;bcdd` toggles Dark Mode. Bare `;b-` clicks the main
+display's notch and rejects on displays without one. `;bv` toggles automatic menu-bar
 hiding through System Events; macOS may request Automation access on first use.
-`=vu`, `=vd`, and `=vm` adjust volume, `=bu` and `=bd` adjust brightness, and `=q` opens
+`;bvu`, `;bvd`, and `;bvm` adjust volume, `;bbu` and `;bbd` adjust brightness, and `;bq` opens
 Force Quit.
 
 ```ts
@@ -74,7 +79,7 @@ main actor and complete on the originating JavaScript queue.
 '@input:tray' = ['CONTROL_CENTER', 'SOUND', 'CLICK']
 ```
 
-`=s` opens Spotlight with `cmd+space`. Named tray actions use accessibility identifiers rather
+Named tray actions use accessibility identifiers rather
 than item positions. Battery and clock actions reject if their menu item is hidden or unavailable;
 Wi-Fi uses Control Center as a fallback. Wi-Fi toggling presses the expanded section's power
 control and reports unavailable or disabled hardware.
@@ -83,7 +88,7 @@ control and reports unavailable or disabled hardware.
 `SOUND` supports `CLICK`, `DECREASE`, and `INCREASE`. Omitting the operation or using `CLICK` expands the
 section via its heading/chevron. Adjustments use native slider increment/decrement actions; display
 options toggle their accessibility controls. Controls absent on a particular Mac reject with an
-unavailable-control error. Display Settings uses `=cds`; `=cd.` expands the section.
+unavailable-control error. Display Settings uses `;bcds`; `;bcd.` expands the section.
 
 The exported `runMenuBarAction({ scope, index, steps, clickType? }, focusedAppId?)` powers
 numeric selection. `scope` is `MENU` or `TRAY`; menu native indexes start at
@@ -94,7 +99,7 @@ The `ITEM` / `HOVER` actions address tray icons only.
 
 The native addon is built from `Sources/KeychordChordsMenuNativeMenu` and exposes
 `runMenuAction`, `runMenuBarAction`, and `runTrayAction`. The menu, tray, and selection
-handlers import `menu.node` (the `=v` visibility handler runs `osascript` instead); the build
+handlers import `menu.node` (the `;bv` visibility handler runs `osascript` instead); the build
 packages it, `libNodeAPI.dylib`, and `libAXorcistRuntime.dylib` under `js/native/<triple>/menu/`,
 including when vendored into other chord packages. Requires macOS 14+ and Accessibility access.
 

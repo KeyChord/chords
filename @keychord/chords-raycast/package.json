@@ -1,7 +1,7 @@
 {
   "name": "@keychord/chords-raycast",
   "displayName": "Raycast Chords",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Chords for Raycast: open a query's first result and move through results, pages and sections.",
   "categories": [
     "Utilities"

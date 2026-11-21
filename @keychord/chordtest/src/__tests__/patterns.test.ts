@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { chordPattern } from "../patterns";
+import { chordPattern, expandPlaceholders } from "../patterns";
 
 test("literal punctuation around regex captures follows Chord's key grammar", () => {
   expect(chordPattern(".(.+)").exec(".b20l.5")?.[1]).toBe("b20l.5");
@@ -15,4 +15,21 @@ test("nested groups, escaped parentheses, and strict full-string matches", () =>
   expect(chordPattern("pa.").test("pa.\n")).toBe(false);
   expect(chordPattern("pa.").test("zpa.")).toBe(false);
   expect(() => chordPattern("x([abc)")).toThrow("Invalid parenthesized regex");
+});
+
+test("declared placeholders expand to their defaults before matching", () => {
+  const placeholders = {
+    "<>": { name: "Prefix", default: "=w" },
+    "<p>": ";",
+    "<mode>": { default: "M" },
+    "<letter>": "k",
+  };
+  expect(expandPlaceholders("?<>d", placeholders)).toBe("?=wd");
+  expect(expandPlaceholders("<p>x<>", placeholders)).toBe(";x=w");
+  expect(expandPlaceholders("<>(?<n>\\d+)<z>", placeholders)).toBe("=w(?<n>\\d+)<z>");
+  expect(expandPlaceholders("?<mode>d", placeholders)).toBe("?;md");
+  expect(expandPlaceholders("dm<letter>", placeholders)).toBe("dmk");
+  expect(chordPattern("<>s(\\d+)", placeholders).exec("=ws12")?.[1]).toBe("12");
+  expect(chordPattern("<>s(\\d+)").test("=ws12")).toBe(false);
+  expect(() => expandPlaceholders("<>q", { p: ";" })).toThrow("Invalid placeholder name");
 });

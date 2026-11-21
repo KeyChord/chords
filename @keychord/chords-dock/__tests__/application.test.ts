@@ -6,12 +6,20 @@ const definition = Bun.TOML.parse(
   await Bun.file(new URL("../chords/macos.toml", import.meta.url)).text(),
 ) as {
   on: Record<string, { file: string }>;
+  placeholders: Record<string, { name: string; default: string }>;
   chords: Record<string, { "@input:application"?: [string]; shortcut?: string }>;
 };
 
+test("every chord and hint starts with the <> prefix, which defaults to ;d", () => {
+  expect(definition.placeholders).toEqual({ "<>": { name: "Dock prefix", default: "d" } });
+  expect(
+    Object.keys(definition.chords).filter((key) => !key.replace(/^\?/, "").startsWith("<>")),
+  ).toEqual([]);
+});
+
 test.each([
-  ["/dw[", "PREVIOUS"],
-  ["/dw]", "NEXT"],
+  ["<>w[", "PREVIOUS"],
+  ["<>w]", "NEXT"],
 ])("%s cycles applications natively from the captured app", async (input, direction) => {
   const cycleApplication = mock().mockResolvedValue(undefined);
   mock.module("../src/js/application.node", () => ({ default: { cycleApplication } }));
@@ -24,8 +32,8 @@ test.each([
     ...binding["@input:application"]!,
   );
   expect(cycleApplication).toHaveBeenCalledWith("dev.fixture", direction);
-  expect(definition.chords["/d["]).toBeUndefined();
-  expect(definition.chords["/d]"]).toBeUndefined();
+  expect(definition.chords["<>["]).toBeUndefined();
+  expect(definition.chords["<>]"]).toBeUndefined();
 });
 
 test("invalid directions never call native code and failed switches leave the queue usable", async () => {
