@@ -1,0 +1,36 @@
+name = 'AirPort Utility'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?f' = { name = 'File' }
+'fc' = { name = 'File: Configure Other', '@input:menu' = [
+  'BY_PATH',
+  [
+    'File',
+    'Configure Other...',
+  ],
+] }
+'fi' = { name = 'File: Import Configuration', '@input:menu' = [
+  'BY_PATH',
+  [
+    'File',
+    'Import Configuration File...',
+  ],
+] }
+'fe' = { name = 'File: Export Configuration', '@input:menu' = [
+  'BY_PATH',
+  [
+    'File',
+    'Export Configuration File...',
+  ],
+] }
+
+'?z' = { name = 'Zoom' }
+'zi' = { name = 'Zoom: In', '@input:menu' = ['BY_PATH', ['View', 'Zoom In']] }
+'zo' = { name = 'Zoom: Out', '@input:menu' = ['BY_PATH', ['View', 'Zoom Out']] }
+'za' = { name = 'Zoom: Actual Size', '@input:menu' = ['BY_PATH', ['View', 'Actual Size']] }
+
+'?g' = { name = 'Goto' }
+'gs' = { name = 'Goto: Settings', '@input:menu' = ['BY_PATH', ['AirPort Utility', 'Settings…']] }

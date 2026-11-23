@@ -1,0 +1,42 @@
+name = 'Calendar'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?n' = { name = 'New' }
+'ne' = { name = 'New: Event', '@input:menu' = ['BY_PATH', ['File', 'New Event']] }
+
+'?e' = { name = 'Edit' }
+'ex' = { name = 'Edit: Delete Event', '@input:menu' = ['BY_PATH', ['Edit', 'Delete']] }
+'ei' = { name = 'Edit: Event Info', '@input:menu' = ['BY_PATH', ['Edit', 'Get Info']] }
+
+'?g' = { name = 'Goto' }
+'gt' = { name = 'Goto: Today', '@input:menu' = ['BY_PATH', ['View', 'Go to Today']] }
+'gd' = { name = 'Goto: Date', '@input:menu' = ['BY_PATH', ['View', 'Go to Date…']] }
+'g[' = { name = 'Goto: Previous Period', '@input:menu' = ['BY_PATH', ['View', 'Previous']] }
+'g]' = { name = 'Goto: Next Period', '@input:menu' = ['BY_PATH', ['View', 'Next']] }
+
+'?j' = { name = 'Jump' }
+'je' = { name = 'Jump: Search Events', '@input:menu' = ['BY_PATH', ['Edit', 'Search']] }
+
+'?v' = { name = 'View' }
+'vd' = { name = 'View: Day', '@input:menu' = ['BY_PATH', ['View', 'By Day']] }
+'vw' = { name = 'View: Week', '@input:menu' = ['BY_PATH', ['View', 'By Week']] }
+'vm' = { name = 'View: Month', '@input:menu' = ['BY_PATH', ['View', 'By Month']] }
+'vy' = { name = 'View: Year', '@input:menu' = ['BY_PATH', ['View', 'By Year']] }
+'vs' = { name = 'View: Toggle Calendar List', '@input:menu' = ['SEARCH', 'Calendar List'] }
+'vn' = { name = 'View: Toggle Notifications', '@input:menu' = ['SEARCH', 'Notifications'] }
+
+'?f' = { name = 'File' }
+'fi' = { name = 'File: Import', '@input:menu' = ['BY_PATH', ['File', 'Import…']] }
+
+'?x' = { name = 'Export' }
+'xa' = { name = 'Export: Calendar Archive', '@input:menu' = [
+  'BY_PATH',
+  [
+    'File',
+    'Export',
+    'Calendar Archive…',
+  ],
+] }

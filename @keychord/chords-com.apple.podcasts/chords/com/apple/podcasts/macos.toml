@@ -1,0 +1,30 @@
+name = 'Podcasts'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?a' = { name = 'App' }
+'a,' = { name = 'App: Settings', '@input:menu' = ['BY_PATH', ['Podcasts', 'Settings…']] }
+'?g' = { name = 'Goto' }
+'g/' = { name = 'Goto: Search', shortcut = 'cmd+f' }
+'?n' = { name = 'New' }
+'ns' = { name = 'New: Station', '@input:menu' = ['SEARCH', 'File > New Station'] }
+'nf' = { name = 'New: Follow a Show by URL', '@input:menu' = [
+  'SEARCH',
+  'File > Follow a Show by URL',
+] }
+'?p' = { name = 'Playback' }
+'pp' = { name = 'Playback: Play', '@input:menu' = ['BY_PATH', ['Controls', 'Play']] }
+'ph' = { name = 'Playback: Pause', '@input:menu' = ['BY_PATH', ['Controls', 'Pause']] }
+'pg' = { name = 'Playback: Go to Current Show', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Controls',
+    'Go to Current Show',
+  ],
+] }
+'pf' = { name = 'Playback: Skip Forward', shortcut = 'cmd+shift+right' }
+'pk' = { name = 'Playback: Skip Back', shortcut = 'cmd+shift+left' }
+'?f' = { name = 'Feeds' }
+'fr' = { name = 'Feeds: Refresh', '@input:menu' = ['BY_PATH', ['File', 'Refresh Feeds']] }

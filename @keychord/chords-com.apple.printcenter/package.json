@@ -1,0 +1,25 @@
+{
+  "name": "@keychord/chords-com.apple.printcenter",
+  "displayName": "Print Center Chords",
+  "version": "0.0.1",
+  "description": "Chords for Print Center (com.apple.printcenter).",
+  "categories": [
+    "macOS"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KeyChord/chords-com.apple.printcenter"
+  },
+  "type": "module",
+  "scripts": {
+    "test": "bun test --isolate"
+  },
+  "dependencies": {
+    "@keychord/chords-menu": "workspace:*"
+  },
+  "devDependencies": {
+    "@keychord/chordtest": "workspace:*",
+    "@keychord/config": "catalog:"
+  },
+  "packageManager": "pnpm@12.11.2"
+}

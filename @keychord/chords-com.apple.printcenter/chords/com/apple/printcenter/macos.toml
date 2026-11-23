@@ -1,0 +1,21 @@
+name = 'Print Center'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?g' = { name = 'Go to' }
+'gc' = { name = 'Go to: Completed Jobs', '@input:menu' = ['BY_PATH', ['Window', 'Completed Jobs']] }
+
+'?p' = { name = 'Printer' }
+'pa' = { name = 'Printer: Add Printer', '@input:menu' = ['SEARCH', 'Printer > Add Printer'] }
+'pi' = { name = 'Printer: Printer Info', '@input:menu' = ['SEARCH', 'Printer > Printer Info'] }
+'pd' = { name = 'Printer: Make Default', '@input:menu' = ['BY_PATH', ['Printer', 'Make Default']] }
+'pt' = { name = 'Printer: Print Test Page', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Printer',
+    'Print Test Page',
+  ],
+] }
+'px' = { name = 'Printer: Remove Printer', '@input:menu' = ['SEARCH', 'Printer > Remove Printer'] }

@@ -1,0 +1,20 @@
+name = 'Calculator'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?v' = { name = 'View' }
+'vb' = { name = 'View: Basic', '@input:menu' = ['BY_PATH', ['View', 'Basic']] }
+'vs' = { name = 'View: Scientific', '@input:menu' = ['BY_PATH', ['View', 'Scientific']] }
+'vp' = { name = 'View: Programmer', '@input:menu' = ['BY_PATH', ['View', 'Programmer']] }
+'vc' = { name = 'View: Convert Units', '@input:menu' = ['BY_PATH', ['View', 'Convert']] }
+'vh' = { name = 'View: History', '@input:menu' = ['SEARCH', 'History'] }
+'vr' = { name = 'View: RPN Mode', '@input:menu' = ['BY_PATH', ['View', 'RPN Mode']] }
+'vt' = { name = 'View: Thousands Separator', '@input:menu' = ['SEARCH', 'Thousands Separator'] }
+
+'?c' = { name = 'Calculate' }
+'cc' = { name = 'Calculate: Copy Result', '@input:menu' = ['BY_PATH', ['Edit', 'Copy']] }
+'cx' = { name = 'Calculate: Clear All', shortcut = 'opt+escape' }
+'cr' = { name = 'Calculate: Square Root', shortcut = 'opt+v' }
+'cb' = { name = 'Calculate: Cycle Programmer Base', shortcut = 'r' }

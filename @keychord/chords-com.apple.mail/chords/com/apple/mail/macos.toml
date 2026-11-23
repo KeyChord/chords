@@ -1,0 +1,95 @@
+name = 'Mail'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?j' = { name = 'Jump' }
+'j/' = { name = 'Jump: Search Mailboxes', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Edit',
+    'Find',
+    'Mailbox Search',
+  ],
+] }
+
+'?g' = { name = 'Goto' }
+'g,' = { name = 'Goto: Settings', '@input:menu' = ['BY_PATH', ['Mail', 'Settings…']] }
+'go' = { name = 'Goto: Open Mailbox Quickly', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Mailbox',
+    'Open Quickly…',
+  ],
+] }
+
+'?n' = { name = 'New' }
+'nm' = { name = 'New: Message', '@input:menu' = ['BY_PATH', ['File', 'New Message']] }
+'nw' = { name = 'New: Viewer Window', '@input:menu' = ['BY_PATH', ['File', 'New Viewer Window']] }
+'nb' = { name = 'New: Mailbox', '@input:menu' = ['BY_PATH', ['Mailbox', 'New Mailbox…']] }
+'ns' = { name = 'New: Smart Mailbox', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Mailbox',
+    'New Smart Mailbox…',
+  ],
+] }
+
+'?v' = { name = 'View' }
+'vs' = { name = 'View: Toggle Sidebar', '@input:menu' = ['SEARCH', 'Sidebar'] }
+'vf' = { name = 'View: Toggle Favorites Bar', '@input:menu' = ['SEARCH', 'Favorites Bar'] }
+'vc' = { name = 'View: Toggle Column Layout', '@input:menu' = [
+  'BY_PATH',
+  [
+    'View',
+    'Use Column Layout',
+  ],
+] }
+'vt' = { name = 'View: Toggle Conversations', '@input:menu' = [
+  'BY_PATH',
+  [
+    'View',
+    'Organize by Conversation',
+  ],
+] }
+'vm' = { name = 'View: Toggle Message Filter', '@input:menu' = ['SEARCH', 'Message Filter'] }
+
+'?s' = { name = 'Sort' }
+'sd' = { name = 'Sort: Date', '@input:menu' = ['BY_PATH', ['View', 'Sort By', 'Date']] }
+'sf' = { name = 'Sort: From', '@input:menu' = ['BY_PATH', ['View', 'Sort By', 'From']] }
+'ss' = { name = 'Sort: Subject', '@input:menu' = ['BY_PATH', ['View', 'Sort By', 'Subject']] }
+
+'?f' = { name = 'File' }
+'fi' = { name = 'File: Import Mailboxes', '@input:menu' = [
+  'BY_PATH',
+  [
+    'File',
+    'Import Mailboxes…',
+  ],
+] }
+'fe' = { name = 'File: Export Message as PDF', '@input:menu' = [
+  'BY_PATH',
+  [
+    'File',
+    'Export as PDF…',
+  ],
+] }
+
+'?m' = { name = 'Message' }
+'mg' = { name = 'Message: Get New Mail', '@input:menu' = ['BY_PATH', ['Mailbox', 'Get New Mail']] }
+'mr' = { name = 'Message: Reply', '@input:menu' = ['BY_PATH', ['Message', 'Reply']] }
+'ml' = { name = 'Message: Reply All', '@input:menu' = ['BY_PATH', ['Message', 'Reply All']] }
+'mf' = { name = 'Message: Forward', '@input:menu' = ['BY_PATH', ['Message', 'Forward']] }
+'ma' = { name = 'Message: Archive', '@input:menu' = ['BY_PATH', ['Message', 'Archive']] }
+'md' = { name = 'Message: Delete', '@input:menu' = ['BY_PATH', ['Edit', 'Delete']] }
+
+'?w' = { name = 'Window' }
+'wa' = { name = 'Window: Activity', '@input:menu' = ['BY_PATH', ['Window', 'Activity']] }
+'wc' = { name = 'Window: Connection Doctor', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Window',
+    'Connection Doctor',
+  ],
+] }

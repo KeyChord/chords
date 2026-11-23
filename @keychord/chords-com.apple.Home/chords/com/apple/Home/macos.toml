@@ -1,0 +1,18 @@
+name = 'Home'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?g' = { name = 'Goto' }
+'gh' = { name = 'Goto: Home', '@input:menu' = ['BY_PATH', ['View', 'Home']] }
+'ga' = { name = 'Goto: Automation', '@input:menu' = ['BY_PATH', ['View', 'Automation']] }
+'gd' = { name = 'Goto: Discover', '@input:menu' = ['BY_PATH', ['View', 'Discover']] }
+
+'?n' = { name = 'New' }
+'na' = { name = 'New: Automation', '@input:menu' = ['BY_PATH', ['File', 'Add Automation…']] }
+'ns' = { name = 'New: Scene', '@input:menu' = ['BY_PATH', ['File', 'Add Scene…']] }
+
+'?e' = { name = 'Edit' }
+'eh' = { name = 'Edit: Home', '@input:menu' = ['BY_PATH', ['Edit', 'Edit Home…']] }
+'er' = { name = 'Edit: Room', '@input:menu' = ['BY_PATH', ['Edit', 'Edit Room…']] }

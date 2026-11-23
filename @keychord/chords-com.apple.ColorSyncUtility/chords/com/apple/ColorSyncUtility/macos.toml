@@ -1,0 +1,18 @@
+name = 'ColorSync Utility'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?f' = { name = 'File' }
+'fn' = { name = 'File: New Utility Window', '@input:menu' = ['BY_PATH', ['File', 'New Window']] }
+'fo' = { name = 'File: Open', '@input:menu' = ['BY_PATH', ['File', 'Open…']] }
+'fs' = { name = 'File: Save As', '@input:menu' = ['BY_PATH', ['File', 'Save As…']] }
+'fc' = { name = 'File: Save ColorSync Profile', '@input:menu' = [
+  'BY_PATH',
+  [
+    'File',
+    'Save ColorSync Profile…',
+  ],
+] }
+'fp' = { name = 'File: Print', '@input:menu' = ['BY_PATH', ['File', 'Print…']] }

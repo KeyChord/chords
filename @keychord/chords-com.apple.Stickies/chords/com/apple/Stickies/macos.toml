@@ -1,0 +1,28 @@
+name = 'Stickies'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?n' = { name = 'Note' }
+'nn' = { name = 'Note: New', '@input:menu' = ['BY_PATH', ['File', 'New Note']] }
+'nq' = { name = 'Note: Close Note', '@input:menu' = ['BY_PATH', ['File', 'Close']] }
+'ni' = { name = 'Note: Import Text', '@input:menu' = ['BY_PATH', ['File', 'Import Text…']] }
+'ne' = { name = 'Note: Export Text', '@input:menu' = ['BY_PATH', ['File', 'Export Text…']] }
+
+'?s' = { name = 'Search' }
+'sf' = { name = 'Search: Find', '@input:menu' = ['BY_PATH', ['Edit', 'Find', 'Find…']] }
+
+'?c' = { name = 'Color' }
+'cy' = { name = 'Color: Yellow', '@input:menu' = ['BY_PATH', ['Color', 'Yellow']] }
+'cb' = { name = 'Color: Blue', '@input:menu' = ['BY_PATH', ['Color', 'Blue']] }
+'cg' = { name = 'Color: Green', '@input:menu' = ['BY_PATH', ['Color', 'Green']] }
+'cp' = { name = 'Color: Pink', '@input:menu' = ['BY_PATH', ['Color', 'Pink']] }
+'cu' = { name = 'Color: Purple', '@input:menu' = ['BY_PATH', ['Color', 'Purple']] }
+'ca' = { name = 'Color: Gray', '@input:menu' = ['BY_PATH', ['Color', 'Gray']] }
+
+'?v' = { name = 'View' }
+'vf' = { name = 'View: Float on Top', '@input:menu' = ['BY_PATH', ['Window', 'Float on Top']] }
+'vt' = { name = 'View: Translucent', '@input:menu' = ['BY_PATH', ['Window', 'Translucent']] }
+'vc' = { name = 'View: Collapse Note', '@input:menu' = ['BY_PATH', ['Window', 'Collapse']] }
+'ve' = { name = 'View: Expand Note', '@input:menu' = ['BY_PATH', ['Window', 'Expand']] }

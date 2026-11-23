@@ -1,0 +1,48 @@
+name = 'Photo Booth'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?c' = { name = 'Capture' }
+'cn' = { name = 'Capture: Take Photo', '@input:menu' = ['BY_PATH', ['File', 'Take Photo']] }
+
+'?v' = { name = 'View' }
+'vp' = { name = 'View: Camera', '@input:menu' = ['BY_PATH', ['View', 'Show Photo']] }
+'ve' = { name = 'View: Effects', '@input:menu' = ['BY_PATH', ['View', 'Show Effects']] }
+'v[' = { name = 'View: Previous Effects Page', '@input:menu' = [
+  'BY_PATH',
+  [
+    'View',
+    'Previous Page of Effects',
+  ],
+] }
+'v]' = { name = 'View: Next Effects Page', '@input:menu' = [
+  'BY_PATH',
+  [
+    'View',
+    'Next Page of Effects',
+  ],
+] }
+
+'?e' = { name = 'Edit' }
+'ea' = { name = 'Edit: Auto Flip New Items', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Edit',
+    'Auto Flip New Items',
+  ],
+] }
+'ef' = { name = 'Edit: Flip Photo', '@input:menu' = ['BY_PATH', ['Edit', 'Flip Photo']] }
+'et' = { name = 'Edit: Trim Movie', '@input:menu' = ['BY_PATH', ['Edit', 'Trim Movie…']] }
+'ed' = { name = 'Edit: Delete Item', '@input:menu' = ['BY_PATH', ['Edit', 'Delete']] }
+
+'?f' = { name = 'File' }
+'fe' = { name = 'File: Export', '@input:menu' = ['BY_PATH', ['File', 'Export...']] }
+'fo' = { name = 'File: Export Original', '@input:menu' = [
+  'BY_PATH',
+  [
+    'File',
+    'Export Original...',
+  ],
+] }

@@ -1,0 +1,51 @@
+name = 'Contacts'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?n' = { name = 'New' }
+'nc' = { name = 'New: Contact', '@input:menu' = ['BY_PATH', ['File', 'New Card']] }
+'nl' = { name = 'New: List', '@input:menu' = ['BY_PATH', ['File', 'New List']] }
+'ns' = { name = 'New: Smart List', '@input:menu' = ['BY_PATH', ['File', 'New Smart List…']] }
+
+'?e' = { name = 'Edit' }
+'ee' = { name = 'Edit: Contact', '@input:menu' = ['BY_PATH', ['Edit', 'Edit Card']] }
+'ex' = { name = 'Edit: Delete Contact', '@input:menu' = ['BY_PATH', ['Edit', 'Delete']] }
+
+'?g' = { name = 'Goto' }
+'g[' = { name = 'Goto: Previous Contact', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Card',
+    'Go to Previous Card',
+  ],
+] }
+'g]' = { name = 'Goto: Next Contact', '@input:menu' = ['BY_PATH', ['Card', 'Go to Next Card']] }
+
+'?j' = { name = 'Jump' }
+'jc' = { name = 'Jump: Search Contacts', '@input:menu' = ['BY_PATH', ['Edit', 'Find', 'Find']] }
+
+'?v' = { name = 'View' }
+'vl' = { name = 'View: Toggle Lists', '@input:menu' = ['SEARCH', 'Lists'] }
+'vw' = { name = 'View: Contact in a Separate Window', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Card',
+    'Open in Separate Window',
+  ],
+] }
+
+'?f' = { name = 'File' }
+'fi' = { name = 'File: Import', '@input:menu' = ['BY_PATH', ['File', 'Import…']] }
+
+'?x' = { name = 'Export' }
+'xc' = { name = 'Export: vCard', '@input:menu' = ['BY_PATH', ['File', 'Export', 'Export vCard…']] }
+'xa' = { name = 'Export: Contacts Archive', '@input:menu' = [
+  'BY_PATH',
+  [
+    'File',
+    'Export',
+    'Contacts Archive…',
+  ],
+] }

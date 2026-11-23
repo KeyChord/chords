@@ -1,0 +1,25 @@
+{
+  "name": "@keychord/chords-com.apple.ScreenSharing",
+  "displayName": "Screen Sharing Chords",
+  "version": "0.0.1",
+  "description": "Chords for Screen Sharing (com.apple.ScreenSharing).",
+  "categories": [
+    "macOS"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KeyChord/chords-com.apple.ScreenSharing"
+  },
+  "type": "module",
+  "scripts": {
+    "test": "bun test --isolate"
+  },
+  "dependencies": {
+    "@keychord/chords-menu": "workspace:*"
+  },
+  "devDependencies": {
+    "@keychord/chordtest": "workspace:*",
+    "@keychord/config": "catalog:"
+  },
+  "packageManager": "pnpm@12.11.2"
+}

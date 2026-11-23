@@ -1,0 +1,12 @@
+name = 'Archive Utility'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?f' = { name = 'File' }
+'fc' = { name = 'File: Create Archive', '@input:menu' = ['BY_PATH', ['File', 'Create Archive…']] }
+'fe' = { name = 'File: Expand Archive', '@input:menu' = ['BY_PATH', ['File', 'Expand Archive…']] }
+
+'?g' = { name = 'Goto' }
+'gc' = { name = 'Goto: Settings', '@input:menu' = ['BY_PATH', ['Archive Utility', 'Settings…']] }

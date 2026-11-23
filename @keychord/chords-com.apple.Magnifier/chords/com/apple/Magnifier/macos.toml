@@ -1,0 +1,17 @@
+name = 'Magnifier'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?f' = { name = 'File' }
+'fn' = { name = 'File: New Window', '@input:menu' = ['BY_PATH', ['File', 'New']] }
+'fo' = { name = 'File: Open Document', '@input:menu' = ['BY_PATH', ['File', 'Open…']] }
+
+'?z' = { name = 'Zoom' }
+'zi' = { name = 'Zoom: In', '@input:menu' = ['BY_PATH', ['Image', 'Zoom In']] }
+'zo' = { name = 'Zoom: Out', '@input:menu' = ['BY_PATH', ['Image', 'Zoom Out']] }
+'za' = { name = 'Zoom: To Fit', '@input:menu' = ['BY_PATH', ['Image', 'Zoom to Fit']] }
+
+'?g' = { name = 'Goto' }
+'gs' = { name = 'Goto: Settings', '@input:menu' = ['BY_PATH', ['Magnifier', 'Settings…']] }

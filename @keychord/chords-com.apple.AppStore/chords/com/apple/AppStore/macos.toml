@@ -1,0 +1,17 @@
+name = 'App Store'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?g' = { name = 'Goto' }
+'gd' = { name = 'Goto: Discover', '@input:menu' = ['BY_PATH', ['Store', 'Discover']] }
+'ga' = { name = 'Goto: Arcade', '@input:menu' = ['BY_PATH', ['Store', 'Arcade']] }
+'gc' = { name = 'Goto: Create', '@input:menu' = ['BY_PATH', ['Store', 'Create']] }
+'gw' = { name = 'Goto: Work', '@input:menu' = ['BY_PATH', ['Store', 'Work']] }
+'gp' = { name = 'Goto: Play', '@input:menu' = ['BY_PATH', ['Store', 'Play']] }
+'ge' = { name = 'Goto: Develop', '@input:menu' = ['BY_PATH', ['Store', 'Develop']] }
+'gg' = { name = 'Goto: Categories', '@input:menu' = ['BY_PATH', ['Store', 'Categories']] }
+'gu' = { name = 'Goto: Updates', '@input:menu' = ['BY_PATH', ['Store', 'Updates']] }
+'g/' = { name = 'Goto: Search', '@input:menu' = ['BY_PATH', ['Store', 'Search']] }
+'g,' = { name = 'Goto: Settings', '@input:menu' = ['BY_PATH', ['App Store', 'Settings…']] }

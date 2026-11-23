@@ -1,0 +1,25 @@
+{
+  "name": "@keychord/chords-com.apple.Ticket-Viewer",
+  "displayName": "Ticket Viewer Chords",
+  "version": "0.0.1",
+  "description": "Chords for Ticket Viewer (com.apple.Ticket-Viewer).",
+  "categories": [
+    "macOS"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KeyChord/chords-com.apple.Ticket-Viewer"
+  },
+  "type": "module",
+  "scripts": {
+    "test": "bun test --isolate"
+  },
+  "dependencies": {
+    "@keychord/chords-menu": "workspace:*"
+  },
+  "devDependencies": {
+    "@keychord/chordtest": "workspace:*",
+    "@keychord/config": "catalog:"
+  },
+  "packageManager": "pnpm@12.11.2"
+}

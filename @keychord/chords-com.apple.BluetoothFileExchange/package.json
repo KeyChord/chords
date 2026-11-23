@@ -1,0 +1,25 @@
+{
+  "name": "@keychord/chords-com.apple.BluetoothFileExchange",
+  "displayName": "Bluetooth File Exchange Chords",
+  "version": "0.0.1",
+  "description": "Chords for Bluetooth File Exchange (com.apple.BluetoothFileExchange).",
+  "categories": [
+    "macOS"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KeyChord/chords-com.apple.BluetoothFileExchange"
+  },
+  "type": "module",
+  "scripts": {
+    "test": "bun test --isolate"
+  },
+  "dependencies": {
+    "@keychord/chords-menu": "workspace:*"
+  },
+  "devDependencies": {
+    "@keychord/chordtest": "workspace:*",
+    "@keychord/config": "catalog:"
+  },
+  "packageManager": "pnpm@12.11.2"
+}

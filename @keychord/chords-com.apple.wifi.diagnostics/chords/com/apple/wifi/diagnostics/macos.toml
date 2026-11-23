@@ -1,0 +1,16 @@
+name = 'Wireless Diagnostics'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?g' = { name = 'Goto' }
+'ga' = { name = 'Goto: Assistant', '@input:menu' = ['BY_PATH', ['Window', 'Assistant']] }
+'gi' = { name = 'Goto: Info', '@input:menu' = ['BY_PATH', ['Window', 'Info']] }
+'gl' = { name = 'Goto: Logs', '@input:menu' = ['BY_PATH', ['Window', 'Logs']] }
+'gs' = { name = 'Goto: Scan', '@input:menu' = ['BY_PATH', ['Window', 'Scan']] }
+'gp' = { name = 'Goto: Performance', '@input:menu' = ['BY_PATH', ['Window', 'Performance']] }
+'gd' = { name = 'Goto: Diagnostics', '@input:menu' = ['BY_PATH', ['Window', 'Diagnostics']] }
+
+'?f' = { name = 'File' }
+'fo' = { name = 'File: Open', '@input:menu' = ['BY_PATH', ['File', 'Open…']] }

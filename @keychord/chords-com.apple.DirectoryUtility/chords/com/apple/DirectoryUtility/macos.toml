@@ -1,0 +1,12 @@
+name = 'Directory Utility'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?c' = { name = 'Connection' }
+'cc' = { name = 'Connection: Connect', '@input:menu' = ['BY_PATH', ['File', 'Connect…']] }
+'cd' = { name = 'Connection: Disconnect', '@input:menu' = ['BY_PATH', ['File', 'Disconnect']] }
+
+'?f' = { name = 'File' }
+'fs' = { name = 'File: Save Changes', '@input:menu' = ['BY_PATH', ['File', 'Save Changes']] }

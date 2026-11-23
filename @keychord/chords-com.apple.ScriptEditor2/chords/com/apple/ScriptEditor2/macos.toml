@@ -1,0 +1,32 @@
+name = 'Script Editor'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?f' = { name = 'File' }
+'fn' = { name = 'File: New Script', '@input:menu' = ['BY_PATH', ['File', 'New']] }
+'fo' = { name = 'File: Open', '@input:menu' = ['BY_PATH', ['File', 'Open…']] }
+'fe' = { name = 'File: Export', '@input:menu' = ['BY_PATH', ['File', 'Export…']] }
+
+'?s' = { name = 'Search' }
+'sf' = { name = 'Search: Find', '@input:menu' = ['BY_PATH', ['Edit', 'Find', 'Find…']] }
+'sr' = { name = 'Search: Find and Replace', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Edit',
+    'Find',
+    'Find and Replace…',
+  ],
+] }
+
+'?r' = { name = 'Script' }
+'rc' = { name = 'Script: Compile', '@input:menu' = ['BY_PATH', ['Script', 'Compile']] }
+'rr' = { name = 'Script: Run', '@input:menu' = ['BY_PATH', ['Script', 'Run']] }
+'rs' = { name = 'Script: Stop', '@input:menu' = ['BY_PATH', ['Script', 'Stop']] }
+
+'?v' = { name = 'View' }
+'vd' = { name = 'View: Description', '@input:menu' = ['SEARCH', 'Description'] }
+'vr' = { name = 'View: Result', '@input:menu' = ['SEARCH', 'Result'] }
+'vl' = { name = 'View: Show Log', '@input:menu' = ['BY_PATH', ['View', 'Show Log']] }
+'vn' = { name = 'View: Navigation Bar', '@input:menu' = ['SEARCH', 'Navigation Bar'] }

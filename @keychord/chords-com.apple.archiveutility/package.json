@@ -1,0 +1,25 @@
+{
+  "name": "@keychord/chords-com.apple.archiveutility",
+  "displayName": "Archive Utility Chords",
+  "version": "0.0.1",
+  "description": "Chords for Archive Utility (com.apple.archiveutility).",
+  "categories": [
+    "macOS"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KeyChord/chords-com.apple.archiveutility"
+  },
+  "type": "module",
+  "scripts": {
+    "test": "bun test --isolate"
+  },
+  "dependencies": {
+    "@keychord/chords-menu": "workspace:*"
+  },
+  "devDependencies": {
+    "@keychord/chordtest": "workspace:*",
+    "@keychord/config": "catalog:"
+  },
+  "packageManager": "pnpm@12.11.2"
+}

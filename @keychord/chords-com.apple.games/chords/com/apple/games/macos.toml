@@ -1,0 +1,11 @@
+name = 'Games'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?g' = { name = 'Goto' }
+'gh' = { name = 'Goto: Home', shell = "open 'games:///play-now?popToRoot=true'" }
+'gl' = { name = 'Goto: Library', shell = "open 'games:///library?popToRoot=true'" }
+'ga' = { name = 'Goto: Arcade', shell = "open -b com.apple.games 'https://games.apple.com/arcade'" }
+'g,' = { name = 'Goto: Settings', '@input:menu' = ['BY_PATH', ['Games', 'Settings…']] }

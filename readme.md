@@ -1,6 +1,6 @@
 # Chord's (conventional) chords
 
-## Global Conventions 
+## Global Conventions
 
 `'` Reserved for entering "insert mode"\
 `\` Reserved for escape characters\
@@ -12,10 +12,10 @@
 All other non-alphanumeric keys are free to be assigned to any global chords.
 
 > Define global chords and their hints in the package's root `chords/macos.toml`
-(for example, `@keychord/chords-betterdisplay/chords/macos.toml`), with any
-handlers they use. Keep application-specific alphanumeric chords in nested
-application/bundle-ID folders. Package builds reject global chords outside the
-root file.
+> (for example, `@keychord/chords-betterdisplay/chords/macos.toml`), with any
+> handlers they use. Keep application-specific alphanumeric chords in nested
+> application/bundle-ID folders. Package builds reject global chords outside the
+> root file.
 
 ### Package prefixes
 
@@ -93,6 +93,12 @@ optional (for example, `'fr' = { name = 'Find and Replace' }`). `vp fmt` preserv
 these quotes.
 
 In TOML chord keys, only parenthesized sections use regex syntax; all surrounding keys are literal. Write `hs.(\d+)` to match `hs.12` and pass `12` as `$1`. Dots outside parentheses need no backslash; dots inside a regex section still use `\.` when they must match literally. Chord patterns match the complete entered sequence automatically.
+
+## Installing packages
+
+Add the `KeyChord/chords` monorepo in Chord and enable the packages you want, or add
+an individual GitHub mirror. The [built-in macOS package list](./@keychord/chords-com.apple)
+links each app to its package.
 
 ## Development
 

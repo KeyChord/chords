@@ -1,0 +1,24 @@
+name = 'Feedback Assistant'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?f' = { name = 'Feedback' }
+'fn' = { name = 'Feedback: New', '@input:menu' = ['BY_PATH', ['File', 'New Feedback']] }
+'fo' = { name = 'Feedback: Open', '@input:menu' = ['BY_PATH', ['File', 'Open']] }
+'fe' = { name = 'Feedback: Export', '@input:menu' = ['BY_PATH', ['File', 'Export Feedback']] }
+'fr' = { name = 'Feedback: Refresh All', '@input:menu' = ['BY_PATH', ['Window', 'Refresh All']] }
+
+'?g' = { name = 'Goto' }
+'gm' = { name = 'Goto: Main Window', '@input:menu' = ['BY_PATH', ['Window', 'Feedback Assistant']] }
+'gc' = { name = 'Goto: Settings', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Feedback Assistant',
+    'Preferences…',
+  ],
+] }
+
+'?v' = { name = 'Vary' }
+'vs' = { name = 'Vary: Sidebar', '@input:menu' = ['SEARCH', 'Sidebar'] }

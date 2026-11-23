@@ -1,0 +1,11 @@
+name = 'Image Playground'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?n' = { name = 'New' }
+'ni' = { name = 'New: Image', '@input:menu' = ['BY_PATH', ['File', 'New Image']] }
+
+'?v' = { name = 'View' }
+'vs' = { name = 'View: Sidebar', '@input:menu' = ['SEARCH', 'Sidebar'] }

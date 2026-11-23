@@ -1,0 +1,19 @@
+name = 'Chess'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?g' = { name = 'Game' }
+'gn' = { name = 'Game: New', '@input:menu' = ['BY_PATH', ['Game', 'New…']] }
+'go' = { name = 'Game: Open', '@input:menu' = ['BY_PATH', ['Game', 'Open…']] }
+'gs' = { name = 'Game: Save', '@input:menu' = ['BY_PATH', ['Game', 'Save']] }
+'ge' = { name = 'Game: Save As', '@input:menu' = ['BY_PATH', ['Game', 'Save As…']] }
+'g,' = { name = 'Game: Settings', '@input:menu' = ['BY_PATH', ['Chess', 'Preferences…']] }
+
+'?m' = { name = 'Moves' }
+'mk' = { name = 'Moves: Take Back', '@input:menu' = ['BY_PATH', ['Moves', 'Take Back Move']] }
+'ml' = { name = 'Moves: Game Log', '@input:menu' = ['BY_PATH', ['Moves', 'Game Log']] }
+
+'?v' = { name = 'Vary' }
+'ve' = { name = 'Vary: Edge Notation', '@input:menu' = ['BY_PATH', ['View', 'Edge Notation']] }

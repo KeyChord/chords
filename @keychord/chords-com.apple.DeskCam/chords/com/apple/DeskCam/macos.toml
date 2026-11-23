@@ -1,0 +1,29 @@
+name = 'Desk View'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?g' = { name = 'Goto' }
+'gs' = { name = 'Goto: Start Desk View', '@input:menu' = ['BY_PATH', ['View', 'Start Desk View']] }
+
+'?v' = { name = 'View' }
+'vs' = { name = 'View: Toggle Always Show Setup', '@input:menu' = [
+  'BY_PATH',
+  [
+    'View',
+    'Always Show Setup',
+  ],
+] }
+'va' = { name = 'View: Toggle Auto Zoom During Setup', '@input:menu' = [
+  'BY_PATH',
+  [
+    'View',
+    'Use Auto Zoom During Setup',
+  ],
+] }
+'vf' = { name = 'View: Toggle Full Screen', '@input:menu' = ['SEARCH', 'Full Screen'] }
+
+'?z' = { name = 'Zoom' }
+'z=' = { name = 'Zoom: In', '@input:menu' = ['BY_PATH', ['View', 'Zoom In']] }
+'z-' = { name = 'Zoom: Out', '@input:menu' = ['BY_PATH', ['View', 'Zoom Out']] }

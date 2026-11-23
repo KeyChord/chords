@@ -1,0 +1,83 @@
+name = 'Music'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?a' = { name = 'App' }
+'a,' = { name = 'App: Settings', '@input:menu' = ['BY_PATH', ['Music', 'Settings…']] }
+'?g' = { name = 'Goto' }
+'g/' = { name = 'Goto: Search', shortcut = 'cmd+f' }
+'gr' = { name = 'Goto: Recently Added', shortcut = 'ctrl+cmd+1' }
+'ga' = { name = 'Goto: Artists', shortcut = 'ctrl+cmd+2' }
+'gb' = { name = 'Goto: Albums', shortcut = 'ctrl+cmd+3' }
+'gs' = { name = 'Goto: Songs', shortcut = 'ctrl+cmd+4' }
+'?n' = { name = 'New' }
+'np' = { name = 'New: Playlist', '@input:menu' = ['BY_PATH', ['File', 'New', 'Playlist']] }
+'ns' = { name = 'New: Smart Playlist', '@input:menu' = [
+  'BY_PATH',
+  [
+    'File',
+    'New',
+    'Smart Playlist',
+  ],
+] }
+'nf' = { name = 'New: Playlist Folder', '@input:menu' = [
+  'BY_PATH',
+  [
+    'File',
+    'New',
+    'Playlist Folder',
+  ],
+] }
+'?f' = { name = 'File' }
+'fi' = { name = 'File: Import', '@input:menu' = ['BY_PATH', ['File', 'Import…']] }
+'fu' = { name = 'File: Open Stream URL', '@input:menu' = ['BY_PATH', ['File', 'Open Stream URL…']] }
+'fe' = { name = 'File: Export Library', '@input:menu' = [
+  'BY_PATH',
+  [
+    'File',
+    'Library',
+    'Export Library…',
+  ],
+] }
+'?v' = { name = 'View' }
+'vn' = { name = 'View: Playing Next', '@input:menu' = ['SEARCH', 'Playing Next'] }
+'vb' = { name = 'View: Status Bar', '@input:menu' = ['SEARCH', 'Status Bar'] }
+'ve' = { name = 'View: Equalizer', '@input:menu' = ['BY_PATH', ['Window', 'Equalizer']] }
+'?p' = { name = 'Playback' }
+'pp' = { name = 'Playback: Play', '@input:menu' = ['BY_PATH', ['Controls', 'Play']] }
+'ph' = { name = 'Playback: Pause', '@input:menu' = ['BY_PATH', ['Controls', 'Pause']] }
+'p[' = { name = 'Playback: Previous Track', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Controls',
+    'Previous Track',
+  ],
+] }
+'p]' = { name = 'Playback: Next Track', '@input:menu' = ['BY_PATH', ['Controls', 'Next Track']] }
+'pro' = { name = 'Playback: Repeat Off', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Controls',
+    'Repeat',
+    'Off',
+  ],
+] }
+'pra' = { name = 'Playback: Repeat All', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Controls',
+    'Repeat',
+    'All',
+  ],
+] }
+'pr1' = { name = 'Playback: Repeat One', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Controls',
+    'Repeat',
+    'One',
+  ],
+] }
+'?pr' = { name = 'Repeat' }

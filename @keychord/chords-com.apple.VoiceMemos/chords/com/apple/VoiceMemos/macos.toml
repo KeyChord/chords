@@ -1,0 +1,45 @@
+name = 'Voice Memos'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?r' = { name = 'Recording' }
+'rn' = { name = 'Recording: New', '@input:menu' = ['BY_PATH', ['File', 'Start New Recording']] }
+'rd' = { name = 'Recording: Duplicate', '@input:menu' = ['BY_PATH', ['File', 'Duplicate']] }
+'rr' = { name = 'Recording: Rename', '@input:menu' = ['BY_PATH', ['File', 'Rename…']] }
+'re' = { name = 'Recording: Edit', '@input:menu' = ['BY_PATH', ['Edit', 'Edit Recording']] }
+'rt' = { name = 'Recording: Trim', '@input:menu' = ['BY_PATH', ['Edit', 'Trim Recording']] }
+'rx' = { name = 'Recording: Delete', '@input:menu' = ['BY_PATH', ['Edit', 'Delete']] }
+
+'?p' = { name = 'Playback' }
+'pp' = { name = 'Playback: Play or Pause', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Controls',
+    'Play/Pause Recording',
+  ],
+] }
+'pk' = { name = 'Playback: Jump Backward 15 Seconds', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Controls',
+    'Jump Backward 15s',
+  ],
+] }
+'pf' = { name = 'Playback: Jump Forward 15 Seconds', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Controls',
+    'Jump Forward 15s',
+  ],
+] }
+
+'?v' = { name = 'View' }
+'vs' = { name = 'View: Toggle Sidebar', '@input:menu' = ['SEARCH', 'Sidebar'] }
+
+'?j' = { name = 'Jump' }
+'jf' = { name = 'Jump: Search Recordings', '@input:menu' = ['FOCUS', 'AXSearchField'] }
+
+'?s' = { name = 'Settings' }
+'s,' = { name = 'Settings: Open', '@input:menu' = ['BY_PATH', ['Voice Memos', 'Settings…']] }

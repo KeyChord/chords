@@ -1,0 +1,23 @@
+name = 'QuickTime Player'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?f' = { name = 'File' }
+'fo' = { name = 'File: Open', '@input:menu' = ['BY_PATH', ['File', 'Open File…']] }
+'fu' = { name = 'File: Open Location', '@input:menu' = ['BY_PATH', ['File', 'Open Location…']] }
+'?e' = { name = 'Edit' }
+'et' = { name = 'Edit: Trim', '@input:menu' = ['SEARCH', 'Edit > Trim'] }
+'el' = { name = 'Edit: Rotate Left', '@input:menu' = ['BY_PATH', ['Edit', 'Rotate Left']] }
+'er' = { name = 'Edit: Rotate Right', '@input:menu' = ['BY_PATH', ['Edit', 'Rotate Right']] }
+'?v' = { name = 'View' }
+'vi' = { name = 'View: Movie Inspector', '@input:menu' = ['SEARCH', 'Movie Inspector'] }
+'vc' = { name = 'View: Clips', '@input:menu' = ['SEARCH', 'Clips'] }
+'vf' = { name = 'View: Float on Top', '@input:menu' = ['BY_PATH', ['View', 'Float on Top']] }
+'va' = { name = 'View: Actual Size', '@input:menu' = ['BY_PATH', ['View', 'Actual Size']] }
+'?p' = { name = 'Playback' }
+'pv' = { name = 'Playback: Play or Pause', shortcut = 'space' }
+'pa' = { name = 'Playback: Beginning', shortcut = 'opt+left' }
+'pz' = { name = 'Playback: End', shortcut = 'opt+right' }
+'pl' = { name = 'Playback: Loop', '@input:menu' = ['BY_PATH', ['View', 'Loop']] }

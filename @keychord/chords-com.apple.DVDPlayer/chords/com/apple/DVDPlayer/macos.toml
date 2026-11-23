@@ -1,0 +1,51 @@
+name = 'DVD Player'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?f' = { name = 'File' }
+'fo' = { name = 'File: Open DVD Media', '@input:menu' = ['BY_PATH', ['File', 'Open DVD Media…']] }
+
+'?p' = { name = 'Playback' }
+'pp' = { name = 'Playback: Play', '@input:menu' = ['BY_PATH', ['Controls', 'Play']] }
+'ph' = { name = 'Playback: Stop', '@input:menu' = ['BY_PATH', ['Controls', 'Stop']] }
+'pf' = { name = 'Playback: Scan Forward', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Controls',
+    'Scan Forward',
+  ],
+] }
+'pk' = { name = 'Playback: Scan Backward', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Controls',
+    'Scan Backwards',
+  ],
+] }
+'pe' = { name = 'Playback: Eject DVD', '@input:menu' = ['BY_PATH', ['Controls', 'Eject DVD']] }
+
+'?g' = { name = 'Goto' }
+'g[' = { name = 'Goto: Previous Chapter', '@input:menu' = ['BY_PATH', ['Go', 'Previous Chapter']] }
+'g]' = { name = 'Goto: Next Chapter', '@input:menu' = ['BY_PATH', ['Go', 'Next Chapter']] }
+'gk' = { name = 'Goto: Back 5 Seconds', '@input:menu' = ['BY_PATH', ['Go', 'Skip Back 5 seconds']] }
+'gf' = { name = 'Goto: Ahead 5 Seconds', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Go',
+    'Skip Ahead 5 seconds',
+  ],
+] }
+'ga' = { name = 'Goto: Beginning of Disc', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Go',
+    'Beginning of Disc',
+  ],
+] }
+'gm' = { name = 'Goto: DVD Menu', '@input:menu' = ['BY_PATH', ['Go', 'DVD Menu']] }
+
+'?v' = { name = 'View' }
+'vf' = { name = 'View: Toggle Full Screen', '@input:menu' = ['SEARCH', 'Full Screen'] }
+'vc' = { name = 'View: Toggle Closed Captioning', '@input:menu' = ['SEARCH', 'Closed Captioning'] }

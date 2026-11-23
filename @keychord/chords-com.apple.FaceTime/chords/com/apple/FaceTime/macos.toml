@@ -1,0 +1,21 @@
+name = 'FaceTime'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?g' = { name = 'Goto' }
+'g,' = { name = 'Goto: Settings', '@input:menu' = ['BY_PATH', ['FaceTime', 'Settings…']] }
+
+'?n' = { name = 'New' }
+'nc' = { name = 'New: FaceTime Call', '@input:menu' = ['BY_PATH', ['File', 'New FaceTime']] }
+
+'?v' = { name = 'Vary Call' }
+'vt' = { name = 'Vary Call: Always on Top', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Video',
+    'Always on Top',
+  ],
+] }
+'vm' = { name = 'Vary Call: Mute', '@input:menu' = ['BY_PATH', ['Audio', 'Mute']] }

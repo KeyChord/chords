@@ -1,0 +1,38 @@
+name = 'Preview'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?f' = { name = 'File' }
+'fo' = { name = 'File: Open', '@input:menu' = ['BY_PATH', ['File', 'Open…']] }
+'fe' = { name = 'File: Export as PDF', '@input:menu' = ['BY_PATH', ['File', 'Export as PDF…']] }
+
+'?s' = { name = 'Search' }
+'sf' = { name = 'Search: Find', '@input:menu' = ['BY_PATH', ['Edit', 'Find', 'Find…']] }
+
+'?g' = { name = 'Goto' }
+'g[' = { name = 'Goto: Previous Page', '@input:menu' = ['BY_PATH', ['Go', 'Previous Page']] }
+'g]' = { name = 'Goto: Next Page', '@input:menu' = ['BY_PATH', ['Go', 'Next Page']] }
+'gp' = { name = 'Goto: Page Number', '@input:menu' = ['BY_PATH', ['Go', 'Go to Page…']] }
+
+'?v' = { name = 'View' }
+'vt' = { name = 'View: Thumbnails', '@input:menu' = ['BY_PATH', ['View', 'Thumbnails']] }
+'vc' = { name = 'View: Contact Sheet', '@input:menu' = ['BY_PATH', ['View', 'Contact Sheet']] }
+'vh' = { name = 'View: Hide Sidebar', '@input:menu' = ['BY_PATH', ['View', 'Hide Sidebar']] }
+'vs' = { name = 'View: Single Page', '@input:menu' = ['BY_PATH', ['View', 'Single Page']] }
+'vd' = { name = 'View: Two Pages', '@input:menu' = ['BY_PATH', ['View', 'Two Pages']] }
+'vw' = { name = 'View: Continuous Scroll', '@input:menu' = [
+  'BY_PATH',
+  [
+    'View',
+    'Continuous Scroll',
+  ],
+] }
+'vm' = { name = 'View: Markup Toolbar', '@input:menu' = ['SEARCH', 'Markup Toolbar'] }
+'vi' = { name = 'View: Inspector', '@input:menu' = ['SEARCH', 'Inspector'] }
+
+'?z' = { name = 'Zoom' }
+'za' = { name = 'Zoom: Actual Size', '@input:menu' = ['BY_PATH', ['View', 'Actual Size']] }
+'z=' = { name = 'Zoom: In', '@input:menu' = ['BY_PATH', ['View', 'Zoom In']] }
+'z-' = { name = 'Zoom: Out', '@input:menu' = ['BY_PATH', ['View', 'Zoom Out']] }
