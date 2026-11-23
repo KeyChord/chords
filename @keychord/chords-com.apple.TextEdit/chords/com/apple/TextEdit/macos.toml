@@ -1,0 +1,35 @@
+name = 'TextEdit'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?f' = { name = 'File' }
+'fn' = { name = 'File: New', '@input:menu' = ['BY_PATH', ['File', 'New']] }
+'fo' = { name = 'File: Open', '@input:menu' = ['BY_PATH', ['File', 'Open…']] }
+'fs' = { name = 'File: Save', '@input:menu' = ['BY_PATH', ['File', 'Save']] }
+'fe' = { name = 'File: Export as PDF', '@input:menu' = ['BY_PATH', ['File', 'Export as PDF…']] }
+
+'?s' = { name = 'Search' }
+'sf' = { name = 'Search: Find', '@input:menu' = ['BY_PATH', ['Edit', 'Find', 'Find…']] }
+'sr' = { name = 'Search: Find and Replace', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Edit',
+    'Find',
+    'Find and Replace…',
+  ],
+] }
+
+'?t' = { name = 'Text' }
+'tp' = { name = 'Text: Make Plain Text', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Format',
+    'Make Plain Text',
+  ],
+] }
+'tr' = { name = 'Text: Make Rich Text', '@input:menu' = ['BY_PATH', ['Format', 'Make Rich Text']] }
+'tv' = { name = 'Text: Toggle Editing', '@input:menu' = ['SEARCH', 'Editing'] }
+'tw' = { name = 'Text: Wrap to Window', '@input:menu' = ['BY_PATH', ['Format', 'Wrap to Window']] }
+'ta' = { name = 'Text: Wrap to Page', '@input:menu' = ['BY_PATH', ['Format', 'Wrap to Page']] }

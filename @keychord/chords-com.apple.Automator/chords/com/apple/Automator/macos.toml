@@ -1,0 +1,55 @@
+name = 'Automator'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?f' = { name = 'File' }
+'fn' = { name = 'File: New Workflow', '@input:menu' = ['BY_PATH', ['File', 'New']] }
+'fo' = { name = 'File: Open', '@input:menu' = ['BY_PATH', ['File', 'Open…']] }
+'fe' = { name = 'File: Export', '@input:menu' = ['BY_PATH', ['File', 'Export…']] }
+'fc' = { name = 'File: Convert Workflow Type', '@input:menu' = [
+  'BY_PATH',
+  [
+    'File',
+    'Convert To…',
+  ],
+] }
+
+'?s' = { name = 'Search' }
+'sl' = { name = 'Search: Find in Library', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Edit',
+    'Find',
+    'Find in Library',
+  ],
+] }
+
+'?v' = { name = 'View' }
+'vl' = { name = 'View: Show Library', '@input:menu' = ['BY_PATH', ['View', 'Show Library']] }
+'vh' = { name = 'View: Hide Library', '@input:menu' = ['BY_PATH', ['View', 'Hide Library']] }
+'vg' = { name = 'View: Log', '@input:menu' = ['BY_PATH', ['View', 'Log']] }
+'vv' = { name = 'View: Variables', '@input:menu' = ['BY_PATH', ['View', 'Variables']] }
+
+'?a' = { name = 'Arrange' }
+'aa' = { name = 'Arrange: By Application', '@input:menu' = [
+  'BY_PATH',
+  [
+    'View',
+    'Arrange Actions by',
+    'Application',
+  ],
+] }
+'ac' = { name = 'Arrange: By Category', '@input:menu' = [
+  'BY_PATH',
+  [
+    'View',
+    'Arrange Actions by',
+    'Category',
+  ],
+] }
+
+'?w' = { name = 'Workflow' }
+'wr' = { name = 'Workflow: Run', '@input:menu' = ['BY_PATH', ['Workflow', 'Run']] }
+'ws' = { name = 'Workflow: Stop', '@input:menu' = ['BY_PATH', ['Workflow', 'Stop']] }
