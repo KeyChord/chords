@@ -1,0 +1,34 @@
+name = 'Grapher'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?f' = { name = 'File' }
+'fn' = { name = 'File: New Graph', '@input:menu' = ['BY_PATH', ['File', 'New…']] }
+'fo' = { name = 'File: Open', '@input:menu' = ['BY_PATH', ['File', 'Open…']] }
+'fs' = { name = 'File: Save', '@input:menu' = ['BY_PATH', ['File', 'Save']] }
+'fe' = { name = 'File: Export', '@input:menu' = ['BY_PATH', ['File', 'Export…']] }
+
+'?e' = { name = 'Equation' }
+'en' = { name = 'Equation: New', '@input:menu' = ['BY_PATH', ['Equation', 'New Equation']] }
+'ed' = { name = 'Equation: Delete Selected', shortcut = 'backspace' }
+'et' = { name = 'Equation: New from Template', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Equation',
+    'New Equation from Template…',
+  ],
+] }
+
+'?v' = { name = 'View' }
+'v2' = { name = 'View: 2D View', '@input:menu' = ['BY_PATH', ['View', 'Switch to 2D View']] }
+'v3' = { name = 'View: 3D View', '@input:menu' = ['BY_PATH', ['View', 'Switch to 3D View']] }
+'vi' = { name = 'View: Zoom In', '@input:menu' = ['BY_PATH', ['View', 'Zoom In']] }
+'vo' = { name = 'View: Zoom Out', '@input:menu' = ['BY_PATH', ['View', 'Zoom Out']] }
+'vf' = { name = 'View: Frame Limits', '@input:menu' = ['BY_PATH', ['View', 'Frame Limits…']] }
+'vp' = { name = 'View: Equation Palette', '@input:menu' = ['SEARCH', 'Equation Palette'] }
+
+'?g' = { name = 'Graph' }
+'gt' = { name = 'Graph: Template', '@input:menu' = ['BY_PATH', ['Format', 'Graph Template…']] }
+'gl' = { name = 'Graph: Layout', '@input:menu' = ['BY_PATH', ['Format', 'Layout…']] }

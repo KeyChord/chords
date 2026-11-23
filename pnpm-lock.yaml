@@ -333,6 +333,32 @@ importers:
         specifier: 'catalog:'
         version: 0.0.12
 
+  '@keychord/chords-com.apple.Console':
+    dependencies:
+      '@keychord/chords-menu':
+        specifier: workspace:*
+        version: link:../chords-menu
+    devDependencies:
+      '@keychord/chordtest':
+        specifier: workspace:*
+        version: link:../chordtest
+      '@keychord/config':
+        specifier: 'catalog:'
+        version: 0.0.12
+
+  '@keychord/chords-com.apple.DiskUtility':
+    dependencies:
+      '@keychord/chords-menu':
+        specifier: workspace:*
+        version: link:../chords-menu
+    devDependencies:
+      '@keychord/chordtest':
+        specifier: workspace:*
+        version: link:../chordtest
+      '@keychord/config':
+        specifier: 'catalog:'
+        version: 0.0.12
+
   '@keychord/chords-com.apple.Safari':
     dependencies:
       '@keychord/chords-menu':
@@ -389,7 +415,46 @@ importers:
         specifier: latest
         version: 1.4.4
 
+  '@keychord/chords-com.apple.SystemProfiler':
+    dependencies:
+      '@keychord/chords-menu':
+        specifier: workspace:*
+        version: link:../chords-menu
+    devDependencies:
+      '@keychord/chordtest':
+        specifier: workspace:*
+        version: link:../chordtest
+      '@keychord/config':
+        specifier: 'catalog:'
+        version: 0.0.12
+
+  '@keychord/chords-com.apple.calculator':
+    dependencies:
+      '@keychord/chords-menu':
+        specifier: workspace:*
+        version: link:../chords-menu
+    devDependencies:
+      '@keychord/chordtest':
+        specifier: workspace:*
+        version: link:../chordtest
+      '@keychord/config':
+        specifier: 'catalog:'
+        version: 0.0.12
+
   '@keychord/chords-com.apple.finder':
+    dependencies:
+      '@keychord/chords-menu':
+        specifier: workspace:*
+        version: link:../chords-menu
+    devDependencies:
+      '@keychord/chordtest':
+        specifier: workspace:*
+        version: link:../chordtest
+      '@keychord/config':
+        specifier: 'catalog:'
+        version: 0.0.12
+
+  '@keychord/chords-com.apple.grapher':
     dependencies:
       '@keychord/chords-menu':
         specifier: workspace:*

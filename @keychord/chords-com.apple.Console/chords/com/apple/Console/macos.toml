@@ -1,0 +1,34 @@
+name = 'Console'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?f' = { name = 'File' }
+'fo' = { name = 'File: Open Log', '@input:menu' = ['BY_PATH', ['File', 'Open…']] }
+
+'?j' = { name = 'Jump' }
+'js' = { name = 'Jump: Focus Search', '@input:menu' = ['BY_PATH', ['Action', 'Search']] }
+
+'?l' = { name = 'Log' }
+'ls' = { name = 'Log: Start or Pause Streaming', '@input:menu' = ['SEARCH', 'Streaming'] }
+'ln' = { name = 'Log: Follow Latest Messages', '@input:menu' = ['SEARCH', 'Now Mode'] }
+'lc' = { name = 'Log: Clear', '@input:menu' = ['BY_PATH', ['Action', 'Clear']] }
+'li' = { name = 'Log: Include Info Messages', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Action',
+    'Include Info Messages',
+  ],
+] }
+'ld' = { name = 'Log: Include Debug Messages', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Action',
+    'Include Debug Messages',
+  ],
+] }
+
+'?v' = { name = 'View' }
+'vs' = { name = 'View: Sources', '@input:menu' = ['SEARCH', 'Sources'] }
+'va' = { name = 'View: Activities', '@input:menu' = ['SEARCH', 'Activities View'] }
