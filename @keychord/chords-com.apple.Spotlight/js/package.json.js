@@ -1,7 +1,7 @@
 //#region package.json
 var name = "@keychord/chords-com.apple.Spotlight";
 var displayName = "Spotlight Chords";
-var version = "0.0.1";
+var version = "0.0.2";
 var description = "Chord's built-in launcher: `/<query>` opens Spotlight's top result for the query.";
 var categories = ["macOS"];
 var repository = {

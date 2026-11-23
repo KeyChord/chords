@@ -2,7 +2,7 @@ import { n as __toESM } from "./rolldown-runtime-DXIUcv95.js";
 import { tap } from "chord";
 //#region src/js/utils/native.ts
 let addon;
-const native = async () => (await (addon ??= import("./_keychord-native_spotlight-CB_NFyxs.js").then((m) => /* @__PURE__ */ __toESM(m.default, 1)))).default;
+const native = async () => (await (addon ??= import("./_keychord-native_spotlight-DQ4qlvDk.js").then((m) => /* @__PURE__ */ __toESM(m.default, 1)))).default;
 /** Whether this Mac has the Spotlight panel the launcher drives (macOS 27's Siri AI app). */
 async function isSpotlightSupported() {
 	return JSON.parse(await (await native()).isSupported());
@@ -62,7 +62,10 @@ function buildSpotlightHandler(timeoutMs = 5e3) {
 		let search = "closed";
 		for (let attempt = 0; search === "closed" && attempt < 2; attempt++) {
 			if (!await isSpotlightPanelOpen()) await open();
-			if (!await prepareSpotlight(timeoutMs)) throw new Error(`Spotlight's search did not open within ${timeoutMs}ms`);
+			if (!await prepareSpotlight(timeoutMs)) {
+				if (attempt === 0 && !await isSpotlightPanelOpen()) continue;
+				throw new Error(`Spotlight's search did not open within ${timeoutMs}ms`);
+			}
 			if (!query) return;
 			search = await searchSpotlight(query, timeoutMs);
 		}

@@ -288,8 +288,8 @@ private let changeNotifications = [
     kAXLayoutChangedNotification, kAXFocusedWindowChangedNotification,
 ]
 
-/// Runs `check`, then again on each accessibility notification from Spotlight's panel app,
-/// until it returns true. The deadline only bounds a change that never comes.
+/// Check the panel as soon as Spotlight posts an accessibility notification.
+/// Recheck periodically because some panel updates omit a notification.
 @MainActor
 private func awaitChange(deadline: Date, _ check: @MainActor () throws -> Bool) async throws -> Bool {
     guard let app = application() else { throw SpotlightError.notRunning }
@@ -309,12 +309,21 @@ private func awaitChange(deadline: Date, _ check: @MainActor () throws -> Bool) 
     }
     let source = AXObserverGetRunLoopSource(observer)
     CFRunLoopAddSource(CFRunLoopGetMain(), source, .commonModes)
-    let timeout = Task {
-        try? await Task.sleep(for: .seconds(max(0, deadline.timeIntervalSinceNow)))
+    let timer = Task {
+        var remaining = deadline.timeIntervalSinceNow
+        while remaining > 0 {
+            do {
+                try await Task.sleep(for: .seconds(min(0.25, remaining)))
+            } catch {
+                return
+            }
+            remaining = deadline.timeIntervalSinceNow
+            if remaining > 0 { continuation.yield(()) }
+        }
         continuation.finish()
     }
     defer {
-        timeout.cancel()
+        timer.cancel()
         CFRunLoopRemoveSource(CFRunLoopGetMain(), source, .commonModes)
         for name in changeNotifications {
             AXObserverRemoveNotification(observer, observed, name as CFString)

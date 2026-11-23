@@ -61,7 +61,15 @@ test.skipIf(!macOSUITestsEnabled)(
           await probe.pressControl(panel, "AXButton", "Continue");
           await waitFor(async () => ((await continuing()) ? undefined : true), 12_000);
         }
-        await app.runChecked("/textedit");
+        await app.runChecked("/textedit").catch(async (error) => {
+          console.error(
+            "Spotlight search state",
+            JSON.stringify(
+              (await controls()).map(({ role, id, value }) => ({ role, id, value })),
+            ).slice(0, 4_000),
+          );
+          throw error;
+        });
         await waitFor(
           async () => ((await probe.front()) === "com.apple.TextEdit" ? true : undefined),
           20_000,

@@ -14,12 +14,16 @@ const state = {
   closed: true,
   // Answers for consecutive calls, before falling back to the fields above.
   opens: [] as boolean[],
+  preparations: [] as boolean[],
   searches: [] as SpotlightSearch[],
 };
 mock.module("../src/js/utils/native", () => ({
   isSpotlightSupported: async () => (calls.push("supported"), state.supported),
   isSpotlightPanelOpen: async () => (calls.push("isOpen"), state.opens.shift() ?? state.open),
-  prepareSpotlight: async () => (calls.push("prepare"), state.prepared),
+  prepareSpotlight: async () => (
+    calls.push("prepare"),
+    state.preparations.shift() ?? state.prepared
+  ),
   searchSpotlight: async (query: string) => (
     calls.push(`search ${query}`),
     state.searches.shift() ?? state.search
@@ -46,6 +50,7 @@ beforeEach(() => {
     ready: true,
     closed: true,
     opens: [],
+    preparations: [],
     searches: [],
   });
   const spy = spyOn(Bun, "spawn").mockImplementation(((...args: unknown[]) => {
@@ -107,6 +112,15 @@ test("an open panel is reused, because the URL would close it", async () => {
   await buildSpotlightHandler()("calculator");
   expect(spawn).not.toHaveBeenCalled();
   expect(calls).toContain("tap enter");
+});
+
+test("a panel that closes while preparing is reopened once", async () => {
+  state.opens = [true, false, false];
+  state.preparations = [false, true];
+  await buildSpotlightHandler()("calculator");
+  expect(spawn).toHaveBeenCalledTimes(1);
+  expect(calls.filter((call) => call === "prepare")).toHaveLength(2);
+  expect(calls.filter((call) => call === "tap enter")).toEqual(["tap enter"]);
 });
 
 test("/ alone opens Spotlight without searching", async () => {

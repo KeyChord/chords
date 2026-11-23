@@ -49,8 +49,10 @@ export default function buildSpotlightHandler(timeoutMs = 5_000) {
     for (let attempt = 0; search === "closed" && attempt < 2; attempt++) {
       // The URL toggles the panel, so it is only sent while the panel is closed.
       if (!(await isSpotlightPanelOpen())) await open();
-      if (!(await prepareSpotlight(timeoutMs)))
+      if (!(await prepareSpotlight(timeoutMs))) {
+        if (attempt === 0 && !(await isSpotlightPanelOpen())) continue;
         throw new Error(`Spotlight's search did not open within ${timeoutMs}ms`);
+      }
       if (!query) return;
       search = await searchSpotlight(query, timeoutMs);
     }

@@ -1,7 +1,7 @@
 //#region package.json
 var name = "@keychord/chords-com.apple.AccessibilityInspector";
 var displayName = "Accessibility Inspector Chords";
-var version = "0.0.2";
+var version = "0.0.3";
 var description = "Chords for Accessibility Inspector (com.apple.AccessibilityInspector).";
 var categories = ["macOS"];
 var repository = {
