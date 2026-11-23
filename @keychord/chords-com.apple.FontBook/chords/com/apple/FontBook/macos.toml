@@ -1,0 +1,33 @@
+name = 'Font Book'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?n' = { name = 'New' }
+'nw' = { name = 'New: Font Book Window', '@input:menu' = ['BY_PATH', ['File', 'New Window']] }
+'ns' = { name = 'New: Smart Collection', '@input:menu' = [
+  'BY_PATH',
+  [
+    'File',
+    'New Smart Collection…',
+  ],
+] }
+
+'?f' = { name = 'Font' }
+'fa' = { name = 'Font: Add Fonts', '@input:menu' = ['SEARCH', 'Add Fonts to'] }
+'fv' = { name = 'Font: Validate File', '@input:menu' = ['BY_PATH', ['File', 'Validate File…']] }
+
+'?v' = { name = 'View' }
+'vg' = { name = 'View: Grid', '@input:menu' = ['BY_PATH', ['View', 'View as Grid']] }
+'vl' = { name = 'View: List', '@input:menu' = ['BY_PATH', ['View', 'View as List']] }
+'vs' = { name = 'View: Samples', '@input:menu' = ['BY_PATH', ['View', 'View as Samples']] }
+'vv' = { name = 'View: Specimen', '@input:menu' = ['BY_PATH', ['View', 'View as Specimen']] }
+'vb' = { name = 'View: Toggle Sidebar', '@input:menu' = ['SEARCH', 'Sidebar'] }
+'vi' = { name = 'View: Toggle Info Pane', '@input:menu' = ['SEARCH', 'Info Pane'] }
+
+'?j' = { name = 'Jump' }
+'jf' = { name = 'Jump: Font Search', '@input:menu' = ['FOCUS', 'AXSearchField'] }
+
+'?g' = { name = 'Go to' }
+'gs' = { name = 'Go to: Settings', '@input:menu' = ['BY_PATH', ['Font Book', 'Settings…']] }

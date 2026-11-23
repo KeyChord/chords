@@ -1,0 +1,46 @@
+name = 'Screen Sharing'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?c' = { name = 'Connection' }
+'cn' = { name = 'Connection: New', '@input:menu' = ['BY_PATH', ['Connection', 'New…']] }
+'co' = { name = 'Connection: Open Saved Connection', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Connection',
+    'Open…',
+  ],
+] }
+'cs' = { name = 'Connection: Save Current Connection', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Connection',
+    'Save As…',
+  ],
+] }
+
+'?w' = { name = 'Window' }
+'wc' = { name = 'Window: Connections', '@input:menu' = ['BY_PATH', ['Window', 'Connections']] }
+'wf' = { name = 'Window: File Transfers', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Window',
+    'File Transfers',
+  ],
+] }
+
+'?v' = { name = 'View' }
+'vs' = { name = 'View: Toggle Scaling', '@input:menu' = ['SEARCH', 'Scaling'] }
+'va' = { name = 'View: Adaptive Quality', '@input:menu' = [
+  'BY_PATH',
+  [
+    'View',
+    'Adaptive Quality',
+  ],
+] }
+'vf' = { name = 'View: Full Quality', '@input:menu' = ['BY_PATH', ['View', 'Full Quality']] }
+
+'?g' = { name = 'Go to' }
+'gs' = { name = 'Go to: Settings', '@input:menu' = ['BY_PATH', ['Screen Sharing', 'Settings…']] }

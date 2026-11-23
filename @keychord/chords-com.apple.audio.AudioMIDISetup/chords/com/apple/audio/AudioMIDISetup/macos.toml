@@ -1,0 +1,28 @@
+name = 'Audio MIDI Setup'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?g' = { name = 'Go to' }
+'ga' = { name = 'Go to: Audio Devices', '@input:menu' = ['SEARCH', 'Audio Devices'] }
+'gm' = { name = 'Go to: MIDI Studio', '@input:menu' = ['SEARCH', 'MIDI Studio'] }
+'gn' = { name = 'Go to: Network Device Browser', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Window',
+    'Show Network Device Browser',
+  ],
+] }
+'gs' = { name = 'Go to: Settings', '@input:menu' = ['BY_PATH', ['Audio MIDI Setup', 'Settings…']] }
+
+'?v' = { name = 'View' }
+'vs' = { name = 'View: Show Toolbar', '@input:menu' = ['BY_PATH', ['View', 'Show Toolbar']] }
+'vh' = { name = 'View: Hide Toolbar', '@input:menu' = ['BY_PATH', ['View', 'Hide Toolbar']] }
+'vc' = { name = 'View: Customize Toolbar', '@input:menu' = [
+  'BY_PATH',
+  [
+    'View',
+    'Customize Toolbar…',
+  ],
+] }

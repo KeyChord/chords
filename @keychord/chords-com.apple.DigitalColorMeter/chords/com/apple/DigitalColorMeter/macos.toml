@@ -1,0 +1,72 @@
+name = 'Digital Color Meter'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?v' = { name = 'View' }
+'vx' = { name = 'View: Lock X', '@input:menu' = ['BY_PATH', ['View', 'Lock X']] }
+'vy' = { name = 'View: Lock Y', '@input:menu' = ['BY_PATH', ['View', 'Lock Y']] }
+'vl' = { name = 'View: Lock Position', '@input:menu' = ['BY_PATH', ['View', 'Lock Position']] }
+'vu' = { name = 'View: Update Continuously', '@input:menu' = [
+  'BY_PATH',
+  [
+    'View',
+    'Update Continuously',
+  ],
+] }
+'vm' = { name = 'View: Show Mouse Location', '@input:menu' = [
+  'BY_PATH',
+  [
+    'View',
+    'Show Mouse Location',
+  ],
+] }
+
+'?m' = { name = 'Magnification' }
+'m1' = { name = 'Magnification: 1x', '@input:menu' = ['BY_PATH', ['View', 'Magnification', '1x']] }
+'m2' = { name = 'Magnification: 2x', '@input:menu' = ['BY_PATH', ['View', 'Magnification', '2x']] }
+'m4' = { name = 'Magnification: 4x', '@input:menu' = ['BY_PATH', ['View', 'Magnification', '4x']] }
+'m8' = { name = 'Magnification: 8x', '@input:menu' = ['BY_PATH', ['View', 'Magnification', '8x']] }
+
+'?f' = { name = 'Format' }
+'fd' = { name = 'Format: Decimal', '@input:menu' = [
+  'BY_PATH',
+  [
+    'View',
+    'Display Values',
+    'as Decimal',
+  ],
+] }
+'fh' = { name = 'Format: Hexadecimal', '@input:menu' = [
+  'BY_PATH',
+  [
+    'View',
+    'Display Values',
+    'as Hexadecimal',
+  ],
+] }
+'fp' = { name = 'Format: Percentage', '@input:menu' = [
+  'BY_PATH',
+  [
+    'View',
+    'Display Values',
+    'as Percentage',
+  ],
+] }
+
+'?c' = { name = 'Color' }
+'ct' = { name = 'Color: Copy as Text', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Color',
+    'Copy Color as Text',
+  ],
+] }
+'ci' = { name = 'Color: Copy as Image', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Color',
+    'Copy Color as Image',
+  ],
+] }
