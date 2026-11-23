@@ -1,0 +1,54 @@
+name = 'Notes'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?n' = { name = 'New' }
+'nn' = { name = 'New: Note', '@input:menu' = ['BY_PATH', ['File', 'New Note']] }
+'nf' = { name = 'New: Folder', '@input:menu' = ['BY_PATH', ['File', 'New Folder']] }
+
+'?e' = { name = 'Edit' }
+'ed' = { name = 'Edit: Duplicate Note', '@input:menu' = ['BY_PATH', ['File', 'Duplicate Note']] }
+'ex' = { name = 'Edit: Delete Note', '@input:menu' = ['BY_PATH', ['Edit', 'Delete']] }
+
+'?j' = { name = 'Jump' }
+'jn' = { name = 'Jump: Search All Notes', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Edit',
+    'Find',
+    'Note List Search…',
+  ],
+] }
+
+'?v' = { name = 'View' }
+'vl' = { name = 'View: List', '@input:menu' = ['BY_PATH', ['View', 'as List']] }
+'vg' = { name = 'View: Gallery', '@input:menu' = ['BY_PATH', ['View', 'as Gallery']] }
+'vs' = { name = 'View: Toggle Sidebar', '@input:menu' = ['SEARCH', 'Sidebar'] }
+'va' = { name = 'View: Toggle Attachments Browser', '@input:menu' = [
+  'SEARCH',
+  'Attachments Browser',
+] }
+
+'?s' = { name = 'Sort' }
+'sd' = { name = 'Sort: Date Edited', '@input:menu' = [
+  'BY_PATH',
+  [
+    'View',
+    'Sort By',
+    'Date Edited',
+  ],
+] }
+'sc' = { name = 'Sort: Date Created', '@input:menu' = [
+  'BY_PATH',
+  [
+    'View',
+    'Sort By',
+    'Date Created',
+  ],
+] }
+'st' = { name = 'Sort: Title', '@input:menu' = ['BY_PATH', ['View', 'Sort By', 'Title']] }
+
+'?x' = { name = 'Export' }
+'xp' = { name = 'Export: PDF', '@input:menu' = ['BY_PATH', ['File', 'Export To', 'PDF']] }

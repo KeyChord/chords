@@ -1,0 +1,27 @@
+name = 'Clock'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?g' = { name = 'Goto' }
+'gw' = { name = 'Goto: World Clock', '@input:menu' = ['BY_PATH', ['View', 'World Clock']] }
+'ga' = { name = 'Goto: Alarms', '@input:menu' = ['BY_PATH', ['View', 'Alarms']] }
+'gs' = { name = 'Goto: Stopwatch', '@input:menu' = ['BY_PATH', ['View', 'Stopwatch']] }
+'gt' = { name = 'Goto: Timers', '@input:menu' = ['BY_PATH', ['View', 'Timers']] }
+
+'?v' = { name = 'View' }
+'va' = { name = 'View: Analog Stopwatch', '@input:menu' = [
+  'BY_PATH',
+  [
+    'View',
+    'View Analog Stopwatch',
+  ],
+] }
+'vd' = { name = 'View: Digital Stopwatch', '@input:menu' = [
+  'BY_PATH',
+  [
+    'View',
+    'View Digital Stopwatch',
+  ],
+] }

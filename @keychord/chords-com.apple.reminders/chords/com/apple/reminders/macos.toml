@@ -1,0 +1,46 @@
+name = 'Reminders'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?n' = { name = 'New' }
+'nr' = { name = 'New: Reminder', '@input:menu' = ['BY_PATH', ['File', 'New Reminder']] }
+'nl' = { name = 'New: List', '@input:menu' = ['BY_PATH', ['File', 'New List']] }
+
+'?e' = { name = 'Edit' }
+'ex' = { name = 'Edit: Delete Reminder', '@input:menu' = ['BY_PATH', ['Edit', 'Delete']] }
+'ec' = { name = 'Edit: Complete Reminder', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Edit',
+    'Mark as Completed',
+  ],
+] }
+'ed' = { name = 'Edit: Due Today', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Edit',
+    'Mark Due Date As',
+    'Today',
+  ],
+] }
+
+'?j' = { name = 'Jump' }
+'jr' = { name = 'Jump: Search Reminders', '@input:menu' = ['BY_PATH', ['Edit', 'Search']] }
+
+'?v' = { name = 'View' }
+'vl' = { name = 'View: List', '@input:menu' = ['BY_PATH', ['View', 'as List']] }
+'vb' = { name = 'View: Columns', '@input:menu' = ['BY_PATH', ['View', 'as Columns']] }
+'vc' = { name = 'View: Show Completed Reminders', '@input:menu' = [
+  'BY_PATH',
+  [
+    'View',
+    'Show Completed',
+  ],
+] }
+'vs' = { name = 'View: Toggle Sidebar', '@input:menu' = ['SEARCH', 'Sidebar'] }
+
+'?s' = { name = 'Sort' }
+'sd' = { name = 'Sort: Due Date', '@input:menu' = ['BY_PATH', ['View', 'Sort By', 'Due Date']] }
+'st' = { name = 'Sort: Title', '@input:menu' = ['BY_PATH', ['View', 'Sort By', 'Title']] }
