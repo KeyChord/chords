@@ -29,6 +29,7 @@ final class SpaceFixture: NSObject, NSApplicationDelegate {
     }
 
     func addButton(_ element: AXUIElement, depth: Int = 0) -> AXUIElement? {
+        if attribute(element, kAXIdentifierAttribute) as? String == "mc.spaces.add" { return element }
         if attribute(element, kAXRoleAttribute) as? String == kAXButtonRole,
            attribute(element, kAXDescriptionAttribute) as? String == "add desktop" { return element }
         guard depth < 12 else { return nil }
@@ -45,8 +46,7 @@ final class SpaceFixture: NSObject, NSApplicationDelegate {
             throw NSError(domain: "Mission Control notification API is unavailable", code: 1)
         }
         let notify = unsafeBitCast(notification, to: (@convention(c) (CFString, Int32) -> Int32).self)
-        guard notify("com.apple.expose.awake" as CFString, 0) == 0,
-              let dock = NSRunningApplication.runningApplications(withBundleIdentifier: "com.apple.dock").first else {
+        guard notify("com.apple.expose.awake" as CFString, 0) == 0 else {
             throw NSError(domain: "Could not open Mission Control", code: 1)
         }
         defer {
@@ -54,11 +54,15 @@ final class SpaceFixture: NSObject, NSApplicationDelegate {
                 CGEvent(keyboardEventSource: nil, virtualKey: 53, keyDown: down)?.post(tap: .cghidEventTap)
             }
         }
-        let root = AXUIElementCreateApplication(dock.processIdentifier)
-        let deadline = ContinuousClock.now + .seconds(8)
+        let roots = ["com.apple.WindowManager", "com.apple.dock"].compactMap {
+            NSRunningApplication.runningApplications(withBundleIdentifier: $0).first.map {
+                AXUIElementCreateApplication($0.processIdentifier)
+            }
+        }
+        let deadline = ContinuousClock.now + .seconds(30)
         while desktops().count < 3 {
             guard ContinuousClock.now < deadline else { throw NSError(domain: "Could not create test desktops", code: 1) }
-            if let button = addButton(root) {
+            if let button = roots.lazy.compactMap({ self.addButton($0) }).first {
                 let count = desktops().count
                 guard AXUIElementPerformAction(button, kAXPressAction as CFString) == .success else {
                     throw NSError(domain: "Could not press Add Desktop", code: 1)

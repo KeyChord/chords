@@ -139,7 +139,7 @@ test(";bwq, ;bwh and ;bwm quit, hide and minimize with the application shortcuts
   for (const [chord, shortcut] of Object.entries(applicationShortcuts))
     expect(bindings[chord]).toEqual({ name: expect.any(String), shortcut });
   // Force Quit uses ;bq.
-  expect(bindings[";bq"].shortcut).toBe("opt+cmd+esc");
+  expect(bindings[";bq"]["@input:menu"]).toEqual(["BY_PATH", ["Apple", "Force Quit…"]]);
   for (const chord of [";bh", ";bm", ";bs", ";bwi", ";bwiv", ";bws["])
     expect(bindings[chord]).toBeUndefined();
 });

@@ -9,7 +9,7 @@
  */
 import addon from "./menu.node";
 
-export type MenuAction = "BY_INDEX" | "BY_LETTERS" | "BY_PATH" | "SEARCH";
+export type MenuAction = "BY_INDEX" | "BY_LETTERS" | "BY_PATH" | "BY_KEY" | "SEARCH" | "FOCUS";
 
 /** An exact menu path, starting at a top-level menu and ending at the item to invoke. */
 export type MenuPath = readonly [menu: string, ...subitems: string[]];
@@ -21,8 +21,8 @@ export type MenuHandlerContext = {
 
 export type MenuArguments =
   | [action: "BY_INDEX", menuIndex: number | string]
-  | [action: "BY_LETTERS" | "SEARCH", query: string]
-  | [action: "BY_PATH", path: MenuPath];
+  | [action: "BY_LETTERS" | "SEARCH" | "FOCUS", query: string]
+  | [action: "BY_PATH" | "BY_KEY", path: MenuPath];
 
 /** Resolves when the native action completes; rejects on validation or accessibility errors. */
 export type MenuHandler = {
@@ -50,12 +50,13 @@ export type MenuHandler = {
    */
   (this: MenuHandlerContext | void, action: "BY_LETTERS", query: string): Promise<void>;
   (this: MenuHandlerContext | void, action: "SEARCH", query: string): Promise<void>;
+  (this: MenuHandlerContext | void, action: "FOCUS", subrole: string): Promise<void>;
 
   /**
    * Exact menu titles from the menu bar down to the item to invoke. For example:
    * `["Window", "Move Tab to New Window"]`.
    */
-  (this: MenuHandlerContext | void, action: "BY_PATH", path: MenuPath): Promise<void>;
+  (this: MenuHandlerContext | void, action: "BY_PATH" | "BY_KEY", path: MenuPath): Promise<void>;
   (this: MenuHandlerContext | void, ...args: MenuArguments): Promise<void>;
 };
 
@@ -64,18 +65,21 @@ export async function runMenuAction(
   action: MenuAction,
   value: number | string | MenuPath,
 ): Promise<void> {
-  if (action === "BY_PATH") {
+  if (action === "BY_PATH" || action === "BY_KEY") {
     if (
       !Array.isArray(value) ||
       value.length < 1 ||
       value.some((component) => typeof component !== "string" || component.trim().length === 0)
     ) {
-      throw new TypeError('"BY_PATH" expects at least one non-empty string component');
+      throw new TypeError(`"${action}" expects at least one non-empty string component`);
     }
     return addon.runMenuAction(processName, action, JSON.stringify(value));
   }
   if (action === "SEARCH" && (typeof value !== "string" || !value.trim())) {
     throw new TypeError('"search" expects non-empty text');
+  }
+  if (action === "FOCUS" && (typeof value !== "string" || !value.trim())) {
+    throw new TypeError('"FOCUS" expects an accessibility subrole');
   }
   return addon.runMenuAction(processName, action, String(value));
 }

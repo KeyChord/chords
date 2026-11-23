@@ -1,4 +1,12 @@
 export { buildNativeAddon, hostTriple, loadNativeAddon } from "./native";
+export { withChordPackage, type ChordApp } from "./chord-app";
+export {
+  flattenAX,
+  testWindowShortcuts,
+  withMacOSProbe,
+  type AXNode,
+  type MacOSProbe,
+} from "./probe";
 export { chordPattern, expandPlaceholders, type ChordPlaceholders } from "./patterns";
 export {
   installChordRuntime,

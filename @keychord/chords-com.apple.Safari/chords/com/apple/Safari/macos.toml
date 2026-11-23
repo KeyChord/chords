@@ -7,12 +7,15 @@ args = ['Safari']
 [on.js]
 file = 'safari.js'
 
+[on.tab]
+file = 'tab.js'
+
 [chords]
 '?w' = { name = 'Window' }
 'wn' = { name = 'Window: New', shortcut = 'cmd+n' }
 'wp' = { name = 'Window: Private', shortcut = 'cmd+shift+n' }
 'wq' = { name = 'Window: Quit', shortcut = 'cmd+shift+w' }
-'wqa' = { name = 'Window: Quit All', shortcut = 'cmd+alt+w' }
+'wqa' = { name = 'Window: Quit All', shortcut = 'cmd+opt+shift+w' }
 
 '?t' = { name = 'Tab' }
 'tn' = { name = 'Tab: New', shortcut = 'cmd+t' }
@@ -26,8 +29,8 @@ file = 'safari.js'
     'Move Tab to New Window',
   ],
 ] }
-'t]' = { name = 'Tab: Next', command = 'Jump to the next open tab', shortcut = 'ctrl+right' }
-'t[' = { name = 'Tab: Previous', command = 'Jump to the previous open tab', shortcut = 'ctrl+shift+right' }
+'t]' = { name = 'Tab: Next', command = 'Jump to the next open tab', shortcut = 'ctrl+tab' }
+'t[' = { name = 'Tab: Previous', command = 'Jump to the previous open tab', shortcut = 'ctrl+shift+tab' }
 't1' = { name = 'Tab 1', command = 'Jump to a specific tab', shortcut = 'cmd+1' }
 't2' = { name = 'Tab 2', command = 'Jump to a specific tab', shortcut = 'cmd+2' }
 't3' = { name = 'Tab 3', command = 'Jump to a specific tab', shortcut = 'cmd+3' }
@@ -36,13 +39,13 @@ file = 'safari.js'
 't6' = { name = 'Tab 6', command = 'Jump to a specific tab', shortcut = 'cmd+6' }
 't7' = { name = 'Tab 7', command = 'Jump to a specific tab', shortcut = 'cmd+7' }
 't8' = { name = 'Tab 8', command = 'Jump to a specific tab', shortcut = 'cmd+8' }
-'tl' = { name = 'Tab: Left Move', command = 'Move tabs right or left', shortcut = 'ctrl' }
-'tr' = { name = 'Tab: Right Move', command = 'Move tabs right or left', shortcut = 'cmd+shift+pgdown' }
+'tl' = { name = 'Tab: Left Move', '@input:tab' = ['LEFT'] }
+'tr' = { name = 'Tab: Right Move', '@input:tab' = ['RIGHT'] }
 
 '?tg' = { name = 'Tab Group' }
-'tgn' = { name = 'Tab Group: New', shortcut = 'cmd+ctrl+n' }
-'tgq' = { name = 'Tab Group: Quit', shortcut = 'cmd+ctrl+w' }
-'tg]' = { name = 'Tab Group: Next', shortcut = 'cmd+shift+up' }
-'tg[' = { name = 'Tab Group: Previous', shortcut = 'cmd+shift+down' }
+'tgn' = { name = 'Tab Group: New', '@input:menu' = ['BY_PATH', ['File', 'New Empty Tab Group']] }
+'tgq' = { name = 'Tab Group: Delete', '@input:menu' = ['BY_PATH', ['File', 'Delete Tab Group']] }
+'tg]' = { name = 'Tab Group: Next', '@input:tab' = ['RIGHT', 'GROUP'] }
+'tg[' = { name = 'Tab Group: Previous', '@input:tab' = ['LEFT', 'GROUP'] }
 
 'js' = { name = 'JavaScript', '@input:js' = [] }

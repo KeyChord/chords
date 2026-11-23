@@ -21,6 +21,14 @@ for (const path of definitions) {
   const definition = Bun.TOML.parse(await Bun.file(join(root, path)).text()) as Record<string, any>;
   if (typeof definition.name !== "string" || !definition.name.trim())
     throw new Error(`${path}: missing name`);
+  for (const [key, binding] of Object.entries(definition.chords ?? {})) {
+    if (!binding || typeof binding !== "object") continue;
+    for (const property of Object.keys(binding)) {
+      const handler = /^@[^:]+:(.+)$/.exec(property)?.[1];
+      if (handler && !Object.hasOwn(definition.on ?? {}, handler))
+        throw new Error(`${path}: chord ${key} uses unregistered handler ${handler}`);
+    }
+  }
   for (const handler of Object.values(definition.on ?? {}) as { file?: string }[]) {
     if (!handler.file) throw new Error(`${path}: missing handler file`);
     const vendor = path.match(/^chords\/(@[^/]+\/[^/]+)\/chords\//)?.[1];

@@ -18,7 +18,7 @@ const CLICK_SEQUENCE_DELAY_MS = 500;
 export async function clickPoints(
   bounds: ClickBounds,
   points: ClickPoint[],
-  validate?: () => Promise<void>,
+  validate?: (index: number) => void | Promise<void>,
 ): Promise<void> {
   const { x, y, width, height, windowId } = bounds;
   let held: "left" | "right" | "middle" | undefined;
@@ -26,7 +26,7 @@ export async function clickPoints(
   let usedMouse = false;
   try {
     for (const [index, point] of points.entries()) {
-      await validate?.();
+      await validate?.(index);
       const target =
         windowId === undefined
           ? { x: point.x, y: point.y }
@@ -141,14 +141,31 @@ export default function buildClickHandler(bundleId?: string) {
 
     return enqueue(async () => {
       let bounds: ClickBounds;
+      let validate: ((index: number) => void) | undefined;
       if (global) bounds = getScreenBounds();
       else {
         const window = getAppWindows(appId!)[0];
         if (!window) throw new Error(`No on-screen window found for ${appId}`);
         bounds = { ...window.bounds, windowId: window.windowId };
+        validate = (index) => {
+          if (index === 0) return;
+          const current = getAppWindows(appId!).find(
+            ({ windowId }) => windowId === window.windowId,
+          );
+          if (!current) throw new Error("The captured window is no longer on screen");
+          const { x, y, width, height } = current.bounds;
+          if (
+            x !== bounds.x ||
+            y !== bounds.y ||
+            width !== bounds.width ||
+            height !== bounds.height
+          ) {
+            throw new Error("The captured window moved or resized during the click sequence");
+          }
+        };
       }
       const points = resolveClickSequence(positions, bounds);
-      await clickPoints(bounds, points);
+      await clickPoints(bounds, points, validate);
       holdingMouse = !!points.at(-1)?.hold;
     });
   };

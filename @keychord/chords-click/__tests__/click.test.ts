@@ -140,7 +140,7 @@ test("the documented sequence forwards all five clicks in order", async () => {
   );
   await runAllTimersAsync();
   await action;
-  expect(getAppWindows).toHaveBeenCalledTimes(1);
+  expect(getAppWindows).toHaveBeenCalledTimes(5);
   expect(getAppWindows).toHaveBeenCalledWith("dev.fixture");
   const points = [
     { x: 150, y: 580 },
@@ -346,12 +346,12 @@ test("clicks wait 500 ms and retain the target window throughout a sequence", as
   const action = buildClickHandler("dev.fixture")("--0r0b");
   await advanceTimersByTimeAsync(0);
   expect(click).toHaveBeenCalledOnce();
-  windowsMock.mockReturnValue([{ ...window, windowId: 789 }]);
+  windowsMock.mockReturnValue([{ ...window, windowId: 789 }, window]);
   await advanceTimersByTimeAsync(499);
   expect(click).toHaveBeenCalledOnce();
   await advanceTimersByTimeAsync(1);
   await action;
-  expect(getAppWindows).toHaveBeenCalledOnce();
+  expect(getAppWindows).toHaveBeenCalledTimes(2);
   expect(click).toHaveBeenNthCalledWith(2, {
     windowId: 123,
     x: 299,

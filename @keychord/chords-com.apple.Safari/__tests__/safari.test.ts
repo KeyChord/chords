@@ -11,10 +11,10 @@ beforeEach(() => {
   openDeveloperSettings.mockReset();
   runJavaScript.mockReset();
   spyOn(Bun, "spawn").mockImplementation(
-    (command) =>
+    () =>
       ({
         exited: Promise.resolve(0),
-        stdout: new Response((command as string[]).includes("IncludeDevelopMenu") ? "1" : "0").body,
+        stdout: new Response("0").body,
         stderr: new Response("").body,
       }) as never,
   );
@@ -24,12 +24,17 @@ afterEach(() => mock.restore());
 
 test("Safari waits for its native Developer settings action to finish", async () => {
   let finish!: () => void;
-  openDeveloperSettings.mockReturnValue(new Promise<void>((resolve) => (finish = resolve)));
-  const handler = await buildSafariHandler();
+  const nativeAction = new Promise<void>((resolve) => (finish = resolve));
+  let started!: () => void;
+  const start = new Promise<void>((resolve) => (started = resolve));
+  openDeveloperSettings.mockImplementation(() => {
+    started();
+    return nativeAction;
+  });
+  const handler = buildSafariHandler();
   let completed = false;
   const action = handler().then(() => (completed = true));
-  await Promise.resolve();
-  await Promise.resolve();
+  await start;
   expect(openDeveloperSettings).toHaveBeenCalledTimes(1);
   expect(completed).toBe(false);
   finish();
@@ -40,6 +45,6 @@ test("Safari waits for its native Developer settings action to finish", async ()
 
 test("Safari propagates native Developer settings failures", async () => {
   openDeveloperSettings.mockRejectedValue(new Error("Developer button is unavailable"));
-  const handler = await buildSafariHandler();
+  const handler = buildSafariHandler();
   await expect(handler()).rejects.toThrow("Developer button is unavailable");
 });

@@ -20,7 +20,6 @@ To move the current window between Spaces, `chords-windows` provides `;ws<number
 | `;s]` or `;sr` | Switch to the Space on the right |
 | `;s1` … `;s9`  | Switch to Desktop 1 … 9          |
 
-Space commands use the standard Control–Left/Right and Control–1…9 shortcuts.
-Enable the matching actions under System Settings → Keyboard → Keyboard Shortcuts →
-Mission Control; numbered desktops must already exist. If you changed those system
-shortcuts, redefine these chords to match in your own chord package.
+Chord selects Spaces in Mission Control via macOS Accessibility. Mission Control briefly
+appears during a switch. Numbered desktops must already exist. Left and right follow
+the current display's Space order, including fullscreen Spaces, and stop at its edges.

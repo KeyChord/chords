@@ -1,4 +1,4 @@
-import { mkdir, mkdtemp, rm } from "node:fs/promises";
+import { chmod, mkdir, mkdtemp, rm } from "node:fs/promises";
 import { basename, dirname, join } from "node:path";
 import { tmpdir } from "node:os";
 import { requireMacOSVM } from "./runtime";
@@ -98,6 +98,10 @@ export type MacOSFixture = {
   close(): Promise<void>;
 };
 
+export async function fixtureDigest(source: string) {
+  return new Bun.CryptoHasher("sha256").update(await Bun.file(source).arrayBuffer()).digest("hex");
+}
+
 /** Compile and launch a controlled AppKit app, confined to virtual macOS hardware. */
 export async function launchMacOSFixture(source: URL, bundleId: string): Promise<MacOSFixture> {
   requireMacOSVM();
@@ -151,10 +155,17 @@ export async function launchMacOSFixture(source: URL, bundleId: string): Promise
 <key>CFBundleExecutable</key><string>${name}</string>
 <key>CFBundlePackageType</key><string>APPL</string></dict></plist>`,
     );
-    await runCommand(
-      ["/usr/bin/swiftc", "-parse-as-library", Bun.fileURLToPath(source), "-o", binary],
-      { timeout: 60_000 },
-    );
+    const swift = Bun.fileURLToPath(source);
+    const cache = process.env.CHORD_TESTING_FIXTURES;
+    const prepared = cache && Bun.file(join(cache, await fixtureDigest(swift)));
+    if (prepared && (await prepared.exists())) {
+      await Bun.write(binary, prepared);
+      await chmod(binary, 0o755);
+    } else {
+      await runCommand(["/usr/bin/swiftc", "-parse-as-library", swift, "-o", binary], {
+        timeout: 120_000,
+      });
+    }
     await runCommand(["/usr/bin/codesign", "--force", "--sign", "-", app]);
     child = Bun.spawn(
       [
@@ -172,7 +183,7 @@ export async function launchMacOSFixture(source: URL, bundleId: string): Promise
     await waitFor(async () => {
       if (child!.exitCode !== null) throw new Error("Fixture exited before becoming ready");
       return (await Bun.file(`${output}.pid`).exists()) ? true : undefined;
-    }, 10_000);
+    }, 45_000);
     return fixture;
   } catch (error) {
     await fixture.close();

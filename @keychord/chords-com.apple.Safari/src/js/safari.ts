@@ -13,12 +13,8 @@ export function runSafariJavaScript(source: string): void {
   addon.runJavaScript(source);
 }
 
-async function openDeveloperSettingsPane(): Promise<void> {
-  await addon.openDeveloperSettings();
-}
-
 async function readBooleanDefault(domain: string, key: string): Promise<boolean> {
-  const result = await runCommand(["defaults", "read", domain, key], true);
+  const result = await runCommand(["/usr/bin/defaults", "read", domain, key], true);
   return result.exitCode === 0 && result.stdout.trim() === "1";
 }
 
@@ -46,49 +42,10 @@ async function runCommand(
   return { exitCode, stdout };
 }
 
-async function enableDevelopMenu(): Promise<void> {
-  await runCommand(["defaults", "write", safariDomain, "IncludeDevelopMenu", "-bool", "true"]);
-  await runCommand([
-    "defaults",
-    "write",
-    "com.apple.Safari.SandboxBroker",
-    "ShowDevelopMenu",
-    "-bool",
-    "true",
-  ]);
-  await runCommand([
-    "defaults",
-    "write",
-    safariDomain,
-    "WebKitDeveloperExtrasEnabledPreferenceKey",
-    "-bool",
-    "true",
-  ]);
-  await runCommand([
-    "defaults",
-    "write",
-    safariDomain,
-    "com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled",
-    "-bool",
-    "true",
-  ]);
-}
-
-export default async function buildSafariHandler() {
-  const [isDevelopMenuEnabled, isAllowJavaScriptFromAppleEventsEnabled] = await Promise.all([
-    readBooleanDefault(safariDomain, "IncludeDevelopMenu"),
-    readBooleanDefault(safariDomain, "AllowJavaScriptFromAppleEvents"),
-  ]);
-
+export default function buildSafariHandler() {
   return async function safari() {
-    if (!isAllowJavaScriptFromAppleEventsEnabled) {
-      if (!isDevelopMenuEnabled) {
-        await enableDevelopMenu();
-        await runCommand(["killall", "-w", "Safari"]);
-        await runCommand(["open", "-a", "Safari"]);
-      }
-
-      await openDeveloperSettingsPane();
+    if (!(await readBooleanDefault(safariDomain, "AllowJavaScriptFromAppleEvents"))) {
+      await addon.openDeveloperSettings();
       return;
     }
 

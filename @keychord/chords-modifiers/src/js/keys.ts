@@ -18,8 +18,12 @@ export function modifierShortcut(sequence: string): string {
 }
 
 export default function buildKeysHandler() {
-  return function keys(sequence: string): void {
+  return function keys(sequence: string): void | Promise<void> {
     // The native helper validates the entire shortcut sequence before sending any input.
-    tap(modifierShortcut(sequence));
+    const shortcut = modifierShortcut(sequence);
+    if (shortcut.split("+").includes("fn")) {
+      return import("./keys.node").then(({ default: addon }) => addon.tapWithFunctionKey(shortcut));
+    }
+    tap(shortcut);
   };
 }

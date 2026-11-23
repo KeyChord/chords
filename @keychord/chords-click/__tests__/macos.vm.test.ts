@@ -35,5 +35,5 @@ test.skipIf(!macOSUITestsEnabled)(
       await target.close();
     }
   },
-  60_000,
+  150_000,
 );

@@ -57,6 +57,12 @@ private enum SafariError: Error, CustomStringConvertible {
     "openDeveloperSettings": try NodeFunction { () throws -> NodePromise in
         try mainActorPromise { try await openDeveloperSettings() }
     },
+    "moveTab": try NodeFunction { (direction: String) throws -> NodePromise in
+        try mainActorPromise { try await moveSafariTab(direction) }
+    },
+    "moveTabGroup": try NodeFunction { (direction: String) throws -> NodePromise in
+        try mainActorPromise { try await moveSafariTabGroup(direction) }
+    },
 ])
 
 private func describe(_ error: Error) -> String {
@@ -135,15 +141,17 @@ private func activateSafari() async throws -> NSRunningApplication {
         throw SafariError.safariDidNotLaunch
     }
 
-    safari.activate()
-    let deadline = Date(timeIntervalSinceNow: 2)
-    while !safari.isActive && Date() < deadline {
-        try await Task.sleep(for: .milliseconds(20))
+    if !safari.isActive {
+        safari.activate()
+        let deadline = Date(timeIntervalSinceNow: 2)
+        while !safari.isActive && Date() < deadline {
+            try await Task.sleep(for: .milliseconds(20))
+        }
     }
     return safari
 }
 
-private func pressCommandComma(processIdentifier: pid_t) throws {
+private func pressCommandComma() throws {
     guard
         let source = CGEventSource(stateID: .hidSystemState),
         let keyDown = CGEvent(keyboardEventSource: source, virtualKey: 43, keyDown: true),
@@ -154,71 +162,71 @@ private func pressCommandComma(processIdentifier: pid_t) throws {
 
     keyDown.flags = .maskCommand
     keyUp.flags = .maskCommand
-    keyDown.postToPid(processIdentifier)
-    keyUp.postToPid(processIdentifier)
+    keyDown.post(tap: .cghidEventTap)
+    keyUp.post(tap: .cghidEventTap)
 }
 
-@MainActor
-private func hasDeveloperLabel(_ element: Element) -> Bool {
-    [element.title(), element.descriptionText(), element.identifier()].contains {
-        $0?.localizedCaseInsensitiveCompare("Developer") == .orderedSame
-    }
-}
-
-@MainActor
-private func findDeveloperButton(_ element: Element, depth: Int = 0) -> Element? {
-    guard depth <= 8 else {
+private func settingAttribute<T>(_ element: AXUIElement, _ name: String) -> T? {
+    var value: CFTypeRef?
+    guard AXUIElementCopyAttributeValue(element, name as CFString, &value) == .success else {
         return nil
     }
-
-    if element.role() == kAXButtonRole, hasDeveloperLabel(element) {
-        return element
-    }
-    for child in (element.attribute(Attribute<[AXUIElement]>(kAXChildrenAttribute)) ?? []).map(Element.init) {
-        if let button = findDeveloperButton(child, depth: depth + 1) {
-            return button
-        }
-    }
-    return nil
+    return value as? T
 }
 
 @MainActor
-private func findToolbars(_ element: Element, depth: Int = 0) -> [Element] {
-    guard depth <= 6 else {
-        return []
+private func settingsControl(in element: AXUIElement, roles: [String], label: String,
+                             depth: Int = 0) -> AXUIElement? {
+    guard depth <= 8 else { return nil }
+    let role: String = settingAttribute(element, kAXRoleAttribute) ?? ""
+    if roles.contains(role) {
+        let labels = [kAXTitleAttribute, kAXDescriptionAttribute, kAXIdentifierAttribute]
+        if labels.contains(where: { key in
+            let name: String? = settingAttribute(element, key)
+            return name?.localizedCaseInsensitiveCompare(label) == .orderedSame
+        }) { return element }
     }
-
-    var toolbars: [Element] = []
-    for child in (element.attribute(Attribute<[AXUIElement]>(kAXChildrenAttribute)) ?? []).map(Element.init) {
-        if child.role() == kAXToolbarRole {
-            toolbars.append(child)
-        } else {
-            toolbars.append(contentsOf: findToolbars(child, depth: depth + 1))
-        }
-    }
-    return toolbars
+    let children: [AXUIElement] = settingAttribute(element, kAXChildrenAttribute) ?? []
+    return children.lazy.compactMap {
+        settingsControl(in: $0, roles: roles, label: label, depth: depth + 1)
+    }.first
 }
 
 @MainActor
-private func developerButton(in application: Element) -> Element? {
-    var windows: [Element] = []
-    if let focused = application.focusedWindow() {
-        windows.append(focused)
-    }
-    for window in application.windows() ?? []
-        where !windows.contains(window)
-    {
-        windows.append(window)
-    }
-
-    for window in windows {
-        for toolbar in findToolbars(window) {
-            if let button = findDeveloperButton(toolbar) {
-                return button
-            }
-        }
-    }
+private func waitForSetting(timeout: TimeInterval = 10, _ find: @MainActor () -> AXUIElement?) async throws -> AXUIElement? {
+    let deadline = Date(timeIntervalSinceNow: timeout)
+    repeat {
+        if let control = find() { return control }
+        try await Task.sleep(for: .milliseconds(100))
+    } while Date() < deadline
     return nil
+}
+
+private func pressSetting(_ control: AXUIElement, label: String) throws {
+    let status = AXUIElementPerformAction(control, kAXPressAction as CFString)
+    guard status == .success else {
+        throw SafariError.accessibility("\(label) AXPress returned \(status.rawValue)")
+    }
+}
+
+@MainActor
+private func showSafariSettings(_ application: AXUIElement, safari: NSRunningApplication) throws {
+    guard safari.isActive else { throw SafariError.accessibility("Safari did not receive focus") }
+    func children(_ element: AXUIElement) -> [AXUIElement] {
+        settingAttribute(element, kAXChildrenAttribute) ?? []
+    }
+    if let menuBar: AXUIElement = settingAttribute(application, kAXMenuBarAttribute),
+       let appMenu = children(menuBar).first(where: { settingAttribute($0, kAXTitleAttribute) == "Safari" }),
+       let menu = children(appMenu).first,
+       let settings = children(menu).first(where: { item in
+           let character: String? = settingAttribute(item, kAXMenuItemCmdCharAttribute)
+           let modifiers: NSNumber? = settingAttribute(item, kAXMenuItemCmdModifiersAttribute)
+           return character == "," && modifiers?.intValue == 0
+       }),
+       AXUIElementPerformAction(settings, kAXPressAction as CFString) == .success {
+        return
+    }
+    try pressCommandComma()
 }
 
 @MainActor
@@ -228,24 +236,57 @@ private func openDeveloperSettings() async throws {
     }
 
     let safari = try await activateSafari()
-    try pressCommandComma(processIdentifier: safari.processIdentifier)
+    let application = AXUIElementCreateApplication(safari.processIdentifier)
+    AXUIElementSetMessagingTimeout(application, 0.8)
+    let buttonRoles = [kAXButtonRole, kAXRadioButtonRole]
+    func windows() -> [AXUIElement] { settingAttribute(application, kAXWindowsAttribute) ?? [] }
+    func button(_ label: String, in window: AXUIElement) -> AXUIElement? {
+        let children: [AXUIElement] = settingAttribute(window, kAXChildrenAttribute) ?? []
+        for toolbar in children where
+            (settingAttribute(toolbar, kAXRoleAttribute) as String?) == kAXToolbarRole {
+            if let control = settingsControl(in: toolbar, roles: buttonRoles, label: label) {
+                return control
+            }
+        }
+        return nil
+    }
+    func button(_ label: String) -> AXUIElement? {
+        windows().lazy.compactMap { button(label, in: $0) }.first
+    }
 
-    let application = AXApp(safari).element
-    let deadline = Date(timeIntervalSinceNow: 10)
-    var button: Element?
-    while button == nil && Date() < deadline {
-        button = developerButton(in: application)
-        if button == nil {
-            try await Task.sleep(for: .milliseconds(100))
+    if button("Advanced") == nil { try showSafariSettings(application, safari: safari) }
+    guard let advanced = try await waitForSetting({ button("Advanced") }) else {
+        throw SafariError.accessibility("could not find the Advanced tab in Safari Settings")
+    }
+    if button("Developer") == nil {
+        try pressSetting(advanced, label: "Advanced")
+        guard let toggle = try await waitForSetting({
+            windows().lazy.compactMap {
+                settingsControl(in: $0, roles: [kAXCheckBoxRole], label: "Show features for web developers")
+            }.first
+        }) else {
+            throw SafariError.accessibility("could not find the web developer features checkbox")
+        }
+        let checked: NSNumber? = settingAttribute(toggle, kAXValueAttribute)
+        if checked?.boolValue != true {
+            try pressSetting(toggle, label: "Show features for web developers")
         }
     }
-
-    guard let button else {
+    var developer = try await waitForSetting(timeout: 3) { button("Developer") }
+    if developer == nil,
+       let settings = windows().first(where: { button("Advanced", in: $0) != nil }),
+       let close: AXUIElement = settingAttribute(settings, kAXCloseButtonAttribute) {
+        // Some Safari versions rebuild the toolbar only when Settings is opened again.
+        try pressSetting(close, label: "Close Settings")
+        let deadline = ContinuousClock.now + .seconds(1)
+        while windows().contains(where: { CFEqual($0, settings) }) && ContinuousClock.now < deadline {
+            try await Task.sleep(for: .milliseconds(30))
+        }
+        try showSafariSettings(application, safari: safari)
+        developer = try await waitForSetting { button("Developer") }
+    }
+    guard let developer else {
         throw SafariError.developerButtonNotFound
     }
-    do {
-        try button.performAction(.press)
-    } catch let error as AccessibilitySystemError {
-        throw SafariError.accessibility("Developer AXPress returned \(error.axError.rawValue)")
-    }
+    try pressSetting(developer, label: "Developer")
 }

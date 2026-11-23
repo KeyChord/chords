@@ -4,12 +4,19 @@ import {
   macOSUITestsEnabled,
   runChordScript,
   testMacOSPackage,
+  testWindowShortcuts,
 } from "@keychord/chordtest";
 
 test.skipIf(!macOSUITestsEnabled)(
   "@keychord/chords-windows: production package loads in the macOS VM",
   () => testMacOSPackage(import.meta.url, []),
   300_000,
+);
+
+test.skipIf(!macOSUITestsEnabled)(
+  ";wh, ;wm and ;wq hide, minimize and quit TextEdit",
+  () => testWindowShortcuts(import.meta.url, ";w"),
+  90_000,
 );
 
 test.skipIf(!macOSUITestsEnabled)(

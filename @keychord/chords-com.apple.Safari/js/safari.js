@@ -26,7 +26,7 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 //#region src/js/safari.ts
 var import__keychord_native_safari = /* @__PURE__ */ __toESM((/* @__PURE__ */ __commonJSMin(((exports, module) => {
 	const nativeRequire = createRequire(import.meta.url);
-	const nativeFiles = { "darwin-arm64": new URL("native/aarch64-apple-darwin/safari/safari-c63e69660479.node", import.meta.url).href };
+	const nativeFiles = { "darwin-arm64": new URL("native/aarch64-apple-darwin/safari/safari-b7b68bc6ae51.node", import.meta.url).href };
 	const nativeTarget = process.platform + "-" + process.arch;
 	const nativeFile = nativeFiles[nativeTarget];
 	if (!nativeFile) throw new Error("[chord-native] safari has no addon for " + nativeTarget);
@@ -36,12 +36,9 @@ const safariDomain = "com.apple.Safari";
 function runSafariJavaScript(source) {
 	import__keychord_native_safari.default.runJavaScript(source);
 }
-async function openDeveloperSettingsPane() {
-	await import__keychord_native_safari.default.openDeveloperSettings();
-}
 async function readBooleanDefault(domain, key) {
 	const result = await runCommand([
-		"defaults",
+		"/usr/bin/defaults",
 		"read",
 		domain,
 		key
@@ -68,58 +65,10 @@ async function runCommand(command, allowFailure = false) {
 		stdout
 	};
 }
-async function enableDevelopMenu() {
-	await runCommand([
-		"defaults",
-		"write",
-		safariDomain,
-		"IncludeDevelopMenu",
-		"-bool",
-		"true"
-	]);
-	await runCommand([
-		"defaults",
-		"write",
-		"com.apple.Safari.SandboxBroker",
-		"ShowDevelopMenu",
-		"-bool",
-		"true"
-	]);
-	await runCommand([
-		"defaults",
-		"write",
-		safariDomain,
-		"WebKitDeveloperExtrasEnabledPreferenceKey",
-		"-bool",
-		"true"
-	]);
-	await runCommand([
-		"defaults",
-		"write",
-		safariDomain,
-		"com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled",
-		"-bool",
-		"true"
-	]);
-}
-async function buildSafariHandler() {
-	const [isDevelopMenuEnabled, isAllowJavaScriptFromAppleEventsEnabled] = await Promise.all([readBooleanDefault(safariDomain, "IncludeDevelopMenu"), readBooleanDefault(safariDomain, "AllowJavaScriptFromAppleEvents")]);
+function buildSafariHandler() {
 	return async function safari() {
-		if (!isAllowJavaScriptFromAppleEventsEnabled) {
-			if (!isDevelopMenuEnabled) {
-				await enableDevelopMenu();
-				await runCommand([
-					"killall",
-					"-w",
-					"Safari"
-				]);
-				await runCommand([
-					"open",
-					"-a",
-					"Safari"
-				]);
-			}
-			await openDeveloperSettingsPane();
+		if (!await readBooleanDefault(safariDomain, "AllowJavaScriptFromAppleEvents")) {
+			await import__keychord_native_safari.default.openDeveloperSettings();
 			return;
 		}
 		runSafariJavaScript("document.title;");

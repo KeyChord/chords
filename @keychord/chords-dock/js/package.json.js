@@ -1,7 +1,7 @@
 //#region package.json
 var name = "@keychord/chords-dock";
-var version = "0.0.1";
 var displayName = "Dock Chords";
+var version = "0.0.2";
 var description = "Move keyboard focus to the macOS Dock and between its apps.";
 var categories = ["macOS"];
 var repository = {
@@ -29,7 +29,8 @@ var chords = {
 			},
 			"tray": { "file": "tray.js" },
 			"select": { "file": "selection.js" },
-			"visibility": { "file": "visibility.js" }
+			"visibility": { "file": "visibility.js" },
+			"media": { "file": "media.js" }
 		},
 		"placeholders": { "<>": {
 			"name": "Menu bar prefix",
@@ -172,7 +173,7 @@ var chords = {
 			},
 			"<>q": {
 				"name": "Force Quit",
-				"shortcut": "opt+cmd+esc"
+				"@input:menu": ["BY_PATH", ["Apple", "Force Quit…"]]
 			},
 			"<>ls": {
 				"name": "Lock Screen",
@@ -189,11 +190,11 @@ var chords = {
 			"?<>b": { "name": "Brightness" },
 			"<>bu": {
 				"name": "Brightness Up",
-				"shortcut": "BrightnessUp"
+				"@input:media": ["BRIGHTNESS_UP"]
 			},
 			"<>bd": {
 				"name": "Brightness Down",
-				"shortcut": "BrightnessDown"
+				"@input:media": ["BRIGHTNESS_DOWN"]
 			},
 			"<>v": {
 				"name": "Menu Bar: Show / Hide",
@@ -202,15 +203,15 @@ var chords = {
 			"?<>v": { "name": "Menu Bar Visibility / Volume" },
 			"<>vu": {
 				"name": "Volume Up",
-				"shortcut": "AudioVolumeUp"
+				"@input:media": ["VOLUME_UP"]
 			},
 			"<>vd": {
 				"name": "Volume Down",
-				"shortcut": "AudioVolumeDown"
+				"@input:media": ["VOLUME_DOWN"]
 			},
 			"<>vm": {
 				"name": "Volume Mute",
-				"shortcut": "AudioVolumeMute"
+				"@input:media": ["VOLUME_MUTE"]
 			},
 			"?<>w": { "name": "Window" },
 			"<>w": {
@@ -407,7 +408,7 @@ var chords = {
 			},
 			"<>.(\\d+).": {
 				"name": "Dock > Click @ Item $1",
-				"@input:dock": ["$1"]
+				"@input:dock": ["$1", "LEFT"]
 			},
 			"<>.,(\\d+)": {
 				"name": "Dock > Right Click @ Item $1",
@@ -418,8 +419,8 @@ var chords = {
 };
 var package_default = {
 	name,
-	version,
 	displayName,
+	version,
 	description,
 	categories,
 	repository,

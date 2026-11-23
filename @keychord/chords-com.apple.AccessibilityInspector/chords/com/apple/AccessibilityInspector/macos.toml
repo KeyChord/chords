@@ -1,21 +1,36 @@
 name = 'Accessibility Inspector'
 
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
 [chords]
 '?i' = { name = 'Inspect' }
-'ir' = { name = 'Inspect: Refresh', shortcut = 'cmd+r' }
-'ip' = { name = 'Inspect: Point', shortcut = 'cmd+ctrl+alt+shift+p' }
-'iu' = { name = 'Inspect: Up Hierarchy - Parent', shortcut = 'cmd+ctrl+up' }
-'id' = { name = 'Inspect: Down Hierarchy - Child', shortcut = 'cmd+ctrl+down' }
-'i[' = { name = 'Inspect: Previous', shortcut = 'cmd+ctrl+left' }
-'i]' = { name = 'Inspect: Next', shortcut = 'cmd+ctrl+right' }
+'ir' = { name = 'Inspect: Refresh', '@input:menu' = ['BY_PATH', ['Inspection', 'Refresh']] }
+'ip' = { name = 'Inspect: Point', '@input:menu' = ['SEARCH', 'Point to Inspect'] }
+'iu' = { name = 'Inspect: Up Hierarchy - Parent', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Inspection',
+    'Move to Parent Item',
+  ],
+] }
+'id' = { name = 'Inspect: Down Hierarchy - Child', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Inspection',
+    'Move to Child Item',
+  ],
+] }
+'i[' = { name = 'Inspect: Previous', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Inspection',
+    'Move to Previous Item',
+  ],
+] }
+'i]' = { name = 'Inspect: Next', '@input:menu' = ['BY_PATH', ['Inspection', 'Move to Next Item']] }
 
 '?v' = { name = 'Vary' }
-'va' = { name = 'Vary Auto-Interact', shell = '''
-  osascript -e 'tell application "System Events" to tell process "Accessibility Inspector" to click (first menu item of menu 1 of menu bar item "Inspection" of menu bar 1 whose name contains "Auto-Interact")'
-''' }
-'vc' = { name = 'Vary Class', shell = '''
-  osascript -e 'tell application "System Events" to tell process "Accessibility Inspector" to click (first menu item of menu 1 of menu bar item "Inspection" of menu bar 1 whose name contains "Class Name")'
-''' }
-'vi' = { name = 'Vary Ignored', shell = '''
-  osascript -e 'tell application "System Events" to tell process "Accessibility Inspector" to click (first menu item of menu 1 of menu bar item "Inspection" of menu bar 1 whose name contains "Ignored Elements")'
-''' }
+'va' = { name = 'Vary Auto-Interact', '@input:menu' = ['SEARCH', 'Auto-Interact'] }
+'vc' = { name = 'Vary Class', '@input:menu' = ['SEARCH', 'Class Name'] }
+'vi' = { name = 'Vary Ignored', '@input:menu' = ['SEARCH', 'Ignored Elements'] }

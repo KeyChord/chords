@@ -29,8 +29,9 @@ async function invoke(input: string, frame: number[]) {
   );
   await handler.call({ focusedAppId: appId, input }, ...args);
   try {
+    // AppKit's visible frame and WindowServer's usable bounds can differ by a few pixels.
     await waitFor(async () =>
-      (await state()).frame.every((value, index) => Math.abs(value - frame[index]) <= 1)
+      (await state()).frame.every((value, index) => Math.abs(value - frame[index]) <= 4)
         ? true
         : undefined,
     );
@@ -44,10 +45,27 @@ async function invoke(input: string, frame: number[]) {
 await invoke(";w1100", [sx, sy, sw, sh]);
 await invoke(";w2200", [sx, sy + sh / 2, sw / 2, sh / 2]);
 await invoke(";w0022", [sx + sw / 2, sy, sw / 2, sh / 2]);
-await invoke(";wtl", [sx, sy + sh / 2, sw / 2, sh / 2]);
+await invoke(";wd200x200", [sx + sw / 2, sy + sh / 2 - 200, 200, 200]);
+await invoke(";wl", [sx, sy + sh / 2 - 200, 200, 200]);
+await invoke(";wr", [sx + sw - 200, sy + sh / 2 - 200, 200, 200]);
+await invoke(";wt", [sx + sw - 200, sy + sh - 200, 200, 200]);
+await invoke(";wb", [sx + sw - 200, sy, 200, 200]);
+await invoke(";wtl", [sx, sy + sh - 200, 200, 200]);
+await invoke(";wtr", [sx + sw - 200, sy + sh - 200, 200, 200]);
+await invoke(";wbl", [sx, sy, 200, 200]);
+await invoke(";wbr", [sx + sw - 200, sy, 200, 200]);
+await invoke(";wc", [sx + (sw - 200) / 2, sy + (sh - 200) / 2, 200, 200]);
+await invoke(";wf", [sx, sy, sw, sh]);
+await invoke(";w2200", [sx, sy + sh / 2, sw / 2, sh / 2]);
 await invoke(";wbr", [sx + sw / 2, sy, sw / 2, sh / 2]);
 await invoke(";wlr", [sx, sy, sw, sh / 2]);
+await invoke(";w2200", [sx, sy + sh / 2, sw / 2, sh / 2]);
+await invoke(";wbr", [sx + sw / 2, sy, sw / 2, sh / 2]);
+await invoke(";wrl", [sx, sy, sw, sh / 2]);
 await invoke(";wtb", [sx, sy, sw, sh]);
+await invoke(";w2200", [sx, sy + sh / 2, sw / 2, sh / 2]);
+await invoke(";wbt", [sx, sy, sw / 2, sh]);
+await invoke(";wf", [sx, sy, sw, sh]);
 await invoke(";wd200x200", [sx, sy + sh - 200, 200, 200]);
 await invoke(";wp200x100", [sx + 200, initial.primaryTop - top - 100 - 200, 200, 200]);
 // Full-screen dimensions must extend beyond the right/bottom borders at the original origin.

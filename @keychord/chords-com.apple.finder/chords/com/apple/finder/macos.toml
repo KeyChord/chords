@@ -1,79 +1,113 @@
 name = 'Finder'
 
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
 [chords]
 '?g' = { name = 'Goto' }
-'gr' = { name = 'Goto Recents', shortcut = 'cmd+shift+f' }
-'gd' = { name = 'Goto Downloads', shortcut = 'cmd+opt+l' }
-'gdo' = { name = 'Goto Documents', shortcut = 'cmd+shift+o' }
+'gr' = { name = 'Goto Recents', '@input:menu' = ['BY_PATH', ['Go', 'Recents']] }
+'gd' = { name = 'Goto Downloads', '@input:menu' = ['BY_PATH', ['Go', 'Downloads']] }
+'gdo' = { name = 'Goto Documents', '@input:menu' = ['BY_PATH', ['Go', 'Documents']] }
 'gde' = { name = 'Goto Desktop', shortcut = 'cmd+shift+d' }
 'gh' = { name = 'Goto Home', shortcut = 'cmd+shift+h' }
 'gc' = { name = 'Goto Computer', shortcut = 'cmd+shift+c' }
 'gad' = { name = 'Goto AirDrop', shortcut = 'cmd+shift+r' }
 'gn' = { name = 'Goto Network', shortcut = 'cmd+shift+k' }
 'gid' = { name = 'Goto iCloud Drive', shortcut = 'cmd+shift+i' }
-'gs' = { name = 'Goto Shared', shortcut = 'cmd+shift+s' }
+'gs' = { name = 'Goto Shared', '@input:menu' = ['BY_PATH', ['Go', 'Shared']] }
 'ga' = { name = 'Goto Applications', shortcut = 'cmd+shift+a' }
-'gu' = { name = 'Goto Utilities', shortcut = 'cmd+shift+u' }
+'gu' = { name = 'Goto Utilities', '@input:menu' = ['BY_PATH', ['Go', 'Utilities']] }
 'gf' = { name = 'Goto Folder', shortcut = 'cmd+shift+g' }
-'gt' = { name = 'Goto Trash', shell = '''
-  osascript -e 'tell application "Finder"
-    open trash
-  end tell
-''' }
+'gt' = { name = 'Goto Trash', shell = 'open -b com.apple.finder "$HOME/.Trash"' }
 
 '?d' = { name = 'Directory' }
 'du' = { name = 'Directory: Up', shortcut = 'cmd+up' }
-'duw' = { name = 'Directory: Up Window', shortcut = 'ctrl+cmd+up' }
+'duw' = { name = 'Directory: Up Window', '@input:menu' = [
+  'BY_KEY',
+  [
+    'Go',
+    'Enclosing Folder in New Window',
+  ],
+] }
 
 '?f' = { name = 'File' }
 'fa' = { name = 'File: Alias', shortcut = 'ctrl+cmd+a' }
-'fe' = { name = 'File: Eject', shortcut = 'cmd+e' }
-'fc' = { name = 'File: Compress', shell = '''
-  osascript -e 'tell application "System Events" to tell process "Finder" to click (first menu item of menu 1 of menu bar item "File" of menu bar 1 whose name starts with "Compress" and name does not contain "password")'
-''' }
-'fr' = { name = 'File: Rename', shell = '''
-  osascript -e 'tell application "System Events" to tell process "Finder" to click (first menu item of menu 1 of menu bar item "File" of menu bar 1 whose name starts with "Rename")'
-''' }
-'ft' = { name = 'File: Trash', shortcut = 'cmd+delete' }
+'fe' = { name = 'File: Eject', '@input:menu' = ['BY_PATH', ['File', 'Eject']] }
+'fc' = { name = 'File: Compress', '@input:menu' = ['BY_PATH', ['File', 'Compress']] }
+'fr' = { name = 'File: Rename', '@input:menu' = ['BY_PATH', ['File', 'Rename']] }
+'ft' = { name = 'File: Trash', '@input:menu' = ['BY_PATH', ['File', 'Move to Trash']] }
 'fd' = { name = 'File: Duplicate', shortcut = 'cmd+d' }
-'fq' = { name = 'File: Quick Look', shortcut = 'cmd+y' }
+'fq' = { name = 'File: Quick Look', '@input:menu' = ['BY_PATH', ['File', 'Quick Look']] }
 'fo' = { name = 'File: Open', shortcut = 'cmd+down' }
 
 '?a' = { name = 'as' }
-'ai' = { name = 'as Icons', shortcut = 'cmd+1' }
-'al' = { name = 'as List', shortcut = 'cmd+2' }
-'ac' = { name = 'as Columns', shortcut = 'cmd+3' }
-'ag' = { name = 'as Gallery', shortcut = 'cmd+4' }
+'ai' = { name = 'as Icons', '@input:menu' = ['BY_PATH', ['View', 'as Icons']] }
+'al' = { name = 'as List', '@input:menu' = ['BY_PATH', ['View', 'as List']] }
+'ac' = { name = 'as Columns', '@input:menu' = ['BY_PATH', ['View', 'as Columns']] }
+'ag' = { name = 'as Gallery', '@input:menu' = ['BY_PATH', ['View', 'as Gallery']] }
 
 '?s' = { name = 'Sort' }
-'sn' = { name = 'Sort: Name', shortcut = 'cmd+opt+ctrl+1' }
-'sk' = { name = 'Sort: Kind', shortcut = 'cmd+opt+ctrl+2' }
-'so' = { name = 'Sort: Opened Date', shortcut = 'cmd+opt+ctrl+3' }
-'sa' = { name = 'Sort: Added Date', shortcut = 'cmd+opt+ctrl+4' }
-'sm' = { name = 'Sort: Modified Date', shortcut = 'cmd+opt+ctrl+5' }
-'sc' = { name = 'Sort: Created Date', shortcut = 'cmd+opt+ctrl+6' }
-'ss' = { name = 'Sort: Size', shortcut = 'cmd+opt+ctrl+7' }
-'st' = { name = 'Sort: Tags', shortcut = 'cmd+opt+ctrl+8' }
+'sn' = { name = 'Sort: Name', '@input:menu' = ['BY_PATH', ['View', 'Sort By', 'Name']] }
+'sk' = { name = 'Sort: Kind', '@input:menu' = ['BY_PATH', ['View', 'Sort By', 'Kind']] }
+'so' = { name = 'Sort: Opened Date', '@input:menu' = [
+  'BY_PATH',
+  [
+    'View',
+    'Sort By',
+    'Date Last Opened',
+  ],
+] }
+'sa' = { name = 'Sort: Added Date', '@input:menu' = ['BY_PATH', ['View', 'Sort By', 'Date Added']] }
+'sm' = { name = 'Sort: Modified Date', '@input:menu' = [
+  'BY_PATH',
+  [
+    'View',
+    'Sort By',
+    'Date Modified',
+  ],
+] }
+'sc' = { name = 'Sort: Created Date', '@input:menu' = [
+  'BY_PATH',
+  [
+    'View',
+    'Sort By',
+    'Date Created',
+  ],
+] }
+'ss' = { name = 'Sort: Size', '@input:menu' = ['BY_PATH', ['View', 'Sort By', 'Size']] }
+'st' = { name = 'Sort: Tags', '@input:menu' = ['BY_PATH', ['View', 'Sort By', 'Tags']] }
 
 '?c' = { name = 'Clean' }
-'cn' = { name = 'Clean: Name', shortcut = 'cmd+opt+1' }
-'ck' = { name = 'Clean: Kind', shortcut = 'cmd+opt+2' }
-'cm' = { name = 'Clean: Modified Date', shortcut = 'cmd+opt+5' }
-'cc' = { name = 'Clean: Created Date', shell = '''
-  osascript -e 'tell application "System Events" to tell process "Finder" to click (menu item "Date Created" of menu 1 of menu item "Clean Up By" of menu 1 of menu bar item "View" of menu bar 1)'
-''' }
-'cs' = { name = 'Clean: Size', shortcut = 'cmd+opt+6' }
-'ct' = { name = 'Clean: Tags', shortcut = 'cmd+opt+7' }
+'cn' = { name = 'Clean: Name', '@input:menu' = ['BY_PATH', ['View', 'Clean Up By', 'Name']] }
+'ck' = { name = 'Clean: Kind', '@input:menu' = ['BY_PATH', ['View', 'Clean Up By', 'Kind']] }
+'cm' = { name = 'Clean: Modified Date', '@input:menu' = [
+  'BY_PATH',
+  [
+    'View',
+    'Clean Up By',
+    'Date Modified',
+  ],
+] }
+'cc' = { name = 'Clean: Created Date', '@input:menu' = [
+  'BY_PATH',
+  [
+    'View',
+    'Clean Up By',
+    'Date Created',
+  ],
+] }
+'cs' = { name = 'Clean: Size', '@input:menu' = ['BY_PATH', ['View', 'Clean Up By', 'Size']] }
+'ct' = { name = 'Clean: Tags', '@input:menu' = ['BY_PATH', ['View', 'Clean Up By', 'Tags']] }
 
 '?t' = { name = 'Toggle' }
-'ta' = { name = 'Tabs: All', shortcut = 'cmd+shift+backslash' }
-'tg' = { name = 'Toggle: Groups', shortcut = 'cmd+ctrl+0' }
-'tt' = { name = 'Toggle: Tabs', shortcut = 'cmd+shift+t' }
+'ta' = { name = 'Tabs: All', '@input:menu' = ['BY_PATH', ['View', 'Show All Tabs']] }
+'tg' = { name = 'Toggle: Groups', '@input:menu' = ['BY_PATH', ['View', 'Use Groups']] }
+'tt' = { name = 'Toggle: Tabs', '@input:menu' = ['SEARCH', 'Tab Bar'] }
 'th' = { name = 'Toggle: Hidden', shortcut = 'cmd+shift+.' }
 'ts' = { name = 'Toggle Sidebar', shortcut = 'cmd+ctrl+s' }
 'tp' = { name = 'Toggle Preview', shortcut = 'cmd+shift+p' }
-'tb' = { name = 'Toggle Status Bar', shortcut = 'cmd+/' }
+'tb' = { name = 'Toggle Status Bar', '@input:menu' = ['SEARCH', 'Status Bar'] }
 'to' = { name = 'Toggle Toolbar', shortcut = 'cmd+opt+t' }
 't/' = { name = 'Toggle Path Bar', shortcut = 'cmd+opt+p' }
-'te' = { name = 'Trash: Empty', shortcut = 'shift+cmd+delete' }
-'tef' = { name = 'Trash: Empty Force', shortcut = 'opt+shift+cmd+delete' }
+'te' = { name = 'Trash: Empty', '@input:menu' = ['BY_PATH', ['Finder', 'Empty Trash…']] }
+'tef' = { name = 'Trash: Empty Force', '@input:menu' = ['BY_KEY', ['Finder', 'Empty Trash']] }

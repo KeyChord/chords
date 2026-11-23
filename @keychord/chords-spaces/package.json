@@ -1,7 +1,7 @@
 {
   "name": "@keychord/chords-spaces",
   "displayName": "Spaces Chords",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Switch between macOS Spaces by direction or desktop number.",
   "categories": [
     "Window Management"
@@ -17,6 +17,7 @@
   "devDependencies": {
     "@keychord/chordtest": "workspace:*",
     "@keychord/config": "catalog:",
+    "@keychord/tsconfig": "catalog:",
     "@types/bun": "^1.4.3"
   },
   "packageManager": "pnpm@12.11.2"

@@ -32,18 +32,19 @@ describe("isolated macOS testing", () => {
   });
   test("keeps VM input, audio, clipboard, and source files isolated", () => {
     const options = { ...vmOptions({}), workspace: "/Users/Test User/chords' repo" };
-    const args = vmRunArguments(options);
+    const args = vmRunArguments(options, true);
     expect(args).toContain("--no-graphics");
     expect(args).toContain("--no-audio");
     expect(args).toContain("--no-clipboard");
     expect(args).toContain(`--dir=chords-sources:${options.workspace}:ro`);
     expect(args).toContain(`--dir=chords-config:${join(options.workspace, "..", "config")}:ro`);
+    expect(vmRunArguments(options, false).some((arg) => arg.includes("chords-config"))).toBe(false);
   });
 
   test("only enables UI tests in the guest command", () => {
     const script = guestTestScript([]);
     expect(script).toContain("export CHORD_TESTING_UI=1");
-    expect(script).toContain("bun test --timeout 300000");
+    expect(script).toContain("bun test --isolate --timeout 300000");
     expect(script).toContain(
       "/bin/bash '/Volumes/My Shared Files/chords-sources/@keychord/chordtest/src/guest-workspace.sh'",
     );

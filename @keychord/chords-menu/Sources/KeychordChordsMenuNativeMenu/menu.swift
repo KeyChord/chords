@@ -17,6 +17,9 @@ import Foundation
 import NodeAPI
 
 #NodeModule(exports: [
+    "pressMediaKey": try NodeFunction { (action: String) throws -> NodePromise in
+        try mainActorPromise { try pressMediaKey(action) }
+    },
     "runMenuBarAction": try NodeFunction {
         (focusedAppId: String?, scope: String, index: String, steps: String, clickType: String) throws -> NodePromise in
         try menuBarActionPromise(focusedAppId: focusedAppId, scope: scope, index: index, steps: steps, clickType: clickType)
@@ -58,7 +61,7 @@ public enum MenuError: Error, CustomStringConvertible {
         case .ambiguousSearch(let query, let paths):
             return "Menu search \"\(query)\" is ambiguous: \(paths.joined(separator: ", ")). Include a menu path such as Window > Center."
         case .invalidAction(let action):
-            return "unknown menu action \"\(action)\" (expected \"BY_INDEX\", \"BY_LETTERS\", \"BY_PATH\", or \"SEARCH\")"
+            return "unknown menu action \"\(action)\" (expected \"BY_INDEX\", \"BY_LETTERS\", \"BY_PATH\", \"BY_KEY\", \"SEARCH\", or \"FOCUS\")"
         case .applicationNotFound(let name):
             return "application \"\(name)\" is not running and could not be launched"
         case .noFrontmostApplication:
@@ -299,7 +302,7 @@ private func parseMenuPath(_ value: String) throws -> [String] {
 }
 
 @MainActor
-private func clickMenuItem(_ menuBarItems: [Element], path: [String]) throws {
+private func menuItem(_ menuBarItems: [Element], path: [String]) throws -> Element {
     func find(_ component: String, in items: [Element]) throws -> Element {
         guard let item = items.first(where: { title(of: $0) == component }) else {
             let available = items.map(title).filter { !$0.isEmpty }
@@ -318,8 +321,75 @@ private func clickMenuItem(_ menuBarItems: [Element], path: [String]) throws {
     guard (item.isEnabled() ?? true) else {
         throw MenuError.pathItemDisabled(component: path.last!, path: path)
     }
-    log("Clicking menu path: \(path.joined(separator: " > "))")
-    try axPress(item, label: "menu path \"\(path.joined(separator: " > "))\"")
+    return item
+}
+
+@MainActor
+private func clickMenuItem(_ items: [Element], path: [String]) throws {
+    let label = path.joined(separator: " > ")
+    log("Clicking menu path: \(label)")
+    try axPress(menuItem(items, path: path), label: "menu path \"\(label)\"")
+}
+
+@MainActor
+private func focusToolbarControl(in application: Element, target: NSRunningApplication, subrole: String) async throws {
+    func search(_ element: Element, depth: Int) -> Element? {
+        if element.subrole() == subrole, element.isEnabled() != false { return element }
+        if depth == 0 { return nil }
+        for child in axChildren(element) {
+            if let match = search(child, depth: depth - 1) { return match }
+        }
+        return nil
+    }
+    guard let window = application.focusedWindow() ?? application.mainWindow(),
+          let toolbar = axChildren(window).first(where: { $0.role() == kAXToolbarRole }),
+          let control = search(toolbar, depth: 4), target.isActive else {
+        throw MenuError.accessibility("the focused window has no enabled \(subrole) toolbar control")
+    }
+    _ = try? control.setAttributeValue(true, forAttribute: kAXFocusedAttribute)
+    try await Task.sleep(for: .milliseconds(100))
+    if application.focusedUIElement()?.subrole() == subrole { return }
+    guard target.isActive, let frame = control.frame(), !frame.isEmpty else {
+        throw MenuError.accessibility("the \(subrole) toolbar control has no visible frame")
+    }
+    let point = CGPoint(x: frame.midX, y: frame.midY)
+    var element: AXUIElement?
+    var pid: pid_t = 0
+    guard AXUIElementCopyElementAtPosition(AXUIElementCreateSystemWide(), Float(point.x), Float(point.y), &element) == .success,
+          let element, AXUIElementGetPid(element, &pid) == .success, pid == target.processIdentifier else {
+        throw MenuError.accessibility("the \(subrole) toolbar control is covered")
+    }
+    try await click(at: point, type: .left)
+    let deadline = ContinuousClock.now + .seconds(1)
+    repeat {
+        if application.focusedUIElement()?.subrole() == subrole { return }
+        try await Task.sleep(for: .milliseconds(30))
+    } while target.isActive && ContinuousClock.now < deadline
+    throw MenuError.accessibility("the \(subrole) toolbar control did not receive focus")
+}
+
+/// Alternate items and first-responder commands can depend on the actual key event.
+@MainActor
+private func pressKeyEquivalent(_ item: Element, target: NSRunningApplication) throws {
+    guard target.isActive else {
+        throw MenuError.accessibility("the application did not receive focus")
+    }
+    guard let virtualKey: Int = item.attribute(Attribute<Int>(kAXMenuItemCmdVirtualKeyAttribute)),
+          let code = CGKeyCode(exactly: virtualKey),
+          let modifiers: Int = item.attribute(Attribute<Int>(kAXMenuItemCmdModifiersAttribute)),
+          let down = CGEvent(keyboardEventSource: nil, virtualKey: code, keyDown: true),
+          let up = CGEvent(keyboardEventSource: nil, virtualKey: code, keyDown: false) else {
+        throw MenuError.accessibility("the menu item has no supported keyboard equivalent")
+    }
+    var flags: CGEventFlags = []
+    if modifiers & 1 != 0 { flags.insert(.maskShift) }
+    if modifiers & 2 != 0 { flags.insert(.maskAlternate) }
+    if modifiers & 4 != 0 { flags.insert(.maskControl) }
+    if modifiers & 8 == 0 { flags.insert(.maskCommand) }
+    for event in [down, up] {
+        event.flags = flags
+        event.post(tap: .cghidEventTap)
+    }
 }
 
 /// Search literal text in titles and full paths, including punctuation and Unicode.
@@ -387,11 +457,13 @@ private func activate(processName: String) async throws -> NSRunningApplication 
         throw MenuError.applicationNotFound(processName)
     }
 
-    log("Activating app: \(processName)")
-    app.activate()
-    let deadline = Date(timeIntervalSinceNow: 1)
-    while !app.isActive && Date() < deadline {
-        try await Task.sleep(for: .milliseconds(20))
+    if !app.isActive {
+        log("Activating app: \(processName)")
+        app.activate()
+        let deadline = Date(timeIntervalSinceNow: 1)
+        while !app.isActive && Date() < deadline {
+            try await Task.sleep(for: .milliseconds(20))
+        }
     }
     return app
 }
@@ -428,6 +500,10 @@ public func runMenuAction(processName: String?, action: String, value: String) a
     log("Frontmost process: \(target.localizedName ?? "<unknown>")")
 
     let application = AXApp(target).element
+    if action == "FOCUS" {
+        try await focusToolbarControl(in: application, target: target, subrole: value)
+        return
+    }
     guard let menuBar = application.menuBar() else {
         throw MenuError.accessibility("menuBars[0]")
     }
@@ -455,6 +531,8 @@ public func runMenuAction(processName: String?, action: String, value: String) a
         }
     case "BY_PATH":
         try clickMenuItem(items, path: try parseMenuPath(value))
+    case "BY_KEY":
+        try pressKeyEquivalent(menuItem(items, path: parseMenuPath(value)), target: target)
     default:
         throw MenuError.invalidAction(action)
     }

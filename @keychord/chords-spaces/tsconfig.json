@@ -1,0 +1,4 @@
+{
+  "extends": "@keychord/tsconfig",
+  "include": ["src"]
+}

@@ -6,6 +6,9 @@ import NodeAPI
     "cycleApplication": try NodeFunction { (bundleId: String?, direction: String) throws -> NodePromise in
         try mainActorPromise { try await ApplicationCycle.shared.cycle(bundleId: bundleId, direction: direction) }
     },
+    "runDockItem": try NodeFunction { (index: Int, action: String) throws -> NodePromise in
+        try mainActorPromise { try await runDockItem(index: index, action: action) }
+    },
 ])
 
 private struct ApplicationError: Error, CustomStringConvertible {

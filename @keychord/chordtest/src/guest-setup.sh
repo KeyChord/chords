@@ -4,7 +4,7 @@ case "$(/usr/sbin/sysctl -n hw.model)" in
   VirtualMac*) ;;
   *) echo "Refusing to provision UI permissions on the host Mac" >&2; exit 1 ;;
 esac
-export PATH="$HOME/.bun/bin:$HOME/.vite-plus/bin:$HOME/.vite-plus/0.1.15/bin:$HOME/.vite-plus/0.1.15:/opt/homebrew/opt/node@24/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
+export PATH="$HOME/.bun/bin:$HOME/.vite-plus/bin:/opt/homebrew/opt/node@24/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
 
 if ! command -v bun >/dev/null || [ "$(bun --version)" != "1.4.4" ]; then
   curl -fsSL https://bun.com/install -o /tmp/chords-install-bun.sh
@@ -12,7 +12,7 @@ if ! command -v bun >/dev/null || [ "$(bun --version)" != "1.4.4" ]; then
 fi
 if ! command -v vp >/dev/null; then
   curl -fsSL https://vite.plus -o /tmp/chords-install-vp.sh
-  VP_HOME="$HOME/.vite-plus" VP_VERSION=0.1.15 bash /tmp/chords-install-vp.sh
+  VP_HOME="$HOME/.vite-plus" VP_VERSION=1.7.0 bash /tmp/chords-install-vp.sh
 fi
 swift --version
 
@@ -23,9 +23,5 @@ for chords_binary in "$HOME/.bun/bin/bun" "$HOME/.local/share/chordtest/runtime/
 done
 sudo killall tccd || true
 
-# Cache dependency installation and native compilation in the prepared baseline.
-# Each test run clones this disk, replaces source with the current read-only share,
-# and rebuilds changed native sources without carrying forward prior test state.
+# Cache the locked dependencies. Selected suites can rebuild their own addons as needed.
 /bin/bash '/Volumes/My Shared Files/chords-sources/@keychord/chordtest/src/guest-workspace.sh'
-cd "$HOME/chords-workspace"
-bun @keychord/chordtest/src/prepare-macos.ts

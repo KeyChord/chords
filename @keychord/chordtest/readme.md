@@ -28,11 +28,24 @@ vp run test:macos -- @keychord/chords-click
 
 Requires an Apple Silicon Mac and at least 45 GiB free for the initial image and build output. Setup uses an existing Tart installation or installs the pinned [openai/tart 2.40.1 release](https://github.com/openai/tart/releases/tag/2.40.1) after verifying its SHA-256 checksum at `~/.local/share/chords-testing/tart.app/Contents/MacOS/tart`. Use `CHORD_TESTING_TART` to select another executable. The Homebrew alternative is `brew install openai/tools/tart`.
 
-The runner pins the Tahoe base image to digest `sha256:87f3aa5ce21b5c876268f233bdfecf38b4c2a8116fe9bbb718e714cbae187377` as `chords-testing-tahoe-87f3aa5c`, provisions Bun 1.4.3 and Vite+ 0.1.15, and caches dependency installation and native compilation in this prepared baseline. Every test command clones that stopped baseline into a disposable VM and deletes only its own clone afterward. UI changes and test files from one run cannot affect the next run.
+The runner pins the Tahoe base image to digest `sha256:87f3aa5ce21b5c876268f233bdfecf38b4c2a8116fe9bbb718e714cbae187377` as `chords-testing-tahoe-87f3aa5c`, provisions Bun 1.4.4 and Vite+ 1.7.0, and caches locked dependencies in this baseline. Each test command clones the stopped baseline and deletes its own clone afterward.
 
-It freezes snapshots of the chords workspace and sibling `../config` checkout, mounts those and the Chord runtime read-only, and copies source into `~/chords-workspace` and `~/config` in the guest. A guest-local `~/chords` link preserves the config's workspace override. The guest installs both checkouts with `vp install --frozen-lockfile` and rebuilds the shared config. Dependencies and build output stay in the guest. Provisioning grants accessibility permission only in the guest and refuses physical Mac hardware. The guest runs production package bundles with the real built-in `chord` module, not the Vitest mocks. Its logs are copied to `.chord-testing/results/tests.log` on the host.
+It freezes the chords workspace and mounts the snapshot and Chord runtime read-only.
+The guest installs locked dependencies in `~/chords-workspace`. If the lockfile links
+`../config`, the runner also snapshots, installs and builds that sibling checkout.
+Dependencies and build output stay in the guest. Provisioning grants Accessibility
+only in the guest. The runner writes logs to `.chord-testing/results/tests.log`.
+Tests ending in `.session.vm.test.ts` each get their own clone and log because
+locking the screen or signing out ends the interactive session.
 
 Build Chord in the sibling `../Chord` checkout before setup, or set `CHORD_TESTING_HOST` to the actual Chord executable. Its `libbun_embed.dylib` is normally found beside the executable under `../Frameworks`; set `CHORD_TESTING_BUN_LIBRARY` if it lives elsewhere. Setup stages these files in `.chord-testing/runtime/`, and the guest uses its own copies.
+
+Behavior suites that call `withChordPackage` load the checked-in package in a running
+Chord app and invoke its sequences through the Chord CLI. They need a complete
+`/Applications/Chord.app`. Set `CHORD_TESTING_APP` to use another build. They can use
+`withMacOSProbe` to observe menu items, window state and application focus independently.
+Spotlight's launcher needs a macOS 27 guest for a positive search test. The Accessibility
+Inspector tests need a guest with Xcode's Accessibility Inspector installed.
 
 Every `@keychord/*` package has `__tests__/macos.vm.test.ts`. The runner discovers these files rather than maintaining a package list. Full-suite discovery rejects a new package without a VM entry point; the host runner unit test also checks this coverage. Definition-only packages validate their TOML; packages with handlers also import their production JS; native packages compile and load their actual Swift addons. Click and menu packages exercise controlled AppKit fixture apps; tray tests also run their native Control Center checks. Browser and IDE smoke tests do not require accounts or third-party applications.
 

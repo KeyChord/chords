@@ -1,7 +1,7 @@
 {
   "name": "@keychord/chords-com.apple.AccessibilityInspector",
   "displayName": "Accessibility Inspector Chords",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Chords for Accessibility Inspector (com.apple.AccessibilityInspector).",
   "categories": [
     "macOS"
@@ -13,6 +13,9 @@
   "type": "module",
   "scripts": {
     "test": "bun test --isolate"
+  },
+  "dependencies": {
+    "@keychord/chords-menu": "workspace:*"
   },
   "devDependencies": {
     "@keychord/chordtest": "workspace:*",

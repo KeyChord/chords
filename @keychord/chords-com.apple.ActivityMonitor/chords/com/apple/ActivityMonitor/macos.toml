@@ -1,6 +1,6 @@
 name = 'Activity Monitor'
 
-[handler.menu]
+[on.menu]
 file = '@keychord/chords-menu/js/menu.js'
 
 [chords]
@@ -73,7 +73,7 @@ file = '@keychord/chords-menu/js/menu.js'
 ] }
 
 '?p' = { name = 'Process' }
-'pf' = { name = 'Process: Filter', '@input:menu' = ['BY_PATH', ['View', 'Filter Processes']] }
+'pf' = { name = 'Process: Filter', '@input:menu' = ['FOCUS', 'AXSearchField'] }
 'pi' = { name = 'Process: Inspect', '@input:menu' = ['BY_PATH', ['View', 'Inspect Process']] }
 'ps' = { name = 'Process: Sample', '@input:menu' = ['BY_PATH', ['View', 'Sample Process']] }
 'pq' = { name = 'Process: Quit', '@input:menu' = ['BY_PATH', ['View', 'Quit Process']] }
@@ -81,7 +81,7 @@ file = '@keychord/chords-menu/js/menu.js'
   'BY_PATH',
   [
     'View',
-    'Send Signal to Process...',
+    'Send Signal to Process…',
   ],
 ] }
 'psd' = { name = 'Process: Show Deltas', '@input:menu' = [
@@ -94,11 +94,11 @@ file = '@keychord/chords-menu/js/menu.js'
 
 '?r' = { name = 'Run' }
 'rs' = { name = 'Run: Spindump', '@input:menu' = ['BY_PATH', ['View', 'Run Spindump']] }
-'rd' = { name = 'Run: Diagonstics for System', '@input:menu' = [
+'rd' = { name = 'Run: Diagnostics for System', '@input:menu' = [
   'BY_PATH',
   [
     'View',
-    'Run System Diagnostics...',
+    'Run System Diagnostics…',
   ],
 ] }
 

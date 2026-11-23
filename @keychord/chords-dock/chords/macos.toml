@@ -23,5 +23,5 @@ file = 'application.js'
 '<>w]' = { name = 'Dock: Next App', '@input:application' = ['NEXT'] }
 '<>v' = { name = 'Dock: Vary (On/Off)', shortcut = 'ctrl+f3' }
 '<>(\d+)' = { name = 'Dock > Focus $1', '@input:dock' = ['$1'] }
-'<>.(\d+).' = { name = 'Dock > Click @ Item $1', '@input:dock' = ['$1'] }
+'<>.(\d+).' = { name = 'Dock > Click @ Item $1', '@input:dock' = ['$1', 'LEFT'] }
 '<>.,(\d+)' = { name = 'Dock > Right Click @ Item $1', '@input:dock' = ['$1', 'RIGHT'] }

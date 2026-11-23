@@ -15,13 +15,13 @@ below use the default.
 | `;dv`          | Move keyboard focus to the Dock (Control-F3) |
 | `;dw]`         | Focus the next app                           |
 | `;dw[`         | Focus the previous app                       |
-| `;d<number>`   | Same as `;dv`; the number isn't used         |
-| `;d.<number>.` | Same as `;dv`; the number isn't used         |
-| `;d.,<number>` | Same as `;dv`; the number isn't used         |
+| `;d<number>`   | Focus the numbered Dock item                 |
+| `;d.<number>.` | Open the numbered Dock item                  |
+| `;d.,<number>` | Show the item's context menu                 |
 
-`;dv` and the numbered chords press Control-F3, macOS's "Move focus to the Dock"
-keyboard shortcut, so that shortcut must be enabled in System Settings → Keyboard →
-Keyboard Shortcuts → Keyboard.
+`;dv` uses macOS's Control-F3 shortcut. Enable "Move focus to the Dock" under
+System Settings → Keyboard → Keyboard Shortcuts → Keyboard. Numbered chords
+use Accessibility and start at the first Dock item.
 
 `;dw]` and `;dw[` cycle through running Dock applications in both directions,
 wrapping around. They use native macOS application activation independently of

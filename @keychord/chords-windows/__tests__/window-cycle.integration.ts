@@ -12,7 +12,7 @@ type State = {
   windows: { title: string; visible: boolean; minimized: boolean }[];
 };
 const state = (): Promise<State> => Bun.file(output).json();
-await waitFor(async () => ((await state()).frontmostAppId === coverId ? true : undefined));
+await waitFor(async () => ((await state()).frontmostAppId === coverId ? true : undefined), 15_000);
 const handler = buildWindowHandler();
 const definition = Bun.TOML.parse(
   await Bun.file(new URL("../chords/macos.toml", import.meta.url)).text(),
@@ -24,6 +24,13 @@ async function step(input: ";w[" | ";w]") {
   const result = await waitFor(async () => {
     const current = await state();
     return current.frontmostAppId === appId && current.keyWindow !== before ? current : undefined;
+  }, 10_000).catch(async (cause) => {
+    throw new Error(
+      `${input} did not switch away from ${before}. ${JSON.stringify(await state())}`,
+      {
+        cause,
+      },
+    );
   });
   assert.ok(["One", "Two", "Three", "Four"].includes(result.keyWindow));
   assert.equal(result.keyEvents, 0);

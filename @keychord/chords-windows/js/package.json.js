@@ -1,7 +1,7 @@
 //#region package.json
 var name = "@keychord/chords-windows";
-var version = "0.0.1";
 var displayName = "Window Chords";
+var version = "0.0.2";
 var description = "Resize, minimize, hide and quit the focused window or app, or move it to another Space.";
 var categories = ["Window Management"];
 var repository = {
@@ -216,8 +216,8 @@ var chords = { "macos.toml": {
 } };
 var package_default = {
 	name,
-	version,
 	displayName,
+	version,
 	description,
 	categories,
 	repository,

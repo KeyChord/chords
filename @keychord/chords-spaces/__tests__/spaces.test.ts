@@ -4,7 +4,7 @@ const definition = Bun.TOML.parse(
   await Bun.file(new URL("../chords/macos.toml", import.meta.url)).text(),
 ) as {
   placeholders: Record<string, { name: string; default: string }>;
-  chords: Record<string, { shortcut?: string }>;
+  chords: Record<string, { "@input:space"?: string[] }>;
 };
 
 test("every chord and hint starts with the <> prefix, which defaults to ;s", () => {
@@ -14,9 +14,11 @@ test("every chord and hint starts with the <> prefix, which defaults to ;s", () 
   ).toEqual([]);
 });
 
-test("Space chords use Mission Control shortcuts", () => {
-  for (const input of ["<>[", "<>l"]) expect(definition.chords[input].shortcut).toBe("ctrl+left");
-  for (const input of ["<>]", "<>r"]) expect(definition.chords[input].shortcut).toBe("ctrl+right");
+test("Space chords select the adjacent Space or numbered desktop", () => {
+  for (const input of ["<>[", "<>l"])
+    expect(definition.chords[input]["@input:space"]).toEqual(["PREVIOUS"]);
+  for (const input of ["<>]", "<>r"])
+    expect(definition.chords[input]["@input:space"]).toEqual(["NEXT"]);
   for (let index = 1; index <= 9; index++)
-    expect(definition.chords[`<>${index}`].shortcut).toBe(`ctrl+${index}`);
+    expect(definition.chords[`<>${index}`]["@input:space"]).toEqual([String(index)]);
 });

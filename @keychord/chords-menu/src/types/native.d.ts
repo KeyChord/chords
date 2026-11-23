@@ -1,5 +1,6 @@
 declare module "*/menu.node" {
   const addon: {
+    pressMediaKey(action: string): Promise<void>;
     runTrayAction(type: string, value: string, action: string): Promise<void>;
     runMenuBarAction(
       app: string | undefined,

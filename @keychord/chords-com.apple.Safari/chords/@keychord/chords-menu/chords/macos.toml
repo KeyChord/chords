@@ -16,6 +16,9 @@ file = 'selection.js'
 [on.visibility]
 file = 'visibility.js'
 
+[on.media]
+file = 'media.js'
+
 [placeholders]
 "<>" = { name = 'Menu bar prefix', default = 'b' }
 
@@ -116,20 +119,20 @@ file = 'visibility.js'
 '<>cw' = { name = 'Tray: Wi-Fi', '@input:tray' = ['WIFI'] }
 '<>cwv' = { name = 'Tray Wi-Fi: Vary On/Off', '@input:tray' = ['WIFI', 'TOGGLE'] }
 
-'<>q' = { name = 'Force Quit', shortcut = 'opt+cmd+esc' }
+'<>q' = { name = 'Force Quit', '@input:menu' = ['BY_PATH', ['Apple', 'Force Quit…']] }
 '<>ls' = { name = 'Lock Screen', shortcut = 'ctrl+cmd+q' }
 '<>lo' = { name = 'Log Out', shortcut = 'shift+cmd+q' }
 '<>lq' = { name = 'Log Quit', shortcut = 'opt+shift+cmd+q' }
 
 '?<>b' = { name = 'Brightness' }
-'<>bu' = { name = 'Brightness Up', shortcut = 'BrightnessUp' }
-'<>bd' = { name = 'Brightness Down', shortcut = 'BrightnessDown' }
+'<>bu' = { name = 'Brightness Up', '@input:media' = ['BRIGHTNESS_UP'] }
+'<>bd' = { name = 'Brightness Down', '@input:media' = ['BRIGHTNESS_DOWN'] }
 
 '<>v' = { name = 'Menu Bar: Show / Hide', '@input:visibility' = [] }
 '?<>v' = { name = 'Menu Bar Visibility / Volume' }
-'<>vu' = { name = 'Volume Up', shortcut = 'AudioVolumeUp' }
-'<>vd' = { name = 'Volume Down', shortcut = 'AudioVolumeDown' }
-'<>vm' = { name = 'Volume Mute', shortcut = 'AudioVolumeMute' }
+'<>vu' = { name = 'Volume Up', '@input:media' = ['VOLUME_UP'] }
+'<>vd' = { name = 'Volume Down', '@input:media' = ['VOLUME_DOWN'] }
+'<>vm' = { name = 'Volume Mute', '@input:media' = ['VOLUME_MUTE'] }
 
 # Window-menu actions and application shortcuts.
 '?<>w' = { name = 'Window' }

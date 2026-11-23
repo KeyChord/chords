@@ -1,7 +1,7 @@
 //#region package.json
 var name = "@keychord/chords-com.apple.Safari";
 var displayName = "Safari Chords";
-var version = "0.0.1";
+var version = "0.0.2";
 var description = "Chords for Safari (com.apple.Safari).";
 var categories = ["macOS"];
 var repository = {
@@ -30,7 +30,8 @@ var chords = {
 			},
 			"tray": { "file": "tray.js" },
 			"select": { "file": "selection.js" },
-			"visibility": { "file": "visibility.js" }
+			"visibility": { "file": "visibility.js" },
+			"media": { "file": "media.js" }
 		},
 		"placeholders": { "<>": {
 			"name": "Menu bar prefix",
@@ -173,7 +174,7 @@ var chords = {
 			},
 			"<>q": {
 				"name": "Force Quit",
-				"shortcut": "opt+cmd+esc"
+				"@input:menu": ["BY_PATH", ["Apple", "Force Quit…"]]
 			},
 			"<>ls": {
 				"name": "Lock Screen",
@@ -190,11 +191,11 @@ var chords = {
 			"?<>b": { "name": "Brightness" },
 			"<>bu": {
 				"name": "Brightness Up",
-				"shortcut": "BrightnessUp"
+				"@input:media": ["BRIGHTNESS_UP"]
 			},
 			"<>bd": {
 				"name": "Brightness Down",
-				"shortcut": "BrightnessDown"
+				"@input:media": ["BRIGHTNESS_DOWN"]
 			},
 			"<>v": {
 				"name": "Menu Bar: Show / Hide",
@@ -203,15 +204,15 @@ var chords = {
 			"?<>v": { "name": "Menu Bar Visibility / Volume" },
 			"<>vu": {
 				"name": "Volume Up",
-				"shortcut": "AudioVolumeUp"
+				"@input:media": ["VOLUME_UP"]
 			},
 			"<>vd": {
 				"name": "Volume Down",
-				"shortcut": "AudioVolumeDown"
+				"@input:media": ["VOLUME_DOWN"]
 			},
 			"<>vm": {
 				"name": "Volume Mute",
-				"shortcut": "AudioVolumeMute"
+				"@input:media": ["VOLUME_MUTE"]
 			},
 			"?<>w": { "name": "Window" },
 			"<>w": {
@@ -383,7 +384,8 @@ var chords = {
 				"file": "@keychord/chords-menu/js/menu.js",
 				"args": ["Safari"]
 			},
-			"js": { "file": "safari.js" }
+			"js": { "file": "safari.js" },
+			"tab": { "file": "tab.js" }
 		},
 		"chords": {
 			"?w": { "name": "Window" },
@@ -401,7 +403,7 @@ var chords = {
 			},
 			"wqa": {
 				"name": "Window: Quit All",
-				"shortcut": "cmd+alt+w"
+				"shortcut": "cmd+opt+shift+w"
 			},
 			"?t": { "name": "Tab" },
 			"tn": {
@@ -428,12 +430,12 @@ var chords = {
 			"t]": {
 				"name": "Tab: Next",
 				"command": "Jump to the next open tab",
-				"shortcut": "ctrl+right"
+				"shortcut": "ctrl+tab"
 			},
 			"t[": {
 				"name": "Tab: Previous",
 				"command": "Jump to the previous open tab",
-				"shortcut": "ctrl+shift+right"
+				"shortcut": "ctrl+shift+tab"
 			},
 			"t1": {
 				"name": "Tab 1",
@@ -477,30 +479,28 @@ var chords = {
 			},
 			"tl": {
 				"name": "Tab: Left Move",
-				"command": "Move tabs right or left",
-				"shortcut": "ctrl"
+				"@input:tab": ["LEFT"]
 			},
 			"tr": {
 				"name": "Tab: Right Move",
-				"command": "Move tabs right or left",
-				"shortcut": "cmd+shift+pgdown"
+				"@input:tab": ["RIGHT"]
 			},
 			"?tg": { "name": "Tab Group" },
 			"tgn": {
 				"name": "Tab Group: New",
-				"shortcut": "cmd+ctrl+n"
+				"@input:menu": ["BY_PATH", ["File", "New Empty Tab Group"]]
 			},
 			"tgq": {
-				"name": "Tab Group: Quit",
-				"shortcut": "cmd+ctrl+w"
+				"name": "Tab Group: Delete",
+				"@input:menu": ["BY_PATH", ["File", "Delete Tab Group"]]
 			},
 			"tg]": {
 				"name": "Tab Group: Next",
-				"shortcut": "cmd+shift+up"
+				"@input:tab": ["RIGHT", "GROUP"]
 			},
 			"tg[": {
 				"name": "Tab Group: Previous",
-				"shortcut": "cmd+shift+down"
+				"@input:tab": ["LEFT", "GROUP"]
 			},
 			"js": {
 				"name": "JavaScript",

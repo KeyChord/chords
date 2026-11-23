@@ -1,7 +1,7 @@
 import { mkdir, mkdtemp, rm, statfs, writeFile } from "node:fs/promises";
-import { closeSync, openSync } from "node:fs";
-import { homedir } from "node:os";
-import { join } from "node:path";
+import { closeSync, existsSync, openSync } from "node:fs";
+import { homedir, tmpdir } from "node:os";
+import { basename, join } from "node:path";
 import { prepareChordHost } from "./host";
 
 export type VMOptions = {
@@ -41,7 +41,7 @@ export function vmOptions(env = process.env): VMOptions {
   return options;
 }
 
-export function vmRunArguments(options: VMOptions) {
+export function vmRunArguments(options: VMOptions, includeConfig?: boolean) {
   const config = join(options.workspace, "..", "config");
   if (
     [options.workspace, config, options.runtime, options.results].some((path) => path.includes(":"))
@@ -56,7 +56,9 @@ export function vmRunArguments(options: VMOptions) {
     "--no-clipboard",
     "--no-usb-accessories",
     `--dir=chords-sources:${options.workspace}:ro`,
-    `--dir=chords-config:${config}:ro`,
+    ...((includeConfig ?? existsSync(join(config, "package.json")))
+      ? [`--dir=chords-config:${config}:ro`]
+      : []),
     `--dir=chords-runtime:${options.runtime}:ro`,
     `--dir=chords-results:${options.results}`,
   ];
@@ -85,7 +87,7 @@ export function discoverMacOSTests(paths: string[] = [], workspace = workspaceRo
   return tests;
 }
 
-export function guestTestScript(paths: string[]) {
+export function guestTestScript(paths: string[], log = "tests.log") {
   // Validate selectors before constructing shell code. Only discovered VM tests are executed.
   const tests = discoverMacOSTests(paths);
   const packages = [...new Set(tests.map((test) => test.split("/__tests__/")[0]))];
@@ -93,17 +95,23 @@ export function guestTestScript(paths: string[]) {
     ? `vp exec --filter=${shellQuote("./@keychord/chordtest")} ${packages.map((pkg) => `--filter=${shellQuote(`./${pkg}...`)}`).join(" ")} vp pack`
     : "vp run build";
   return `set -euo pipefail
-export PATH="$HOME/.bun/bin:$HOME/.vite-plus/bin:$HOME/.vite-plus/0.1.15/bin:$HOME/.vite-plus/0.1.15:/opt/homebrew/opt/node@24/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
+export PATH="$HOME/.bun/bin:$HOME/.vite-plus/bin:/opt/homebrew/opt/node@24/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
 /bin/bash '/Volumes/My Shared Files/chords-sources/@keychord/chordtest/src/guest-workspace.sh'
 mkdir -p "$HOME/.local/share/chordtest/runtime"
 rsync -a --delete '/Volumes/My Shared Files/chords-runtime/' "$HOME/.local/share/chordtest/runtime/"
-export CHORD_NATIVE_TEST_HOST="$HOME/.local/share/chordtest/runtime/MacOS/chord"
+export CHORD_NATIVE_TEST_HOST="$HOME/.local/share/chordtest/runtime/$(cat "$HOME/.local/share/chordtest/runtime/host-executable")"
+export CHORD_TESTING_APP="$HOME/.local/share/chordtest/runtime/Chord.app"
+export CHORD_TESTING_FIXTURES="$HOME/.local/share/chordtest/runtime/fixtures"
 export DYLD_LIBRARY_PATH="$HOME/.local/share/chordtest/runtime/Frameworks"
 cd "$HOME/chords-workspace"
 CHORD_SKIP_NATIVE=1 ${build}
+export CHORD_TESTING_PROBE="$HOME/.local/share/chordtest/runtime/macos-probe"
+if [ ! -x "$CHORD_TESTING_PROBE" ]; then
+  /usr/bin/swiftc @keychord/chordtest/src/fixtures/MacOSProbe.swift -o "$CHORD_TESTING_PROBE"
+fi
 export CHORD_TESTING_UI=1
 export CHORD_TESTING_ARTIFACTS='/Volumes/My Shared Files/chords-results'
-bun test --timeout 300000 ${tests.map((path) => shellQuote(`./${path}`)).join(" ")} 2>&1 | tee '/Volumes/My Shared Files/chords-results/tests.log'
+bun test --isolate --timeout 300000 ${tests.map((path) => shellQuote(`./${path}`)).join(" ")} 2>&1 | tee ${shellQuote(`/Volumes/My Shared Files/chords-results/${log}`)}
 `;
 }
 
@@ -276,17 +284,39 @@ export class MacOSVM {
   }
 
   async test(paths: string[]) {
-    const script = guestTestScript(paths);
+    const selected = discoverMacOSTests(paths);
     if (!(await this.status()))
       throw new Error("The test VM is not prepared. Run vp run test:macos:setup first.");
     if ((await this.status())?.Running)
       throw new Error("Stop the prepared VM before cloning it for tests");
     await prepareChordHost(this.options.workspace, this.options.runtime);
     await mkdir(this.options.results, { recursive: true });
+    // Session tests need their own desktop for first-use behavior or actions such as Lock Screen.
+    const sessionTests = selected.filter((path) => path.endsWith(".session.vm.test.ts"));
+    const normalTests = selected.filter((path) => !sessionTests.includes(path));
+    const scripts = [
+      ...(normalTests.length ? [guestTestScript(sessionTests.length ? normalTests : paths)] : []),
+      ...sessionTests.map((path) =>
+        guestTestScript([path], `${basename(path, ".vm.test.ts")}.log`),
+      ),
+    ];
+    const failures: unknown[] = [];
+    for (const script of scripts) {
+      try {
+        await this.testInClone(script);
+      } catch (error) {
+        failures.push(error);
+      }
+    }
+    if (failures.length === 1) throw failures[0];
+    if (failures.length > 1) throw new AggregateError(failures, "Multiple Tart test runs failed");
+  }
+
+  private async testInClone(script: string) {
     const name = `${this.options.name}-run-${process.pid}`;
     if (await this.status(name))
       throw new Error(`Test clone ${name} already exists; refusing to replace it`);
-    const snapshot = await mkdtemp(join(stateDirectory, "source-"));
+    const snapshot = await mkdtemp(join(tmpdir(), "chordtest-source-"));
     try {
       // Freeze both linked checkouts before booting; later host edits cannot
       // change the suite's inputs, including its shared config.
@@ -294,6 +324,7 @@ export class MacOSVM {
         [this.options.workspace, join(snapshot, "chords")],
         [join(this.options.workspace, "..", "config"), join(snapshot, "config")],
       ]) {
+        if (!existsSync(join(source, "package.json"))) continue;
         await mkdir(destination, { recursive: true });
         await command([
           "/usr/bin/rsync",

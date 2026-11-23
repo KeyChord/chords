@@ -308,6 +308,10 @@ importers:
         version: 0.0.12
 
   '@keychord/chords-com.apple.AccessibilityInspector':
+    dependencies:
+      '@keychord/chords-menu':
+        specifier: workspace:*
+        version: link:../chords-menu
     devDependencies:
       '@keychord/chordtest':
         specifier: workspace:*
@@ -386,6 +390,10 @@ importers:
         version: 1.4.4
 
   '@keychord/chords-com.apple.finder':
+    dependencies:
+      '@keychord/chords-menu':
+        specifier: workspace:*
+        version: link:../chords-menu
     devDependencies:
       '@keychord/chordtest':
         specifier: workspace:*
@@ -608,6 +616,9 @@ importers:
       '@keychord/config':
         specifier: 'catalog:'
         version: 0.0.12
+      '@keychord/tsconfig':
+        specifier: 'catalog:'
+        version: 0.0.6
       '@types/bun':
         specifier: ^1.4.3
         version: 1.4.3

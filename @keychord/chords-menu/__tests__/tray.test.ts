@@ -38,6 +38,7 @@ const { chords, placeholders } = Bun.TOML.parse(
       "@keydown:select"?: ["KEYDOWN", string];
       "@input:select"?: ["INPUT", string];
       "@input:visibility"?: [];
+      "@input:media"?: [string];
       "@input:menu"?: unknown;
       shortcut?: string;
     }
@@ -248,6 +249,7 @@ test("every non-category chord has an action", () => {
       !binding["@input:tray"] &&
       !binding["@keydown:select"] &&
       !binding["@input:visibility"] &&
+      !binding["@input:media"] &&
       !binding["@input:menu"] &&
       !binding.shortcut,
   );
@@ -271,7 +273,7 @@ test("native failures reach the caller", async () => {
 
 test("visibility chord invokes its own handler without colliding with volume chords", () => {
   expect(bindings[";bv"]["@input:visibility"]).toEqual([]);
-  expect(bindings[";bvu"].shortcut).toBe("AudioVolumeUp");
-  expect(bindings[";bvd"].shortcut).toBe("AudioVolumeDown");
-  expect(bindings[";bvm"].shortcut).toBe("AudioVolumeMute");
+  expect(bindings[";bvu"]["@input:media"]).toEqual(["VOLUME_UP"]);
+  expect(bindings[";bvd"]["@input:media"]).toEqual(["VOLUME_DOWN"]);
+  expect(bindings[";bvm"]["@input:media"]).toEqual(["VOLUME_MUTE"]);
 });

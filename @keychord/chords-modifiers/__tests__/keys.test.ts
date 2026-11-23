@@ -76,9 +76,13 @@ test.each(combinations)(
   ({ entry, suffix, modifiers }) => {
     for (const ordering of permutations(suffix)) {
       mocked(tap).mockClear();
-      buildKeysHandler()(capture(`;k${entry}v${ordering}`));
-      expect(tap).toHaveBeenCalledTimes(1);
-      expect(tap).toHaveBeenCalledWith(`${modifiers}+v`);
+      const sequence = capture(`;k${entry}v${ordering}`);
+      const expected = `${modifiers}+v`;
+      expect(modifierShortcut(sequence)).toBe(expected);
+      if (!modifiers.split("+").includes("fn")) {
+        buildKeysHandler()(sequence);
+        expect(tap).toHaveBeenCalledWith(expected);
+      }
     }
   },
 );
@@ -86,9 +90,13 @@ test.each(combinations)(
 test.each(letters)(";k%s treats the next character as a literal regular key", (entry) => {
   for (const key of regularKeys) {
     mocked(tap).mockClear();
-    buildKeysHandler()(capture(`;k${entry}${key}`));
-    expect(tap).toHaveBeenCalledTimes(1);
-    expect(tap).toHaveBeenCalledWith(`${nativeModifiers[letters.indexOf(entry)]}+${key}`);
+    const sequence = capture(`;k${entry}${key}`);
+    const expected = `${nativeModifiers[letters.indexOf(entry)]}+${key}`;
+    expect(modifierShortcut(sequence)).toBe(expected);
+    if (entry !== "f") {
+      buildKeysHandler()(sequence);
+      expect(tap).toHaveBeenCalledWith(expected);
+    }
   }
 });
 

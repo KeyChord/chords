@@ -1,7 +1,7 @@
 {
   "name": "@keychord/chords-click",
   "displayName": "Click Chords",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Mouse clicks, drags and pointer moves by coordinates, in the focused window or on the screen.",
   "categories": [
     "Input"

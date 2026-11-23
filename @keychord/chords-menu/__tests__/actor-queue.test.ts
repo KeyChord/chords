@@ -1,6 +1,6 @@
 import { buildNative } from "../scripts/build-native";
 import { expect, test } from "bun:test";
-import { mkdir } from "node:fs/promises";
+import { mkdir, rm } from "node:fs/promises";
 import { join } from "node:path";
 
 // No UI or input APIs are used: only main-actor scheduling and JS completion.
@@ -26,7 +26,9 @@ test.skipIf(process.platform !== "darwin")(
     for (const module of modules) {
       const sources = join(scratch, "Sources", module);
       await mkdir(sources, { recursive: true });
-      await Bun.write(join(sources, "MainActorPromise.swift"), Bun.file(helper));
+      const helperCopy = join(sources, "MainActorPromise.swift");
+      await rm(helperCopy, { force: true });
+      await Bun.write(helperCopy, await Bun.file(helper).text());
       await Bun.write(
         join(sources, "Probe.swift"),
         `import Foundation

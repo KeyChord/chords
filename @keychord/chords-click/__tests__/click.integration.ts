@@ -7,7 +7,7 @@ import { chordPattern } from "@keychord/chordtest/patterns";
 requireMacOSVM();
 const [appId, output, coverId, coverOutput] = process.argv.slice(2);
 type Event = {
-  phase: "down" | "up" | "DRAG";
+  phase: "down" | "up" | "drag";
   x: number;
   y: number;
   timestamp: number;
@@ -201,7 +201,7 @@ for (const [input, button] of [
     (await state()).events.slice(-3).map(({ phase, x, y, button }) => ({ phase, x, y, button })),
     [
       { phase: "down", x: 30, y: 180, button },
-      { phase: "DRAG", x: 60, y: 480, button },
+      { phase: "drag", x: 60, y: 480, button },
       { phase: "up", x: 60, y: 480, button },
     ],
   );
@@ -210,14 +210,14 @@ await invokeChord(";c-1355-");
 eventCount += 2;
 await until(async () => (await state()).events.length === eventCount);
 await Bun.sleep(100);
-assert.equal((await state()).events.at(-1)!.phase, "DRAG");
+assert.equal((await state()).events.at(-1)!.phase, "drag");
 await invokeChord(";c=28");
 eventCount += 2;
 await until(async () => (await state()).events.length === eventCount);
 assert.deepEqual(
   (await state()).events.slice(-2).map(({ phase, x, y }) => ({ phase, x, y })),
   [
-    { phase: "DRAG", x: 60, y: 480 },
+    { phase: "drag", x: 60, y: 480 },
     { phase: "up", x: 60, y: 480 },
   ],
 );
@@ -313,7 +313,7 @@ for (const [prefix, button] of [
       .map(({ phase, x, y, button }) => ({ phase, x, y, button })),
     [
       { phase: "down", x: 30, y: 20, button },
-      { phase: "DRAG", x: 60, y: 40, button },
+      { phase: "drag", x: 60, y: 40, button },
       { phase: "up", x: 60, y: 40, button },
     ],
   );
@@ -327,7 +327,7 @@ const rejected = assert.rejects(sequence, /moved or resized/);
 eventCount += 2;
 await until(async () => (await state()).events.length === eventCount);
 const previous = getAppWindows(appId)[0].bounds;
-await Bun.write(`${output}.command`, "MOVE");
+await Bun.write(`${output}.command`, "move");
 await until(async () => getAppWindows(appId)[0].bounds.x !== previous.x);
 await rejected;
 assert.equal((await state()).events.length, eventCount);

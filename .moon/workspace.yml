@@ -10,7 +10,9 @@ projects:
   chords-dock: "@keychord/chords-dock"
   chords-windows: "@keychord/chords-windows"
   chords-monitors: "@keychord/chords-monitors"
+  chords-modifiers: "@keychord/chords-modifiers"
   chords-navigation: "@keychord/chords-navigation"
+  chords-spaces: "@keychord/chords-spaces"
   chords-livesplit: "@keychord/chords-livesplit"
 
 vcs:

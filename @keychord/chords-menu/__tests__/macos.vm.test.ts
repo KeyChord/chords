@@ -4,6 +4,7 @@ import {
   macOSUITestsEnabled,
   runChordScript,
   testMacOSPackage,
+  testWindowShortcuts,
 } from "@keychord/chordtest";
 import { expect } from "bun:test";
 
@@ -11,6 +12,12 @@ test.skipIf(!macOSUITestsEnabled)(
   "@keychord/chords-menu: production package loads in the macOS VM",
   () => testMacOSPackage(import.meta.url, []),
   300_000,
+);
+
+test.skipIf(!macOSUITestsEnabled)(
+  ";bwh, ;bwm and ;bwq hide, minimize and quit TextEdit",
+  () => testWindowShortcuts(import.meta.url, ";bw"),
+  90_000,
 );
 
 if (macOSUITestsEnabled) await import("./tray-native.test");

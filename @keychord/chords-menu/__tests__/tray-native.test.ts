@@ -15,6 +15,15 @@ type TrayAddon = {
   ): Promise<void>;
 };
 
+const { chords } = Bun.TOML.parse(
+  await Bun.file(new URL("../chords/macos.toml", import.meta.url)).text(),
+) as { chords: Record<string, { "@input:tray"?: [string, string?, string?] }> };
+const trayBinding = (type: string, value = "", action = "") =>
+  Object.entries(chords).filter(([, binding]) => {
+    const [input, section = "", operation = ""] = binding["@input:tray"] ?? [];
+    return input === type && section === value && operation === action;
+  });
+
 // These tests load the real Swift addon. Validation happens before accessibility/UI actions.
 describe.skipIf(process.platform !== "darwin")("Swift tray addon in Bun", () => {
   let addon: TrayAddon;
@@ -25,6 +34,18 @@ describe.skipIf(process.platform !== "darwin")("Swift tray addon in Bun", () => 
     const binary = await buildNative(directory, "debug");
     addon = loadNativeAddon<TrayAddon>(binary);
   }, 300_000);
+
+  // Exercise the live native action with the arguments used by its shipped chord.
+  async function runBinding(type: string, section = "", action = "") {
+    const matches = trayBinding(type, section, action);
+    expect(matches, `${type} ${section} ${action}`).toHaveLength(1);
+    const [pattern, binding] = matches[0];
+    const [input, value = "", operation = ""] = binding["@input:tray"]!;
+    await addon.runTrayAction(input, value, operation);
+    console.info(
+      `Menu bar ${pattern.replace("<>", ";b")} performed ${input} ${value} ${operation}`.trim(),
+    );
+  }
 
   const invalidActions: [string, string, string, string][] = [
     ["UNKNOWN", "", "", "unknown tray action"],
@@ -151,6 +172,7 @@ describe.skipIf(process.platform !== "darwin")("Swift tray addon in Bun", () => 
           role: string;
           identifier?: string;
           title?: string;
+          description?: string;
           value?: number;
           enabled?: boolean;
         };
@@ -158,9 +180,9 @@ describe.skipIf(process.platform !== "darwin")("Swift tray addon in Bun", () => 
           const child = Bun.spawn([probeBinary, ...args], { stdout: "pipe", stderr: "inherit" });
           const output = await new Response(child.stdout).text();
           expect(await child.exited).toBe(0);
-          return output ? JSON.parse(output) : [];
+          return JSON.parse(output || "[]") as Control[];
         }
-        const run = (type: string, value = "") => addon.runTrayAction(type, value, "");
+        const run = (type: string, value = "") => runBinding(type, value);
         const items = await probe("menu-bar");
         try {
           if (items.some((item) => item.identifier === "com.apple.menuextra.battery")) {
@@ -173,28 +195,23 @@ describe.skipIf(process.platform !== "darwin")("Swift tray addon in Bun", () => 
             await expect(run("BATTERY")).rejects.toThrow("BATTERY menu bar item");
           }
 
-          // Desktop widgets keep their own AXWindows even when Notification Center is closed.
-          const desktopWindows = (await probe("windows", "com.apple.notificationcenterui"))
-            .filter((element) => element.role === "AXWindow")
-            .map((element) => element.title);
-          await run("DATE_TIME");
-          const notificationWindow = await waitFor(async () =>
-            (await probe("windows", "com.apple.notificationcenterui")).find(
-              (element) => element.role === "AXWindow" && !desktopWindows.includes(element.title),
-            ),
-          );
-          await run("DATE_TIME");
-          await waitFor(async () =>
+          // This button belongs to the sidebar. It is absent from the individual desktop widgets.
+          const notificationCenterOpen = async () =>
             (await probe("windows", "com.apple.notificationcenterui")).some(
-              (element) =>
-                element.role === "AXWindow" && element.title === notificationWindow.title,
-            )
-              ? undefined
-              : true,
-          );
+              (item) => item.role === "AXButton" && item.description === "Edit Widgets",
+            );
+          const toggleNotificationCenter = async (open: boolean) => {
+            await run("DATE_TIME");
+            await waitFor(async () =>
+              (await notificationCenterOpen()) === open ? true : undefined,
+            );
+          };
+          if (await notificationCenterOpen()) await toggleNotificationCenter(false);
+          await toggleNotificationCenter(true);
+          await toggleNotificationCenter(false);
 
           // Virtual Macs may expose no Wi-Fi hardware or tile. Check that absence is reported.
-          await addon.runTrayAction("CONTROL_CENTER", "", "");
+          await runBinding("CONTROL_CENTER");
           const hasWifi = (await probe()).some(
             (element) => element.identifier === "controlcenter-wifi",
           );
@@ -282,8 +299,7 @@ describe.skipIf(process.platform !== "darwin")("Swift tray addon in Bun", () => 
           expect(match).toBeDefined();
           return match!;
         }
-        const run = (section = "", action = "") =>
-          addon.runTrayAction("CONTROL_CENTER", section, action);
+        const run = (section = "", action = "") => runBinding("CONTROL_CENTER", section, action);
         try {
           await run();
           const hasDisplay = !!(await maybeControl("controlcenter-display"));
@@ -292,9 +308,20 @@ describe.skipIf(process.platform !== "darwin")("Swift tray addon in Bun", () => 
             await run("DISPLAY", "CLICK");
             await control("display-setting-dark-mode");
           } else {
-            await expect(run("DISPLAY")).rejects.toThrow("could not find DISPLAY");
+            for (const action of [
+              "",
+              "CLICK",
+              "DECREASE",
+              "INCREASE",
+              "DARK_MODE",
+              "NIGHT_SHIFT",
+              "TRUE_TONE",
+              "SETTINGS",
+            ])
+              await expect(run("DISPLAY", action)).rejects.toThrow("could not find DISPLAY");
             console.info("DISPLAY is unavailable on this virtual Mac");
           }
+          await run("SOUND");
           await run("SOUND", "CLICK");
           expect((await control("controlcenter-volume")).role).toBe("AXStaticText");
           await run();

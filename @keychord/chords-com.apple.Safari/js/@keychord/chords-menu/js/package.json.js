@@ -1,7 +1,7 @@
 //#region package.json
 var name = "@keychord/chords-menu";
 var displayName = "Menu Chords";
-var version = "0.0.3";
+var version = "0.0.4";
 var description = "Chords for app menus, menu bar extras, Control Center and menu bar visibility, in whichever app is focused.";
 var categories = ["macOS"];
 var repository = {
@@ -28,7 +28,8 @@ var chords = { "macos.toml": {
 		},
 		"tray": { "file": "tray.js" },
 		"select": { "file": "selection.js" },
-		"visibility": { "file": "visibility.js" }
+		"visibility": { "file": "visibility.js" },
+		"media": { "file": "media.js" }
 	},
 	"placeholders": { "<>": {
 		"name": "Menu bar prefix",
@@ -171,7 +172,7 @@ var chords = { "macos.toml": {
 		},
 		"<>q": {
 			"name": "Force Quit",
-			"shortcut": "opt+cmd+esc"
+			"@input:menu": ["BY_PATH", ["Apple", "Force Quit…"]]
 		},
 		"<>ls": {
 			"name": "Lock Screen",
@@ -188,11 +189,11 @@ var chords = { "macos.toml": {
 		"?<>b": { "name": "Brightness" },
 		"<>bu": {
 			"name": "Brightness Up",
-			"shortcut": "BrightnessUp"
+			"@input:media": ["BRIGHTNESS_UP"]
 		},
 		"<>bd": {
 			"name": "Brightness Down",
-			"shortcut": "BrightnessDown"
+			"@input:media": ["BRIGHTNESS_DOWN"]
 		},
 		"<>v": {
 			"name": "Menu Bar: Show / Hide",
@@ -201,15 +202,15 @@ var chords = { "macos.toml": {
 		"?<>v": { "name": "Menu Bar Visibility / Volume" },
 		"<>vu": {
 			"name": "Volume Up",
-			"shortcut": "AudioVolumeUp"
+			"@input:media": ["VOLUME_UP"]
 		},
 		"<>vd": {
 			"name": "Volume Down",
-			"shortcut": "AudioVolumeDown"
+			"@input:media": ["VOLUME_DOWN"]
 		},
 		"<>vm": {
 			"name": "Volume Mute",
-			"shortcut": "AudioVolumeMute"
+			"@input:media": ["VOLUME_MUTE"]
 		},
 		"?<>w": { "name": "Window" },
 		"<>w": {
