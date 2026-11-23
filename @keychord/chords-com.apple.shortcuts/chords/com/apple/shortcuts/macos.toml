@@ -1,0 +1,39 @@
+name = 'Shortcuts'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?s' = { name = 'Shortcut' }
+'sn' = { name = 'Shortcut: New', '@input:menu' = ['BY_PATH', ['File', 'New Shortcut']] }
+'sd' = { name = 'Shortcut: Duplicate', '@input:menu' = ['BY_PATH', ['File', 'Duplicate']] }
+'sx' = { name = 'Shortcut: Delete', '@input:menu' = ['BY_PATH', ['Edit', 'Delete']] }
+
+'?f' = { name = 'File' }
+'fn' = { name = 'File: New Folder', '@input:menu' = ['BY_PATH', ['File', 'New Folder']] }
+'fi' = { name = 'File: Import', '@input:menu' = ['BY_PATH', ['File', 'Import…']] }
+'fe' = { name = 'File: Export', '@input:menu' = ['BY_PATH', ['File', 'Export…']] }
+
+'?v' = { name = 'View' }
+'vs' = { name = 'View: Toggle Sidebar', '@input:menu' = ['SEARCH', 'Sidebar'] }
+'va' = { name = 'View: Action Library', '@input:menu' = [
+  'BY_PATH',
+  [
+    'View',
+    'Show Action Library',
+  ],
+] }
+'vi' = { name = 'View: Shortcut Details', '@input:menu' = [
+  'BY_PATH',
+  [
+    'View',
+    'Show Shortcut Details',
+  ],
+] }
+
+'?g' = { name = 'Goto' }
+'ga' = { name = 'Goto: All Shortcuts', '@input:menu' = ['BY_PATH', ['View', 'All Shortcuts']] }
+'gg' = { name = 'Goto: Gallery', '@input:menu' = ['BY_PATH', ['View', 'Gallery']] }
+
+'?j' = { name = 'Jump' }
+'jf' = { name = 'Jump: Search Shortcuts', '@input:menu' = ['BY_PATH', ['Edit', 'Search']] }

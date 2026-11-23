@@ -1,0 +1,25 @@
+name = 'Find My'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?g' = { name = 'Goto' }
+'gp' = { name = 'Goto: People', '@input:menu' = ['BY_PATH', ['View', 'People']] }
+'gd' = { name = 'Goto: Devices', '@input:menu' = ['BY_PATH', ['View', 'Devices']] }
+'gi' = { name = 'Goto: Items', '@input:menu' = ['BY_PATH', ['View', 'Items']] }
+
+'?m' = { name = 'Map' }
+'me' = { name = 'Map: Explore', '@input:menu' = ['BY_PATH', ['View', 'Map Mode', 'Explore']] }
+'ms' = { name = 'Map: Satellite', '@input:menu' = ['BY_PATH', ['View', 'Map Mode', 'Satellite']] }
+'mt' = { name = 'Map: Toggle Traffic', '@input:menu' = ['SEARCH', 'Traffic'] }
+'ml' = { name = 'Map: Toggle Labels', '@input:menu' = ['SEARCH', 'Labels'] }
+
+'?l' = { name = 'Location' }
+'ls' = { name = 'Location: Share My Location', '@input:menu' = [
+  'BY_PATH',
+  [
+    'View',
+    'Share My Location',
+  ],
+] }

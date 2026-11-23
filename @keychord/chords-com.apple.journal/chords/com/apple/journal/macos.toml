@@ -1,0 +1,35 @@
+name = 'Journal'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?n' = { name = 'New' }
+'ne' = { name = 'New: Entry', '@input:menu' = ['BY_PATH', ['File', 'New Entry']] }
+'nj' = { name = 'New: Journal', '@input:menu' = ['BY_PATH', ['File', 'New Journal']] }
+'nw' = { name = 'New: Window', '@input:menu' = ['BY_PATH', ['File', 'New Window']] }
+
+'?e' = { name = 'Entry' }
+'ee' = { name = 'Entry: Edit', '@input:menu' = ['BY_PATH', ['Entry', 'Edit Entry']] }
+'eb' = { name = 'Entry: Toggle Bookmark', '@input:menu' = ['SEARCH', 'Bookmark'] }
+'ex' = { name = 'Entry: Delete', '@input:menu' = ['BY_PATH', ['Entry', 'Delete Entry']] }
+
+'?g' = { name = 'Goto' }
+'ga' = { name = 'Goto: All Entries', '@input:menu' = ['BY_PATH', ['View', 'All Entries']] }
+'gd' = { name = 'Goto: Recently Deleted', '@input:menu' = [
+  'BY_PATH',
+  [
+    'View',
+    'Recently Deleted',
+  ],
+] }
+
+'?j' = { name = 'Jump' }
+'jf' = { name = 'Jump: Find Entries', '@input:menu' = ['BY_PATH', ['Edit', 'Find', 'Search']] }
+
+'?f' = { name = 'File' }
+'fe' = { name = 'File: Export', '@input:menu' = ['BY_PATH', ['File', 'Export…']] }
+'fp' = { name = 'File: Print', '@input:menu' = ['BY_PATH', ['File', 'Print…']] }
+
+'?s' = { name = 'Settings' }
+'s,' = { name = 'Settings: Open', '@input:menu' = ['BY_PATH', ['Journal', 'Settings…']] }

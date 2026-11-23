@@ -389,7 +389,59 @@ importers:
         specifier: latest
         version: 1.4.4
 
+  '@keychord/chords-com.apple.VoiceMemos':
+    dependencies:
+      '@keychord/chords-menu':
+        specifier: workspace:*
+        version: link:../chords-menu
+    devDependencies:
+      '@keychord/chordtest':
+        specifier: workspace:*
+        version: link:../chordtest
+      '@keychord/config':
+        specifier: 'catalog:'
+        version: 0.0.12
+
   '@keychord/chords-com.apple.finder':
+    dependencies:
+      '@keychord/chords-menu':
+        specifier: workspace:*
+        version: link:../chords-menu
+    devDependencies:
+      '@keychord/chordtest':
+        specifier: workspace:*
+        version: link:../chordtest
+      '@keychord/config':
+        specifier: 'catalog:'
+        version: 0.0.12
+
+  '@keychord/chords-com.apple.findmy':
+    dependencies:
+      '@keychord/chords-menu':
+        specifier: workspace:*
+        version: link:../chords-menu
+    devDependencies:
+      '@keychord/chordtest':
+        specifier: workspace:*
+        version: link:../chordtest
+      '@keychord/config':
+        specifier: 'catalog:'
+        version: 0.0.12
+
+  '@keychord/chords-com.apple.journal':
+    dependencies:
+      '@keychord/chords-menu':
+        specifier: workspace:*
+        version: link:../chords-menu
+    devDependencies:
+      '@keychord/chordtest':
+        specifier: workspace:*
+        version: link:../chordtest
+      '@keychord/config':
+        specifier: 'catalog:'
+        version: 0.0.12
+
+  '@keychord/chords-com.apple.shortcuts':
     dependencies:
       '@keychord/chords-menu':
         specifier: workspace:*
