@@ -1,0 +1,45 @@
+name = 'VoiceOver Utility'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?g' = { name = 'Goto' }
+'gg' = { name = 'Goto: General', '@input:menu' = ['BY_PATH', ['View', 'General']] }
+'gv' = { name = 'Goto: Verbosity', '@input:menu' = ['BY_PATH', ['View', 'Verbosity']] }
+'gs' = { name = 'Goto: Speech', '@input:menu' = ['BY_PATH', ['View', 'Speech']] }
+'gn' = { name = 'Goto: Navigation', '@input:menu' = ['BY_PATH', ['View', 'Navigation']] }
+'gw' = { name = 'Goto: Web', '@input:menu' = ['BY_PATH', ['View', 'Web']] }
+'gu' = { name = 'Goto: Sound', '@input:menu' = ['BY_PATH', ['View', 'Sound']] }
+'gi' = { name = 'Goto: Visuals', '@input:menu' = ['BY_PATH', ['View', 'Visuals']] }
+'gc' = { name = 'Goto: Commands', '@input:menu' = ['BY_PATH', ['View', 'Commands']] }
+'gb' = { name = 'Goto: Braille', '@input:menu' = ['BY_PATH', ['View', 'Braille']] }
+'ga' = { name = 'Goto: Activities', '@input:menu' = ['BY_PATH', ['View', 'Activities']] }
+'gr' = { name = 'Goto: Recognition', '@input:menu' = ['BY_PATH', ['View', 'Recognition']] }
+'gh' = { name = 'Goto: Screen Sharing', '@input:menu' = ['BY_PATH', ['View', 'Screen Sharing']] }
+
+'?f' = { name = 'File' }
+'fi' = { name = 'File: Import Preferences', '@input:menu' = [
+  'BY_PATH',
+  [
+    'File',
+    'Import Preferences…',
+  ],
+] }
+'fe' = { name = 'File: Export Preferences', '@input:menu' = [
+  'BY_PATH',
+  [
+    'File',
+    'Export Preferences…',
+  ],
+] }
+'fp' = { name = 'File: Set Up Portable Preferences', '@input:menu' = [
+  'BY_PATH',
+  [
+    'File',
+    'Set Up Portable Preferences…',
+  ],
+] }
+
+'?j' = { name = 'Jump' }
+'js' = { name = 'Jump: Search Settings', '@input:menu' = ['BY_PATH', ['Edit', 'Find']] }

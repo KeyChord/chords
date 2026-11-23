@@ -1,0 +1,21 @@
+name = 'Migration Assistant'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?g' = { name = 'Goto' }
+'ga' = { name = 'Goto: About Migration Assistant', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Migration Assistant',
+    'About Migration Assistant',
+  ],
+] }
+'gh' = { name = 'Goto: Migration Assistant Help', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Help',
+    'Migration Assistant Help',
+  ],
+] }
