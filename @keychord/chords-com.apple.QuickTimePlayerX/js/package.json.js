@@ -1,7 +1,7 @@
 //#region package.json
 var name = "@keychord/chords-com.apple.QuickTimePlayerX";
 var displayName = "QuickTime Player Chords";
-var version = "0.0.1";
+var version = "0.0.2";
 var description = "Chords for QuickTime Player (com.apple.QuickTimePlayerX).";
 var categories = ["macOS"];
 var repository = {

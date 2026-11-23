@@ -1,5 +1,10 @@
 # @keychord/chords-com.apple.Dictionary
 
+> [!WARNING]
+> **EXPERIMENTAL**
+>
+> This package was largely created with AI and will be reviewed by a human later.
+
 Chords for Dictionary (`com.apple.Dictionary`). Install through the
 `KeyChord/chords` monorepo and enable this package under Settings → Chords.
 

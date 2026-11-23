@@ -1,7 +1,7 @@
 //#region package.json
 var name = "@keychord/chords-com.apple.wifi.diagnostics";
 var displayName = "Wireless Diagnostics Chords";
-var version = "0.0.1";
+var version = "0.0.2";
 var description = "Chords for Wireless Diagnostics (com.apple.wifi.diagnostics).";
 var categories = ["macOS"];
 var repository = {

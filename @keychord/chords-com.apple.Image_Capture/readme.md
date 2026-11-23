@@ -1,5 +1,10 @@
 # @keychord/chords-com.apple.Image_Capture
 
+> [!WARNING]
+> **EXPERIMENTAL**
+>
+> This package was largely created with AI and will be reviewed by a human later.
+
 Chords for Image Capture (`com.apple.Image_Capture`). Install through the
 `KeyChord/chords` monorepo and enable this package under Settings → Chords.
 

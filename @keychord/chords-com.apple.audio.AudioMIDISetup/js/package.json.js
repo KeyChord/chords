@@ -1,7 +1,7 @@
 //#region package.json
 var name = "@keychord/chords-com.apple.audio.AudioMIDISetup";
 var displayName = "Audio MIDI Setup Chords";
-var version = "0.0.1";
+var version = "0.0.2";
 var description = "Chords for Audio MIDI Setup (com.apple.audio.AudioMIDISetup).";
 var categories = ["macOS"];
 var repository = {

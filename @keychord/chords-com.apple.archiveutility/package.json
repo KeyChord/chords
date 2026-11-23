@@ -1,7 +1,7 @@
 {
   "name": "@keychord/chords-com.apple.archiveutility",
   "displayName": "Archive Utility Chords",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Chords for Archive Utility (com.apple.archiveutility).",
   "categories": [
     "macOS"

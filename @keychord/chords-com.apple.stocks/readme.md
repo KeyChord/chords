@@ -1,5 +1,10 @@
 # @keychord/chords-com.apple.stocks
 
+> [!WARNING]
+> **EXPERIMENTAL**
+>
+> This package was largely created with AI and will be reviewed by a human later.
+
 Chords for Stocks (`com.apple.stocks`). Install through the
 `KeyChord/chords` monorepo and enable this package under Settings → Chords.
 

@@ -1,7 +1,7 @@
 {
   "name": "@keychord/chords-com.apple.grapher",
   "displayName": "Grapher Chords",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Chords for Grapher (com.apple.grapher).",
   "categories": [
     "macOS"

@@ -1,7 +1,7 @@
 {
   "name": "@keychord/chords-com.apple.calculator",
   "displayName": "Calculator Chords",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Chords for Calculator (com.apple.calculator).",
   "categories": [
     "macOS"

@@ -1,5 +1,10 @@
 # @keychord/chords-com.apple.QuickTimePlayerX
 
+> [!WARNING]
+> **EXPERIMENTAL**
+>
+> This package was largely created with AI and will be reviewed by a human later.
+
 Chords for QuickTime Player (`com.apple.QuickTimePlayerX`). Install through the
 `KeyChord/chords` monorepo and enable this package under Settings → Chords.
 

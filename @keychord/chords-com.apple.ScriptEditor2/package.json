@@ -1,7 +1,7 @@
 {
   "name": "@keychord/chords-com.apple.ScriptEditor2",
   "displayName": "Script Editor Chords",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Chords for Script Editor (com.apple.ScriptEditor2).",
   "categories": [
     "macOS"

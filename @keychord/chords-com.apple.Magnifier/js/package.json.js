@@ -1,7 +1,7 @@
 //#region package.json
 var name = "@keychord/chords-com.apple.Magnifier";
 var displayName = "Magnifier Chords";
-var version = "0.0.1";
+var version = "0.0.2";
 var description = "Chords for Magnifier (com.apple.Magnifier).";
 var categories = ["macOS"];
 var repository = {

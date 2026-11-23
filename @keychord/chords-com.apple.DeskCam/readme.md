@@ -1,5 +1,10 @@
 # @keychord/chords-com.apple.DeskCam
 
+> [!WARNING]
+> **EXPERIMENTAL**
+>
+> This package was largely created with AI and will be reviewed by a human later.
+
 Chords for Desk View (`com.apple.DeskCam`). Install through the
 `KeyChord/chords` monorepo and enable this package under Settings → Chords.
 

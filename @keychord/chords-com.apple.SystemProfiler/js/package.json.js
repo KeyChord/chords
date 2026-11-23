@@ -1,7 +1,7 @@
 //#region package.json
 var name = "@keychord/chords-com.apple.SystemProfiler";
 var displayName = "System Information Chords";
-var version = "0.0.1";
+var version = "0.0.2";
 var description = "Chords for System Information (com.apple.SystemProfiler).";
 var categories = ["macOS"];
 var repository = {

@@ -1,7 +1,7 @@
 {
   "name": "@keychord/chords-com.apple.FolderActionsSetup",
   "displayName": "Folder Actions Setup Chords",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Chords for Folder Actions Setup (com.apple.FolderActionsSetup).",
   "categories": [
     "macOS"

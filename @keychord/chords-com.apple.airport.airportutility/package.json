@@ -1,7 +1,7 @@
 {
   "name": "@keychord/chords-com.apple.airport.airportutility",
   "displayName": "AirPort Utility Chords",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Chords for AirPort Utility (com.apple.airport.airportutility).",
   "categories": [
     "macOS"

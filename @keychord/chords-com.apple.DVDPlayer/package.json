@@ -1,7 +1,7 @@
 {
   "name": "@keychord/chords-com.apple.DVDPlayer",
   "displayName": "DVD Player Chords",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Chords for DVD Player (com.apple.DVDPlayer).",
   "categories": [
     "macOS"

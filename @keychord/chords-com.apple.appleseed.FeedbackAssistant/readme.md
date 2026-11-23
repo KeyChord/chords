@@ -1,5 +1,10 @@
 # @keychord/chords-com.apple.appleseed.FeedbackAssistant
 
+> [!WARNING]
+> **EXPERIMENTAL**
+>
+> This package was largely created with AI and will be reviewed by a human later.
+
 Chords for Feedback Assistant (`com.apple.appleseed.FeedbackAssistant`). Install through the
 `KeyChord/chords` monorepo and enable this package under Settings → Chords.
 

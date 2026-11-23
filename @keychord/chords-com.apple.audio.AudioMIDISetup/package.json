@@ -1,7 +1,7 @@
 {
   "name": "@keychord/chords-com.apple.audio.AudioMIDISetup",
   "displayName": "Audio MIDI Setup Chords",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Chords for Audio MIDI Setup (com.apple.audio.AudioMIDISetup).",
   "categories": [
     "macOS"

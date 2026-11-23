@@ -1,7 +1,7 @@
 //#region package.json
 var name = "@keychord/chords-com.apple.Ticket-Viewer";
 var displayName = "Ticket Viewer Chords";
-var version = "0.0.1";
+var version = "0.0.2";
 var description = "Chords for Ticket Viewer (com.apple.Ticket-Viewer).";
 var categories = ["macOS"];
 var repository = {

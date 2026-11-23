@@ -1,5 +1,10 @@
 # @keychord/chords-com.apple.printcenter
 
+> [!WARNING]
+> **EXPERIMENTAL**
+>
+> This package was largely created with AI and will be reviewed by a human later.
+
 Chords for Print Center (`com.apple.printcenter`). Install through the
 `KeyChord/chords` monorepo and enable this package under Settings → Chords.
 

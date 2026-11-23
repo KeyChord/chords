@@ -1,7 +1,7 @@
 //#region package.json
 var name = "@keychord/chords-com.apple.keychainaccess";
 var displayName = "Keychain Access Chords";
-var version = "0.0.1";
+var version = "0.0.2";
 var description = "Chords for Keychain Access (com.apple.keychainaccess).";
 var categories = ["macOS"];
 var repository = {

@@ -1,7 +1,7 @@
 {
   "name": "@keychord/chords-com.apple.findmy",
   "displayName": "Find My Chords",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Chords for Find My (com.apple.findmy).",
   "categories": [
     "macOS"

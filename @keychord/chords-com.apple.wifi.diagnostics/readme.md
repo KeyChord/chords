@@ -1,5 +1,10 @@
 # @keychord/chords-com.apple.wifi.diagnostics
 
+> [!WARNING]
+> **EXPERIMENTAL**
+>
+> This package was largely created with AI and will be reviewed by a human later.
+
 Chords for Wireless Diagnostics (`com.apple.wifi.diagnostics`). Install through the
 `KeyChord/chords` monorepo and enable this package under Settings → Chords.
 

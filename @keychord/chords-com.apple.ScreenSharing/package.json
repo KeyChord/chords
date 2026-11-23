@@ -1,7 +1,7 @@
 {
   "name": "@keychord/chords-com.apple.ScreenSharing",
   "displayName": "Screen Sharing Chords",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Chords for Screen Sharing (com.apple.ScreenSharing).",
   "categories": [
     "macOS"

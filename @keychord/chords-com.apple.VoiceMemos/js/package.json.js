@@ -1,7 +1,7 @@
 //#region package.json
 var name = "@keychord/chords-com.apple.VoiceMemos";
 var displayName = "Voice Memos Chords";
-var version = "0.0.1";
+var version = "0.0.2";
 var description = "Chords for Voice Memos (com.apple.VoiceMemos).";
 var categories = ["macOS"];
 var repository = {

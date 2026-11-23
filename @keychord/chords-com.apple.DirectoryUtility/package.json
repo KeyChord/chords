@@ -1,7 +1,7 @@
 {
   "name": "@keychord/chords-com.apple.DirectoryUtility",
   "displayName": "Directory Utility Chords",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Chords for Directory Utility (com.apple.DirectoryUtility).",
   "categories": [
     "macOS"

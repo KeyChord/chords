@@ -1,7 +1,7 @@
 //#region package.json
 var name = "@keychord/chords-com.apple.ScreenSharing";
 var displayName = "Screen Sharing Chords";
-var version = "0.0.1";
+var version = "0.0.2";
 var description = "Chords for Screen Sharing (com.apple.ScreenSharing).";
 var categories = ["macOS"];
 var repository = {

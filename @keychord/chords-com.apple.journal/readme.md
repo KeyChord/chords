@@ -1,5 +1,10 @@
 # @keychord/chords-com.apple.journal
 
+> [!WARNING]
+> **EXPERIMENTAL**
+>
+> This package was largely created with AI and will be reviewed by a human later.
+
 Chords for Journal (`com.apple.journal`). Install through the
 `KeyChord/chords` monorepo and enable this package under Settings → Chords.
 

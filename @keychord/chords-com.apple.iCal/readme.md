@@ -1,5 +1,10 @@
 # @keychord/chords-com.apple.iCal
 
+> [!WARNING]
+> **EXPERIMENTAL**
+>
+> This package was largely created with AI and will be reviewed by a human later.
+
 Chords for Calendar (`com.apple.iCal`). Install through the
 `KeyChord/chords` monorepo and enable this package under Settings → Chords.
 

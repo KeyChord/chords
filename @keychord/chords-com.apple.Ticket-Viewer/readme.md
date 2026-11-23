@@ -1,5 +1,10 @@
 # @keychord/chords-com.apple.Ticket-Viewer
 
+> [!WARNING]
+> **EXPERIMENTAL**
+>
+> This package was largely created with AI and will be reviewed by a human later.
+
 Chords for Ticket Viewer (`com.apple.Ticket-Viewer`). Install through the
 `KeyChord/chords` monorepo and enable this package under Settings → Chords.
 

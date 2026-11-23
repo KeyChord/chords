@@ -1,5 +1,10 @@
 # @keychord/chords-com.apple.helpviewer
 
+> [!WARNING]
+> **EXPERIMENTAL**
+>
+> This package was largely created with AI and will be reviewed by a human later.
+
 Chords for Tips (`com.apple.helpviewer`). Install through the
 `KeyChord/chords` monorepo and enable this package under Settings → Chords.
 

@@ -1,7 +1,7 @@
 //#region package.json
 var name = "@keychord/chords-com.apple.PhotoBooth";
 var displayName = "Photo Booth Chords";
-var version = "0.0.1";
+var version = "0.0.2";
 var description = "Chords for Photo Booth (com.apple.PhotoBooth).";
 var categories = ["macOS"];
 var repository = {

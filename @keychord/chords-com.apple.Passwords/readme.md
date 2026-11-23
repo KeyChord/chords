@@ -1,5 +1,10 @@
 # @keychord/chords-com.apple.Passwords
 
+> [!WARNING]
+> **EXPERIMENTAL**
+>
+> This package was largely created with AI and will be reviewed by a human later.
+
 Chords for Passwords (`com.apple.Passwords`). Install through the
 `KeyChord/chords` monorepo and enable this package under Settings → Chords.
 

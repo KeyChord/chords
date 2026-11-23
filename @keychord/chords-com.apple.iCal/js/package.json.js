@@ -1,7 +1,7 @@
 //#region package.json
 var name = "@keychord/chords-com.apple.iCal";
 var displayName = "Calendar Chords";
-var version = "0.0.1";
+var version = "0.0.2";
 var description = "Chords for Calendar (com.apple.iCal).";
 var categories = ["macOS"];
 var repository = {

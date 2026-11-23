@@ -1,7 +1,7 @@
 {
   "name": "@keychord/chords-com.apple.BluetoothFileExchange",
   "displayName": "Bluetooth File Exchange Chords",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Chords for Bluetooth File Exchange (com.apple.BluetoothFileExchange).",
   "categories": [
     "macOS"

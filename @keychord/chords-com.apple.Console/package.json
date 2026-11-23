@@ -1,7 +1,7 @@
 {
   "name": "@keychord/chords-com.apple.Console",
   "displayName": "Console Chords",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Chords for Console (com.apple.Console).",
   "categories": [
     "macOS"

@@ -1,5 +1,10 @@
 # @keychord/chords-com.apple.Stickies
 
+> [!WARNING]
+> **EXPERIMENTAL**
+>
+> This package was largely created with AI and will be reviewed by a human later.
+
 Chords for Stickies (`com.apple.Stickies`). Install through the
 `KeyChord/chords` monorepo and enable this package under Settings → Chords.
 

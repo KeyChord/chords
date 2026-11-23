@@ -1,7 +1,7 @@
 //#region package.json
 var name = "@keychord/chords-com.apple.mobilephone";
 var displayName = "Phone Chords";
-var version = "0.0.1";
+var version = "0.0.2";
 var description = "Chords for Phone (com.apple.mobilephone).";
 var categories = ["macOS"];
 var repository = {

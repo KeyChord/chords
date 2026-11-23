@@ -1,7 +1,7 @@
 //#region package.json
 var name = "@keychord/chords-com.apple.DeskCam";
 var displayName = "Desk View Chords";
-var version = "0.0.1";
+var version = "0.0.2";
 var description = "Chords for Desk View (com.apple.DeskCam).";
 var categories = ["macOS"];
 var repository = {

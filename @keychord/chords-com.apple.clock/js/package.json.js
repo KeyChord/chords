@@ -1,7 +1,7 @@
 //#region package.json
 var name = "@keychord/chords-com.apple.clock";
 var displayName = "Clock Chords";
-var version = "0.0.1";
+var version = "0.0.2";
 var description = "Chords for Clock (com.apple.clock).";
 var categories = ["macOS"];
 var repository = {

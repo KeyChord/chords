@@ -1,5 +1,10 @@
 # @keychord/chords-com.apple.airport.airportutility
 
+> [!WARNING]
+> **EXPERIMENTAL**
+>
+> This package was largely created with AI and will be reviewed by a human later.
+
 Chords for AirPort Utility (`com.apple.airport.airportutility`). Install through the
 `KeyChord/chords` monorepo and enable this package under Settings → Chords.
 

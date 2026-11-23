@@ -1,7 +1,7 @@
 //#region package.json
 var name = "@keychord/chords-com.apple.Music";
 var displayName = "Music Chords";
-var version = "0.0.1";
+var version = "0.0.2";
 var description = "Chords for Music (com.apple.Music).";
 var categories = ["macOS"];
 var repository = {
