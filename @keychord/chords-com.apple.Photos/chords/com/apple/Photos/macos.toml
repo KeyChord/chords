@@ -1,0 +1,41 @@
+name = 'Photos'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?g' = { name = 'Goto' }
+'gy' = { name = 'Goto: Years', shortcut = 'cmd+1' }
+'gm' = { name = 'Goto: Months', shortcut = 'cmd+2' }
+'ga' = { name = 'Goto: All Photos', shortcut = 'cmd+3' }
+
+'?n' = { name = 'New' }
+'na' = { name = 'New: Album', '@input:menu' = ['BY_PATH', ['File', 'New Album']] }
+'nf' = { name = 'New: Folder', '@input:menu' = ['BY_PATH', ['File', 'New Folder']] }
+'ns' = { name = 'New: Smart Album', '@input:menu' = ['BY_PATH', ['File', 'New Smart Album…']] }
+
+'?f' = { name = 'File' }
+'fi' = { name = 'File: Import', '@input:menu' = ['BY_PATH', ['File', 'Import…']] }
+'fe' = { name = 'File: Export Unmodified Original', '@input:menu' = [
+  'SEARCH',
+  'Export Unmodified Original',
+] }
+
+'?j' = { name = 'Jump' }
+'jf' = { name = 'Jump: Search', '@input:menu' = ['BY_PATH', ['Edit', 'Search']] }
+
+'?v' = { name = 'View' }
+'vss' = { name = 'View: Show Sidebar', '@input:menu' = ['BY_PATH', ['View', 'Show Sidebar']] }
+'vsh' = { name = 'View: Hide Sidebar', '@input:menu' = ['BY_PATH', ['View', 'Hide Sidebar']] }
+'vi' = { name = 'View: Info', '@input:menu' = ['BY_PATH', ['Window', 'Info']] }
+'vk' = { name = 'View: Keyword Manager', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Window',
+    'Keyword Manager',
+  ],
+] }
+'vt' = { name = 'View: Titles', '@input:menu' = ['BY_PATH', ['View', 'Metadata', 'Titles']] }
+
+'?p' = { name = 'Photo' }
+'pd' = { name = 'Photo: Delete', '@input:menu' = ['BY_PATH', ['Image', 'Delete Photo']] }

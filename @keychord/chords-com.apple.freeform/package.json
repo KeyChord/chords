@@ -1,0 +1,25 @@
+{
+  "name": "@keychord/chords-com.apple.freeform",
+  "displayName": "Freeform Chords",
+  "version": "0.0.1",
+  "description": "Chords for Freeform (com.apple.freeform).",
+  "categories": [
+    "macOS"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KeyChord/chords-com.apple.freeform"
+  },
+  "type": "module",
+  "scripts": {
+    "test": "bun test --isolate"
+  },
+  "dependencies": {
+    "@keychord/chords-menu": "workspace:*"
+  },
+  "devDependencies": {
+    "@keychord/chordtest": "workspace:*",
+    "@keychord/config": "catalog:"
+  },
+  "packageManager": "pnpm@12.11.2"
+}

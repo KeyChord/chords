@@ -1,0 +1,35 @@
+name = 'Freeform'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?b' = { name = 'Board' }
+'bn' = { name = 'Board: New', '@input:menu' = ['BY_PATH', ['File', 'New Board']] }
+'bu' = { name = 'Board: Duplicate', '@input:menu' = ['BY_PATH', ['File', 'Duplicate']] }
+'bd' = { name = 'Board: Delete', '@input:menu' = ['BY_PATH', ['File', 'Delete']] }
+'be' = { name = 'Board: Export PDF', '@input:menu' = ['BY_PATH', ['File', 'Export Board as PDF…']] }
+
+'?j' = { name = 'Jump' }
+'jf' = { name = 'Jump: Find', '@input:menu' = ['BY_PATH', ['Edit', 'Find', 'Find…']] }
+
+'?v' = { name = 'View' }
+'vi' = { name = 'View: Icons', '@input:menu' = ['BY_PATH', ['View', 'as Icons']] }
+'vl' = { name = 'View: List', '@input:menu' = ['BY_PATH', ['View', 'as List']] }
+'vs' = { name = 'View: Sidebar', '@input:menu' = ['SEARCH', 'Sidebar'] }
+'vgs' = { name = 'View: Show Grid', '@input:menu' = ['BY_PATH', ['View', 'Show Grid']] }
+'vgh' = { name = 'View: Hide Grid', '@input:menu' = ['BY_PATH', ['View', 'Hide Grid']] }
+
+'?s' = { name = 'Sort' }
+'sn' = { name = 'Sort: By Name', '@input:menu' = ['BY_PATH', ['View', 'Sort By', 'Name']] }
+'sd' = { name = 'Sort: By Date', '@input:menu' = ['BY_PATH', ['View', 'Sort By', 'Date']] }
+
+'?i' = { name = 'Insert' }
+'in' = { name = 'Insert: Sticky Note', '@input:menu' = ['BY_PATH', ['Insert', 'Sticky Note']] }
+'it' = { name = 'Insert: Text Box', '@input:menu' = ['BY_PATH', ['Insert', 'Text Box']] }
+'ir' = { name = 'Insert: Rectangle', '@input:menu' = ['BY_PATH', ['Insert', 'Shape', 'Rectangle']] }
+
+'?z' = { name = 'Zoom' }
+'z=' = { name = 'Zoom: In', '@input:menu' = ['BY_PATH', ['View', 'Zoom', 'Zoom In']] }
+'z-' = { name = 'Zoom: Out', '@input:menu' = ['BY_PATH', ['View', 'Zoom', 'Zoom Out']] }
+'za' = { name = 'Zoom: Actual Size', '@input:menu' = ['BY_PATH', ['View', 'Zoom', 'Actual Size']] }

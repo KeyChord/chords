@@ -1,0 +1,13 @@
+name = 'Image Capture'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?v' = { name = 'View' }
+'vs' = { name = 'View: Sidebar', '@input:menu' = ['SEARCH', 'Sidebar'] }
+'vt' = { name = 'View: Toolbar', '@input:menu' = ['SEARCH', 'Toolbar'] }
+
+'?e' = { name = 'Edit' }
+'el' = { name = 'Edit: Rotate Left', '@input:menu' = ['BY_PATH', ['Edit', 'Rotate Left']] }
+'ed' = { name = 'Edit: Delete Selection', '@input:menu' = ['BY_PATH', ['Edit', 'Delete']] }
