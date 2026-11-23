@@ -1,0 +1,22 @@
+{
+  "name": "@keychord/chords-com.apple.FolderActionsSetup",
+  "displayName": "Folder Actions Setup Chords",
+  "version": "0.0.1",
+  "description": "Chords for Folder Actions Setup (com.apple.FolderActionsSetup).",
+  "categories": [
+    "macOS"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KeyChord/chords-com.apple.FolderActionsSetup"
+  },
+  "type": "module",
+  "scripts": {
+    "test": "bun test --isolate"
+  },
+  "devDependencies": {
+    "@keychord/chordtest": "workspace:*",
+    "@keychord/config": "catalog:"
+  },
+  "packageManager": "pnpm@12.11.2"
+}

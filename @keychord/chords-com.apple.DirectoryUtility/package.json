@@ -1,0 +1,25 @@
+{
+  "name": "@keychord/chords-com.apple.DirectoryUtility",
+  "displayName": "Directory Utility Chords",
+  "version": "0.0.1",
+  "description": "Chords for Directory Utility (com.apple.DirectoryUtility).",
+  "categories": [
+    "macOS"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KeyChord/chords-com.apple.DirectoryUtility"
+  },
+  "type": "module",
+  "scripts": {
+    "test": "bun test --isolate"
+  },
+  "dependencies": {
+    "@keychord/chords-menu": "workspace:*"
+  },
+  "devDependencies": {
+    "@keychord/chordtest": "workspace:*",
+    "@keychord/config": "catalog:"
+  },
+  "packageManager": "pnpm@12.11.2"
+}

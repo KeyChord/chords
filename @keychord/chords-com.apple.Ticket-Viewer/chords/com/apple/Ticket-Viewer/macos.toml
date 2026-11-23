@@ -1,0 +1,36 @@
+name = 'Ticket Viewer'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?t' = { name = 'Ticket' }
+'ta' = { name = 'Ticket: Add Identity', '@input:menu' = ['BY_PATH', ['Ticket', 'Add Identity']] }
+'td' = { name = 'Ticket: Remove Identity', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Ticket',
+    'Remove Identity',
+  ],
+] }
+'ts' = { name = 'Ticket: Set as Default', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Ticket',
+    'Set as Default',
+  ],
+] }
+'tp' = { name = 'Ticket: Change Password', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Ticket',
+    'Change Password',
+  ],
+] }
+'ti' = { name = 'Ticket: Diagnostic Information', '@input:menu' = [
+  'BY_PATH',
+  [
+    'Ticket',
+    'Diagnostic Information',
+  ],
+] }

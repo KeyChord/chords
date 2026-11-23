@@ -333,6 +333,28 @@ importers:
         specifier: 'catalog:'
         version: 0.0.12
 
+  '@keychord/chords-com.apple.DirectoryUtility':
+    dependencies:
+      '@keychord/chords-menu':
+        specifier: workspace:*
+        version: link:../chords-menu
+    devDependencies:
+      '@keychord/chordtest':
+        specifier: workspace:*
+        version: link:../chordtest
+      '@keychord/config':
+        specifier: 'catalog:'
+        version: 0.0.12
+
+  '@keychord/chords-com.apple.FolderActionsSetup':
+    devDependencies:
+      '@keychord/chordtest':
+        specifier: workspace:*
+        version: link:../chordtest
+      '@keychord/config':
+        specifier: 'catalog:'
+        version: 0.0.12
+
   '@keychord/chords-com.apple.Safari':
     dependencies:
       '@keychord/chords-menu':
@@ -389,7 +411,59 @@ importers:
         specifier: latest
         version: 1.4.4
 
+  '@keychord/chords-com.apple.Ticket-Viewer':
+    dependencies:
+      '@keychord/chords-menu':
+        specifier: workspace:*
+        version: link:../chords-menu
+    devDependencies:
+      '@keychord/chordtest':
+        specifier: workspace:*
+        version: link:../chordtest
+      '@keychord/config':
+        specifier: 'catalog:'
+        version: 0.0.12
+
+  '@keychord/chords-com.apple.appleseed.FeedbackAssistant':
+    dependencies:
+      '@keychord/chords-menu':
+        specifier: workspace:*
+        version: link:../chords-menu
+    devDependencies:
+      '@keychord/chordtest':
+        specifier: workspace:*
+        version: link:../chordtest
+      '@keychord/config':
+        specifier: 'catalog:'
+        version: 0.0.12
+
+  '@keychord/chords-com.apple.archiveutility':
+    dependencies:
+      '@keychord/chords-menu':
+        specifier: workspace:*
+        version: link:../chords-menu
+    devDependencies:
+      '@keychord/chordtest':
+        specifier: workspace:*
+        version: link:../chordtest
+      '@keychord/config':
+        specifier: 'catalog:'
+        version: 0.0.12
+
   '@keychord/chords-com.apple.finder':
+    dependencies:
+      '@keychord/chords-menu':
+        specifier: workspace:*
+        version: link:../chords-menu
+    devDependencies:
+      '@keychord/chordtest':
+        specifier: workspace:*
+        version: link:../chordtest
+      '@keychord/config':
+        specifier: 'catalog:'
+        version: 0.0.12
+
+  '@keychord/chords-com.apple.keychainaccess':
     dependencies:
       '@keychord/chords-menu':
         specifier: workspace:*
@@ -416,6 +490,19 @@ importers:
       '@types/bun':
         specifier: latest
         version: 1.4.4
+
+  '@keychord/chords-com.apple.wifi.diagnostics':
+    dependencies:
+      '@keychord/chords-menu':
+        specifier: workspace:*
+        version: link:../chords-menu
+    devDependencies:
+      '@keychord/chordtest':
+        specifier: workspace:*
+        version: link:../chordtest
+      '@keychord/config':
+        specifier: 'catalog:'
+        version: 0.0.12
 
   '@keychord/chords-dock':
     devDependencies:

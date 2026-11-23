@@ -1,0 +1,8 @@
+name = 'Folder Actions Setup'
+
+[on.attach]
+file = 'attach.js'
+
+[chords]
+'?f' = { name = 'Folder' }
+'fa(.+)' = { name = 'Folder: Attach Script to $1', '@input:attach' = ['$1'] }
