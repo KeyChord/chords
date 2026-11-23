@@ -1,0 +1,9 @@
+name = 'Screenshot'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?f' = { name = 'File' }
+'fs' = { name = 'File: Save Screenshot', '@input:menu' = ['BY_PATH', ['File', 'Save']] }
+'fc' = { name = 'File: Copy and Close', '@input:menu' = ['BY_PATH', ['Edit', 'Copy and Close']] }
