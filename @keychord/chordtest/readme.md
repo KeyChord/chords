@@ -28,7 +28,7 @@ vp run test:macos -- @keychord/chords-click
 
 Requires an Apple Silicon Mac and at least 45 GiB free for the initial image and build output. Setup uses an existing Tart installation or installs the pinned [openai/tart 2.40.1 release](https://github.com/openai/tart/releases/tag/2.40.1) after verifying its SHA-256 checksum at `~/.local/share/chords-testing/tart.app/Contents/MacOS/tart`. Use `CHORD_TESTING_TART` to select another executable. The Homebrew alternative is `brew install openai/tools/tart`.
 
-The runner pins the Tahoe base image to digest `sha256:87f3aa5ce21b5c876268f233bdfecf38b4c2a8116fe9bbb718e714cbae187377` as `chords-testing-tahoe-87f3aa5c`, provisions Bun 1.4.4 and Vite+ 1.7.0, and caches locked dependencies in this baseline. Each test command clones the stopped baseline and deletes its own clone afterward.
+The runner pins the macOS 27 (Golden Gate) base image to digest `sha256:4859ea9483a1f6e377301f23a5243798044266a373fc36635e9dcd045e09292f` as `chords-testing-golden-gate-4859ea94`, provisions Bun 1.4.4 and Vite+ 1.7.0, and caches locked dependencies in this baseline. Each test command clones the stopped baseline and deletes its own clone afterward.
 
 It freezes the chords workspace and mounts the snapshot and Chord runtime read-only.
 The guest installs locked dependencies in `~/chords-workspace`. If the lockfile links
@@ -44,7 +44,7 @@ Behavior suites that call `withChordPackage` load the checked-in package in a ru
 Chord app and invoke its sequences through the Chord CLI. They need a complete
 `/Applications/Chord.app`. Set `CHORD_TESTING_APP` to use another build. They can use
 `withMacOSProbe` to observe menu items, window state and application focus independently.
-Spotlight's launcher needs a macOS 27 guest for a positive search test. The Accessibility
+Spotlight's launcher needs the default macOS 27 guest for a positive search test. The Accessibility
 Inspector tests need a guest with Xcode's Accessibility Inspector installed.
 
 Every `@keychord/*` package has `__tests__/macos.vm.test.ts`. The runner discovers these files rather than maintaining a package list. Full-suite discovery rejects a new package without a VM entry point; the host runner unit test also checks this coverage. Definition-only packages validate their TOML; packages with handlers also import their production JS; native packages compile and load their actual Swift addons. Click and menu packages exercise controlled AppKit fixture apps; tray tests also run their native Control Center checks. Browser and IDE smoke tests do not require accounts or third-party applications.

@@ -74,6 +74,8 @@ describe("isolated macOS testing", () => {
   test("pins the guest image and requires one VM entry point per chord package", async () => {
     expect(vmOptions({}).image).toBe(defaultVMImage);
     expect(defaultVMImage).toMatch(/@sha256:[a-f0-9]{64}$/);
+    // The baseline is named after its image digest, so a new pin gets its own VM.
+    expect(vmOptions({}).name).toEndWith(`-${defaultVMImage.split("@sha256:")[1]!.slice(0, 8)}`);
     const tests = discoverMacOSTests();
     for (const manifest of new Bun.Glob("@keychord/*/package.json").scanSync({
       cwd: workspaceRoot,

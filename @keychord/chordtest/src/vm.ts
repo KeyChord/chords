@@ -20,7 +20,7 @@ const localTart = join(localTools, "tart.app", "Contents", "MacOS", "tart");
 const tartVersion = "2.40.1";
 const tartArchiveSHA256 = "363e2701154a8155cbc1bb6d845430c9b42697d2a186bc49574471ca2877db46";
 export const defaultVMImage =
-  "ghcr.io/cirruslabs/macos-tahoe-base@sha256:87f3aa5ce21b5c876268f233bdfecf38b4c2a8116fe9bbb718e714cbae187377";
+  "ghcr.io/cirruslabs/macos-golden-gate-base@sha256:4859ea9483a1f6e377301f23a5243798044266a373fc36635e9dcd045e09292f";
 
 export function shellQuote(value: string) {
   return `'${value.replaceAll("'", "'\\''")}'`;
@@ -28,7 +28,7 @@ export function shellQuote(value: string) {
 
 export function vmOptions(env = process.env): VMOptions {
   const options = {
-    name: env.CHORD_TESTING_VM_NAME ?? "chords-testing-tahoe-87f3aa5c",
+    name: env.CHORD_TESTING_VM_NAME ?? "chords-testing-golden-gate-4859ea94",
     image: env.CHORD_TESTING_VM_IMAGE ?? defaultVMImage,
     workspace: workspaceRoot,
     tartHome: env.TART_HOME ?? join(homedir(), ".tart"),
