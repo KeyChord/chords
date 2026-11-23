@@ -1,0 +1,18 @@
+name = 'Tips'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?j' = { name = 'Jump' }
+'js' = { name = 'Jump: Help Search', '@input:menu' = ['SEARCH', 'Help Search'] }
+
+'?v' = { name = 'Vary' }
+'vs' = { name = 'Vary: Sidebar', '@input:menu' = ['SEARCH', 'Sidebar'] }
+
+'?g' = { name = 'Goto' }
+'gg' = { name = 'Goto: Mac User Guide', '@input:menu' = ['SEARCH', 'Mac User Guide'] }
+'gn' = { name = 'Goto: What’s New in macOS', '@input:menu' = ['SEARCH', 'What’s New in macOS'] }
+
+'?f' = { name = 'Find' }
+'ff' = { name = 'Find: On Page', '@input:menu' = ['SEARCH', 'Find…'] }

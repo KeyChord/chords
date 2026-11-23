@@ -1,0 +1,30 @@
+name = 'News'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?w' = { name = 'Window' }
+'wn' = { name = 'Window: New', '@input:menu' = ['BY_PATH', ['File', 'New Window']] }
+
+'?t' = { name = 'Tab' }
+'tn' = { name = 'Tab: New', '@input:menu' = ['BY_PATH', ['File', 'New Tab']] }
+'t[' = { name = 'Tab: Previous', '@input:menu' = ['BY_PATH', ['Window', 'Show Previous Tab']] }
+'t]' = { name = 'Tab: Next', '@input:menu' = ['BY_PATH', ['Window', 'Show Next Tab']] }
+'ta' = { name = 'Tab: Overview', '@input:menu' = ['BY_PATH', ['View', 'Show All Tabs']] }
+
+'?g' = { name = 'Goto' }
+'gd' = { name = 'Goto: Discover Channels', '@input:menu' = [
+  'BY_PATH',
+  [
+    'File',
+    'Discover Channels',
+  ],
+] }
+
+'?v' = { name = 'Vary' }
+'vs' = { name = 'Vary: Sidebar', '@input:menu' = ['SEARCH', 'Sidebar'] }
+'vt' = { name = 'Vary: Tab Bar', '@input:menu' = ['SEARCH', 'Tab Bar'] }
+
+'?s' = { name = 'Settings' }
+'sa' = { name = 'Settings: Open', '@input:menu' = ['BY_PATH', ['News', 'Settings…']] }

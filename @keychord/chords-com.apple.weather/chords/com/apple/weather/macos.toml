@@ -1,0 +1,30 @@
+name = 'Weather'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?j' = { name = 'Jump' }
+'js' = { name = 'Jump: Search', '@input:menu' = ['FOCUS', 'AXSearchField'] }
+
+'?v' = { name = 'Vary' }
+'vs' = { name = 'Vary: Sidebar', '@input:menu' = ['SEARCH', 'Sidebar'] }
+
+'?u' = { name = 'Units' }
+'uc' = { name = 'Units: Celsius', '@input:menu' = ['BY_PATH', ['View', 'Celsius']] }
+'uf' = { name = 'Units: Fahrenheit', '@input:menu' = ['BY_PATH', ['View', 'Fahrenheit']] }
+
+'?l' = { name = 'Location' }
+'la' = { name = 'Location: Add to List', '@input:menu' = [
+  'BY_PATH',
+  [
+    'File',
+    'Add Location to List',
+  ],
+] }
+
+'?m' = { name = 'Map' }
+'mo' = { name = 'Map: Open', '@input:menu' = ['BY_PATH', ['View', 'Show Map']] }
+
+'?s' = { name = 'Settings' }
+'sa' = { name = 'Settings: Open', '@input:menu' = ['BY_PATH', ['Weather', 'Settings…']] }

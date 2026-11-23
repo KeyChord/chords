@@ -1,0 +1,36 @@
+name = 'Maps'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?w' = { name = 'Window' }
+'wn' = { name = 'Window: New', '@input:menu' = ['BY_PATH', ['File', 'New Window']] }
+
+'?t' = { name = 'Tab' }
+'tn' = { name = 'Tab: New', '@input:menu' = ['BY_PATH', ['File', 'New Tab']] }
+
+'?j' = { name = 'Jump' }
+'js' = { name = 'Jump: Search', '@input:menu' = ['BY_PATH', ['Edit', 'Search']] }
+
+'?m' = { name = 'Map' }
+'me' = { name = 'Map: Explore', '@input:menu' = ['BY_PATH', ['View', 'Explore']] }
+'md' = { name = 'Map: Driving', '@input:menu' = ['BY_PATH', ['View', 'Driving']] }
+'mt' = { name = 'Map: Transit', '@input:menu' = ['BY_PATH', ['View', 'Transit']] }
+'ms' = { name = 'Map: Satellite', '@input:menu' = ['BY_PATH', ['View', 'Satellite']] }
+
+'?v' = { name = 'Vary' }
+'vs' = { name = 'Vary: Sidebar', '@input:menu' = ['SEARCH', 'Sidebar'] }
+'vd' = { name = 'Vary: Directions', '@input:menu' = ['SEARCH', 'Directions'] }
+'vm' = { name = 'Vary: 3D Map', '@input:menu' = ['SEARCH', '3D Map'] }
+'vc' = { name = 'Vary: Scale', '@input:menu' = ['SEARCH', 'Scale'] }
+
+'?z' = { name = 'Zoom' }
+'zi' = { name = 'Zoom: In', '@input:menu' = ['BY_PATH', ['View', 'Zoom In']] }
+'zo' = { name = 'Zoom: Out', '@input:menu' = ['BY_PATH', ['View', 'Zoom Out']] }
+
+'?f' = { name = 'File' }
+'fp' = { name = 'File: Print', '@input:menu' = ['BY_PATH', ['File', 'Print…']] }
+
+'?s' = { name = 'Settings' }
+'sa' = { name = 'Settings: Open', '@input:menu' = ['BY_PATH', ['Maps', 'Settings…']] }
