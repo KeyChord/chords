@@ -1,4 +1,6 @@
 import { tap } from "chord";
+import { homedir } from "node:os";
+import { isAbsolute, join } from "node:path";
 //#region ../../node_modules/.pnpm/array-uniq@3.0.0/node_modules/array-uniq/index.js
 function arrayUniq(array) {
 	return [...new Set(array)];
@@ -289,8 +291,8 @@ function expand_(str, max, maxLength, maxDepth, depth, maxRewrites, isTop) {
 	return acc;
 }
 //#endregion
-//#region ../../node_modules/.pnpm/js-yaml@5.4.3/node_modules/js-yaml/dist/js-yaml.mjs
-/*! js-yaml 5.4.3 https://github.com/nodeca/js-yaml @license MIT */
+//#region ../../node_modules/.pnpm/js-yaml@5.5.0/node_modules/js-yaml/dist/js-yaml.mjs
+/*! js-yaml 5.5.0 https://github.com/nodeca/js-yaml @license MIT */
 /**
 * Returned by a scalar resolver when the source does not match its tag.
 *
@@ -1599,16 +1601,17 @@ function getBlockValue(input, start, end, indent, chomping, folded) {
 		}
 		const content = line.slice(textIndent);
 		const first = content.charCodeAt(0);
-		if (folded) if (first === 32 || first === 9) {
-			atMoreIndented = true;
-			result += "\n".repeat(didReadContent ? 1 + emptyLines : emptyLines);
-		} else if (atMoreIndented) {
-			atMoreIndented = false;
-			result += "\n".repeat(emptyLines + 1);
-		} else if (emptyLines === 0) {
-			if (didReadContent) result += " ";
-		} else result += "\n".repeat(emptyLines);
-		else result += "\n".repeat(didReadContent ? 1 + emptyLines : emptyLines);
+		if (folded) {
+			if (first === 32 || first === 9) {
+				atMoreIndented = true;
+				result += "\n".repeat(didReadContent ? 1 + emptyLines : emptyLines);
+			} else if (atMoreIndented) {
+				atMoreIndented = false;
+				result += "\n".repeat(emptyLines + 1);
+			} else if (emptyLines === 0) {
+				if (didReadContent) result += " ";
+			} else result += "\n".repeat(emptyLines);
+		} else result += "\n".repeat(didReadContent ? 1 + emptyLines : emptyLines);
 		result += content;
 		didReadContent = true;
 		emptyLines = 0;
@@ -1640,24 +1643,69 @@ var DEFAULT_TAG_HANDLERS = Object.assign(Object.create(null), {
 	"!": "!",
 	"!!": "tag:yaml.org,2002:"
 });
-function tagPercentEncode(source) {
-	return encodeURI(source).replace(/!/g, "%21");
+var TAG_SUFFIX_CHARS = "-#;/?:@&=+$_.~*'()";
+var TAG_URI_CHARS = TAG_SUFFIX_CHARS + "!,[]";
+var HEX = "0123456789ABCDEF";
+function percentByte(byte) {
+	return "%" + HEX[byte >> 4] + HEX[byte & 15];
+}
+function tagPercentEncode(source, isSuffix) {
+	const allowed = isSuffix ? TAG_SUFFIX_CHARS : TAG_URI_CHARS;
+	let result = "";
+	for (let index = 0; index < source.length; index++) {
+		let ch = source.charCodeAt(index);
+		if (ch >= 48 && ch <= 57 || ch >= 65 && ch <= 90 || ch >= 97 && ch <= 122 || allowed.includes(source[index])) {
+			result += source[index];
+			continue;
+		}
+		if (ch >= 55296 && ch <= 56319) ch = 65536 + ((ch & 1023) << 10) + (source.charCodeAt(++index) & 1023);
+		if (ch < 128) result += percentByte(ch);
+		else if (ch < 2048) result += percentByte(192 | ch >> 6) + percentByte(128 | ch & 63);
+		else if (ch < 65536) result += percentByte(224 | ch >> 12) + percentByte(128 | ch >> 6 & 63) + percentByte(128 | ch & 63);
+		else result += percentByte(240 | ch >> 18) + percentByte(128 | ch >> 12 & 63) + percentByte(128 | ch >> 6 & 63) + percentByte(128 | ch & 63);
+	}
+	return result;
+}
+function tagPercentDecode(source) {
+	let result = "";
+	let index = 0;
+	while (index < source.length) {
+		if (source.charCodeAt(index) !== 37) {
+			result += source[index++];
+			continue;
+		}
+		let ch = parseInt(source.slice(index + 1, index + 3), 16);
+		index += 3;
+		if (ch >= 192) {
+			let remaining = ch < 224 ? 1 : ch < 240 ? 2 : 3;
+			ch &= (1 << 6 - remaining) - 1;
+			while (remaining-- > 0) {
+				ch = ch << 6 | parseInt(source.slice(index + 1, index + 3), 16) & 63;
+				index += 3;
+			}
+		}
+		if (ch < 65536) result += String.fromCharCode(ch);
+		else {
+			ch -= 65536;
+			result += String.fromCharCode(55296 | ch >> 10, 56320 | ch & 1023);
+		}
+	}
+	return result;
 }
 function tagNameFull(rawTag, tagHandlers) {
-	if (rawTag.startsWith("!<") && rawTag.endsWith(">")) return decodeURIComponent(rawTag.slice(2, -1));
+	if (rawTag.startsWith("!<") && rawTag.endsWith(">")) return tagPercentDecode(rawTag.slice(2, -1));
 	const handleEnd = rawTag.indexOf("!", 1);
 	const handle = handleEnd === -1 ? "!" : rawTag.slice(0, handleEnd + 1);
-	const prefix = tagHandlers?.[handle] ?? DEFAULT_TAG_HANDLERS[handle] ?? handle;
-	return decodeURIComponent(prefix) + decodeURIComponent(rawTag.slice(handle.length));
+	return tagPercentDecode(tagHandlers?.[handle] ?? DEFAULT_TAG_HANDLERS[handle] ?? handle) + tagPercentDecode(rawTag.slice(handle.length));
 }
 function tagNameShort(fullTag) {
 	let tag = fullTag;
 	if (tag.charCodeAt(0) === 33) {
 		tag = tag.slice(1);
-		return `!${tagPercentEncode(tag)}`;
+		return `!${tagPercentEncode(tag, true)}`;
 	}
-	if (tag.slice(0, 18) === "tag:yaml.org,2002:") return `!!${tagPercentEncode(tag.slice(18))}`;
-	return `!<${tagPercentEncode(tag)}>`;
+	if (tag.slice(0, 18) === "tag:yaml.org,2002:") return `!!${tagPercentEncode(tag.slice(18), true)}`;
+	return `!<${tagPercentEncode(tag, false)}>`;
 }
 var NO_RANGE$2 = -1;
 var MERGE_TAG_NAME = "tag:yaml.org,2002:merge";
@@ -2126,7 +2174,11 @@ function skipUntilLineEnd(state) {
 	while (ch !== 0 && !isEol(ch)) ch = state.input.charCodeAt(++state.position);
 }
 function checkPrintable(state, start, end) {
-	if (PATTERN_NON_PRINTABLE.test(state.input.slice(start, end))) throwError(state, "the stream contains non-printable characters");
+	const match = PATTERN_NON_PRINTABLE.exec(state.input.slice(start, end));
+	if (match !== null) {
+		state.position = start + match.index + match[0].length - 1;
+		throwError(state, "the stream contains non-printable characters");
+	}
 }
 function readTagProperty(state, props, inFlow) {
 	if (state.input.charCodeAt(state.position) !== 33) return false;
@@ -2153,12 +2205,14 @@ function readTagProperty(state, props, inFlow) {
 		state.position++;
 	} else {
 		while (ch !== 0 && !isWsOrEol(ch) && !(inFlow && isFlowIndicator(ch))) {
-			if (ch === 33) if (!isNamed) {
-				tagHandle = state.input.slice(suffixStart - 1, state.position + 1);
-				if (!PATTERN_TAG_HANDLE.test(tagHandle)) throwError(state, "named tag handle cannot contain such characters");
-				isNamed = true;
-				suffixStart = state.position + 1;
-			} else throwError(state, "tag suffix cannot contain exclamation marks");
+			if (ch === 33) {
+				if (!isNamed) {
+					tagHandle = state.input.slice(suffixStart - 1, state.position + 1);
+					if (!PATTERN_TAG_HANDLE.test(tagHandle)) throwError(state, "named tag handle cannot contain such characters");
+					isNamed = true;
+					suffixStart = state.position + 1;
+				} else throwError(state, "tag suffix cannot contain exclamation marks");
+			}
 			ch = state.input.charCodeAt(++state.position);
 		}
 		tagName = state.input.slice(suffixStart, state.position);
@@ -2342,7 +2396,7 @@ function readBlockScalar(state, parentIndent, props) {
 function canStartPlainScalar(state, nodeContext) {
 	const ch = state.input.charCodeAt(state.position);
 	const inFlow = nodeContext === CONTEXT_FLOW_IN;
-	if (ch === 0 || isWsOrEol(ch) || ch === 35 || ch === 38 || ch === 42 || ch === 33 || ch === 124 || ch === 62 || ch === 39 || ch === 34 || ch === 37 || ch === 64 || ch === 96 || inFlow && isFlowIndicator(ch)) return false;
+	if (ch === 0 || isWsOrEol(ch) || ch === 35 || ch === 38 || ch === 42 || ch === 33 || ch === 124 || ch === 62 || ch === 39 || ch === 34 || ch === 37 || ch === 64 || ch === 96 || isFlowIndicator(ch)) return false;
 	if (ch === 63 || ch === 45) {
 		const following = state.input.charCodeAt(state.position + 1);
 		if (isWsOrEolOrEnd(following) || inFlow && isFlowIndicator(following)) return false;
@@ -2614,19 +2668,20 @@ function parseNode(state, parentIndent, nodeContext, allowToSeek, allowCompact, 
 	if (indentStatus === 1 || nodeContext === CONTEXT_BLOCK_OUT) {
 		const flowIndent = nodeContext === CONTEXT_FLOW_IN || nodeContext === CONTEXT_FLOW_OUT ? parentIndent : parentIndent + 1;
 		const blockIndent = state.position - state.lineStart;
-		if (indentStatus === 1) if (allowBlockCollections && (readBlockSequence(state, blockIndent, props) || readBlockMapping(state, blockIndent, flowIndent, props)) || readFlowCollection(state, flowIndent, props)) hasContent = true;
-		else {
-			const ch = state.input.charCodeAt(state.position);
-			if (propertyStart !== null && allowPropertyMapping && allowBlockStyles && !allowBlockCollections && ch !== 124 && ch !== 62) {
-				const fallbackState = snapshotState(state);
-				const propertyIndent = propertyStart.position - propertyStart.lineStart;
-				restoreState(state, propertyStart);
-				if (readBlockMapping(state, propertyIndent, flowIndent, emptyProperties()) && state.events[fallbackState.eventsLength]?.type === EVENT_ID.MAPPING) hasContent = true;
-				else restoreState(state, fallbackState);
+		if (indentStatus === 1) {
+			if (allowBlockCollections && (readBlockSequence(state, blockIndent, props) || readBlockMapping(state, blockIndent, flowIndent, props)) || readFlowCollection(state, flowIndent, props)) hasContent = true;
+			else {
+				const ch = state.input.charCodeAt(state.position);
+				if (propertyStart !== null && allowPropertyMapping && allowBlockStyles && !allowBlockCollections && ch !== 124 && ch !== 62) {
+					const fallbackState = snapshotState(state);
+					const propertyIndent = propertyStart.position - propertyStart.lineStart;
+					restoreState(state, propertyStart);
+					if (readBlockMapping(state, propertyIndent, flowIndent, emptyProperties()) && state.events[fallbackState.eventsLength]?.type === EVENT_ID.MAPPING) hasContent = true;
+					else restoreState(state, fallbackState);
+				}
+				if (!hasContent && (allowBlockScalars && readBlockScalar(state, flowIndent, props) || readSingleQuotedScalar(state, flowIndent, props) || readDoubleQuotedScalar(state, flowIndent, props) || readAlias(state, props) || readPlainScalar(state, flowIndent, nodeContext, props))) hasContent = true;
 			}
-			if (!hasContent && (allowBlockScalars && readBlockScalar(state, flowIndent, props) || readSingleQuotedScalar(state, flowIndent, props) || readDoubleQuotedScalar(state, flowIndent, props) || readAlias(state, props) || readPlainScalar(state, flowIndent, nodeContext, props))) hasContent = true;
-		}
-		else if (indentStatus === 0) hasContent = allowBlockCollections && readBlockSequence(state, blockIndent, props);
+		} else if (indentStatus === 0) hasContent = allowBlockCollections && readBlockSequence(state, blockIndent, props);
 	}
 	allowBlockScalars = allowBlockScalars && !hasContent;
 	if (!hasContent && (props.anchorStart !== NO_RANGE$1 || props.tagStart !== NO_RANGE$1 || allowBlockScalars)) {
@@ -2771,6 +2826,14 @@ function loadDocuments(input, options = {}) {
 		...pick(opts, CONSTRUCTOR_OPT_KEYS),
 		source
 	});
+}
+function loadAll(input, iteratorOrOptions, options) {
+	let iterator = null;
+	if (typeof iteratorOrOptions === "function") iterator = iteratorOrOptions;
+	else if (iteratorOrOptions !== null && typeof iteratorOrOptions === "object") options = iteratorOrOptions;
+	const documents = loadDocuments(input, options);
+	if (iterator === null) return documents;
+	for (const document of documents) iterator(document);
 }
 /**
 * Parses `string` as a single YAML document. Throws {@link YAMLException} on
@@ -3396,8 +3459,10 @@ function writeBlockMapping(state, level, node, compact) {
 		const keyHasLineBreak = key.kind === "scalar" && key.value.indexOf("\n") !== -1;
 		const keyIsTooLong = keyText.length > 1024 && /^[\s\S]{1025}/u.test(keyText);
 		const explicitPair = keyIsBlock || keyHasLineBreak || keyIsTooLong;
-		if (explicitPair) if (keyText && CHAR_LINE_FEED === keyText.charCodeAt(0)) pairBuffer += "?";
-		else pairBuffer += "? ";
+		if (explicitPair) {
+			if (keyText && CHAR_LINE_FEED === keyText.charCodeAt(0)) pairBuffer += "?";
+			else pairBuffer += "? ";
+		}
 		pairBuffer += keyText;
 		if (explicitPair) pairBuffer += generateNextLine(state, level);
 		const valueText = writeNode(state, level + 1, value, node, {
@@ -3433,12 +3498,15 @@ function writeNode(state, level, node, parent, ctx) {
 	let body;
 	let shouldPrintTag = node.tagged;
 	const useBlockCollection = block && (node.kind === "mapping" || node.kind === "sequence") && node.style === COLLECTION_STYLE.BLOCK && node.items.length !== 0;
-	if (node.kind === "mapping") if (useBlockCollection) body = writeBlockMapping(state, level, node, compact);
-	else body = writeFlowMapping(state, level, node);
-	else if (node.kind === "sequence") if (useBlockCollection) if (state.seqNoIndent && !isblockseq && level > 0) body = writeBlockSequence(state, level - 1, node, compact);
-	else body = writeBlockSequence(state, level, node, compact);
-	else body = writeFlowSequence(state, level, node);
-	else {
+	if (node.kind === "mapping") {
+		if (useBlockCollection) body = writeBlockMapping(state, level, node, compact);
+		else body = writeFlowMapping(state, level, node);
+	} else if (node.kind === "sequence") {
+		if (useBlockCollection) {
+			if (state.seqNoIndent && !isblockseq && level > 0) body = writeBlockSequence(state, level - 1, node, compact);
+			else body = writeBlockSequence(state, level, node, compact);
+		} else body = writeFlowSequence(state, level, node);
+	} else {
 		const layout = scalarLayout(state, node, parent, level, iskey, !block);
 		detectAllowedStyles(layout);
 		for (const rule of state.scalarStyleRules) rule(layout);
@@ -3587,29 +3655,97 @@ CHOMPING_MODE.STRIP;
 CHOMPING_MODE.KEEP;
 //#endregion
 //#region src/js/warp.ts
+function configuredKeybindingsPath() {
+	if (process.platform === "win32") {
+		const root = Bun.env.LOCALAPPDATA || join(homedir(), "AppData", "Local");
+		return join(root, "warp", "Warp", "config", "keybindings.yaml");
+	}
+	const xdg = Bun.env.XDG_CONFIG_HOME;
+	const root = xdg && isAbsolute(xdg) ? xdg : join(homedir(), ".config");
+	return join(root, "warp-terminal", "keybindings.yaml");
+}
+const shiftedKeys = new Map(Object.entries({
+	"~": "`",
+	"!": "1",
+	"@": "2",
+	"#": "3",
+	$: "4",
+	"%": "5",
+	"^": "6",
+	"&": "7",
+	"*": "8",
+	"(": "9",
+	")": "0",
+	_: "-",
+	"+": "=",
+	"{": "[",
+	"}": "]",
+	"|": "\\",
+	":": ";",
+	"\"": "'",
+	"<": ",",
+	">": ".",
+	"?": "/"
+}));
+const warpModifiers = /* @__PURE__ */ new Set([
+	"alt",
+	"cmd",
+	"ctrl",
+	"meta",
+	"shift",
+	"super"
+]);
+function configuredShortcut(binding) {
+	return binding.trim().split(/\s+/).map((keystroke) => {
+		const separator = keystroke.endsWith("--") ? keystroke.length - 2 : keystroke === "-" ? -1 : keystroke.lastIndexOf("-");
+		const modifiers = separator < 0 ? [] : keystroke.slice(0, separator).split("-");
+		const key = keystroke.slice(separator + 1).toLowerCase();
+		if (!key || modifiers.some((modifier) => !warpModifiers.has(modifier))) throw new Error(`Invalid Warp shortcut: ${binding}`);
+		const unshifted = shiftedKeys.get(key);
+		if (unshifted && !modifiers.includes("shift")) modifiers.push("shift");
+		return [...modifiers, unshifted ?? (key === "numpadenter" ? "NumpadEnter" : key)].join("+");
+	}).join(" ");
+}
+function configuredWarpHandler(keybindingsPath) {
+	return async function command(action, defaultShortcut) {
+		const documents = loadAll(await Bun.file(keybindingsPath).text().catch((error) => {
+			if (error instanceof Error && "code" in error && error.code === "ENOENT") return "";
+			throw error;
+		}), null, { schema: FAILSAFE_SCHEMA });
+		const keybindings = documents[0];
+		if (documents.length > 1 || keybindings && (typeof keybindings !== "object" || Array.isArray(keybindings))) throw new Error(`Invalid Warp keybindings file: ${keybindingsPath}`);
+		const binding = keybindings && Object.hasOwn(keybindings, action) ? keybindings[action] : void 0;
+		if (binding !== void 0 && typeof binding !== "string") throw new Error(`Invalid Warp keybinding for ${action}`);
+		const shortcut = binding === void 0 ? defaultShortcut : binding === "none" ? void 0 : configuredShortcut(binding);
+		if (!shortcut) throw new Error(`Assign a keyboard shortcut to ${action} in Warp's settings.`);
+		await tap(shortcut);
+		return true;
+	};
+}
 function extractCommands(chords) {
 	const result = [];
 	for (const chord of Object.values(chords)) if (chord?.args?.[0] && !chord.shortcut) result.push(chord.args[0]);
 	return result;
 }
-async function buildWarpHandler() {
+async function buildWarpHandler(mode, keybindingsPath) {
+	if (mode === "configured") return configuredWarpHandler(keybindingsPath ?? configuredKeybindingsPath());
 	const syntheticKeybinds = generateSyntheticKeybinds(extractCommands(this.chordsFile.chords), [
 		"alt+shift+cmd+{0..9}",
 		"ctrl+cmd+shift+{0..9}",
 		"ctrl+alt+shift+{0..9}"
 	].flatMap((pattern) => expand(pattern)));
 	const sortedCommands = Object.keys(syntheticKeybinds).sort();
-	const keybindingsPath = `${Bun.env.HOME}/.warp/keybindings.yaml`;
+	const macKeybindingsPath = `${Bun.env.HOME}/.warp/keybindings.yaml`;
 	let keybindings = {};
-	if (await Bun.file(keybindingsPath).exists()) {
-		const yml = load(await Bun.file(keybindingsPath).text());
+	if (await Bun.file(macKeybindingsPath).exists()) {
+		const yml = load(await Bun.file(macKeybindingsPath).text());
 		if (typeof yml === "object" && yml !== null) keybindings = yml;
 	}
 	for (const cmd of sortedCommands) {
 		const keybind = syntheticKeybinds[cmd].replaceAll("+", "-");
 		keybindings[cmd] = keybind;
 	}
-	await Bun.write(keybindingsPath, "---\n" + dump(keybindings));
+	await Bun.write(macKeybindingsPath, "---\n" + dump(keybindings));
 	return function command(cmd) {
 		const keybind = keybindings[cmd];
 		if (!keybind) return false;

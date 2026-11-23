@@ -19,9 +19,11 @@ Chord package for the [Warp](https://www.warp.dev/) terminal. For other terminal
 - [Warp on Linux](./chords/dev/warp/Warp-Stable/linux.toml) and
   [Warp on Windows](./chords/dev/warp/Warp-Stable/windows.toml) share the same chords for find,
   blocks, commands, bookmarks, tabs, panes, scrolling, font size, Warp Drive, and terminal input.
-  They use [Warp's default shortcuts](https://docs.warp.dev/getting-started/keyboard-shortcuts).
-  Advanced actions such as pane resizing, single-line scrolling, and toggling mouse reporting
-  can be found in Warp's command palette (`cp`).
+  Chord reads [Warp's keybindings file](https://docs.warp.dev/terminal/settings/file-locations)
+  when you run a chord and falls back to [Warp's defaults](https://docs.warp.dev/getting-started/keyboard-shortcuts)
+  for actions you haven't remapped. Assign a shortcut in Warp's **Settings → Keyboard Shortcuts**
+  for actions without defaults, including the block menu (`bm`), pane resizing
+  (`ru`, `rd`, `rl`, `rr`), single-line scrolling (`slu`, `sld`), and mouse reporting (`im`).
 
 ## Install
 
