@@ -1,0 +1,5 @@
+name = 'PhpStorm'
+executables = ['phpstorm', 'jetbrains-phpstorm']
+
+[[import]]
+file = 'base-linux.toml'

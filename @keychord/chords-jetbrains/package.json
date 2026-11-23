@@ -11,6 +11,9 @@
     "url": "https://github.com/KeyChord/chords-jetbrains"
   },
   "type": "module",
+  "scripts": {
+    "test": "bun test --isolate"
+  },
   "dependencies": {
     "nano-spawn-compat": "latest",
     "outdent": "latest"

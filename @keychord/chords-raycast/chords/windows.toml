@@ -1,0 +1,17 @@
+name = 'Raycast'
+
+[meta]
+chord = '>=0.3.4'
+
+[on.raycast]
+file = 'raycast-windows.js'
+
+[placeholders]
+"<>" = { name = 'Raycast prefix', default = '/' }
+
+[chords]
+'?<>' = { name = 'Launch' }
+'<>' = { name = 'Raycast: Open', fallback = true, '@input:raycast' = [] }
+'<>(raycast://extensions/.*)' = { name = 'Raycast: Open Command', fallback = true, '@input:raycast' = [
+  '$1',
+] }

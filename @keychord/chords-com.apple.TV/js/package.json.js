@@ -1,9 +1,9 @@
-//#region package.json
+// package.json
 var name = "@keychord/chords-com.apple.TV";
 var displayName = "TV Chords";
 var version = "0.0.2";
-var description = "Chords for TV (com.apple.TV).";
-var categories = ["macOS"];
+var description = "Chords for the Apple TV app on macOS and Windows.";
+var categories = ["Windows", "macOS"];
 var repository = {
 	"type": "git",
 	"url": "https://github.com/KeyChord/chords-com.apple.TV"
@@ -374,75 +374,178 @@ var chords = {
 			}
 		}
 	} } } },
-	"com": { "apple": { "TV": { "macos.toml": {
-		"name": "TV",
-		"on": { "menu": { "file": "@keychord/chords-menu/js/menu.js" } },
-		"chords": {
-			"?a": { "name": "App" },
-			"a,": {
-				"name": "App: Settings",
-				"@input:menu": ["BY_PATH", ["TV", "Settings…"]]
-			},
-			"?g": { "name": "Goto" },
-			"g/": {
-				"name": "Goto: Search",
-				"shortcut": "cmd+f"
-			},
-			"?n": { "name": "New" },
-			"np": {
-				"name": "New: Playlist",
-				"@input:menu": ["BY_PATH", [
-					"File",
-					"New",
-					"Playlist"
-				]]
-			},
-			"ns": {
-				"name": "New: Smart Playlist",
-				"@input:menu": ["BY_PATH", [
-					"File",
-					"New",
-					"Smart Playlist"
-				]]
-			},
-			"?f": { "name": "File" },
-			"fi": {
-				"name": "File: Import",
-				"@input:menu": ["BY_PATH", ["File", "Import…"]]
-			},
-			"ff": {
-				"name": "File: Show in Finder",
-				"@input:menu": ["BY_PATH", ["File", "Show in Finder"]]
-			},
-			"?v": { "name": "View" },
-			"va": {
-				"name": "View: Activity",
-				"@input:menu": ["BY_PATH", ["Window", "Activity"]]
-			},
-			"vo": {
-				"name": "View: View Options",
-				"@input:menu": ["SEARCH", "View Options"]
-			},
-			"vb": {
-				"name": "View: Status Bar",
-				"@input:menu": ["SEARCH", "Status Bar"]
-			},
-			"?i": { "name": "Item" },
-			"ii": {
-				"name": "Item: Get Info",
-				"@input:menu": ["BY_PATH", ["Actions", "Get Info…"]]
-			},
-			"?p": { "name": "Playback" },
-			"pp": {
-				"name": "Playback: Play",
-				"@input:menu": ["BY_PATH", ["Controls", "Play"]]
-			},
-			"ph": {
-				"name": "Playback: Pause",
-				"@input:menu": ["BY_PATH", ["Controls", "Pause"]]
+	"com": { "apple": { "TV": {
+		"macos.toml": {
+			"name": "TV",
+			"on": { "menu": { "file": "@keychord/chords-menu/js/menu.js" } },
+			"chords": {
+				"?a": { "name": "App" },
+				"a,": {
+					"name": "App: Settings",
+					"@input:menu": ["BY_PATH", ["TV", "Settings…"]]
+				},
+				"?g": { "name": "Goto" },
+				"g/": {
+					"name": "Goto: Search",
+					"shortcut": "cmd+f"
+				},
+				"?n": { "name": "New" },
+				"np": {
+					"name": "New: Playlist",
+					"@input:menu": ["BY_PATH", [
+						"File",
+						"New",
+						"Playlist"
+					]]
+				},
+				"ns": {
+					"name": "New: Smart Playlist",
+					"@input:menu": ["BY_PATH", [
+						"File",
+						"New",
+						"Smart Playlist"
+					]]
+				},
+				"?f": { "name": "File" },
+				"fi": {
+					"name": "File: Import",
+					"@input:menu": ["BY_PATH", ["File", "Import…"]]
+				},
+				"ff": {
+					"name": "File: Show in Finder",
+					"@input:menu": ["BY_PATH", ["File", "Show in Finder"]]
+				},
+				"?v": { "name": "View" },
+				"va": {
+					"name": "View: Activity",
+					"@input:menu": ["BY_PATH", ["Window", "Activity"]]
+				},
+				"vo": {
+					"name": "View: View Options",
+					"@input:menu": ["SEARCH", "View Options"]
+				},
+				"vb": {
+					"name": "View: Status Bar",
+					"@input:menu": ["SEARCH", "Status Bar"]
+				},
+				"?i": { "name": "Item" },
+				"ii": {
+					"name": "Item: Get Info",
+					"@input:menu": ["BY_PATH", ["Actions", "Get Info…"]]
+				},
+				"?p": { "name": "Playback" },
+				"pp": {
+					"name": "Playback: Play",
+					"@input:menu": ["BY_PATH", ["Controls", "Play"]]
+				},
+				"ph": {
+					"name": "Playback: Pause",
+					"@input:menu": ["BY_PATH", ["Controls", "Pause"]]
+				}
+			}
+		},
+		"windows.toml": {
+			"name": "Apple TV",
+			"executables": ["AppleTV.exe"],
+			"meta": { "chord": ">=0.3.4" },
+			"chords": {
+				"?a": { "name": "App" },
+				"a,": {
+					"name": "App: Settings",
+					"shortcut": "ctrl+comma"
+				},
+				"ah": {
+					"name": "App: Help",
+					"shortcut": "f1"
+				},
+				"aa": {
+					"name": "App: Account Menu",
+					"shortcut": "alt n u"
+				},
+				"?g": { "name": "Goto" },
+				"g/": {
+					"name": "Goto: Search",
+					"shortcut": "alt n f"
+				},
+				"gr": {
+					"name": "Goto: Recently Added",
+					"shortcut": "alt n n"
+				},
+				"gm": {
+					"name": "Goto: Movies",
+					"shortcut": "alt n m"
+				},
+				"gt": {
+					"name": "Goto: TV Shows",
+					"shortcut": "alt n t"
+				},
+				"g4": {
+					"name": "Goto: 4K HDR",
+					"shortcut": "alt n 4"
+				},
+				"gl": {
+					"name": "Goto: Rentals",
+					"shortcut": "alt n r"
+				},
+				"gh": {
+					"name": "Goto: Home Videos",
+					"shortcut": "alt n e"
+				},
+				"gd": {
+					"name": "Goto: Downloaded",
+					"shortcut": "alt n d"
+				},
+				"gg": {
+					"name": "Goto: Genres",
+					"shortcut": "alt n g"
+				},
+				"?n": { "name": "Playlist" },
+				"np": {
+					"name": "Playlist: New",
+					"shortcut": "ctrl+n"
+				},
+				"nc": {
+					"name": "Playlist: Copy Selected",
+					"shortcut": "ctrl+c"
+				},
+				"nd": {
+					"name": "Playlist: Delete Selected",
+					"shortcut": "backspace"
+				},
+				"?f": { "name": "File" },
+				"fi": {
+					"name": "File: Add to Library",
+					"shortcut": "ctrl+o"
+				},
+				"fd": {
+					"name": "File: Add Folder to Library",
+					"shortcut": "ctrl+shift+o"
+				},
+				"?v": { "name": "View" },
+				"va": {
+					"name": "View: Download Activity",
+					"shortcut": "ctrl+shift+l"
+				},
+				"vs": {
+					"name": "View: Sidebar Actions",
+					"shortcut": "alt m m"
+				},
+				"?p": { "name": "Playback" },
+				"pp": {
+					"name": "Playback: Play or Pause",
+					"shortcut": "space"
+				},
+				"pu": {
+					"name": "Playback: Increase Volume",
+					"shortcut": "ctrl+up"
+				},
+				"pd": {
+					"name": "Playback: Decrease Volume",
+					"shortcut": "ctrl+down"
+				}
 			}
 		}
-	} } } },
+	} } },
 	"macos.toml": {
 		"name": "TV",
 		"chords": {}
@@ -462,5 +565,4 @@ var package_default = {
 	packageManager,
 	chords
 };
-//#endregion
 export { categories, chords, package_default as default, dependencies, description, devDependencies, displayName, name, packageManager, repository, scripts, type, version };

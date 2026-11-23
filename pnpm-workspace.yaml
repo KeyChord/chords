@@ -23,3 +23,5 @@ allowBuilds:
 
 minimumReleaseAgeExclude:
   - "@keychord/config@0.0.12"
+patchedDependencies:
+  '@keychord/config@0.0.12': patches/@keychord__config@0.0.12.patch

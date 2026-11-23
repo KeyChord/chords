@@ -2,8 +2,9 @@
   "name": "@keychord/chords-com.apple.screencaptureui",
   "displayName": "Screenshot Chords",
   "version": "0.0.2",
-  "description": "Chords for Screenshot (com.apple.screencaptureui).",
+  "description": "Chords for Screenshot on macOS and Snipping Tool on Windows.",
   "categories": [
+    "Windows",
     "macOS"
   ],
   "repository": {

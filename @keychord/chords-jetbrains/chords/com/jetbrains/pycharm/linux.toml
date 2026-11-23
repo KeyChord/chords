@@ -1,0 +1,5 @@
+name = 'PyCharm'
+executables = ['pycharm', 'jetbrains-pycharm', 'jetbrains-pycharm-ce']
+
+[[import]]
+file = 'base-linux.toml'

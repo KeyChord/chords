@@ -7,7 +7,7 @@ A private development package for authors of the chord packages in the
 [`KeyChord/chords`](https://github.com/KeyChord/chords) monorepo. It is not a chord package and
 is not installed in Chord; it is only used from a checkout of the monorepo.
 
-Shared Bun and native macOS test helpers, plus a Tart VM runner for UI tests. The VM has its own desktop, and runs without a host window, audio passthrough, or clipboard sharing. UI helpers check `hw.model` and refuse to run on the physical Mac, even if `CHORD_TESTING_UI=1` is set.
+The Bun unit-test helpers and preloaded host mocks support macOS, Linux, and Windows. The Tart runner and Swift addon integration tests require an Apple Silicon Mac. The VM has its own desktop, and runs without a host window, audio passthrough, or clipboard sharing. UI helpers check `hw.model` and refuse to run on the physical Mac, even if `CHORD_TESTING_UI=1` is set.
 
 From the workspace root:
 

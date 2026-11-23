@@ -1,0 +1,74 @@
+[meta]
+url = 'https://docs.warp.dev/getting-started/keyboard-shortcuts'
+
+[chords]
+'?f' = { name = 'Find' }
+'f' = { name = 'Find', shortcut = 'ctrl+shift+f' }
+'f]' = { name = 'Find: Next Match', shortcut = 'f3' }
+'f[' = { name = 'Find: Previous Match', shortcut = 'shift+f3' }
+
+'?b' = { name = 'Block' }
+'ba' = { name = 'Block: Select All', shortcut = 'ctrl+shift+a' }
+'bs' = { name = 'Block: Share', shortcut = 'ctrl+shift+s' }
+'bc' = { name = 'Block: Clear All', shortcut = 'ctrl+shift+k' }
+'b[' = { name = 'Block: Previous', shortcut = 'ctrl+up' }
+'b]' = { name = 'Block: Next', shortcut = 'ctrl+down' }
+'bu' = { name = 'Block: Expand Selection Up', shortcut = 'shift+up' }
+'bd' = { name = 'Block: Expand Selection Down', shortcut = 'shift+down' }
+
+'?c' = { name = 'Command' }
+'co' = { name = 'Command: Copy Output', shortcut = 'ctrl+shift+alt+c' }
+'cr' = { name = 'Command: Reinput', shortcut = 'ctrl+shift+i' }
+'cc' = { name = 'Command: Copy', shortcut = 'ctrl+shift+c' }
+'cp' = { name = 'Command: Palette', shortcut = 'ctrl+shift+p' }
+'cs' = { name = 'Command: Search', shortcut = 'ctrl+r' }
+
+'?m' = { name = 'Mark' }
+'mb' = { name = 'Mark: Bookmark Block', shortcut = 'ctrl+shift+b' }
+'mu' = { name = 'Mark: Previous Bookmark', shortcut = 'alt+up' }
+'md' = { name = 'Mark: Next Bookmark', shortcut = 'alt+down' }
+
+'?t' = { name = 'Tab' }
+'tn' = { name = 'Tab: New', shortcut = 'ctrl+shift+t' }
+'tq' = { name = 'Close Current Pane or Tab', shortcut = 'ctrl+shift+w' }
+'to' = { name = 'Tab: Reopen Closed', shortcut = 'ctrl+alt+t' }
+'t1' = { name = 'Switch to Tab 1', shortcut = 'ctrl+1' }
+'t2' = { name = 'Switch to Tab 2', shortcut = 'ctrl+2' }
+'t3' = { name = 'Switch to Tab 3', shortcut = 'ctrl+3' }
+'t4' = { name = 'Switch to Tab 4', shortcut = 'ctrl+4' }
+'t5' = { name = 'Switch to Tab 5', shortcut = 'ctrl+5' }
+'t6' = { name = 'Switch to Tab 6', shortcut = 'ctrl+6' }
+'t7' = { name = 'Switch to Tab 7', shortcut = 'ctrl+7' }
+'t8' = { name = 'Switch to Tab 8', shortcut = 'ctrl+8' }
+'t9' = { name = 'Switch to Last Tab', shortcut = 'ctrl+9' }
+'t[' = { name = 'Switch to Previous Tab', shortcut = 'ctrl+pageup' }
+'t]' = { name = 'Switch to Next Tab', shortcut = 'ctrl+pagedown' }
+'tl' = { name = 'Move Current Tab Left', shortcut = 'ctrl+shift+left' }
+'tr' = { name = 'Move Current Tab Right', shortcut = 'ctrl+shift+right' }
+
+'?s' = { name = 'Split / Scroll' }
+'sn' = { name = 'Split: Focus Up', shortcut = 'ctrl+alt+up' }
+'se' = { name = 'Split: Focus Right', shortcut = 'ctrl+alt+right' }
+'ss' = { name = 'Split: Focus Down', shortcut = 'ctrl+alt+down' }
+'sw' = { name = 'Split: Focus Left', shortcut = 'ctrl+alt+left' }
+'sd' = { name = 'Split: Down', shortcut = 'ctrl+shift+e' }
+'sr' = { name = 'Split: Right', shortcut = 'ctrl+shift+d' }
+'sm' = { name = 'Split: Toggle Maximize Pane', shortcut = 'ctrl+shift+enter' }
+'spu' = { name = 'Scroll Up One Page', shortcut = 'pageup' }
+'spd' = { name = 'Scroll Down One Page', shortcut = 'pagedown' }
+'st' = { name = 'Scroll to Top', shortcut = 'home' }
+'sb' = { name = 'Scroll to Bottom', shortcut = 'end' }
+
+'?z' = { name = 'Zoom' }
+'zi' = { name = 'Increase Font Size', shortcut = 'ctrl+=' }
+'zo' = { name = 'Decrease Font Size', shortcut = 'ctrl+-' }
+'zr' = { name = 'Reset Font Size', shortcut = 'ctrl+0' }
+
+'?p' = { name = 'Panel' }
+'pd' = { name = 'Panel: Drive', shortcut = 'ctrl+shift+backslash' }
+
+'?i' = { name = 'Input' }
+'in' = { name = 'Input: Natural Language', shortcut = 'ctrl+backtick' }
+'if' = { name = 'Input: Focus Terminal', shortcut = 'ctrl+shift+l' }
+'iw' = { name = 'Input: Workflows', shortcut = 'ctrl+shift+r' }
+'is' = { name = 'Input: Warpify Subshell', shortcut = 'ctrl+i' }

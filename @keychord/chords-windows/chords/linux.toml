@@ -1,0 +1,29 @@
+name = 'Linux Window Management'
+
+[meta]
+chord = '>=0.3.0'
+
+[placeholders]
+"<>" = { name = 'Window prefix', default = 'w' }
+
+[chords]
+'?<>' = { name = 'Window' }
+'<>l' = { name = 'Window: Tile Left', shortcut = 'super+left' }
+'<>r' = { name = 'Window: Tile Right', shortcut = 'super+right' }
+'<>f' = { name = 'Window: Maximize', shortcut = 'super+up' }
+'<>u' = { name = 'Window: Restore', shortcut = 'super+down' }
+'<>m' = { name = 'Window: Minimize', shortcut = 'super+h' }
+'<>q' = { name = 'Window: Close', shortcut = 'alt+f4' }
+'<>p' = { name = 'Window: Move with Arrow Keys', shortcut = 'alt+f7' }
+'<>d' = { name = 'Window: Resize with Arrow Keys', shortcut = 'alt+f8' }
+'<>a' = { name = 'Window: Open Window Menu', shortcut = 'alt+space' }
+'<>]' = { name = 'Window: Switch to Another Window of This App', shortcut = 'alt+f6' }
+'?<>s' = { name = 'Window: Move to Workspace' }
+'<>s1' = { name = 'Window: Move to First Workspace', shortcut = 'super+shift+home' }
+'<>s[' = { name = 'Window: Move to Previous Workspace', shortcut = 'super+shift+pageup' }
+'<>s]' = { name = 'Window: Move to Next Workspace', shortcut = 'super+shift+pagedown' }
+'?<>g' = { name = 'Window: Move to Monitor' }
+'<>gl' = { name = 'Window: Move to Left Monitor', shortcut = 'super+shift+left' }
+'<>gr' = { name = 'Window: Move to Right Monitor', shortcut = 'super+shift+right' }
+'<>gt' = { name = 'Window: Move to Upper Monitor', shortcut = 'super+shift+up' }
+'<>gb' = { name = 'Window: Move to Lower Monitor', shortcut = 'super+shift+down' }

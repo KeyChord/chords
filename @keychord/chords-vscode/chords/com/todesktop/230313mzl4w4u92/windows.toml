@@ -1,0 +1,5 @@
+name = 'Cursor'
+executables = ['Cursor.exe']
+
+[[import]]
+file = 'com/microsoft/VSCode/windows.toml'

@@ -1,0 +1,5 @@
+name = 'Ghostty'
+executables = ['ghostty', 'com.mitchellh.ghostty']
+
+[[import]]
+file = 'tabs-alt.desktop.toml'

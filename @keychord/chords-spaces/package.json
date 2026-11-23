@@ -2,7 +2,7 @@
   "name": "@keychord/chords-spaces",
   "displayName": "Spaces Chords",
   "version": "0.0.2",
-  "description": "Switch between macOS Spaces by direction or desktop number.",
+  "description": "Navigate macOS Spaces, Linux workspaces, and Windows virtual desktops.",
   "categories": [
     "Window Management"
   ],

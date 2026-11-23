@@ -1,0 +1,34 @@
+name = 'GNOME Dash'
+
+[meta]
+chord = '>=0.3.4'
+
+[placeholders]
+"<>" = { name = 'Dash prefix', default = 't' }
+
+[chords]
+'?<>' = { name = 'GNOME Dash' }
+'<>v' = { name = 'Activities Overview', shortcut = 'super' }
+'<>w[' = { name = 'Previous Application', shortcut = 'super+shift+tab' }
+'<>w]' = { name = 'Next Application', shortcut = 'super+tab' }
+
+'<>1' = { name = 'Open or Switch to Dash App 1', shortcut = 'super+1' }
+'<>2' = { name = 'Open or Switch to Dash App 2', shortcut = 'super+2' }
+'<>3' = { name = 'Open or Switch to Dash App 3', shortcut = 'super+3' }
+'<>4' = { name = 'Open or Switch to Dash App 4', shortcut = 'super+4' }
+'<>5' = { name = 'Open or Switch to Dash App 5', shortcut = 'super+5' }
+'<>6' = { name = 'Open or Switch to Dash App 6', shortcut = 'super+6' }
+'<>7' = { name = 'Open or Switch to Dash App 7', shortcut = 'super+7' }
+'<>8' = { name = 'Open or Switch to Dash App 8', shortcut = 'super+8' }
+'<>9' = { name = 'Open or Switch to Dash App 9', shortcut = 'super+9' }
+
+'?<>n' = { name = 'Open New Dash Window' }
+'<>n1' = { name = 'Open New Dash Window 1', shortcut = 'super+ctrl+1' }
+'<>n2' = { name = 'Open New Dash Window 2', shortcut = 'super+ctrl+2' }
+'<>n3' = { name = 'Open New Dash Window 3', shortcut = 'super+ctrl+3' }
+'<>n4' = { name = 'Open New Dash Window 4', shortcut = 'super+ctrl+4' }
+'<>n5' = { name = 'Open New Dash Window 5', shortcut = 'super+ctrl+5' }
+'<>n6' = { name = 'Open New Dash Window 6', shortcut = 'super+ctrl+6' }
+'<>n7' = { name = 'Open New Dash Window 7', shortcut = 'super+ctrl+7' }
+'<>n8' = { name = 'Open New Dash Window 8', shortcut = 'super+ctrl+8' }
+'<>n9' = { name = 'Open New Dash Window 9', shortcut = 'super+ctrl+9' }

@@ -1,0 +1,13 @@
+name = 'Navigation'
+
+[meta]
+chord = '>=0.3.0'
+
+[placeholders]
+"<>" = { name = 'Navigation prefix', default = 'n' }
+
+[chords]
+'?<>' = { name = 'Navigation' }
+'<>[' = { name = 'Navigation: Go Back', shortcut = 'alt+left' }
+'<>]' = { name = 'Navigation: Default Action', shortcut = 'enter' }
+'<>x' = { name = 'Navigation: Cancel / Dismiss', shortcut = 'escape' }

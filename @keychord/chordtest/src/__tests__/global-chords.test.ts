@@ -5,7 +5,7 @@ import { chordPattern, expandPlaceholders, type ChordPlaceholders } from "../pat
 type Binding = { fallback?: boolean };
 type ChordsFile = { placeholders?: ChordPlaceholders; chords?: Record<string, Binding> };
 
-const root = new URL("../../../../", import.meta.url).pathname;
+const root = Bun.fileURLToPath(new URL("../../../../", import.meta.url));
 // A package's root chords file holds its global chords; app chords live in nested folders.
 const packages = await Promise.all(
   [...new Bun.Glob("@keychord/*/chords/macos.toml").scanSync({ cwd: root })]
@@ -17,7 +17,7 @@ const packages = await Promise.all(
         key: expandPlaceholders(raw, file.placeholders),
         binding,
       }));
-      return { name: path.split("/")[1]!, file, keys };
+      return { name: path.split(/[\\/]/)[1]!, file, keys };
     }),
 );
 

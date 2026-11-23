@@ -1,0 +1,8 @@
+name = 'Vivaldi'
+executables = ['vivaldi.exe']
+
+[[import]]
+file = 'vivaldi.desktop.toml'
+
+[[import]]
+file = 'window.windows.toml'

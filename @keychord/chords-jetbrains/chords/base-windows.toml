@@ -1,0 +1,10 @@
+name = "JetBrains Windows Chords"
+
+[[import]]
+file = 'base.desktop.toml'
+
+[chords]
+'csw' = { name = "Code: Surround With", shortcut = "ctrl+alt+t" }
+'us' = { name = "Usages: Show", shortcut = "ctrl+alt+f7" }
+'zo' = { name = "Zoom Out", shortcut = "alt+shift+-" }
+'zi' = { name = "Zoom In", shortcut = "alt+shift+equals" }

@@ -1,0 +1,5 @@
+name = 'GoLand'
+executables = ['goland', 'jetbrains-goland']
+
+[[import]]
+file = 'base-linux.toml'

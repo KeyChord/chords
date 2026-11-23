@@ -2,7 +2,7 @@
   "name": "@keychord/chords-whatsapp",
   "displayName": "WhatsApp Chords",
   "version": "0.0.1",
-  "description": "Chords for the native WhatsApp app, covering chats, Info, groups, calls, settings and more.",
+  "description": "Chords for WhatsApp on macOS, Windows, and Linux X11.",
   "categories": [
     "Social"
   ],

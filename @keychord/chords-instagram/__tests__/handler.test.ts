@@ -217,6 +217,94 @@ test("multiple unfocused Instagram pages are left untouched", async () => {
   ).toBe(true);
 });
 
+test("both portable manifests expose the same eleven actions with a dedicated prefix", async () => {
+  const mac = Bun.TOML.parse(
+    await Bun.file(
+      new URL(
+        "../chords/com/brave/Browser/app/akpamiohjfcnimfljfndmaldlcfphjmp/macos.toml",
+        import.meta.url,
+      ),
+    ).text(),
+  ) as { chords: Record<string, unknown> };
+  const expected = Object.fromEntries(
+    Object.entries(mac.chords)
+      .filter(([chord]) => !chord.startsWith("?"))
+      .map(([chord, binding]) => ["<>" + chord, binding]),
+  );
+  for (const platform of ["linux", "windows"]) {
+    const manifest = Bun.TOML.parse(
+      await Bun.file(new URL(`../chords/${platform}.toml`, import.meta.url)).text(),
+    ) as {
+      on: { instagram: { file: string; args: unknown[] } };
+      chords: Record<string, unknown>;
+    };
+    expect(manifest.on.instagram).toEqual({ file: "instagram.js", args: [9222, "desktop"] });
+    expect(
+      Object.fromEntries(
+        Object.entries(manifest.chords).filter(([chord]) => !chord.startsWith("?")),
+      ),
+    ).toEqual(expected);
+  }
+});
+
+test("portable chords require Brave to own keyboard focus and never relaunch it", async () => {
+  const handler = buildHandler(9222, "desktop");
+  await expect(handler.call({ focusedAppId: "executable.chrome" }, "HOME")).rejects.toThrow(
+    "Focus Instagram in Brave",
+  );
+  expect(fetchMock).not.toHaveBeenCalled();
+  expect(configureBraveDebugging).not.toHaveBeenCalled();
+});
+
+test("portable chords reject external endpoints and send the guarded action only to the focused Instagram page", async () => {
+  const focused = "ws://127.0.0.1:9222/devtools/page/focused";
+  const background = "ws://127.0.0.1:9222/devtools/page/background";
+  fetchMock.mockResolvedValue({
+    ok: true,
+    json: async () => [
+      target(undefined, "ws://127.0.0.1:9333/devtools/page/wrong-port"),
+      target(undefined, "ws://example.com:9222/devtools/page/remote"),
+      target("https://instagram.com.example.com/", "ws://127.0.0.1:9222/devtools/page/lookalike"),
+      target(undefined, background),
+      target(undefined, focused),
+    ],
+  });
+  const source = buildInstagramJavaScript("HOME");
+  reply = (expression, endpoint) => ({
+    id: 1,
+    result: {
+      result: { value: expression.includes(source) ? '{"ok":true}' : endpoint === focused },
+    },
+  });
+  const handler = buildHandler(9222, "desktop");
+  await expect(handler.call({ focusedAppId: "com.brave.Browser" }, "HOME")).resolves.toBe(true);
+  expect(sockets.map((socket) => socket.url)).toEqual([background, focused, focused]);
+  expect(sockets[2].requests[0].params.expression).toContain("The Instagram page lost focus.");
+  expect(sockets[2].requests[0].params.expression).toContain(source);
+  expect(configureBraveDebugging).not.toHaveBeenCalled();
+});
+
+test("portable chords reject a lone background tab or multiple focused pages", async () => {
+  const handler = buildHandler(9222, "desktop");
+  reply = () => ({ id: 1, result: { result: { value: false } } });
+  await expect(handler.call({ focusedAppId: "executable.brave" }, "HOME")).rejects.toThrow(
+    "Focus one Instagram page",
+  );
+  expect(sockets).toHaveLength(1);
+  fetchMock.mockResolvedValue({
+    ok: true,
+    json: async () => [
+      target(),
+      target(undefined, "ws://127.0.0.1:9222/devtools/page/also-focused"),
+    ],
+  });
+  reply = () => ({ id: 1, result: { result: { value: true } } });
+  await expect(handler.call({ focusedAppId: "executable.brave" }, "HOME")).rejects.toThrow(
+    "Focus one Instagram page",
+  );
+  expect(sockets).toHaveLength(3);
+});
+
 test("page errors propagate and a following chord can still run", async () => {
   const handler = buildHandler();
   reply = () => ({

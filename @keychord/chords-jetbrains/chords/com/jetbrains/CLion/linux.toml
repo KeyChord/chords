@@ -1,0 +1,5 @@
+name = 'CLion'
+executables = ['clion', 'jetbrains-clion']
+
+[[import]]
+file = 'base-linux.toml'

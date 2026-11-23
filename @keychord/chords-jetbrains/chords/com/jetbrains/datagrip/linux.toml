@@ -1,0 +1,5 @@
+name = 'DataGrip'
+executables = ['datagrip', 'jetbrains-datagrip']
+
+[[import]]
+file = 'base-linux.toml'

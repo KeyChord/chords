@@ -1,0 +1,17 @@
+name = 'Windows Virtual Desktops'
+
+[meta]
+chord = '>=0.3.4'
+
+[placeholders]
+"<>" = { name = 'Desktop prefix', default = 'd' }
+
+[chords]
+'?<>' = { name = 'Virtual Desktops' }
+'<>[' = { name = 'Desktop: Previous', shortcut = 'super+ctrl+left' }
+'<>]' = { name = 'Desktop: Next', shortcut = 'super+ctrl+right' }
+'<>l' = { name = 'Desktop: Previous', shortcut = 'super+ctrl+left' }
+'<>r' = { name = 'Desktop: Next', shortcut = 'super+ctrl+right' }
+'<>v' = { name = 'Desktop: Open Task View', shortcut = 'super+tab' }
+'<>n' = { name = 'Desktop: Create', shortcut = 'super+ctrl+d' }
+'<>q' = { name = 'Desktop: Close Current', shortcut = 'super+ctrl+f4' }

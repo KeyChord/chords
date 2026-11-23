@@ -1,0 +1,44 @@
+name = 'WhatsApp'
+executables = ['WhatsApp.Root.exe', 'WhatsApp.exe']
+
+[meta]
+chord = '>=0.3.4'
+
+[chords]
+'?c' = { name = 'Chat' }
+'cq' = { name = 'Chat: Close', shortcut = 'escape' }
+'cb' = { name = 'Chat: Block', shortcut = 'ctrl+shift+b' }
+'c/' = { name = 'Chat: Search', shortcut = 'ctrl+shift+f' }
+'cn' = { name = 'Chat: New', shortcut = 'ctrl+alt+n' }
+'cp' = { name = 'Chat: Pin', shortcut = 'ctrl+alt+shift+p' }
+'ch' = { name = 'Chat: Archive', shortcut = 'ctrl+shift+a' }
+'cm' = { name = 'Chat: Mute', shortcut = 'ctrl+shift+m' }
+'cu' = { name = 'Chat: Mark Unread', shortcut = 'ctrl+shift+u' }
+'c[' = { name = 'Chat: Previous', shortcut = 'ctrl+[' }
+'c]' = { name = 'Chat: Next', shortcut = 'ctrl+]' }
+'ci' = { name = 'Chat: Info', shortcut = 'alt+i' }
+'cgc' = { name = 'Chat Groups > Create', shortcut = 'ctrl+shift+n' }
+'c1' = { name = 'Chat: Open 1', shortcut = 'ctrl+1' }
+'c2' = { name = 'Chat: Open 2', shortcut = 'ctrl+2' }
+'c3' = { name = 'Chat: Open 3', shortcut = 'ctrl+3' }
+'c4' = { name = 'Chat: Open 4', shortcut = 'ctrl+4' }
+'c5' = { name = 'Chat: Open 5', shortcut = 'ctrl+5' }
+'c6' = { name = 'Chat: Open 6', shortcut = 'ctrl+6' }
+'c7' = { name = 'Chat: Open 7', shortcut = 'ctrl+7' }
+'c8' = { name = 'Chat: Open 8', shortcut = 'ctrl+8' }
+'c9' = { name = 'Chat: Open 9', shortcut = 'ctrl+9' }
+
+'?g' = { name = 'Goto' }
+'gi' = { name = 'Goto: Info', shortcut = 'alt+i' }
+'g,' = { name = 'Goto: Settings', shortcut = 'alt+s' }
+'g/' = { name = 'Goto: Search', shortcut = 'ctrl+alt+/' }
+
+'?i' = { name = 'Info' }
+'i/' = { name = 'Info > Search', shortcut = 'ctrl+shift+f' }
+'im' = { name = 'Info > Mute', shortcut = 'ctrl+shift+m' }
+'ib' = { name = 'Info > Block', shortcut = 'ctrl+shift+b' }
+
+'?z' = { name = 'Zoom' }
+'zi' = { name = 'Zoom In', shortcut = 'ctrl+shift+=' }
+'zo' = { name = 'Zoom Out', shortcut = 'ctrl+-' }
+'zr' = { name = 'Zoom Reset', shortcut = 'ctrl+0' }

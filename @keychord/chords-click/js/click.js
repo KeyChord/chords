@@ -145,7 +145,7 @@ function resolveClickSequence(positions, bounds, clampEdges = true) {
 //#region src/js/click.ts
 const CLICK_SEQUENCE_DELAY_MS = 500;
 /** Send resolved screen points to one window, with an optional check before each click. */
-async function clickPoints(bounds, points, validate) {
+async function clickPoints(bounds, points, validate, pointerClick = false) {
 	const { x, y, width, height, windowId } = bounds;
 	let held;
 	let keepHeld = false;
@@ -189,20 +189,18 @@ async function clickPoints(bounds, points, validate) {
 				}
 				const options = {
 					...target,
-					moveCursor: true,
 					...point.click === "RIGHT" || point.click === "MIDDLE" ? { button: point.click === "RIGHT" ? "right" : "middle" } : {},
 					...point.click === "DOUBLE" ? { clickCount: 2 } : {},
 					...point.click === "LONG" ? { pressDurationMs: 500 } : {}
 				};
-				if (windowId === void 0) {
-					const { moveCursor: _, ...globalOptions } = options;
-					await mouse({
-						...globalOptions,
-						action: "click"
-					});
-				} else await click({
+				if (windowId === void 0 || pointerClick) await mouse({
 					...options,
-					windowId
+					action: "click"
+				});
+				else await click({
+					...options,
+					windowId,
+					moveCursor: true
 				});
 			}
 			keepHeld = !!point.hold;
@@ -231,8 +229,10 @@ function buildClickHandler(bundleId) {
 		pending = action.catch(() => {});
 		return action;
 	}
-	return function click(sequence, defaultClick = "LEFT") {
+	return function click(sequence, defaultClick = "LEFT", inputMode) {
 		const appId = bundleId ?? this?.focusedAppId;
+		const pointerClick = inputMode === "POINTER";
+		const focusedWindowId = pointerClick && bundleId === void 0 ? this?.focusedWindowId : null;
 		let positions;
 		let global = false;
 		try {
@@ -259,8 +259,12 @@ function buildClickHandler(bundleId) {
 			let validate;
 			if (global) bounds = getScreenBounds();
 			else {
-				const window = getAppWindows(appId)[0];
-				if (!window) throw new Error(`No on-screen window found for ${appId}`);
+				const windows = getAppWindows(appId);
+				const window = focusedWindowId == null ? windows[0] : windows.find(({ windowId }) => windowId === focusedWindowId);
+				if (!window) {
+					if (focusedWindowId != null) throw new Error("The captured window is no longer on screen");
+					throw new Error(`No on-screen window found for ${appId}`);
+				}
 				bounds = {
 					...window.bounds,
 					windowId: window.windowId
@@ -274,7 +278,7 @@ function buildClickHandler(bundleId) {
 				};
 			}
 			const points = resolveClickSequence(positions, bounds);
-			await clickPoints(bounds, points, validate);
+			await clickPoints(bounds, points, validate, pointerClick);
 			holdingMouse = !!points.at(-1)?.hold;
 		});
 	};

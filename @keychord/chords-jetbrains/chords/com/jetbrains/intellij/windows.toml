@@ -1,0 +1,5 @@
+name = 'IntelliJ IDEA'
+executables = ['idea64.exe', 'idea.exe']
+
+[[import]]
+file = 'base-windows.toml'

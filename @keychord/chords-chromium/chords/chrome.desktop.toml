@@ -1,0 +1,36 @@
+# Defaults shared by Chrome, Chromium, Brave and Edge.
+name = 'Chrome Desktop Shortcuts'
+
+[[import]]
+file = 'base.desktop.toml'
+
+[chords]
+'t1' = { name = 'Tab 1', shortcut = 'ctrl+1' }
+'t2' = { name = 'Tab 2', shortcut = 'ctrl+2' }
+'t3' = { name = 'Tab 3', shortcut = 'ctrl+3' }
+'t4' = { name = 'Tab 4', shortcut = 'ctrl+4' }
+'t5' = { name = 'Tab 5', shortcut = 'ctrl+5' }
+'t6' = { name = 'Tab 6', shortcut = 'ctrl+6' }
+'t7' = { name = 'Tab 7', shortcut = 'ctrl+7' }
+'t8' = { name = 'Tab 8', shortcut = 'ctrl+8' }
+'t9' = { name = 'Last Tab', shortcut = 'ctrl+9' }
+
+'ph' = { name = 'Page: History', shortcut = 'ctrl+h' }
+'pd' = { name = 'Page: Downloads', shortcut = 'ctrl+j' }
+'pm' = { name = 'Page: Home', shortcut = 'alt+home' }
+
+'?b' = { name = 'Bookmarks' }
+'bt' = { name = 'Bookmarks: Toggle Bar', shortcut = 'ctrl+shift+b' }
+'bm' = { name = 'Bookmarks: Manager', shortcut = 'ctrl+shift+o' }
+'bs' = { name = 'Bookmark: Save', shortcut = 'ctrl+d' }
+'bf' = { name = 'Bookmarks: Folder from Tabs', shortcut = 'ctrl+shift+d' }
+
+'ga' = { name = 'Goto: Profile', shortcut = 'ctrl+shift+m' }
+'gm' = { name = 'Goto: Browser Menu', shortcut = 'alt+f' }
+
+'odb' = { name = 'Delete Browsing Data', shortcut = 'ctrl+shift+delete' }
+'fd]' = { name = 'Focus Next Pane', shortcut = 'f6' }
+'fd[' = { name = 'Focus Previous Pane', shortcut = 'shift+f6' }
+'ofb' = { name = 'Open Feedback', shortcut = 'alt+shift+i' }
+'cb' = { name = 'Caret Browsing', shortcut = 'f7' }
+'sw' = { name = 'Search Web', shortcut = 'ctrl+k' }

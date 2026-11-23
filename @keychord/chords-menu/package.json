@@ -2,7 +2,7 @@
   "name": "@keychord/chords-menu",
   "displayName": "Menu Chords",
   "version": "0.0.4",
-  "description": "Chords for app menus, menu bar extras, Control Center and menu bar visibility, in whichever app is focused.",
+  "description": "System shortcuts for Linux and Windows, plus application menus and the menu bar on macOS.",
   "categories": [
     "macOS"
   ],

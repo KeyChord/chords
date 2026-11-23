@@ -1,0 +1,10 @@
+name = 'Vivaldi Desktop Shortcuts'
+
+[[import]]
+file = 'base.desktop.toml'
+
+[chords]
+'tl' = { name = 'Tab: Move Left', shortcut = 'ctrl+shift+pgup' }
+'tr' = { name = 'Tab: Move Right', shortcut = 'ctrl+shift+pgdown' }
+'p,' = { name = 'Page: Settings', shortcut = 'ctrl+f12' }
+'ph' = { name = 'Page: History', shortcut = 'ctrl+h' }

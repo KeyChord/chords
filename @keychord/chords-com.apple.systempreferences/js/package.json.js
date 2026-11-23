@@ -2,7 +2,7 @@
 var name = "@keychord/chords-com.apple.systempreferences";
 var displayName = "System Preferences Chords";
 var version = "0.0.1";
-var description = "Chords for System Preferences (com.apple.systempreferences).";
+var description = "Open system settings panels on macOS, GNOME on Linux, and Windows.";
 var categories = ["macOS"];
 var repository = {
   type: "git",
@@ -167,6 +167,119 @@ var chords = {
         },
       },
     },
+    microsoft: {
+      WindowsSettings: {
+        "windows.toml": {
+          name: "Windows Settings",
+          executables: ["SystemSettings.exe"],
+          meta: { chord: ">=0.3.4" },
+          chords: {
+            "?g": { name: "Go to Settings Page" },
+            gaa: {
+              name: "Go to Your Info",
+              shell: 'start "" "ms-settings:yourinfo"',
+            },
+            gwi: {
+              name: "Go to Wi-Fi",
+              shell: 'start "" "ms-settings:network-wifi"',
+            },
+            gbl: {
+              name: "Go to Bluetooth",
+              shell: 'start "" "ms-settings:bluetooth"',
+            },
+            gne: {
+              name: "Go to Network & Internet",
+              shell: 'start "" "ms-settings:network-status"',
+            },
+            gvp: {
+              name: "Go to VPN",
+              shell: 'start "" "ms-settings:network-vpn"',
+            },
+            gba: {
+              name: "Go to Power & Battery",
+              shell: 'start "" "ms-settings:powersleep"',
+            },
+            gge: {
+              name: "Go to About",
+              shell: 'start "" "ms-settings:about"',
+            },
+            gac: {
+              name: "Go to Accessibility Display",
+              shell: 'start "" "ms-settings:easeofaccess-display"',
+            },
+            gap: {
+              name: "Go to Personalization",
+              shell: 'start "" "ms-settings:personalization"',
+            },
+            gdd: {
+              name: "Go to Taskbar",
+              shell: 'start "" "ms-settings:taskbar"',
+            },
+            gdi: {
+              name: "Go to Display",
+              shell: 'start "" "ms-settings:display"',
+            },
+            gwa: {
+              name: "Go to Background",
+              shell: 'start "" "ms-settings:personalization-background"',
+            },
+            gno: {
+              name: "Go to Notifications",
+              shell: 'start "" "ms-settings:notifications"',
+            },
+            gso: {
+              name: "Go to Sound",
+              shell: 'start "" "ms-settings:sound"',
+            },
+            gls: {
+              name: "Go to Lock Screen",
+              shell: 'start "" "ms-settings:lockscreen"',
+            },
+            gps: {
+              name: "Go to Privacy",
+              shell: 'start "" "ms-settings:privacy"',
+            },
+            gtp: {
+              name: "Go to Sign-in Options",
+              shell: 'start "" "ms-settings:signinoptions"',
+            },
+            gia: {
+              name: "Go to Email & Accounts",
+              shell: 'start "" "ms-settings:emailandaccounts"',
+            },
+            gke: {
+              name: "Go to Typing",
+              shell: 'start "" "ms-settings:typing"',
+            },
+            gtr: {
+              name: "Go to Mouse & Touchpad",
+              shell: 'start "" "ms-settings:mousetouchpad"',
+            },
+            gpr: {
+              name: "Go to Printers & Scanners",
+              shell: 'start "" "ms-settings:printers"',
+            },
+          },
+        },
+      },
+    },
+  },
+  "linux.toml": {
+    name: "GNOME Settings",
+    meta: { chord: ">=0.3.4" },
+    placeholders: {
+      "<>": {
+        name: "System Settings prefix",
+        default: "/",
+      },
+    },
+    chords: {
+      "<>,": {
+        name: "GNOME Settings",
+        shell:
+          "command -v gnome-control-center >/dev/null && { gnome-control-center </dev/null >/dev/null 2>&1 & }",
+      },
+    },
   },
   "macos.toml": {
     name: "System Preferences",
@@ -181,6 +294,116 @@ var chords = {
       "<>,": {
         name: "System Preferences",
         shell: "open -b com.apple.systempreferences",
+      },
+    },
+  },
+  org: {
+    gnome: {
+      Settings: {
+        "linux.toml": {
+          name: "GNOME Settings",
+          executables: ["gnome-control-center"],
+          meta: { chord: ">=0.3.4" },
+          chords: {
+            "?g": { name: "Go to Settings Page" },
+            gwi: {
+              name: "Go to Wi-Fi",
+              shell:
+                "command -v gnome-control-center >/dev/null && { gnome-control-center wifi </dev/null >/dev/null 2>&1 & }",
+            },
+            gbl: {
+              name: "Go to Bluetooth",
+              shell:
+                "command -v gnome-control-center >/dev/null && { gnome-control-center bluetooth </dev/null >/dev/null 2>&1 & }",
+            },
+            gne: {
+              name: "Go to Network",
+              shell:
+                "command -v gnome-control-center >/dev/null && { gnome-control-center network </dev/null >/dev/null 2>&1 & }",
+            },
+            gba: {
+              name: "Go to Power",
+              shell:
+                "command -v gnome-control-center >/dev/null && { gnome-control-center power </dev/null >/dev/null 2>&1 & }",
+            },
+            gac: {
+              name: "Go to Accessibility",
+              shell:
+                "command -v gnome-control-center >/dev/null && { gnome-control-center universal-access </dev/null >/dev/null 2>&1 & }",
+            },
+            gdd: {
+              name: "Go to Multitasking",
+              shell:
+                "command -v gnome-control-center >/dev/null && { gnome-control-center multitasking </dev/null >/dev/null 2>&1 & }",
+            },
+            gdi: {
+              name: "Go to Displays",
+              shell:
+                "command -v gnome-control-center >/dev/null && { gnome-control-center display </dev/null >/dev/null 2>&1 & }",
+            },
+            gsp: {
+              name: "Go to Search",
+              shell:
+                "command -v gnome-control-center >/dev/null && { gnome-control-center search </dev/null >/dev/null 2>&1 & }",
+            },
+            gwa: {
+              name: "Go to Background",
+              shell:
+                "command -v gnome-control-center >/dev/null && { gnome-control-center background </dev/null >/dev/null 2>&1 & }",
+            },
+            gno: {
+              name: "Go to Notifications",
+              shell:
+                "command -v gnome-control-center >/dev/null && { gnome-control-center notifications </dev/null >/dev/null 2>&1 & }",
+            },
+            gso: {
+              name: "Go to Sound",
+              shell:
+                "command -v gnome-control-center >/dev/null && { gnome-control-center sound </dev/null >/dev/null 2>&1 & }",
+            },
+            gps: {
+              name: "Go to Privacy",
+              shell:
+                "command -v gnome-control-center >/dev/null && { gnome-control-center privacy </dev/null >/dev/null 2>&1 & }",
+            },
+            gia: {
+              name: "Go to Online Accounts",
+              shell:
+                "command -v gnome-control-center >/dev/null && { gnome-control-center online-accounts </dev/null >/dev/null 2>&1 & }",
+            },
+            gke: {
+              name: "Go to Keyboard",
+              shell:
+                "command -v gnome-control-center >/dev/null && { gnome-control-center keyboard </dev/null >/dev/null 2>&1 & }",
+            },
+            gtr: {
+              name: "Go to Mouse & Touchpad",
+              shell:
+                "command -v gnome-control-center >/dev/null && { gnome-control-center mouse </dev/null >/dev/null 2>&1 & }",
+            },
+            gpr: {
+              name: "Go to Printers",
+              shell:
+                "command -v gnome-control-center >/dev/null && { gnome-control-center printers </dev/null >/dev/null 2>&1 & }",
+            },
+          },
+        },
+      },
+    },
+  },
+  "windows.toml": {
+    name: "Windows Settings",
+    meta: { chord: ">=0.3.4" },
+    placeholders: {
+      "<>": {
+        name: "System Settings prefix",
+        default: "/",
+      },
+    },
+    chords: {
+      "<>,": {
+        name: "Windows Settings",
+        shell: 'start "" "ms-settings:"',
       },
     },
   },

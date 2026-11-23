@@ -40,6 +40,7 @@ function target(
 ) {
   return { type: "page", url, webSocketDebuggerUrl: endpoint };
 }
+const pageEndpoint = (id: string, port = 9222) => `ws://127.0.0.1:${port}/devtools/page/${id}`;
 const fetchMock = mock();
 beforeEach(() => {
   sockets.length = 0;
@@ -94,6 +95,10 @@ test("all ten TOML bindings reach the page through the configured handler", asyn
 });
 
 test("the handler supports a configured local debugging port", async () => {
+  fetchMock.mockResolvedValue({
+    ok: true,
+    json: async () => [target(undefined, pageEndpoint("youtube", 9333))],
+  });
   await buildHandler(9333)("PAUSE");
   expect(fetchMock.mock.calls[0][0]).toBe("http://127.0.0.1:9333/json/list");
 });
@@ -121,6 +126,8 @@ test("non-YouTube pages, workers, and lookalike domains are excluded", async () 
       target("https://youtube.com.example.com"),
       { ...target(), type: "service_worker" },
       target("not a URL"),
+      target(undefined, "ws://example.com:9222/devtools/page/unrelated"),
+      target(undefined, pageEndpoint("different-port", 9333)),
     ],
   });
   await expect(buildHandler()("PLAY")).rejects.toThrow("Open the YouTube app");
@@ -128,20 +135,22 @@ test("non-YouTube pages, workers, and lookalike domains are excluded", async () 
 });
 
 test("several YouTube pages route the action only to the focused one", async () => {
+  const first = pageEndpoint("first");
+  const focused = pageEndpoint("focused");
   fetchMock.mockResolvedValue({
     ok: true,
-    json: async () => [target(undefined, "ws://first"), target(undefined, "ws://focused")],
+    json: async () => [target(undefined, first), target(undefined, focused)],
   });
   replies = (expression, url) => ({
     id: 1,
     result: {
       result: {
-        value: expression === "document.hasFocus()" ? url === "ws://focused" : '{"ok":true}',
+        value: expression === "document.hasFocus()" ? url === focused : '{"ok":true}',
       },
     },
   });
   await buildHandler()("MUTE");
-  expect(sockets.map((s) => s.url)).toEqual(["ws://first", "ws://focused", "ws://focused"]);
+  expect(sockets.map((s) => s.url)).toEqual([first, focused, focused]);
   expect(sockets[0].requests).toHaveLength(1);
   expect(sockets.every((s) => s.close.mock.calls.length === 1)).toBe(true);
 });
@@ -149,13 +158,74 @@ test("several YouTube pages route the action only to the focused one", async () 
 test("multiple unfocused pages do not receive a command", async () => {
   fetchMock.mockResolvedValue({
     ok: true,
-    json: async () => [target(), target(undefined, "ws://second")],
+    json: async () => [target(), target(undefined, pageEndpoint("second"))],
   });
   replies = () => ({ id: 1, result: { result: { value: false } } });
   await expect(buildHandler()("PLAY")).rejects.toThrow("Focus the YouTube app");
   expect(
     sockets.every((s) => s.requests.every((r) => r.params.expression === "document.hasFocus()")),
   ).toBe(true);
+});
+
+test.each(["linux", "windows"])(
+  "all ten %s bindings reach only the focused page",
+  async (platform) => {
+    const path = new URL(`../chords/${platform}.toml`, import.meta.url);
+    const bindings = Bun.TOML.parse(await Bun.file(path).text()) as {
+      on: { youtube: { file: string; args: Parameters<typeof buildHandler> } };
+      chords: Record<string, { "@input:youtube"?: Parameters<ReturnType<typeof buildHandler>> }>;
+    };
+    const { file, args } = bindings.on.youtube;
+    expect(file).toBe("youtube.js");
+    expect(args).toEqual([9222, true]);
+    const handler = buildHandler(...args);
+    replies = (expression) => ({
+      id: 1,
+      result: {
+        result: { value: expression === "document.hasFocus()" ? true : '{"ok":true}' },
+      },
+    });
+    const commands = Object.values(bindings.chords).flatMap((binding) => {
+      const command = binding["@input:youtube"];
+      return command ? [command] : [];
+    });
+    expect(commands).toHaveLength(10);
+    for (const [action, seconds] of commands) {
+      const targetSecond = seconds === "$1" ? "30" : seconds;
+      await expect(handler(action, targetSecond)).resolves.toBe(true);
+      expect(sockets.at(-2)!.requests[0].params.expression).toBe("document.hasFocus()");
+      const expression = sockets.at(-1)!.requests[0].params.expression;
+      expect(expression).toContain("document.hasFocus() &&");
+      expect(expression).toContain(buildYouTubeJavaScript(action, targetSecond));
+    }
+  },
+);
+
+test("a single background YouTube page receives no player action on desktop", async () => {
+  replies = () => ({ id: 1, result: { result: { value: false } } });
+  await expect(buildHandler(9222, true)("PLAY")).rejects.toThrow("Focus the YouTube app");
+  expect(sockets).toHaveLength(1);
+  expect(sockets[0].requests[0].params.expression).toBe("document.hasFocus()");
+});
+
+test.each([
+  { focused: false, hostname: "youtube.com" },
+  { focused: true, hostname: "youtube.com.example.com" },
+])("desktop player actions recheck focus and origin before execution", (page) => {
+  replies = (expression) => ({
+    id: 1,
+    result: {
+      result: {
+        value:
+          expression === "document.hasFocus()" ||
+          new Function("document", "location", `return ${expression}`)(
+            { hasFocus: () => page.focused },
+            { hostname: page.hostname, protocol: "https:" },
+          ),
+      },
+    },
+  });
+  return expect(buildHandler(9222, true)("PLAY")).rejects.toThrow("lost focus");
 });
 
 test("page failures propagate to Chord", async () => {

@@ -1,0 +1,49 @@
+name = 'Chromium Desktop Shortcuts'
+
+[chords]
+'?w' = { name = 'Window' }
+'wn' = { name = 'Window: New', shortcut = 'ctrl+n' }
+'wi' = { name = 'Window: Private', shortcut = 'ctrl+shift+n' }
+'wc' = { name = 'Window: Close', shortcut = 'alt+f4' }
+
+'?t' = { name = 'Tab' }
+'tq' = { name = 'Tab: Close', shortcut = 'ctrl+w' }
+'tn' = { name = 'Tab: New', shortcut = 'ctrl+t' }
+'to' = { name = 'Tab: Reopen', shortcut = 'ctrl+shift+t' }
+'t]' = { name = 'Tab: Next', shortcut = 'ctrl+tab' }
+'t[' = { name = 'Tab: Previous', shortcut = 'ctrl+shift+tab' }
+
+'?h' = { name = 'History' }
+'hb' = { name = 'History: Back', shortcut = 'alt+left' }
+'hf' = { name = 'History: Forward', shortcut = 'alt+right' }
+
+'?p' = { name = 'Page' }
+'ps' = { name = 'Page: Save', shortcut = 'ctrl+s' }
+
+'?m' = { name = 'Match' }
+'mf' = { name = 'Match: Find', shortcut = 'ctrl+f' }
+'m]' = { name = 'Match: Next', shortcut = 'ctrl+g' }
+'m[' = { name = 'Match: Previous', shortcut = 'ctrl+shift+g' }
+
+'?z' = { name = 'Zoom' }
+'zi' = { name = 'Zoom In', shortcut = 'ctrl+plus' }
+'zo' = { name = 'Zoom Out', shortcut = 'ctrl+minus' }
+'zr' = { name = 'Zoom Reset', shortcut = 'ctrl+0' }
+
+'?l' = { name = 'Load' }
+'lr' = { name = 'Load: Reload', shortcut = 'ctrl+r' }
+'lh' = { name = 'Load: Hard Reload', shortcut = 'ctrl+shift+r' }
+'ls' = { name = 'Load: Stop', shortcut = 'esc' }
+
+'?g' = { name = 'Goto' }
+'gb' = { name = 'Goto: Address Bar', shortcut = 'ctrl+l' }
+
+'fs' = { name = 'Full Screen', shortcut = 'f11' }
+'fso' = { name = 'Full Screen Off', shortcut = 'f11' }
+'dt' = { name = 'Developer Tools', shortcut = 'ctrl+shift+i' }
+'pr' = { name = 'Print', shortcut = 'ctrl+p' }
+'of' = { name = 'Open File', shortcut = 'ctrl+o' }
+'sc' = { name = 'Source Code', shortcut = 'ctrl+u' }
+'jc' = { name = 'JavaScript Console', shortcut = 'ctrl+shift+j' }
+'sd' = { name = 'Scroll Down', shortcut = 'space' }
+'su' = { name = 'Scroll Up', shortcut = 'shift+space' }

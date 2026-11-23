@@ -20,6 +20,7 @@ import * as chord from "./chord.ts";
 mock.module("chord", () => chord);
 
 const namespaceModule = Bun.fileURLToPath(new URL("./module-namespace.ts", import.meta.url));
+const namespaceSpecifier = Bun.pathToFileURL(namespaceModule).href;
 const defaultImplementation = Symbol.for("chordtest.defaultImplementation");
 const loaders: Record<string, "js" | "jsx" | "ts" | "tsx"> = {
   ".js": "js",
@@ -36,7 +37,7 @@ plugin({
   name: "chord-test-runtime",
   setup(build) {
     build.onResolve({ filter: /^\.\.?\/.*\.node$/ }, ({ path, importer }) => {
-      if (importer.includes("/node_modules/")) return undefined;
+      if (/[\\/]node_modules[\\/]/.test(importer)) return undefined;
       // A non-`.node` path keeps Bun's Node-API loader away; mock.module resolves the same path.
       return { path: `${resolve(dirname(importer), path)}.stub.js`, namespace: "chord-native" };
     });
@@ -51,14 +52,14 @@ plugin({
 
     // Same package binding and vendored layout as Chord's import.meta hook. Kept on the first
     // line so stack traces keep their line numbers.
-    build.onLoad({ filter: /^(?!.*\/node_modules\/).*\.[cm]?[jt]sx?$/ }, async ({ path }) => {
+    build.onLoad({ filter: /^(?!.*[\\/]node_modules[\\/]).*\.[cm]?[jt]sx?$/ }, async ({ path }) => {
       const source = await Bun.file(path).text();
       const loader = loaders[extname(path)] ?? "js";
       if (path === namespaceModule || !source.includes("import.meta")) {
         return { contents: source, loader };
       }
       return {
-        contents: `import { createModuleNamespace as __chordTestNamespace } from ${JSON.stringify(namespaceModule)}; import.meta.chord = __chordTestNamespace(${JSON.stringify(path)}); ${source}`,
+        contents: `import { createModuleNamespace as __chordTestNamespace } from ${JSON.stringify(namespaceSpecifier)}; import.meta.chord = __chordTestNamespace(${JSON.stringify(path)}); ${source}`,
         loader,
       };
     });

@@ -1,0 +1,5 @@
+name = 'WebStorm'
+executables = ['webstorm64.exe', 'webstorm.exe']
+
+[[import]]
+file = 'base-windows.toml'

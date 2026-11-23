@@ -1,0 +1,10 @@
+name = 'File Explorer'
+
+[meta]
+chord = '>=0.3.4'
+
+[placeholders]
+"<>" = { name = 'Finder prefix', default = '/' }
+
+[chords]
+'<>f' = { name = 'Open File Explorer', shortcut = 'super+e' }

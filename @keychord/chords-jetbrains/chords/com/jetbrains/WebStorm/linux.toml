@@ -1,0 +1,5 @@
+name = 'WebStorm'
+executables = ['webstorm', 'jetbrains-webstorm']
+
+[[import]]
+file = 'base-linux.toml'

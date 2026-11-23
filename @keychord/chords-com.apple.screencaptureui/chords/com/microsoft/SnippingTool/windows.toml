@@ -1,0 +1,10 @@
+name = 'Snipping Tool'
+executables = ['SnippingTool.exe']
+
+[meta]
+chord = '>=0.3.4'
+
+[chords]
+'?f' = { name = 'File' }
+'fs' = { name = 'File: Save Snip', shortcut = 'ctrl+s' }
+'fc' = { name = 'File: Copy Snip', shortcut = 'ctrl+c' }

@@ -1,0 +1,5 @@
+name = 'Cursor'
+executables = ['cursor', 'Cursor']
+
+[[import]]
+file = 'com/microsoft/VSCode/linux.toml'

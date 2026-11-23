@@ -64,7 +64,9 @@ test("loaded modules receive package-bound import.meta helpers", () => {
   expect(meta.chord.resolvePackageFile("package.json")).toBe(
     join(import.meta.dirname, "..", "..", "package.json"),
   );
-  expect(meta.chord.resolveNative("menu")).toMatch(/\/target\/[^/]+\/menu\/menu\.node$/);
+  expect(meta.chord.resolveNative("menu").replaceAll("\\", "/")).toMatch(
+    /\/target\/[^/]+\/menu\/menu\.node$/,
+  );
 });
 
 test("relative native imports throw until a test mocks them with the same specifier", () => {
@@ -102,7 +104,7 @@ test("native modules and package files resolve relative to the caller's package"
   const root = fixturePackage();
   const namespace = createModuleNamespace(join(root, "src/js/handler.ts"));
   expect(namespace.resolvePackageFile("chords/macos.toml")).toBe(join(root, "chords/macos.toml"));
-  expect(namespace.resolveNative("native/beep")).toMatch(
+  expect(namespace.resolveNative("native/beep").replaceAll("\\", "/")).toMatch(
     /\/target\/[^/]+\/native\/beep\/beep\.node$/,
   );
 });
@@ -113,12 +115,14 @@ test("vendored handlers resolve the dependency's logical package", () => {
   expect(namespace.resolvePackageFile("chords/macos.toml")).toBe(
     join(root, "chords/@keychord/chords-menu/chords/macos.toml"),
   );
-  expect(namespace.resolveNative("menu")).toContain("/target/@keychord/chords-menu/target/");
+  expect(namespace.resolveNative("menu").replaceAll("\\", "/")).toContain(
+    "/target/@keychord/chords-menu/target/",
+  );
 });
 
 test("resolvers reject paths escaping the package or malformed native module paths", () => {
   const namespace = createModuleNamespace(join(fixturePackage(), "src/js/handler.ts"));
-  for (const path of ["", "../file", "/tmp/file", "a/../file"]) {
+  for (const path of ["", "../file", "/tmp/file", "a/../file", "a\\..\\file"]) {
     expect(() => namespace.resolvePackageFile(path)).toThrow();
   }
   for (const path of ["", "../menu", "/menu", "menu.node", "native/../menu", ".hidden/menu"]) {

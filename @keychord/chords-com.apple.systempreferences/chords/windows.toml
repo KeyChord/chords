@@ -1,0 +1,10 @@
+name = 'Windows Settings'
+
+[meta]
+chord = '>=0.3.4'
+
+[placeholders]
+"<>" = { name = 'System Settings prefix', default = '/' }
+
+[chords]
+'<>,' = { name = 'Windows Settings', shell = 'start "" "ms-settings:"' }

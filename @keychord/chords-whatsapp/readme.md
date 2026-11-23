@@ -1,5 +1,40 @@
 # @keychord/chords-whatsapp
 
+WhatsApp Chords supports the macOS and Windows apps and a dedicated WhatsApp Web
+window on Linux X11. Windows and Linux require Chord 0.3.4 or later.
+
+## Windows
+
+Open the Microsoft Store version of WhatsApp. The bindings use WhatsApp's
+documented Windows shortcuts for finding and organizing chats, opening Chat
+Info and Settings, zooming, and switching to chats 1–9. WhatsApp controls whether
+an action needs a confirmation or an open chat.
+[Windows keyboard shortcuts](https://faq.whatsapp.com/6204576529560565/?cms_platform=windows-desktop)
+
+## Linux X11
+
+Open WhatsApp Web in a dedicated Chrome or Chromium app window. The separate
+profile keeps the window class specific to this launcher.
+
+```sh
+google-chrome --ozone-platform=x11 --class=keychord-whatsapp \
+  --user-data-dir="${XDG_CONFIG_HOME:-$HOME/.config}/keychord-whatsapp" \
+  --app=https://web.whatsapp.com/
+```
+
+Use your installed Chromium command, such as `chromium`, if it differs from
+`google-chrome`. Link the WhatsApp account in that window. The app window uses
+WhatsApp Web's non-Mac keyboard shortcuts for chat search, new chat and group,
+pin, archive, mute, and mark unread. Your X11 desktop can reserve a combination
+before WhatsApp receives it. A regular browser tab keeps its normal browser
+bindings.
+[WhatsApp Web keyboard shortcuts](https://faq.whatsapp.com/6204576529560565/?cms_platform=web)
+
+Group and contact management, call controls, theme palettes, and detailed Chat
+Info navigation below use the macOS accessibility handler.
+
+## macOS
+
 Chord package for the native macOS WhatsApp app (`net.whatsapp.WhatsApp`), moved
 from [leonsilicon/chords](https://github.com/leonsilicon/chords).
 

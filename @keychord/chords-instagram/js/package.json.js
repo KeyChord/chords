@@ -1,8 +1,8 @@
 //#region package.json
 var name = "@keychord/chords-instagram";
-var version = "0.0.1";
 var displayName = "Instagram Chords";
-var description = "Chords for Instagram installed as a web app from Brave.";
+var version = "0.0.1";
+var description = "Chords for Instagram in Brave.";
 var categories = ["Social"];
 var repository = {
   type: "git",
@@ -88,11 +88,153 @@ var chords = {
       },
     },
   },
+  "linux.toml": {
+    name: "Instagram",
+    meta: { chord: ">=0.3.4" },
+    on: {
+      instagram: {
+        file: "instagram.js",
+        args: [9222, "desktop"],
+      },
+    },
+    placeholders: {
+      "<>": {
+        name: "Instagram prefix",
+        default: "i",
+      },
+    },
+    chords: {
+      "?<>": { name: "Instagram" },
+      "?<>g": { name: "Goto" },
+      "<>gh": {
+        name: "Goto: Home",
+        "@input:instagram": ["HOME"],
+      },
+      "<>gr": {
+        name: "Goto: Reels",
+        "@input:instagram": ["REELS"],
+      },
+      "<>gm": {
+        name: "Goto: Messages",
+        "@input:instagram": ["MESSAGES"],
+      },
+      "<>gs": {
+        name: "Goto: Search",
+        "@input:instagram": ["SEARCH"],
+      },
+      "<>gc": {
+        name: "Goto: Create",
+        "@input:instagram": ["CREATE"],
+      },
+      "<>gp": {
+        name: "Goto: Profile",
+        "@input:instagram": ["PROFILE"],
+      },
+      "?<>h": { name: "Home" },
+      "?<>hs": { name: "Home: Stories" },
+      "?<>hs.": { name: "Home: Stories > Click" },
+      "<>hs.(\\d+)": {
+        name: "Home: Stories > Click @ #",
+        "@input:instagram": ["STORY", "$1"],
+      },
+      "?<>hsr": { name: "Home: Stories > Reply" },
+      "<>hsr(\\d+)": {
+        name: "Home: Stories > Reply @ #",
+        "@input:instagram": ["STORY_REPLY", "$1"],
+      },
+      "?<>p": { name: "Profile" },
+      "?<>pa": { name: "Profile: Avatar" },
+      "<>pa.": {
+        name: "Profile: Avatar > Click",
+        "@input:instagram": ["AVATAR"],
+      },
+      "?<>pan": { name: "Profile: Avatar > Note" },
+      "<>pan": {
+        name: "Profile: Avatar > Note",
+        "@input:instagram": ["NOTE"],
+      },
+      "<>panx": {
+        name: "Profile: Avatar > Note > Close",
+        "@input:instagram": ["CLOSE_NOTE"],
+      },
+    },
+  },
+  "windows.toml": {
+    name: "Instagram",
+    meta: { chord: ">=0.3.4" },
+    on: {
+      instagram: {
+        file: "instagram.js",
+        args: [9222, "desktop"],
+      },
+    },
+    placeholders: {
+      "<>": {
+        name: "Instagram prefix",
+        default: "i",
+      },
+    },
+    chords: {
+      "?<>": { name: "Instagram" },
+      "?<>g": { name: "Goto" },
+      "<>gh": {
+        name: "Goto: Home",
+        "@input:instagram": ["HOME"],
+      },
+      "<>gr": {
+        name: "Goto: Reels",
+        "@input:instagram": ["REELS"],
+      },
+      "<>gm": {
+        name: "Goto: Messages",
+        "@input:instagram": ["MESSAGES"],
+      },
+      "<>gs": {
+        name: "Goto: Search",
+        "@input:instagram": ["SEARCH"],
+      },
+      "<>gc": {
+        name: "Goto: Create",
+        "@input:instagram": ["CREATE"],
+      },
+      "<>gp": {
+        name: "Goto: Profile",
+        "@input:instagram": ["PROFILE"],
+      },
+      "?<>h": { name: "Home" },
+      "?<>hs": { name: "Home: Stories" },
+      "?<>hs.": { name: "Home: Stories > Click" },
+      "<>hs.(\\d+)": {
+        name: "Home: Stories > Click @ #",
+        "@input:instagram": ["STORY", "$1"],
+      },
+      "?<>hsr": { name: "Home: Stories > Reply" },
+      "<>hsr(\\d+)": {
+        name: "Home: Stories > Reply @ #",
+        "@input:instagram": ["STORY_REPLY", "$1"],
+      },
+      "?<>p": { name: "Profile" },
+      "?<>pa": { name: "Profile: Avatar" },
+      "<>pa.": {
+        name: "Profile: Avatar > Click",
+        "@input:instagram": ["AVATAR"],
+      },
+      "?<>pan": { name: "Profile: Avatar > Note" },
+      "<>pan": {
+        name: "Profile: Avatar > Note",
+        "@input:instagram": ["NOTE"],
+      },
+      "<>panx": {
+        name: "Profile: Avatar > Note > Close",
+        "@input:instagram": ["CLOSE_NOTE"],
+      },
+    },
+  },
 };
 var package_default = {
   name,
-  version,
   displayName,
+  version,
   description,
   categories,
   repository,

@@ -1,0 +1,30 @@
+diff --git a/exports/default.mjs b/exports/default.mjs
+index 24f45a557e7278c07d1d763a25927e1f3c4dbf3c..c7c38ed52a74d05c98da302e7cc48fb407bd99ea 100644
+--- a/exports/default.mjs
++++ b/exports/default.mjs
+@@ -300,7 +300,8 @@ module.exports = nativeRequire(fileURLToPath(nativeFile));
+ //#region src/chords-plugin.ts
+ const CHORDS_DIR = "chords";
+ const CORE_PACKAGE = "@keychord/chords-chord";
+-const CORE_FILE = "com/leonsilicon/chord/macos.toml";
++const PLATFORM_FILES = new Set(["macos.toml", "linux.toml", "windows.toml"]);
++const CORE_FILES = new Set([...PLATFORM_FILES].map((file) => `com/leonsilicon/chord/${file}`));
+ /** Add a `chords` property with the package's parsed `chords/` tree to its bundled `package.json`. */
+ function packageChordsPlugin(options = {}) {
+ 	const root = fs$1.realpathSync(options.root ?? process.cwd());
+@@ -324,11 +325,12 @@ function packageChordsPlugin(options = {}) {
+ 					this.error(`[chord-package] failed to parse ${file}: ${error.message}`);
+ 				}
+ 				const vendor = options.vendor?.find((name) => relative.startsWith(`${name}/chords/`));
+-				if ((vendor ? relative.slice(`${vendor}/chords/`.length) : relative).replace(/^(?:@[^/]+\/[^/]+\/chords\/)+/, "") !== "macos.toml") {
+-					const isCoreFile = packageJson.name === CORE_PACKAGE && relative === CORE_FILE;
++				const packageRelative = (vendor ? relative.slice(`${vendor}/chords/`.length) : relative).replace(/^(?:@[^/]+\/[^/]+\/chords\/)+/, "");
++				if (!PLATFORM_FILES.has(packageRelative)) {
++					const isCoreFile = packageJson.name === CORE_PACKAGE && CORE_FILES.has(relative);
+ 					for (const key of Object.keys(data.chords ?? {})) {
+ 						if (isCoreFile && key.startsWith("?")) continue;
+-						if (isGlobalBinding(key)) this.error(`[chord-package] global chord ${JSON.stringify(key)} in ${file} must be defined in the package's root chords/macos.toml`);
++						if (isGlobalBinding(key)) this.error(`[chord-package] global chord ${JSON.stringify(key)} in ${file} must be defined in the package's root platform file (chords/macos.toml, chords/linux.toml, or chords/windows.toml)`);
+ 					}
+ 				}
+ 				const segments = relative.split("/");

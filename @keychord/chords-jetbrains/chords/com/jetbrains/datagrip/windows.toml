@@ -1,0 +1,5 @@
+name = 'DataGrip'
+executables = ['datagrip64.exe', 'datagrip.exe']
+
+[[import]]
+file = 'base-windows.toml'

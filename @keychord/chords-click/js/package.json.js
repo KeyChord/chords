@@ -21,30 +21,88 @@ var devDependencies = {
 	"@types/bun": "latest"
 };
 var packageManager = "pnpm@12.11.2";
-var chords = { "macos.toml": {
-	"name": "Mouse",
-	"meta": { "chord": ">=0.3.0" },
-	"on": { "click": { "file": "click.js" } },
-	"placeholders": { "<>": {
-		"name": "Mouse prefix",
-		"default": "c"
-	} },
-	"chords": {
-		"?<>": { "name": "Click" },
-		"?<>.": { "name": "Double Click" },
-		"?<>,": { "name": "Right Click" },
-		"?<>;": { "name": "Middle Click" },
-		"?<>-": { "name": "Drag" },
-		"?<>,-": { "name": "Right Drag" },
-		"?<>;-": { "name": "Middle Drag" },
-		"?<>=": { "name": "Move Mouse" },
-		"?<>/": { "name": "Global Mouse" },
-		"<>([.,;=/0-9-].*)": {
-			"name": "Mouse",
-			"@input:click": ["$1", "COMMAND"]
+var chords = {
+	"linux.toml": {
+		"name": "Mouse",
+		"meta": { "chord": ">=0.3.4" },
+		"on": { "click": { "file": "click.js" } },
+		"placeholders": { "<>": {
+			"name": "Mouse prefix",
+			"default": "c"
+		} },
+		"chords": {
+			"?<>": { "name": "Click" },
+			"?<>.": { "name": "Double Click" },
+			"?<>,": { "name": "Right Click" },
+			"?<>;": { "name": "Middle Click" },
+			"?<>-": { "name": "Drag" },
+			"?<>,-": { "name": "Right Drag" },
+			"?<>;-": { "name": "Middle Drag" },
+			"?<>=": { "name": "Move Mouse" },
+			"?<>/": { "name": "Global Mouse" },
+			"<>([.,;=/0-9-].*)": {
+				"name": "Mouse",
+				"@input:click": [
+					"$1",
+					"COMMAND",
+					"POINTER"
+				]
+			}
+		}
+	},
+	"macos.toml": {
+		"name": "Mouse",
+		"meta": { "chord": ">=0.3.0" },
+		"on": { "click": { "file": "click.js" } },
+		"placeholders": { "<>": {
+			"name": "Mouse prefix",
+			"default": "c"
+		} },
+		"chords": {
+			"?<>": { "name": "Click" },
+			"?<>.": { "name": "Double Click" },
+			"?<>,": { "name": "Right Click" },
+			"?<>;": { "name": "Middle Click" },
+			"?<>-": { "name": "Drag" },
+			"?<>,-": { "name": "Right Drag" },
+			"?<>;-": { "name": "Middle Drag" },
+			"?<>=": { "name": "Move Mouse" },
+			"?<>/": { "name": "Global Mouse" },
+			"<>([.,;=/0-9-].*)": {
+				"name": "Mouse",
+				"@input:click": ["$1", "COMMAND"]
+			}
+		}
+	},
+	"windows.toml": {
+		"name": "Mouse",
+		"meta": { "chord": ">=0.3.4" },
+		"on": { "click": { "file": "click.js" } },
+		"placeholders": { "<>": {
+			"name": "Mouse prefix",
+			"default": "c"
+		} },
+		"chords": {
+			"?<>": { "name": "Click" },
+			"?<>.": { "name": "Double Click" },
+			"?<>,": { "name": "Right Click" },
+			"?<>;": { "name": "Middle Click" },
+			"?<>-": { "name": "Drag" },
+			"?<>,-": { "name": "Right Drag" },
+			"?<>;-": { "name": "Middle Drag" },
+			"?<>=": { "name": "Move Mouse" },
+			"?<>/": { "name": "Global Mouse" },
+			"<>([.,;=/0-9-].*)": {
+				"name": "Mouse",
+				"@input:click": [
+					"$1",
+					"COMMAND",
+					"POINTER"
+				]
+			}
 		}
 	}
-} };
+};
 var package_default = {
 	name,
 	displayName,

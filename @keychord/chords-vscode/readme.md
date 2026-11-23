@@ -1,12 +1,7 @@
 # @keychord/chords-vscode
 
-Chord handlers for VSCode and VSCode forks. Currently supports:
-
-- [VSCode](./chords/com/microsoft/VSCode/macos.toml)
-- [Cursor](./chords/com/todesktop/230313mzl4w4u92/macos.toml)
-
-> [!NOTE]
-> This section is largely AI-written, so parts of it may not be fully accurate. It will be replaced with a hand-written version when I get the time.
+Chords for VS Code and Cursor on macOS, Linux, and Windows. The Linux and Windows
+files also recognize VS Code Insiders.
 
 ## Install
 
@@ -17,11 +12,12 @@ package, but that adds its standalone repository, which can be older than this r
 
 ## How the chords run
 
-Cursor imports the VSCode chord file, so both editors get the same chords. Most chords press
-VSCode's default keyboard shortcuts, so they assume default keybindings. The few without a
-default shortcut (`fpa`, `fpr`, `fnn`, `fh`, `fd`, `fs`, `fuc`, `es`, `tn`, `tt`, `gd`, `gy`,
-`wqo`, `wt`, `dd`) run their VSCode command through the
+Cursor imports the VS Code chord file for the same platform. Most chords send
+the platform's default shortcut and expect the relevant editor, terminal, or
+panel to have focus. Cursor and user keybinding overrides can change those defaults.
+[VS Code default keyboard shortcuts](https://code.visualstudio.com/docs/reference/default-keybindings)
+
+Install the Command Server extension in each editor to use bindings marked
+`@input:command` in the Linux and Windows TOML files. Keep its default temporary
+directory and Ctrl+Shift+Alt+P binding. The macOS handler uses Command+Shift+F17.
 [Command Server](https://marketplace.visualstudio.com/items?itemName=pokey.command-server)
-extension: the handler writes the command to `$TMPDIR/vscode-command-server-<uid>/request.json`
-and presses Command-Shift-F17, the extension's default keybinding. Install the extension in the
-editor to use them; without it, those chords do nothing.

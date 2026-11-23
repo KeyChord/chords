@@ -1,0 +1,5 @@
+name = 'WezTerm'
+executables = ['wezterm-gui.exe']
+
+[[import]]
+file = 'tabs-ctrl-shift.desktop.toml'

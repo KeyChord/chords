@@ -1,4 +1,3 @@
-import { readFileSync } from "node:fs";
 import { click, getAppWindows, getScreenBounds, mouse } from "chord";
 import {
   chordPattern,
@@ -20,7 +19,7 @@ const bounds = { x: -100, y: 200, width: 300, height: 600 };
 const window = { windowId: 123, processId: 456, bounds, title: "First window" };
 const clickMock = mocked(click);
 const windowsMock = mocked(getAppWindows);
-const source = readFileSync(new URL("../chords/macos.toml", import.meta.url), "utf8");
+const source = await Bun.file(new URL("../chords/macos.toml", import.meta.url)).text();
 const { placeholders } = Bun.TOML.parse(source) as { placeholders: ChordPlaceholders };
 const bindings = Array.from(
   source.matchAll(/^'([^']+)' = .*'@input:click' = \['(\$\d+)', '(COMMAND)'\]/gm),
@@ -104,6 +103,50 @@ test.each(namedChords)(
     }
   },
 );
+
+test.each(["linux", "windows"])("%s uses the window-relative pointer API", async (platform) => {
+  const source = await Bun.file(new URL(`../chords/${platform}.toml`, import.meta.url)).text();
+  const { chords, placeholders } = Bun.TOML.parse(source) as {
+    chords: Record<string, { "@input:click"?: ["$1", "COMMAND", "POINTER"] }>;
+    placeholders: ChordPlaceholders;
+  };
+  const input = ";c.13";
+  const matches = Object.entries(chords).flatMap(([trigger, chord]) => {
+    const action = chord["@input:click"];
+    if (!action) return [];
+    const match = chordPattern(trigger, placeholders).exec(input);
+    return match ? [[match[1]!, action[1], action[2]] as const] : [];
+  });
+  expect(matches).toEqual([[".13", "COMMAND", "POINTER"]]);
+  await buildClickHandler().call(
+    { focusedAppId: "dev.fixture", focusedWindowId: 789 },
+    ...matches[0]!,
+  );
+  expect(getAppWindows).toHaveBeenCalledWith("dev.fixture");
+  expect(click).not.toHaveBeenCalled();
+  expect(mouse).toHaveBeenCalledOnce();
+  expect(mouse).toHaveBeenCalledWith({
+    action: "click",
+    windowId: 789,
+    x: 30,
+    y: 180,
+    expectedBounds: bounds,
+    clickCount: 2,
+  });
+});
+
+test("a portable click stops when the captured window is gone", async () => {
+  await expect(
+    buildClickHandler().call(
+      { focusedAppId: "dev.fixture", focusedWindowId: 999 },
+      "13",
+      "COMMAND",
+      "POINTER",
+    ),
+  ).rejects.toThrow("The captured window is no longer on screen");
+  expect(click).not.toHaveBeenCalled();
+  expect(mouse).not.toHaveBeenCalled();
+});
 
 test("one mouse binding captures commands and leaves application prefixes unmatched", () => {
   expect(source).toMatch(/\[on\.click\]\s+file = 'click\.js'/);

@@ -2,7 +2,7 @@
   "name": "@keychord/chords-livesplit",
   "displayName": "LiveSplit Chords",
   "version": "0.0.1",
-  "description": "Chords for the LiveSplit One desktop app.",
+  "description": "Chords for LiveSplit One on desktop and Chromium.",
   "categories": [
     "Utilities"
   ],

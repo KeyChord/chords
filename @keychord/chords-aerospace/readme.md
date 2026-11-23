@@ -4,8 +4,18 @@
 > This document is largely AI-written, so parts of it may not be fully accurate. It will be replaced with a hand-written version when I get the time.
 
 Global `;a` chords for the [AeroSpace](https://github.com/nikitabobko/AeroSpace) tiling
-window manager. Each chord runs one `aerospace` command, so AeroSpace must be installed and
-running, with `aerospace` on your login shell's `PATH`.
+window manager. The window manager must be running and its command-line tool must be on
+Chord's `PATH`.
+
+## Platform requirements
+
+- **macOS** uses the original AeroSpace and its `aerospace` CLI.
+- **Windows 11 x64** uses the independent [AeroSpace for Windows](https://github.com/jetsquared/AeroSpaceForWindows)
+  port and its `aerospace.exe` CLI. Build the port using its project instructions, launch
+  `AeroSpaceApp.exe`, then add its folder to your user `PATH` before starting Chord.
+  The bindings control the port's own tiling workspaces. [Windows command reference](https://github.com/jetsquared/AeroSpaceForWindows/blob/main/docs/commands.adoc)
+- **Linux** has no AeroSpace backend for this package. [i3](https://i3wm.org/docs/userguide.html)
+  provides similar tiling controls on X11 and can be scripted with [`i3-msg`](https://i3wm.org/docs/i3-msg.html).
 
 Install it from Settings → Browse (**AeroSpace Chords**), which adds this package's
 mirror repo. For the current version, add the `KeyChord/chords` monorepo under
@@ -15,8 +25,8 @@ The keys after the prefix follow the same layout as [`@keychord/chords-rift`](..
 
 Every chord starts with the same prefix, `;a` by default. To use another key, such as `-`,
 set **Window management prefix** under Settings → Chords → Placeholders; the table below
-uses `;a`. In [`chords/macos.toml`](./chords/macos.toml) the keys are written `'<>q'`, and
-the `[placeholders]` table declares `p` with its default. This needs a Chord with
+uses `;a`. In [`chords/macos.toml`](./chords/macos.toml) and [`chords/windows.toml`](./chords/windows.toml) the keys are written `'<>q'`, and
+the `[placeholders]` table declares `a` with its default. This needs a Chord with
 placeholder support: older versions skip every `<>` chord as an invalid key sequence.
 
 | Chords                          | `aerospace` command                                                            |

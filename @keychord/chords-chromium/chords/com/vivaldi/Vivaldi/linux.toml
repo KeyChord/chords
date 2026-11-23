@@ -1,0 +1,8 @@
+name = 'Vivaldi'
+executables = ['vivaldi', 'vivaldi-bin', 'vivaldi-stable', 'vivaldi-snapshot']
+
+[[import]]
+file = 'vivaldi.desktop.toml'
+
+[chords]
+'wq' = { name = 'Window: Quit', shortcut = 'ctrl+q' }

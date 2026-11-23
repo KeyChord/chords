@@ -3,24 +3,36 @@
 > [!NOTE]
 > This document is largely AI-written, so parts of it may not be fully accurate. It will be replaced with a hand-written version when I get the time.
 
-Commands for YouTube installed as a web app from Brave Browser (`com.brave.Browser.app.agimnkijcaahngcdmfeangaknmldooml`). They apply while that app is focused, not in ordinary browser tabs. To install, in [Chord](https://github.com/KeyChord/Chord) open Settings → Chords → **Chord Monorepos** → **Add Monorepo**, enter `KeyChord/chords`, tick `@keychord/chords-youtube` under **Packages to use**, then follow [Browser setup](#browser-setup).
+YouTube controls playback and search in a focused browser page. To install, in [Chord](https://github.com/KeyChord/Chord) open Settings → Chords → **Chord Monorepos** → **Add Monorepo**, enter `KeyChord/chords`, and select `@keychord/chords-youtube`. Follow the setup below for your platform.
 
-| Chord  | Action                                                                                  |
-| ------ | --------------------------------------------------------------------------------------- |
-| `vs30` | Seek to second 30 (any non-negative integer; clamped to the last playable whole second) |
-| `vp`   | Play; repeated calls keep playing                                                       |
-| `vh`   | Pause; repeated calls keep paused                                                       |
-| `vm`   | Toggle mute                                                                             |
-| `va`   | Toggle autoplay                                                                         |
-| `vc`   | Toggle closed captions                                                                  |
-| `v,`   | Toggle the player settings menu                                                         |
-| `vt`   | Toggle theater mode                                                                     |
-| `vf`   | Toggle video fullscreen                                                                 |
-| `js`   | Focus Search and select the current query                                               |
+| macOS chord | Linux and Windows chord | Action                                                                                  |
+| ----------- | ----------------------- | --------------------------------------------------------------------------------------- |
+| `vs30`      | `/yvs30`                | Seek to second 30 (any non-negative integer; clamped to the last playable whole second) |
+| `vp`        | `/yvp`                  | Play; repeated calls keep playing                                                       |
+| `vh`        | `/yvh`                  | Pause; repeated calls keep paused                                                       |
+| `vm`        | `/yvm`                  | Toggle mute                                                                             |
+| `va`        | `/yva`                  | Toggle autoplay                                                                         |
+| `vc`        | `/yvc`                  | Toggle closed captions                                                                  |
+| `v,`        | `/yv,`                  | Toggle the player settings menu                                                         |
+| `vt`        | `/yvt`                  | Toggle theater mode                                                                     |
+| `vf`        | `/yvf`                  | Toggle video fullscreen                                                                 |
+| `js`        | `/yjs`                  | Focus Search and select the current query                                               |
 
-## Browser setup
+## Linux (X11) and Windows
 
-Brave's installed web apps do not expose the browser's JavaScript Apple Events API. This package uses the Chrome DevTools Protocol on a local debugging port instead. Quit Brave, then launch it with:
+Use a Chromium browser such as Chrome, Chromium, or Brave with Chord 0.3.4 or later. Launch the browser with the same flags used by [Web Chords](https://github.com/KeyChord/chords-web#linux-x11-and-windows).
+
+```text
+--remote-debugging-port=9222 --user-data-dir=<separate-profile-directory>
+```
+
+Keep the endpoint on its default loopback address. Chrome 136 and later require a non-default profile for the debugging flags. [Chrome developer documentation](https://developer.chrome.com/blog/remote-debugging-port)
+
+Open YouTube in a browser tab or installed web app in that profile, then focus the webpage. Chord checks document focus again before sending the player action. Change the default `/y` prefix from Settings → Chords → Placeholders.
+
+## macOS
+
+These chords apply while the Brave-installed YouTube web app is focused. Brave's installed web apps do not expose the browser's JavaScript Apple Events API. This package uses the Chrome DevTools Protocol on a local debugging port instead. Quit Brave, then launch it with:
 
 ```sh
 open -na 'Brave Browser' --args --remote-debugging-port=9222 --restore-last-session
@@ -28,15 +40,19 @@ open -na 'Brave Browser' --args --remote-debugging-port=9222 --restore-last-sess
 
 Then open the installed YouTube app normally. The handler discovers YouTube pages on that port and selects the focused page when several are open. It reports a setup error if debugging is unavailable and does not restart the browser automatically. Local debugging gives programs on your Mac access to browser pages; enable it only for a browser session you intend to automate.
 
-For another port, set the handler arguments in the TOML file and launch Brave with the same port:
+Video commands require an open video. Controls unavailable on that video report an error. Search also works on the home page.
+
+## Custom port
+
+Set the handler arguments in the TOML file and launch the browser with the same port. On Linux and Windows, keep the second argument set to `true` to require document focus.
 
 ```toml
 [on.youtube]
 file = 'youtube.js'
-args = [9333]
+args = [9333, true]
 ```
 
-Video commands require an open video. Controls unavailable on that video report an error. Search also works on the home page.
+On macOS, set `args = [9333]`.
 
 ## Development
 

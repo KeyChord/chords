@@ -4,8 +4,8 @@
 > This document is largely AI-written, so parts of it may not be fully accurate. It will be replaced with a hand-written version when I get the time.
 
 Mouse clicks, drags and pointer moves by coordinates, in the focused app's window or
-on the screen. It works with any app; Chord needs Accessibility permission. To install
-it, add the `KeyChord/chords` monorepo under Settings → Chords → Chord Monorepos and
+on the screen. The package supports macOS, Linux on X11, and Windows. To install it,
+add the `KeyChord/chords` monorepo under Settings → Chords → Chord Monorepos and
 tick `@keychord/chords-click`.
 
 Every chord starts with the package's `<>` prefix, `;c` by default. To reach them with fewer
@@ -27,9 +27,10 @@ always consumed as part of that coordinate; `/0` adds zero. `;c91/2` clicks
 A direction suffix makes the whole number an exact pixel offset: `20l` means
 20 pixels from the left, `20r` from the right, `20t` from the top, and `20b` from
 the bottom. `;c20l5` clicks x=20 pixels, y=50%. `;c20b5` clicks halfway across and
-20 pixels above the bottom. Exact values may include decimals and use macOS
-logical points, independent of Retina scale. Explicit directions may appear in
-either axis order. Each pair must contain one horizontal and one vertical coordinate.
+20 pixels above the bottom. Exact values may include decimals. They use logical
+points on macOS and screen pixels on Linux and Windows. Explicit directions may
+appear in either axis order. Each pair must contain one horizontal and one
+vertical coordinate.
 
 Pairs run together without separators. Pixel offsets consume the complete number
 before their direction suffix. Use `/0` on a shorthand coordinate immediately
@@ -65,8 +66,7 @@ and pixel edge offsets use that display's bounds. These are ordinary global mous
 events, so they reach the visible app at that point and can change focus.
 Combine modifiers as `;c/=55` (move globally), `;c/-1328` (drag globally), or
 `;c/;-1328` (middle-button drag globally). `;c=/55` and `;c-/1328`
-also support screen scope. Window-scoped commands continue to target the captured
-app's window even when covered.
+also support screen scope.
 
 Because a `-` immediately after the command/button prefix starts a drag, write `0l`
 to begin a normal click with a zero horizontal offset: `;c0l9`, `;c,0l9`, or
@@ -86,17 +86,19 @@ edge, and 60% from the left and halfway down.
 ## Behavior
 
 The handler uses the application captured by Chord when the chord was entered and
-targets its frontmost on-screen normal window. It validates the complete sequence
+targets its frontmost on-screen normal window. On Linux and Windows, the
+handler uses the captured window ID when Chord supplies one. It validates the complete sequence
 before sending input, queues overlapping sequences, and waits 500 ms between
 coordinate pairs. Drags keep the button held during this pause. Double-clicks retain
 their short internal interval; single actions and the final action add no delay.
 The fixed pause allows time for transitions, but the coordinate runner cannot
 observe animation completion. Slow transitions or network requests may still need longer.
-Clicks use the built-in `chord.click` helper and move the pointer to each resolved
-point so the target is visible. Button events still go directly to the target window,
-including when another app covers it; cursor movement does not activate the app or
-click a covering window. Chord needs Accessibility permission. The sequence stops if the window
-moves, resizes, disappears, or a click fails. No additional native addon is needed.
+On macOS, Chord needs Accessibility permission. Window clicks go straight to the
+captured app, even when another window covers it. On Linux and Windows, keep the
+target window visible while the sequence runs. Chord moves the system pointer to
+each point and uses the desktop's ordinary mouse input. On all platforms, a move,
+resize, closed target window, or failed click stops the sequence. The package uses
+Chord's built-in mouse APIs.
 
 ## Development
 

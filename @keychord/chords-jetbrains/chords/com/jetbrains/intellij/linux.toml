@@ -1,0 +1,5 @@
+name = 'IntelliJ IDEA'
+executables = ['idea', 'jetbrains-idea', 'jetbrains-idea-ce']
+
+[[import]]
+file = 'base-linux.toml'

@@ -1,0 +1,12 @@
+name = 'Opera Desktop Shortcuts'
+
+[[import]]
+file = 'base.desktop.toml'
+
+[chords]
+'wq' = { name = 'Window: Quit', shortcut = 'ctrl+shift+x' }
+'p,' = { name = 'Page: Settings', shortcut = 'alt+p' }
+'ph' = { name = 'Page: History', shortcut = 'ctrl+h' }
+'pd' = { name = 'Page: Downloads', shortcut = 'ctrl+j' }
+'?b' = { name = 'Bookmarks' }
+'bt' = { name = 'Bookmarks: Toggle Bar', shortcut = 'ctrl+shift+b' }

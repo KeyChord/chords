@@ -1,0 +1,37 @@
+name = 'Apple Music'
+executables = ['AppleMusic.exe']
+
+[meta]
+chord = '>=0.3.4'
+
+[chords]
+'?a' = { name = 'App' }
+'a,' = { name = 'App: Settings', shortcut = 'ctrl+comma' }
+'ah' = { name = 'App: Help', shortcut = 'f1' }
+'?g' = { name = 'Go To' }
+'g[' = { name = 'Go To: Previous Screen', shortcut = 'alt+left' }
+'g/' = { name = 'Go To: Search', shortcut = 'alt n f' }
+'gr' = { name = 'Go To: Recently Added', shortcut = 'alt n n' }
+'ga' = { name = 'Go To: Artists', shortcut = 'alt n t' }
+'gb' = { name = 'Go To: Albums', shortcut = 'alt n a' }
+'gs' = { name = 'Go To: Songs', shortcut = 'alt n s' }
+'?f' = { name = 'File' }
+'fi' = { name = 'File: Import', shortcut = 'ctrl+o' }
+'?v' = { name = 'View' }
+'vn' = { name = 'View: Queue', shortcut = 'alt l q' }
+'ve' = { name = 'View: Equalizer', shortcut = 'ctrl+shift+e' }
+'vl' = { name = 'View: Current Track in List', shortcut = 'ctrl+l' }
+'vm' = { name = 'View: Mini Player', shortcut = 'ctrl+shift+m' }
+'vf' = { name = 'View: Full-Screen Player', shortcut = 'ctrl+shift+f' }
+'vy' = { name = 'View: Lyrics', shortcut = 'alt l l' }
+'?p' = { name = 'Playback' }
+'pp' = { name = 'Playback: Play or Pause', shortcut = 'ctrl+space' }
+'ps' = { name = 'Playback: Stop', shortcut = 'ctrl+period' }
+'p[' = { name = 'Playback: Previous Track', shortcut = 'ctrl+left' }
+'p]' = { name = 'Playback: Next Track', shortcut = 'ctrl+right' }
+'pb' = { name = 'Playback: Seek Backward', shortcut = 'alt+ctrl+left' }
+'pf' = { name = 'Playback: Seek Forward', shortcut = 'alt+ctrl+right' }
+'pu' = { name = 'Playback: Volume Up', shortcut = 'ctrl+up' }
+'pd' = { name = 'Playback: Volume Down', shortcut = 'ctrl+down' }
+'pr' = { name = 'Playback: Repeat', shortcut = 'alt l r' }
+'pl' = { name = 'Playback: Shuffle', shortcut = 'alt l s' }

@@ -8,15 +8,20 @@ Chord package for the [Warp](https://www.warp.dev/) terminal. For other terminal
 
 ## Chords
 
-- [Warp](./chords/dev/warp/Warp-Stable/macos.toml) (`dev.warp.Warp-Stable`): chords for find (`f`),
+- [Warp on macOS](./chords/dev/warp/Warp-Stable/macos.toml) (`dev.warp.Warp-Stable`): chords for find (`f`),
   blocks (`b`), commands (`c`), bookmarks (`m`), tabs (`t`), splits and scrolling (`s`), pane
   resizing (`r`), font size and full screen (`z`), panels (`p`), and input (`i`). Most of them
   press Warp's default keyboard shortcuts, so they assume Warp's default keybindings. The rest
   (`f[`, `f]`, `su`, `sl`, `slu`, `sld`, `zr`, `zf`, `im`) press the key bound to their Warp action in
-  `~/.warp/keybindings.yaml`, and do nothing if there is none.
-
-When Chord loads the package, the Warp handler re-saves `~/.warp/keybindings.yaml`, creating it
-if needed. Existing bindings are kept, but comments and formatting are not.
+  `~/.warp/keybindings.yaml`, and do nothing if there is none. When Chord loads the macOS bindings,
+  the Warp handler re-saves that file, creating it if needed. Existing bindings are kept, but
+  comments and formatting are discarded.
+- [Warp on Linux](./chords/dev/warp/Warp-Stable/linux.toml) and
+  [Warp on Windows](./chords/dev/warp/Warp-Stable/windows.toml) share the same chords for find,
+  blocks, commands, bookmarks, tabs, panes, scrolling, font size, Warp Drive, and terminal input.
+  They use [Warp's default shortcuts](https://docs.warp.dev/getting-started/keyboard-shortcuts).
+  Advanced actions such as pane resizing, single-line scrolling, and toggling mouse reporting
+  can be found in Warp's command palette (`cp`).
 
 ## Install
 

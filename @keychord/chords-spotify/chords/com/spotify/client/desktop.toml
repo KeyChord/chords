@@ -1,0 +1,26 @@
+# Spotify's native desktop hotkeys for Linux and Windows.
+[chords]
+'?g' = { name = 'Goto' }
+'g/' = { name = 'Goto: Search', shortcut = 'ctrl+k' }
+'gh' = { name = 'Goto: Home', shortcut = 'alt+shift+h' }
+'gl' = { name = 'Goto: Library', shortcut = 'alt+shift+0' }
+'gls' = { name = 'Goto: Liked Songs', shortcut = 'alt+shift+s' }
+'glpl' = { name = 'Goto: Library > Playlists', shortcut = 'alt+shift+1' }
+'glpo' = { name = 'Goto: Library > Podcasts', shortcut = 'alt+shift+2' }
+'glal' = { name = 'Goto: Library > Albums', shortcut = 'alt+shift+4' }
+'glar' = { name = 'Goto: Library > Artists', shortcut = 'alt+shift+3' }
+
+'?l' = { name = 'Library (Sidebar)' }
+'lv' = { name = 'Library: Toggle sidebar', shortcut = 'alt+shift+l' }
+
+'?p' = { name = 'Playlist' }
+'p/' = { name = 'Playlist: Filter', shortcut = 'ctrl+f' }
+
+'?b' = { name = 'Bar (Player)' }
+'bt' = { name = 'Bar: Play / Pause', shortcut = 'space' }
+'br' = { name = 'Bar: Repeat', shortcut = 'ctrl+r' }
+'bq' = { name = 'Bar: Go to queue', shortcut = 'alt+shift+q' }
+'bs' = { name = 'Bar: Shuffle', shortcut = 'ctrl+s' }
+
+'?np' = { name = 'Now Playing' }
+'npv' = { name = 'Now Playing: Toggle sidebar', shortcut = 'alt+shift+r' }

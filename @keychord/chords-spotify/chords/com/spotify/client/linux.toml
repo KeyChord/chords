@@ -1,0 +1,5 @@
+name = 'Spotify'
+executables = ['spotify', 'spotify-client', 'com.spotify.Client']
+
+[[import]]
+file = 'desktop.toml'

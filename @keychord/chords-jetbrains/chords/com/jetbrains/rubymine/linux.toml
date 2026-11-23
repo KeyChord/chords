@@ -1,0 +1,5 @@
+name = 'RubyMine'
+executables = ['rubymine', 'jetbrains-rubymine']
+
+[[import]]
+file = 'base-linux.toml'

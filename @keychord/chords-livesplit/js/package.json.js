@@ -1,8 +1,8 @@
 //#region package.json
 var name = "@keychord/chords-livesplit";
-var version = "0.0.1";
 var displayName = "LiveSplit Chords";
-var description = "Chords for the LiveSplit One desktop app.";
+var version = "0.0.1";
+var description = "Chords for LiveSplit One on desktop and Chromium.";
 var categories = ["Utilities"];
 var repository = {
 	"type": "git",
@@ -21,19 +21,41 @@ var devDependencies = {
 	"happy-dom": "^21.0.1"
 };
 var packageManager = "pnpm@12.11.2";
-var chords = { "org": { "livesplit": { "one": { "macos.toml": {
-	"name": "LiveSplit One",
-	"executables": ["LiveSplit One"],
-	"on": { "livesplit": { "file": "livesplit.js" } },
-	"chords": { "v,tm": {
-		"name": "Vary Setting: Time Milliseconds",
-		"@input:livesplit": ["TOGGLE_MILLISECONDS"]
-	} }
-} } } } };
+var chords = { "org": { "livesplit": { "one": {
+	"linux.toml": {
+		"name": "LiveSplit One Web",
+		"executables": ["keychord-livesplit"],
+		"meta": { "chord": ">=0.3.4" },
+		"on": { "livesplit": { "file": "livesplit-linux.js" } },
+		"chords": { "v,tm": {
+			"name": "Vary Setting: Time Milliseconds",
+			"@input:livesplit": ["TOGGLE_MILLISECONDS"]
+		} }
+	},
+	"macos.toml": {
+		"name": "LiveSplit One",
+		"executables": ["LiveSplit One"],
+		"on": { "livesplit": { "file": "livesplit.js" } },
+		"chords": { "v,tm": {
+			"name": "Vary Setting: Time Milliseconds",
+			"@input:livesplit": ["TOGGLE_MILLISECONDS"]
+		} }
+	},
+	"windows.toml": {
+		"name": "LiveSplit One",
+		"executables": ["LiveSplit One.exe", "livesplit-one.exe"],
+		"meta": { "chord": ">=0.3.4" },
+		"on": { "livesplit": { "file": "livesplit-windows.js" } },
+		"chords": { "v,tm": {
+			"name": "Vary Setting: Time Milliseconds",
+			"@input:livesplit": ["TOGGLE_MILLISECONDS"]
+		} }
+	}
+} } } };
 var package_default = {
 	name,
-	version,
 	displayName,
+	version,
 	description,
 	categories,
 	repository,

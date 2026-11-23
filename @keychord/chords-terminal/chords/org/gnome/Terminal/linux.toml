@@ -1,0 +1,8 @@
+name = 'GNOME Terminal'
+executables = ['gnome-terminal-server', 'Gnome-terminal']
+
+[[import]]
+file = 'tabs-alt.desktop.toml'
+
+[chords]
+'t9' = { name = 'Tab 9', shortcut = 'alt+9' }

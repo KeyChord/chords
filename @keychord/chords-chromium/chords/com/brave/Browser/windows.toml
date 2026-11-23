@@ -1,0 +1,8 @@
+name = 'Brave'
+executables = ['brave.exe']
+
+[[import]]
+file = 'chrome.desktop.toml'
+
+[[import]]
+file = 'window.windows.toml'

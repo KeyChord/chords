@@ -1,0 +1,5 @@
+name = 'Rider'
+executables = ['rider', 'jetbrains-rider']
+
+[[import]]
+file = 'base-linux.toml'

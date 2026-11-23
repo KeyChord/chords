@@ -18,6 +18,21 @@ function isInstagramTarget(target: Target): boolean {
   }
 }
 
+function desktopEndpoint(target: Target, port: number): string | undefined {
+  if (!isInstagramTarget(target) || new URL(target.url).protocol !== "https:") return;
+  const endpoint = URL.parse(target.webSocketDebuggerUrl!);
+  if (
+    endpoint?.protocol === "ws:" &&
+    endpoint.hostname === "127.0.0.1" &&
+    Number(endpoint.port || 80) === port &&
+    !endpoint.username &&
+    !endpoint.password &&
+    endpoint.pathname.startsWith("/devtools/page/")
+  ) {
+    return endpoint.href;
+  }
+}
+
 function evaluate(target: Target, expression: string): Promise<unknown> {
   return new Promise((resolve, reject) => {
     const socket = new WebSocket(target.webSocketDebuggerUrl!);
@@ -91,4 +106,57 @@ export async function runInstagramJavaScript(source: string, port: number): Prom
   }
   if (!target) throw new Error("Focus the Instagram app before using Instagram chords.");
   return evaluate(target, source);
+}
+
+// Check inside the page as well because a debugging target can navigate without changing
+// its connection. Evaluation checks again immediately before running the action.
+const pageHasFocus = `(
+  location.protocol === "https:" &&
+  (location.hostname === "instagram.com" || location.hostname.endsWith(".instagram.com")) &&
+  document.hasFocus()
+)`;
+
+export async function runDesktopInstagramJavaScript(
+  source: string,
+  port: number,
+): Promise<unknown> {
+  let targets: Target[];
+  try {
+    const response = await fetch(`http://127.0.0.1:${port}/json/list`, {
+      signal: AbortSignal.timeout(2000),
+      redirect: "error",
+    });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    targets = await response.json();
+    if (!Array.isArray(targets)) throw new Error("Invalid browser target list.");
+  } catch (error) {
+    throw new Error(
+      `Start Brave with --remote-debugging-port=${port} and a dedicated profile. See the Instagram Chords README.`,
+      { cause: error },
+    );
+  }
+  const viable = targets.flatMap((target) => {
+    const endpoint = target && desktopEndpoint(target, port);
+    return endpoint ? [{ ...target, webSocketDebuggerUrl: endpoint }] : [];
+  });
+  const focused = await Promise.all(
+    viable.map(async (target) => {
+      try {
+        return (await evaluate(target, pageHasFocus)) === true ? target : null;
+      } catch {
+        return null;
+      }
+    }),
+  );
+  const pages = focused.filter((target) => target !== null);
+  if (pages.length !== 1) {
+    throw new Error("Focus one Instagram page in Brave before using Instagram chords.");
+  }
+  return evaluate(
+    pages[0]!,
+    `(() => {
+      if (!${pageHasFocus}) throw new Error("The Instagram page lost focus.");
+      return ${source};
+    })()`,
+  );
 }

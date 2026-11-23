@@ -8,7 +8,7 @@ import {
   type ClickKind,
 } from "./utils/click-sequence";
 
-export type ClickHandlerContext = { focusedAppId?: string };
+export type ClickHandlerContext = { focusedAppId?: string; focusedWindowId?: number | null };
 export type ClickBounds = ScreenBounds & { windowId?: number };
 
 // Leave time for UI transitions between coordinate actions.
@@ -19,6 +19,7 @@ export async function clickPoints(
   bounds: ClickBounds,
   points: ClickPoint[],
   validate?: (index: number) => void | Promise<void>,
+  pointerClick = false,
 ): Promise<void> {
   const { x, y, width, height, windowId } = bounds;
   let held: "left" | "right" | "middle" | undefined;
@@ -58,18 +59,16 @@ export async function clickPoints(
         }
         const options = {
           ...target,
-          moveCursor: true,
           ...(point.click === "RIGHT" || point.click === "MIDDLE"
             ? { button: point.click === "RIGHT" ? ("right" as const) : ("middle" as const) }
             : {}),
           ...(point.click === "DOUBLE" ? { clickCount: 2 as const } : {}),
           ...(point.click === "LONG" ? { pressDurationMs: 500 } : {}),
         };
-        if (windowId === undefined) {
-          const { moveCursor: _, ...globalOptions } = options;
-          await mouse({ ...globalOptions, action: "click" });
+        if (windowId === undefined || pointerClick) {
+          await mouse({ ...options, action: "click" });
         } else {
-          await clickWindow({ ...options, windowId });
+          await clickWindow({ ...options, windowId, moveCursor: true });
         }
       }
       keepHeld = !!point.hold;
@@ -109,9 +108,12 @@ export default function buildClickHandler(bundleId?: string) {
     this: ClickHandlerContext | void,
     sequence: string,
     defaultClick: Exclude<ClickKind, "LONG"> | "COMMAND" = "LEFT",
+    inputMode?: "POINTER",
   ): Promise<void> {
     // Capture the invocation context before waiting for a previous sequence to finish.
     const appId = bundleId ?? this?.focusedAppId;
+    const pointerClick = inputMode === "POINTER";
+    const focusedWindowId = pointerClick && bundleId === undefined ? this?.focusedWindowId : null;
     let positions: ReturnType<typeof parseClickSequence>;
     let global = false;
     try {
@@ -144,8 +146,16 @@ export default function buildClickHandler(bundleId?: string) {
       let validate: ((index: number) => void) | undefined;
       if (global) bounds = getScreenBounds();
       else {
-        const window = getAppWindows(appId!)[0];
-        if (!window) throw new Error(`No on-screen window found for ${appId}`);
+        const windows = getAppWindows(appId!);
+        const window =
+          focusedWindowId == null
+            ? windows[0]
+            : windows.find(({ windowId }) => windowId === focusedWindowId);
+        if (!window) {
+          if (focusedWindowId != null)
+            throw new Error("The captured window is no longer on screen");
+          throw new Error(`No on-screen window found for ${appId}`);
+        }
         bounds = { ...window.bounds, windowId: window.windowId };
         validate = (index) => {
           if (index === 0) return;
@@ -165,7 +175,7 @@ export default function buildClickHandler(bundleId?: string) {
         };
       }
       const points = resolveClickSequence(positions, bounds);
-      await clickPoints(bounds, points, validate);
+      await clickPoints(bounds, points, validate, pointerClick);
       holdingMouse = !!points.at(-1)?.hold;
     });
   };

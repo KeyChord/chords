@@ -1,0 +1,8 @@
+name = 'Opera'
+executables = ['opera.exe']
+
+[[import]]
+file = 'opera.desktop.toml'
+
+[[import]]
+file = 'window.windows.toml'

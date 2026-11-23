@@ -1,9 +1,9 @@
-//#region package.json
+// package.json
 var name = "@keychord/chords-com.apple.screencaptureui";
 var displayName = "Screenshot Chords";
 var version = "0.0.2";
-var description = "Chords for Screenshot (com.apple.screencaptureui).";
-var categories = ["macOS"];
+var description = "Chords for Screenshot on macOS and Snipping Tool on Windows.";
+var categories = ["Windows", "macOS"];
 var repository = {
 	"type": "git",
 	"url": "https://github.com/KeyChord/chords-com.apple.screencaptureui"
@@ -374,21 +374,39 @@ var chords = {
 			}
 		}
 	} } } },
-	"com": { "apple": { "screencaptureui": { "macos.toml": {
-		"name": "Screenshot",
-		"on": { "menu": { "file": "@keychord/chords-menu/js/menu.js" } },
-		"chords": {
-			"?f": { "name": "File" },
-			"fs": {
-				"name": "File: Save Screenshot",
-				"@input:menu": ["BY_PATH", ["File", "Save"]]
-			},
-			"fc": {
-				"name": "File: Copy and Close",
-				"@input:menu": ["BY_PATH", ["Edit", "Copy and Close"]]
+	"com": {
+		"apple": { "screencaptureui": { "macos.toml": {
+			"name": "Screenshot",
+			"on": { "menu": { "file": "@keychord/chords-menu/js/menu.js" } },
+			"chords": {
+				"?f": { "name": "File" },
+				"fs": {
+					"name": "File: Save Screenshot",
+					"@input:menu": ["BY_PATH", ["File", "Save"]]
+				},
+				"fc": {
+					"name": "File: Copy and Close",
+					"@input:menu": ["BY_PATH", ["Edit", "Copy and Close"]]
+				}
 			}
-		}
-	} } } },
+		} } },
+		"microsoft": { "SnippingTool": { "windows.toml": {
+			"name": "Snipping Tool",
+			"executables": ["SnippingTool.exe"],
+			"meta": { "chord": ">=0.3.4" },
+			"chords": {
+				"?f": { "name": "File" },
+				"fs": {
+					"name": "File: Save Snip",
+					"shortcut": "ctrl+s"
+				},
+				"fc": {
+					"name": "File: Copy Snip",
+					"shortcut": "ctrl+c"
+				}
+			}
+		} } }
+	},
 	"macos.toml": {
 		"name": "Screenshot",
 		"chords": {}
@@ -408,5 +426,4 @@ var package_default = {
 	packageManager,
 	chords
 };
-//#endregion
 export { categories, chords, package_default as default, dependencies, description, devDependencies, displayName, name, packageManager, repository, scripts, type, version };

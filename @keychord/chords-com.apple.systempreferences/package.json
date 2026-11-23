@@ -2,7 +2,7 @@
   "name": "@keychord/chords-com.apple.systempreferences",
   "displayName": "System Preferences Chords",
   "version": "0.0.1",
-  "description": "Chords for System Preferences (com.apple.systempreferences).",
+  "description": "Open system settings panels on macOS, GNOME on Linux, and Windows.",
   "categories": [
     "macOS"
   ],

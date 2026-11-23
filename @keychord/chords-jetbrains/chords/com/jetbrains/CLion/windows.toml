@@ -1,0 +1,5 @@
+name = 'CLion'
+executables = ['clion64.exe', 'clion.exe']
+
+[[import]]
+file = 'base-windows.toml'

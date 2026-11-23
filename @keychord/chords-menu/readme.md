@@ -4,11 +4,36 @@
 > This document is largely AI-written, so parts of it may not be fully accurate. It will be replaced with a hand-written version when I get the time.
 
 One package for macOS application menus, menu-bar extras, Control Center, and menu-bar
-visibility. Its chords work in whichever app is focused. [Chord](https://github.com/KeyChord/Chord)
-installs this package by default, from its pinned `KeyChord/chords-menu` repository. To use the monorepo's current version documented here
+visibility. Its chords work in whichever app is focused. On macOS,
+[Chord](https://github.com/KeyChord/Chord) installs this package by default from its pinned `KeyChord/chords-menu` repository. To use the monorepo's current version documented here
 instead, open Settings → Chords → **Chord Monorepos** → **Add Monorepo**, enter
 `KeyChord/chords`, tick `@keychord/chords-menu` under **Packages to use**, and remove the
 `KeyChord/chords-menu` entry under **Chord Repos**.
+
+## Linux and Windows
+
+Chord 0.3.4 or newer loads the Linux or Windows system shortcuts automatically.
+The **System shortcuts prefix** defaults to `s`. Examples use the default global
+prefix, so `;sls` locks the screen, `;svu`, `;svd`, and `;svm` adjust volume,
+`;sr` opens the run dialog, and `;sw` opens the active window's system menu.
+Change this prefix in Settings → Chords → **Placeholders**.
+
+- **Linux X11.** The shortcuts use GNOME's default bindings. `;s0` opens the
+  Activities overview, `;sa` shows applications, `;sc` opens Quick Settings,
+  and `;st` opens notifications and the calendar. `;sbu` and `;sbd` send the
+  brightness keys and require display brightness controls supported by the desktop.
+  [GNOME shortcuts](https://help.gnome.org/gnome-help/keyboard-shortcuts-set.html)
+- **Windows.** `;s0` opens Start, `;si` focuses the taskbar notification area,
+  `;sc` opens Quick Settings on Windows 11 or Action Center on Windows 10,
+  and `;sq` opens Task Manager. `;st` opens the Windows 11 notification center
+  and calendar. `;swm` activates an application's menu bar when it supports
+  the standard F10 shortcut.
+  [Windows shortcuts](https://support.microsoft.com/en-us/accessibility/windows/keyboard-shortcuts-in-windows)
+
+The Swift menu search, menu traversal, numbered tray selection, and Control
+Center automation described below are specific to macOS.
+
+## macOS
 
 Set **Menu bar prefix** under Settings → Chords → **Placeholders** to change the
 prefix for these chords. The examples below use the default, `;b`.

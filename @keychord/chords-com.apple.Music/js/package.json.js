@@ -1,9 +1,9 @@
-//#region package.json
+// package.json
 var name = "@keychord/chords-com.apple.Music";
 var displayName = "Music Chords";
 var version = "0.0.2";
-var description = "Chords for Music (com.apple.Music).";
-var categories = ["macOS"];
+var description = "Chords for Apple Music on macOS and Windows.";
+var categories = ["macOS", "Windows"];
 var repository = {
 	"type": "git",
 	"url": "https://github.com/KeyChord/chords-com.apple.Music"
@@ -374,135 +374,249 @@ var chords = {
 			}
 		}
 	} } } },
-	"com": { "apple": { "Music": { "macos.toml": {
-		"name": "Music",
-		"on": { "menu": { "file": "@keychord/chords-menu/js/menu.js" } },
-		"chords": {
-			"?a": { "name": "App" },
-			"a,": {
-				"name": "App: Settings",
-				"@input:menu": ["BY_PATH", ["Music", "Settings…"]]
-			},
-			"?g": { "name": "Goto" },
-			"g/": {
-				"name": "Goto: Search",
-				"shortcut": "cmd+f"
-			},
-			"gr": {
-				"name": "Goto: Recently Added",
-				"shortcut": "ctrl+cmd+1"
-			},
-			"ga": {
-				"name": "Goto: Artists",
-				"shortcut": "ctrl+cmd+2"
-			},
-			"gb": {
-				"name": "Goto: Albums",
-				"shortcut": "ctrl+cmd+3"
-			},
-			"gs": {
-				"name": "Goto: Songs",
-				"shortcut": "ctrl+cmd+4"
-			},
-			"?n": { "name": "New" },
-			"np": {
-				"name": "New: Playlist",
-				"@input:menu": ["BY_PATH", [
-					"File",
-					"New",
-					"Playlist"
-				]]
-			},
-			"ns": {
-				"name": "New: Smart Playlist",
-				"@input:menu": ["BY_PATH", [
-					"File",
-					"New",
-					"Smart Playlist"
-				]]
-			},
-			"nf": {
-				"name": "New: Playlist Folder",
-				"@input:menu": ["BY_PATH", [
-					"File",
-					"New",
-					"Playlist Folder"
-				]]
-			},
-			"?f": { "name": "File" },
-			"fi": {
-				"name": "File: Import",
-				"@input:menu": ["BY_PATH", ["File", "Import…"]]
-			},
-			"fu": {
-				"name": "File: Open Stream URL",
-				"@input:menu": ["BY_PATH", ["File", "Open Stream URL…"]]
-			},
-			"fe": {
-				"name": "File: Export Library",
-				"@input:menu": ["BY_PATH", [
-					"File",
-					"Library",
-					"Export Library…"
-				]]
-			},
-			"?v": { "name": "View" },
-			"vn": {
-				"name": "View: Playing Next",
-				"@input:menu": ["SEARCH", "Playing Next"]
-			},
-			"vb": {
-				"name": "View: Status Bar",
-				"@input:menu": ["SEARCH", "Status Bar"]
-			},
-			"ve": {
-				"name": "View: Equalizer",
-				"@input:menu": ["BY_PATH", ["Window", "Equalizer"]]
-			},
-			"?p": { "name": "Playback" },
-			"pp": {
-				"name": "Playback: Play",
-				"@input:menu": ["BY_PATH", ["Controls", "Play"]]
-			},
-			"ph": {
-				"name": "Playback: Pause",
-				"@input:menu": ["BY_PATH", ["Controls", "Pause"]]
-			},
-			"p[": {
-				"name": "Playback: Previous Track",
-				"@input:menu": ["BY_PATH", ["Controls", "Previous Track"]]
-			},
-			"p]": {
-				"name": "Playback: Next Track",
-				"@input:menu": ["BY_PATH", ["Controls", "Next Track"]]
-			},
-			"pro": {
-				"name": "Playback: Repeat Off",
-				"@input:menu": ["BY_PATH", [
-					"Controls",
-					"Repeat",
-					"Off"
-				]]
-			},
-			"pra": {
-				"name": "Playback: Repeat All",
-				"@input:menu": ["BY_PATH", [
-					"Controls",
-					"Repeat",
-					"All"
-				]]
-			},
-			"pr1": {
-				"name": "Playback: Repeat One",
-				"@input:menu": ["BY_PATH", [
-					"Controls",
-					"Repeat",
-					"One"
-				]]
-			},
-			"?pr": { "name": "Repeat" }
+	"com": { "apple": { "Music": {
+		"macos.toml": {
+			"name": "Music",
+			"on": { "menu": { "file": "@keychord/chords-menu/js/menu.js" } },
+			"chords": {
+				"?a": { "name": "App" },
+				"a,": {
+					"name": "App: Settings",
+					"@input:menu": ["BY_PATH", ["Music", "Settings…"]]
+				},
+				"?g": { "name": "Goto" },
+				"g/": {
+					"name": "Goto: Search",
+					"shortcut": "cmd+f"
+				},
+				"gr": {
+					"name": "Goto: Recently Added",
+					"shortcut": "ctrl+cmd+1"
+				},
+				"ga": {
+					"name": "Goto: Artists",
+					"shortcut": "ctrl+cmd+2"
+				},
+				"gb": {
+					"name": "Goto: Albums",
+					"shortcut": "ctrl+cmd+3"
+				},
+				"gs": {
+					"name": "Goto: Songs",
+					"shortcut": "ctrl+cmd+4"
+				},
+				"?n": { "name": "New" },
+				"np": {
+					"name": "New: Playlist",
+					"@input:menu": ["BY_PATH", [
+						"File",
+						"New",
+						"Playlist"
+					]]
+				},
+				"ns": {
+					"name": "New: Smart Playlist",
+					"@input:menu": ["BY_PATH", [
+						"File",
+						"New",
+						"Smart Playlist"
+					]]
+				},
+				"nf": {
+					"name": "New: Playlist Folder",
+					"@input:menu": ["BY_PATH", [
+						"File",
+						"New",
+						"Playlist Folder"
+					]]
+				},
+				"?f": { "name": "File" },
+				"fi": {
+					"name": "File: Import",
+					"@input:menu": ["BY_PATH", ["File", "Import…"]]
+				},
+				"fu": {
+					"name": "File: Open Stream URL",
+					"@input:menu": ["BY_PATH", ["File", "Open Stream URL…"]]
+				},
+				"fe": {
+					"name": "File: Export Library",
+					"@input:menu": ["BY_PATH", [
+						"File",
+						"Library",
+						"Export Library…"
+					]]
+				},
+				"?v": { "name": "View" },
+				"vn": {
+					"name": "View: Playing Next",
+					"@input:menu": ["SEARCH", "Playing Next"]
+				},
+				"vb": {
+					"name": "View: Status Bar",
+					"@input:menu": ["SEARCH", "Status Bar"]
+				},
+				"ve": {
+					"name": "View: Equalizer",
+					"@input:menu": ["BY_PATH", ["Window", "Equalizer"]]
+				},
+				"?p": { "name": "Playback" },
+				"pp": {
+					"name": "Playback: Play",
+					"@input:menu": ["BY_PATH", ["Controls", "Play"]]
+				},
+				"ph": {
+					"name": "Playback: Pause",
+					"@input:menu": ["BY_PATH", ["Controls", "Pause"]]
+				},
+				"p[": {
+					"name": "Playback: Previous Track",
+					"@input:menu": ["BY_PATH", ["Controls", "Previous Track"]]
+				},
+				"p]": {
+					"name": "Playback: Next Track",
+					"@input:menu": ["BY_PATH", ["Controls", "Next Track"]]
+				},
+				"pro": {
+					"name": "Playback: Repeat Off",
+					"@input:menu": ["BY_PATH", [
+						"Controls",
+						"Repeat",
+						"Off"
+					]]
+				},
+				"pra": {
+					"name": "Playback: Repeat All",
+					"@input:menu": ["BY_PATH", [
+						"Controls",
+						"Repeat",
+						"All"
+					]]
+				},
+				"pr1": {
+					"name": "Playback: Repeat One",
+					"@input:menu": ["BY_PATH", [
+						"Controls",
+						"Repeat",
+						"One"
+					]]
+				},
+				"?pr": { "name": "Repeat" }
+			}
+		},
+		"windows.toml": {
+			"name": "Apple Music",
+			"executables": ["AppleMusic.exe"],
+			"meta": { "chord": ">=0.3.4" },
+			"chords": {
+				"?a": { "name": "App" },
+				"a,": {
+					"name": "App: Settings",
+					"shortcut": "ctrl+comma"
+				},
+				"ah": {
+					"name": "App: Help",
+					"shortcut": "f1"
+				},
+				"?g": { "name": "Go To" },
+				"g[": {
+					"name": "Go To: Previous Screen",
+					"shortcut": "alt+left"
+				},
+				"g/": {
+					"name": "Go To: Search",
+					"shortcut": "alt n f"
+				},
+				"gr": {
+					"name": "Go To: Recently Added",
+					"shortcut": "alt n n"
+				},
+				"ga": {
+					"name": "Go To: Artists",
+					"shortcut": "alt n t"
+				},
+				"gb": {
+					"name": "Go To: Albums",
+					"shortcut": "alt n a"
+				},
+				"gs": {
+					"name": "Go To: Songs",
+					"shortcut": "alt n s"
+				},
+				"?f": { "name": "File" },
+				"fi": {
+					"name": "File: Import",
+					"shortcut": "ctrl+o"
+				},
+				"?v": { "name": "View" },
+				"vn": {
+					"name": "View: Queue",
+					"shortcut": "alt l q"
+				},
+				"ve": {
+					"name": "View: Equalizer",
+					"shortcut": "ctrl+shift+e"
+				},
+				"vl": {
+					"name": "View: Current Track in List",
+					"shortcut": "ctrl+l"
+				},
+				"vm": {
+					"name": "View: Mini Player",
+					"shortcut": "ctrl+shift+m"
+				},
+				"vf": {
+					"name": "View: Full-Screen Player",
+					"shortcut": "ctrl+shift+f"
+				},
+				"vy": {
+					"name": "View: Lyrics",
+					"shortcut": "alt l l"
+				},
+				"?p": { "name": "Playback" },
+				"pp": {
+					"name": "Playback: Play or Pause",
+					"shortcut": "ctrl+space"
+				},
+				"ps": {
+					"name": "Playback: Stop",
+					"shortcut": "ctrl+period"
+				},
+				"p[": {
+					"name": "Playback: Previous Track",
+					"shortcut": "ctrl+left"
+				},
+				"p]": {
+					"name": "Playback: Next Track",
+					"shortcut": "ctrl+right"
+				},
+				"pb": {
+					"name": "Playback: Seek Backward",
+					"shortcut": "alt+ctrl+left"
+				},
+				"pf": {
+					"name": "Playback: Seek Forward",
+					"shortcut": "alt+ctrl+right"
+				},
+				"pu": {
+					"name": "Playback: Volume Up",
+					"shortcut": "ctrl+up"
+				},
+				"pd": {
+					"name": "Playback: Volume Down",
+					"shortcut": "ctrl+down"
+				},
+				"pr": {
+					"name": "Playback: Repeat",
+					"shortcut": "alt l r"
+				},
+				"pl": {
+					"name": "Playback: Shuffle",
+					"shortcut": "alt l s"
+				}
+			}
 		}
-	} } } },
+	} } },
 	"macos.toml": {
 		"name": "Music",
 		"chords": {}
@@ -522,5 +636,4 @@ var package_default = {
 	packageManager,
 	chords
 };
-//#endregion
 export { categories, chords, package_default as default, dependencies, description, devDependencies, displayName, name, packageManager, repository, scripts, type, version };

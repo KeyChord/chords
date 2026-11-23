@@ -2,873 +2,1232 @@
 var name = "@keychord/chords-chromium";
 var displayName = "Chromium Chords";
 var version = "0.0.1";
-var description =
-  "Chords for Google Chrome and other Chromium-based browsers, including Brave, Edge, Opera and Vivaldi.";
+var description = "Chords for Google Chrome and other Chromium-based browsers, including Brave, Edge, Opera and Vivaldi.";
 var categories = ["Browsers"];
 var repository = {
-  type: "git",
-  url: "https://github.com/KeyChord/chords-chromium",
+	"type": "git",
+	"url": "https://github.com/KeyChord/chords-chromium"
 };
 var type = "module";
 var dependencies = {
-  "chrome-remote-interface": "latest",
-  desm: "latest",
-  "get-port": "latest",
-  "jquery-as-string": "latest",
-  "nano-spawn-compat": "latest",
+	"chrome-remote-interface": "latest",
+	"desm": "latest",
+	"get-port": "latest",
+	"jquery-as-string": "latest",
+	"nano-spawn-compat": "latest"
 };
 var devDependencies = {
-  "@keychord/chordtest": "workspace:*",
-  "@keychord/config": "catalog:",
-  "@keychord/tsconfig": "catalog:",
-  "@types/chrome-remote-interface": "latest",
-  "bun-types": "latest",
-  dax: "latest",
+	"@keychord/chordtest": "workspace:*",
+	"@keychord/config": "catalog:",
+	"@keychord/tsconfig": "catalog:",
+	"@types/chrome-remote-interface": "latest",
+	"bun-types": "latest",
+	"dax": "latest"
 };
 var packageManager = "pnpm@12.11.2";
 var chords = {
-  "+web": {
-    google: {
-      com: {
-        "macos.toml": {
-          name: "google.com",
-          on: {
-            js: {
-              file: "chrome.js",
-              args: [],
-            },
-          },
-          chords: {
-            "?r": { name: "Results" },
-            r1: {
-              name: "Result 1",
-              "@input:js": ['$(`div[lang="en"]:has(cite[role="text"])`).eq(0)'],
-            },
-            r2: {
-              name: "Result 1",
-              "@input:js": ['$(`div[lang="en"]:has(cite[role="text"])`).eq(1)'],
-            },
-            r3: {
-              name: "Result 1",
-              "@input:js": ['$(`div[lang="en"]:has(cite[role="text"])`).eq(2)'],
-            },
-            r4: {
-              name: "Result 1",
-              "@input:js": ['$(`div[lang="en"]:has(cite[role="text"])`).eq(3)'],
-            },
-            r5: {
-              name: "Result 1",
-              "@input:js": ['$(`div[lang="en"]:has(cite[role="text"])`).eq(4)'],
-            },
-            r6: {
-              name: "Result 1",
-              "@input:js": ['$(`div[lang="en"]:has(cite[role="text"])`).eq(5)'],
-            },
-            r7: {
-              name: "Result 1",
-              "@input:js": ['$(`div[lang="en"]:has(cite[role="text"])`).eq(6)'],
-            },
-            r8: {
-              name: "Result 1",
-              "@input:js": ['$(`div[lang="en"]:has(cite[role="text"])`).eq(7)'],
-            },
-            r9: {
-              name: "Result 1",
-              "@input:js": ['$(`div[lang="en"]:has(cite[role="text"])`).eq(8)'],
-            },
-          },
-        },
-      },
-    },
-  },
-  "base.toml": {
-    name: "Chromium Base Shortcuts",
-    chords: {
-      "?w": { name: "Window" },
-      wn: {
-        name: "Window: New",
-        command: "Open a new window",
-        shortcut: "cmd+n",
-      },
-      wi: {
-        name: "Window: Incognito",
-        command: "Open a new window in Incognito mode",
-        shortcut: "cmd+shift+n",
-      },
-      wc: {
-        name: "Window: Close",
-        command: "Close the current window",
-        shortcut: "cmd+shift+w",
-      },
-      wm: {
-        name: "Window: Minimize",
-        command: "Minimize the window",
-        shortcut: "cmd+m",
-      },
-      wh: {
-        name: "Window: Hide",
-        command: "Hide Google Chrome",
-        shortcut: "cmd+h",
-      },
-      wq: {
-        name: "Window: Quit",
-        command: "Quit Google Chrome",
-        shortcut: "cmd+q",
-      },
-      "?t": { name: "Tab" },
-      tq: {
-        name: "Tab: Quit",
-        command: "Close the current tab, or pop-up",
-        shortcut: "cmd+w",
-      },
-      tn: {
-        name: "Tab: New",
-        command: "Open a new tab, and jump to it",
-        shortcut: "cmd+t",
-      },
-      to: {
-        name: "Tab: Reopen",
-        command: "Reopen previously closed tabs in the order they were closed",
-        shortcut: "cmd+shift+t",
-      },
-      "t]": {
-        name: "Tab: Next",
-        command: "Jump to the next open tab",
-        shortcut: "ctrl+tab",
-      },
-      "t[": {
-        name: "Tab: Previous",
-        command: "Jump to the previous open tab",
-        shortcut: "cmd+shift+tab",
-      },
-      t1: {
-        name: "Tab 1",
-        command: "Jump to a specific tab",
-        shortcut: "cmd+1",
-      },
-      t2: {
-        name: "Tab 2",
-        command: "Jump to a specific tab",
-        shortcut: "cmd+2",
-      },
-      t3: {
-        name: "Tab 3",
-        command: "Jump to a specific tab",
-        shortcut: "cmd+3",
-      },
-      t4: {
-        name: "Tab 4",
-        command: "Jump to a specific tab",
-        shortcut: "cmd+4",
-      },
-      t5: {
-        name: "Tab 5",
-        command: "Jump to a specific tab",
-        shortcut: "cmd+5",
-      },
-      t6: {
-        name: "Tab 6",
-        command: "Jump to a specific tab",
-        shortcut: "cmd+6",
-      },
-      t7: {
-        name: "Tab 7",
-        command: "Jump to a specific tab",
-        shortcut: "cmd+7",
-      },
-      t8: {
-        name: "Tab 8",
-        command: "Jump to a specific tab",
-        shortcut: "cmd+8",
-      },
-      tl: {
-        name: "Tab: Left Move",
-        command: "Move tabs right or left",
-        shortcut: "cmd+shift+pgup",
-      },
-      tr: {
-        name: "Tab: Right Move",
-        command: "Move tabs right or left",
-        shortcut: "cmd+shift+pgdown",
-      },
-      "?h": { name: "History" },
-      hb: {
-        name: "History: Back",
-        command: "Open the next page from your browsing history in the current tab",
-        shortcut: "cmd+]",
-      },
-      hf: {
-        name: "History: Forward",
-        command: "Open the previous page from your browsing history in the current tab",
-        shortcut: "cmd+[",
-      },
-      "?p": { name: "Page" },
-      "p,": {
-        name: "Page: Settings",
-        command: "Open the Settings page in a new tab",
-        shortcut: "cmd+,",
-      },
-      ph: {
-        name: "Page: History",
-        command: "Open the History page in a new tab",
-        shortcut: "cmd+y",
-      },
-      pd: {
-        name: "Page: Downloads",
-        command: "Open the Downloads page in a new tab",
-        shortcut: "cmd+shift+j",
-      },
-      pm: {
-        name: "Page: Home",
-        command: "Open your home page in the current tab",
-        shortcut: "cmd+shift+h",
-      },
-      psd: {
-        name: "Page Setup Dialog",
-        command: "Open the Page Setup dialog",
-        shortcut: "cmd+option+p",
-      },
-      ps: {
-        name: "Page: Save",
-        command: "Open options to save the current page",
-        shortcut: "cmd+s",
-      },
-      "?m": { name: "Match" },
-      "m]": {
-        name: "Match: Next",
-        command: "Jump to the next match to your Find Bar search",
-        shortcut: "cmd+g",
-      },
-      "m[": {
-        name: "Match: Previous",
-        command: "Jump to the previous match to your Find Bar search",
-        shortcut: "cmd+shift+g",
-      },
-      "?b": { name: "Bookmarks" },
-      bt: {
-        name: "Bookmarks: Toggle",
-        command: "Show or hide the Bookmarks Bar",
-        shortcut: "cmd+b",
-      },
-      bm: {
-        name: "Bookmarks: Manager",
-        command: "Open the Bookmark Manager",
-        shortcut: "cmd+option+b",
-      },
-      bs: {
-        name: "Bookmark: Save",
-        command: "Save your current webpage as a bookmark",
-        shortcut: "cmd+d",
-      },
-      bf: {
-        name: "Bookmarks: Folder from tabs",
-        command: "Save all open tabs as bookmarks in a new folder",
-        shortcut: "cmd+shift+d",
-      },
-      "?z": { name: "Zoom" },
-      zi: {
-        name: "Zoom In",
-        command: "Make everything on the page bigger",
-        shortcut: "cmd+plus",
-      },
-      zo: {
-        name: "Zoom Out",
-        command: "Make everything on the page smaller",
-        shortcut: "cmd+minus",
-      },
-      zr: {
-        name: "Zoom Reset",
-        command: "Return everything on the page to the default size",
-        shortcut: "cmd+0",
-      },
-      "?l": { name: "Load" },
-      lr: {
-        name: "Load: Reload",
-        command: "Reload your current page",
-        shortcut: "cmd+r",
-      },
-      lh: {
-        name: "Load: Hard Reload",
-        command: "Reload your current page, ignoring cached content",
-        shortcut: "cmd+shift+r",
-      },
-      ls: {
-        name: "Load: Stop",
-        command: "Stop the page loading",
-        shortcut: "esc",
-      },
-      "?g": { name: "Goto" },
-      ga: {
-        name: "Goto: Account",
-        command:
-          "Log in as a different user, browse as a Guest, or access payment and password info",
-        shortcut: "cmd+shift+m",
-      },
-      gb: {
-        name: "Goto: Bar",
-        command: "Jump to the address bar",
-        shortcut: "cmd+l",
-      },
-      gm: {
-        name: "Goto: Main Menu",
-        command: "Jump to the main menu bar",
-        shortcut: "control+f2",
-      },
-      fs: {
-        name: "Full Screen",
-        command: "Turn on full-screen mode",
-        shortcut: "fn+f",
-      },
-      fso: {
-        name: "Full Screen Off",
-        command: "Turn off full-screen mode",
-        shortcut: "fn+f",
-      },
-      dt: {
-        name: "Developer Tools",
-        command: "Open Developer Tools",
-        shortcut: "cmd+option+i",
-      },
-      odb: {
-        name: "Open Delete Browsing Data",
-        command: "Open the Delete Browsing Data options",
-        shortcut: "cmd+shift+delete",
-      },
-      "fd]": {
-        name: "Focus Dialog Next",
-        command: "Cycle focus to unfocused dialog (if showing) and all toolbars",
-        shortcut: "cmd+option+up",
-      },
-      "fd[": {
-        name: "Focus Dialog Previous",
-        command: "Cycle focus to unfocused dialog (if showing) and all toolbars",
-        shortcut: "cmd+option+down",
-      },
-      ofb: {
-        name: "Open Feedback",
-        command: "Open a feedback form",
-        shortcut: "cmd+option+shift+i",
-      },
-      cb: {
-        name: "Caret Browsing",
-        command: "Turn on caret browsing",
-        shortcut: "f7",
-      },
-      fid: {
-        name: "Focus Inactive Dialogs",
-        command: "Focus on inactive dialogs",
-        shortcut: "cmd+option+shift+a",
-      },
-      sp: {
-        name: "Split View",
-        command: "Open split view in the active tab",
-        shortcut: "cmd+option+n",
-      },
-      rp: {
-        name: "Remove Predictions",
-        command: "Remove predictions from your address bar",
-        shortcut: "shift+fn+delete",
-      },
-      cab: {
-        name: "Cursor to Address Bar",
-        command: "Move cursor to the address bar",
-        shortcut: "control+f5",
-      },
-      ne: {
-        name: "New Email",
-        command: "Compose a new email message with a link to the current page",
-        shortcut: "cmd+shift+i",
-      },
-      pr: {
-        name: "Print",
-        command: "Open options to print the current page",
-        shortcut: "cmd+p",
-      },
-      of: {
-        name: "Open File",
-        command: "Open a file from your computer",
-        shortcut: "cmd+o",
-      },
-      sc: {
-        name: "Source Code",
-        command: "Display non-editable HTML source code for the current page",
-        shortcut: "cmd+option+u",
-      },
-      jc: {
-        name: "JavaScript Console",
-        command: "Open the JavaScript Console",
-        shortcut: "cmd+option+j",
-      },
-      sd: {
-        name: "Scroll Down",
-        command: "Scroll down a webpage, a screen at a time",
-        shortcut: "space",
-      },
-      su: {
-        name: "Scroll Up",
-        command: "Scroll up a webpage, a screen at a time",
-        shortcut: "shift+space",
-      },
-      sw: {
-        name: "Search Web",
-        command: "Search the web",
-        shortcut: "cmd+option+f",
-      },
-    },
-  },
-  com: {
-    brave: {
-      Browser: {
-        "macos.toml": {
-          name: "Brave",
-          on: {
-            js: {
-              file: "chrome.js",
-              args: ["/Applications/Brave.app"],
-            },
-          },
-          import: [{ file: "base.toml" }],
-        },
-      },
-    },
-    google: {
-      Chrome: {
-        beta: {
-          "macos.toml": {
-            name: "Google Chrome Beta",
-            on: {
-              js: {
-                file: "chrome.js",
-                args: ["/Applications/Google Chrome Beta.app"],
-              },
-            },
-            import: [{ file: "com/google/Chrome/macos.toml" }],
-          },
-        },
-        canary: {
-          "macos.toml": {
-            name: "Google Chrome Canary",
-            on: {
-              js: {
-                file: "chrome.js",
-                args: ["/Applications/Google Chrome Canary.app"],
-              },
-            },
-            import: [{ file: "com/google/Chrome/macos.toml" }],
-          },
-        },
-        "macos.toml": {
-          name: "Google Chrome",
-          on: {
-            js: {
-              file: "chrome.js",
-              args: ["/Applications/Google Chrome.app"],
-            },
-          },
-          chords: {
-            "?w": { name: "Window" },
-            wn: {
-              name: "Window: New",
-              command: "Open a new window",
-              shortcut: "cmd+n",
-            },
-            wi: {
-              name: "Window: Incognito",
-              command: "Open a new window in Incognito mode",
-              shortcut: "cmd+shift+n",
-            },
-            wc: {
-              name: "Window: Close",
-              command: "Close the current window",
-              shortcut: "cmd+shift+w",
-            },
-            wm: {
-              name: "Window: Minimize",
-              command: "Minimize the window",
-              shortcut: "cmd+m",
-            },
-            wh: {
-              name: "Window: Hide",
-              command: "Hide Google Chrome",
-              shortcut: "cmd+h",
-            },
-            wq: {
-              name: "Window: Quit",
-              command: "Quit Google Chrome",
-              shortcut: "cmd+q",
-            },
-            "?t": { name: "Tab" },
-            tq: {
-              name: "Tab: Quit",
-              command: "Close the current tab, or pop-up",
-              shortcut: "cmd+w",
-            },
-            tn: {
-              name: "Tab: New",
-              command: "Open a new tab, and jump to it",
-              shortcut: "cmd+t",
-            },
-            to: {
-              name: "Tab: Reopen",
-              command: "Reopen previously closed tabs in the order they were closed",
-              shortcut: "cmd+shift+t",
-            },
-            "t]": {
-              name: "Tab: Next",
-              command: "Jump to the next open tab",
-              shortcut: "ctrl+tab",
-            },
-            "t[": {
-              name: "Tab: Previous",
-              command: "Jump to the previous open tab",
-              shortcut: "cmd+shift+tab",
-            },
-            t1: {
-              name: "Tab 1",
-              command: "Jump to a specific tab",
-              shortcut: "cmd+1",
-            },
-            t2: {
-              name: "Tab 2",
-              command: "Jump to a specific tab",
-              shortcut: "cmd+2",
-            },
-            t3: {
-              name: "Tab 3",
-              command: "Jump to a specific tab",
-              shortcut: "cmd+3",
-            },
-            t4: {
-              name: "Tab 4",
-              command: "Jump to a specific tab",
-              shortcut: "cmd+4",
-            },
-            t5: {
-              name: "Tab 5",
-              command: "Jump to a specific tab",
-              shortcut: "cmd+5",
-            },
-            t6: {
-              name: "Tab 6",
-              command: "Jump to a specific tab",
-              shortcut: "cmd+6",
-            },
-            t7: {
-              name: "Tab 7",
-              command: "Jump to a specific tab",
-              shortcut: "cmd+7",
-            },
-            t8: {
-              name: "Tab 8",
-              command: "Jump to a specific tab",
-              shortcut: "cmd+8",
-            },
-            tl: {
-              name: "Tab: Left Move",
-              command: "Move tabs right or left",
-              shortcut: "cmd+shift+pgup",
-            },
-            tr: {
-              name: "Tab: Right Move",
-              command: "Move tabs right or left",
-              shortcut: "cmd+shift+pgdown",
-            },
-            "?h": { name: "History" },
-            hb: {
-              name: "History: Back",
-              command: "Open the next page from your browsing history in the current tab",
-              shortcut: "cmd+]",
-            },
-            hf: {
-              name: "History: Forward",
-              command: "Open the previous page from your browsing history in the current tab",
-              shortcut: "cmd+[",
-            },
-            "?p": { name: "Page" },
-            "p,": {
-              name: "Page: Settings",
-              command: "Open the Settings page in a new tab",
-              shortcut: "cmd+,",
-            },
-            ph: {
-              name: "Page: History",
-              command: "Open the History page in a new tab",
-              shortcut: "cmd+y",
-            },
-            pd: {
-              name: "Page: Downloads",
-              command: "Open the Downloads page in a new tab",
-              shortcut: "cmd+shift+j",
-            },
-            pm: {
-              name: "Page: Home",
-              command: "Open your home page in the current tab",
-              shortcut: "cmd+shift+h",
-            },
-            psd: {
-              name: "Page Setup Dialog",
-              command: "Open the Page Setup dialog",
-              shortcut: "cmd+option+p",
-            },
-            ps: {
-              name: "Page: Save",
-              command: "Open options to save the current page",
-              shortcut: "cmd+s",
-            },
-            "?m": { name: "Match" },
-            "m]": {
-              name: "Match: Next",
-              command: "Jump to the next match to your Find Bar search",
-              shortcut: "cmd+g",
-            },
-            "m[": {
-              name: "Match: Previous",
-              command: "Jump to the previous match to your Find Bar search",
-              shortcut: "cmd+shift+g",
-            },
-            "?b": { name: "Bookmarks" },
-            bt: {
-              name: "Bookmarks: Toggle",
-              command: "Show or hide the Bookmarks Bar",
-              shortcut: "cmd+b",
-            },
-            bm: {
-              name: "Bookmarks: Manager",
-              command: "Open the Bookmark Manager",
-              shortcut: "cmd+option+b",
-            },
-            bs: {
-              name: "Bookmark: Save",
-              command: "Save your current webpage as a bookmark",
-              shortcut: "cmd+d",
-            },
-            bf: {
-              name: "Bookmarks: Folder from tabs",
-              command: "Save all open tabs as bookmarks in a new folder",
-              shortcut: "cmd+shift+d",
-            },
-            "?z": { name: "Zoom" },
-            zi: {
-              name: "Zoom In",
-              command: "Make everything on the page bigger",
-              shortcut: "cmd+plus",
-            },
-            zo: {
-              name: "Zoom Out",
-              command: "Make everything on the page smaller",
-              shortcut: "cmd+minus",
-            },
-            zr: {
-              name: "Zoom Reset",
-              command: "Return everything on the page to the default size",
-              shortcut: "cmd+0",
-            },
-            "?l": { name: "Load" },
-            lr: {
-              name: "Load: Reload",
-              command: "Reload your current page",
-              shortcut: "cmd+r",
-            },
-            lh: {
-              name: "Load: Hard Reload",
-              command: "Reload your current page, ignoring cached content",
-              shortcut: "cmd+shift+r",
-            },
-            ls: {
-              name: "Load: Stop",
-              command: "Stop the page loading",
-              shortcut: "esc",
-            },
-            "?g": { name: "Goto" },
-            ga: {
-              name: "Goto: Account",
-              command:
-                "Log in as a different user, browse as a Guest, or access payment and password info",
-              shortcut: "cmd+shift+m",
-            },
-            gb: {
-              name: "Goto: Bar",
-              command: "Jump to the address bar",
-              shortcut: "cmd+l",
-            },
-            gm: {
-              name: "Goto: Main Menu",
-              command: "Jump to the main menu bar",
-              shortcut: "control+f2",
-            },
-            fs: {
-              name: "Full Screen",
-              command: "Turn on full-screen mode",
-              shortcut: "fn+f",
-            },
-            fso: {
-              name: "Full Screen Off",
-              command: "Turn off full-screen mode",
-              shortcut: "fn+f",
-            },
-            dt: {
-              name: "Developer Tools",
-              command: "Open Developer Tools",
-              shortcut: "cmd+option+i",
-            },
-            odb: {
-              name: "Open Delete Browsing Data",
-              command: "Open the Delete Browsing Data options",
-              shortcut: "cmd+shift+delete",
-            },
-            "fd]": {
-              name: "Focus Dialog Next",
-              command: "Cycle focus to unfocused dialog (if showing) and all toolbars",
-              shortcut: "cmd+option+up",
-            },
-            "fd[": {
-              name: "Focus Dialog Previous",
-              command: "Cycle focus to unfocused dialog (if showing) and all toolbars",
-              shortcut: "cmd+option+down",
-            },
-            ofb: {
-              name: "Open Feedback",
-              command: "Open a feedback form",
-              shortcut: "cmd+option+shift+i",
-            },
-            cb: {
-              name: "Caret Browsing",
-              command: "Turn on caret browsing",
-              shortcut: "f7",
-            },
-            fid: {
-              name: "Focus Inactive Dialogs",
-              command: "Focus on inactive dialogs",
-              shortcut: "cmd+option+shift+a",
-            },
-            sp: {
-              name: "Split View",
-              command: "Open split view in the active tab",
-              shortcut: "cmd+option+n",
-            },
-            rp: {
-              name: "Remove Predictions",
-              command: "Remove predictions from your address bar",
-              shortcut: "shift+fn+delete",
-            },
-            cab: {
-              name: "Cursor to Address Bar",
-              command: "Move cursor to the address bar",
-              shortcut: "control+f5",
-            },
-            ne: {
-              name: "New Email",
-              command: "Compose a new email message with a link to the current page",
-              shortcut: "cmd+shift+i",
-            },
-            pr: {
-              name: "Print",
-              command: "Open options to print the current page",
-              shortcut: "cmd+p",
-            },
-            of: {
-              name: "Open File",
-              command: "Open a file from your computer",
-              shortcut: "cmd+o",
-            },
-            sc: {
-              name: "Source Code",
-              command: "Display non-editable HTML source code for the current page",
-              shortcut: "cmd+option+u",
-            },
-            jc: {
-              name: "JavaScript Console",
-              command: "Open the JavaScript Console",
-              shortcut: "cmd+option+j",
-            },
-            sd: {
-              name: "Scroll Down",
-              command: "Scroll down a webpage, a screen at a time",
-              shortcut: "space",
-            },
-            su: {
-              name: "Scroll Up",
-              command: "Scroll up a webpage, a screen at a time",
-              shortcut: "shift+space",
-            },
-            sw: {
-              name: "Search Web",
-              command: "Search the web",
-              shortcut: "cmd+option+f",
-            },
-          },
-        },
-      },
-    },
-    microsoft: {
-      edgemac: {
-        "macos.toml": {
-          name: "Microsoft Edge",
-          on: {
-            js: {
-              file: "chrome.js",
-              args: ["/Applications/Microsoft Edge.app"],
-            },
-          },
-          import: [{ file: "base.toml" }],
-        },
-      },
-    },
-    operasoftware: {
-      Opera: {
-        "macos.toml": {
-          name: "Opera",
-          on: {
-            js: {
-              file: "chrome.js",
-              args: ["/Applications/Opera.app"],
-            },
-          },
-          import: [{ file: "base.toml" }],
-        },
-      },
-    },
-    vivaldi: {
-      Vivaldi: {
-        "macos.toml": {
-          name: "Vivaldi",
-          on: {
-            js: {
-              file: "chrome.js",
-              args: ["/Applications/Vivaldi.app"],
-            },
-          },
-          import: [{ file: "base.toml" }],
-        },
-      },
-    },
-  },
+	"+web": { "google": { "com": { "macos.toml": {
+		"name": "google.com",
+		"on": { "js": {
+			"file": "chrome.js",
+			"args": []
+		} },
+		"chords": {
+			"?r": { "name": "Results" },
+			"r1": {
+				"name": "Result 1",
+				"@input:js": ["$(`div[lang=\"en\"]:has(cite[role=\"text\"])`).eq(0)"]
+			},
+			"r2": {
+				"name": "Result 1",
+				"@input:js": ["$(`div[lang=\"en\"]:has(cite[role=\"text\"])`).eq(1)"]
+			},
+			"r3": {
+				"name": "Result 1",
+				"@input:js": ["$(`div[lang=\"en\"]:has(cite[role=\"text\"])`).eq(2)"]
+			},
+			"r4": {
+				"name": "Result 1",
+				"@input:js": ["$(`div[lang=\"en\"]:has(cite[role=\"text\"])`).eq(3)"]
+			},
+			"r5": {
+				"name": "Result 1",
+				"@input:js": ["$(`div[lang=\"en\"]:has(cite[role=\"text\"])`).eq(4)"]
+			},
+			"r6": {
+				"name": "Result 1",
+				"@input:js": ["$(`div[lang=\"en\"]:has(cite[role=\"text\"])`).eq(5)"]
+			},
+			"r7": {
+				"name": "Result 1",
+				"@input:js": ["$(`div[lang=\"en\"]:has(cite[role=\"text\"])`).eq(6)"]
+			},
+			"r8": {
+				"name": "Result 1",
+				"@input:js": ["$(`div[lang=\"en\"]:has(cite[role=\"text\"])`).eq(7)"]
+			},
+			"r9": {
+				"name": "Result 1",
+				"@input:js": ["$(`div[lang=\"en\"]:has(cite[role=\"text\"])`).eq(8)"]
+			}
+		}
+	} } } },
+	"base.desktop.toml": {
+		"name": "Chromium Desktop Shortcuts",
+		"chords": {
+			"?w": { "name": "Window" },
+			"wn": {
+				"name": "Window: New",
+				"shortcut": "ctrl+n"
+			},
+			"wi": {
+				"name": "Window: Private",
+				"shortcut": "ctrl+shift+n"
+			},
+			"wc": {
+				"name": "Window: Close",
+				"shortcut": "alt+f4"
+			},
+			"?t": { "name": "Tab" },
+			"tq": {
+				"name": "Tab: Close",
+				"shortcut": "ctrl+w"
+			},
+			"tn": {
+				"name": "Tab: New",
+				"shortcut": "ctrl+t"
+			},
+			"to": {
+				"name": "Tab: Reopen",
+				"shortcut": "ctrl+shift+t"
+			},
+			"t]": {
+				"name": "Tab: Next",
+				"shortcut": "ctrl+tab"
+			},
+			"t[": {
+				"name": "Tab: Previous",
+				"shortcut": "ctrl+shift+tab"
+			},
+			"?h": { "name": "History" },
+			"hb": {
+				"name": "History: Back",
+				"shortcut": "alt+left"
+			},
+			"hf": {
+				"name": "History: Forward",
+				"shortcut": "alt+right"
+			},
+			"?p": { "name": "Page" },
+			"ps": {
+				"name": "Page: Save",
+				"shortcut": "ctrl+s"
+			},
+			"?m": { "name": "Match" },
+			"mf": {
+				"name": "Match: Find",
+				"shortcut": "ctrl+f"
+			},
+			"m]": {
+				"name": "Match: Next",
+				"shortcut": "ctrl+g"
+			},
+			"m[": {
+				"name": "Match: Previous",
+				"shortcut": "ctrl+shift+g"
+			},
+			"?z": { "name": "Zoom" },
+			"zi": {
+				"name": "Zoom In",
+				"shortcut": "ctrl+plus"
+			},
+			"zo": {
+				"name": "Zoom Out",
+				"shortcut": "ctrl+minus"
+			},
+			"zr": {
+				"name": "Zoom Reset",
+				"shortcut": "ctrl+0"
+			},
+			"?l": { "name": "Load" },
+			"lr": {
+				"name": "Load: Reload",
+				"shortcut": "ctrl+r"
+			},
+			"lh": {
+				"name": "Load: Hard Reload",
+				"shortcut": "ctrl+shift+r"
+			},
+			"ls": {
+				"name": "Load: Stop",
+				"shortcut": "esc"
+			},
+			"?g": { "name": "Goto" },
+			"gb": {
+				"name": "Goto: Address Bar",
+				"shortcut": "ctrl+l"
+			},
+			"fs": {
+				"name": "Full Screen",
+				"shortcut": "f11"
+			},
+			"fso": {
+				"name": "Full Screen Off",
+				"shortcut": "f11"
+			},
+			"dt": {
+				"name": "Developer Tools",
+				"shortcut": "ctrl+shift+i"
+			},
+			"pr": {
+				"name": "Print",
+				"shortcut": "ctrl+p"
+			},
+			"of": {
+				"name": "Open File",
+				"shortcut": "ctrl+o"
+			},
+			"sc": {
+				"name": "Source Code",
+				"shortcut": "ctrl+u"
+			},
+			"jc": {
+				"name": "JavaScript Console",
+				"shortcut": "ctrl+shift+j"
+			},
+			"sd": {
+				"name": "Scroll Down",
+				"shortcut": "space"
+			},
+			"su": {
+				"name": "Scroll Up",
+				"shortcut": "shift+space"
+			}
+		}
+	},
+	"base.toml": {
+		"name": "Chromium Base Shortcuts",
+		"chords": {
+			"?w": { "name": "Window" },
+			"wn": {
+				"name": "Window: New",
+				"command": "Open a new window",
+				"shortcut": "cmd+n"
+			},
+			"wi": {
+				"name": "Window: Incognito",
+				"command": "Open a new window in Incognito mode",
+				"shortcut": "cmd+shift+n"
+			},
+			"wc": {
+				"name": "Window: Close",
+				"command": "Close the current window",
+				"shortcut": "cmd+shift+w"
+			},
+			"wm": {
+				"name": "Window: Minimize",
+				"command": "Minimize the window",
+				"shortcut": "cmd+m"
+			},
+			"wh": {
+				"name": "Window: Hide",
+				"command": "Hide Google Chrome",
+				"shortcut": "cmd+h"
+			},
+			"wq": {
+				"name": "Window: Quit",
+				"command": "Quit Google Chrome",
+				"shortcut": "cmd+q"
+			},
+			"?t": { "name": "Tab" },
+			"tq": {
+				"name": "Tab: Quit",
+				"command": "Close the current tab, or pop-up",
+				"shortcut": "cmd+w"
+			},
+			"tn": {
+				"name": "Tab: New",
+				"command": "Open a new tab, and jump to it",
+				"shortcut": "cmd+t"
+			},
+			"to": {
+				"name": "Tab: Reopen",
+				"command": "Reopen previously closed tabs in the order they were closed",
+				"shortcut": "cmd+shift+t"
+			},
+			"t]": {
+				"name": "Tab: Next",
+				"command": "Jump to the next open tab",
+				"shortcut": "ctrl+tab"
+			},
+			"t[": {
+				"name": "Tab: Previous",
+				"command": "Jump to the previous open tab",
+				"shortcut": "cmd+shift+tab"
+			},
+			"t1": {
+				"name": "Tab 1",
+				"command": "Jump to a specific tab",
+				"shortcut": "cmd+1"
+			},
+			"t2": {
+				"name": "Tab 2",
+				"command": "Jump to a specific tab",
+				"shortcut": "cmd+2"
+			},
+			"t3": {
+				"name": "Tab 3",
+				"command": "Jump to a specific tab",
+				"shortcut": "cmd+3"
+			},
+			"t4": {
+				"name": "Tab 4",
+				"command": "Jump to a specific tab",
+				"shortcut": "cmd+4"
+			},
+			"t5": {
+				"name": "Tab 5",
+				"command": "Jump to a specific tab",
+				"shortcut": "cmd+5"
+			},
+			"t6": {
+				"name": "Tab 6",
+				"command": "Jump to a specific tab",
+				"shortcut": "cmd+6"
+			},
+			"t7": {
+				"name": "Tab 7",
+				"command": "Jump to a specific tab",
+				"shortcut": "cmd+7"
+			},
+			"t8": {
+				"name": "Tab 8",
+				"command": "Jump to a specific tab",
+				"shortcut": "cmd+8"
+			},
+			"tl": {
+				"name": "Tab: Left Move",
+				"command": "Move tabs right or left",
+				"shortcut": "cmd+shift+pgup"
+			},
+			"tr": {
+				"name": "Tab: Right Move",
+				"command": "Move tabs right or left",
+				"shortcut": "cmd+shift+pgdown"
+			},
+			"?h": { "name": "History" },
+			"hb": {
+				"name": "History: Back",
+				"command": "Open the next page from your browsing history in the current tab",
+				"shortcut": "cmd+]"
+			},
+			"hf": {
+				"name": "History: Forward",
+				"command": "Open the previous page from your browsing history in the current tab",
+				"shortcut": "cmd+["
+			},
+			"?p": { "name": "Page" },
+			"p,": {
+				"name": "Page: Settings",
+				"command": "Open the Settings page in a new tab",
+				"shortcut": "cmd+,"
+			},
+			"ph": {
+				"name": "Page: History",
+				"command": "Open the History page in a new tab",
+				"shortcut": "cmd+y"
+			},
+			"pd": {
+				"name": "Page: Downloads",
+				"command": "Open the Downloads page in a new tab",
+				"shortcut": "cmd+shift+j"
+			},
+			"pm": {
+				"name": "Page: Home",
+				"command": "Open your home page in the current tab",
+				"shortcut": "cmd+shift+h"
+			},
+			"psd": {
+				"name": "Page Setup Dialog",
+				"command": "Open the Page Setup dialog",
+				"shortcut": "cmd+option+p"
+			},
+			"ps": {
+				"name": "Page: Save",
+				"command": "Open options to save the current page",
+				"shortcut": "cmd+s"
+			},
+			"?m": { "name": "Match" },
+			"m]": {
+				"name": "Match: Next",
+				"command": "Jump to the next match to your Find Bar search",
+				"shortcut": "cmd+g"
+			},
+			"m[": {
+				"name": "Match: Previous",
+				"command": "Jump to the previous match to your Find Bar search",
+				"shortcut": "cmd+shift+g"
+			},
+			"?b": { "name": "Bookmarks" },
+			"bt": {
+				"name": "Bookmarks: Toggle",
+				"command": "Show or hide the Bookmarks Bar",
+				"shortcut": "cmd+b"
+			},
+			"bm": {
+				"name": "Bookmarks: Manager",
+				"command": "Open the Bookmark Manager",
+				"shortcut": "cmd+option+b"
+			},
+			"bs": {
+				"name": "Bookmark: Save",
+				"command": "Save your current webpage as a bookmark",
+				"shortcut": "cmd+d"
+			},
+			"bf": {
+				"name": "Bookmarks: Folder from tabs",
+				"command": "Save all open tabs as bookmarks in a new folder",
+				"shortcut": "cmd+shift+d"
+			},
+			"?z": { "name": "Zoom" },
+			"zi": {
+				"name": "Zoom In",
+				"command": "Make everything on the page bigger",
+				"shortcut": "cmd+plus"
+			},
+			"zo": {
+				"name": "Zoom Out",
+				"command": "Make everything on the page smaller",
+				"shortcut": "cmd+minus"
+			},
+			"zr": {
+				"name": "Zoom Reset",
+				"command": "Return everything on the page to the default size",
+				"shortcut": "cmd+0"
+			},
+			"?l": { "name": "Load" },
+			"lr": {
+				"name": "Load: Reload",
+				"command": "Reload your current page",
+				"shortcut": "cmd+r"
+			},
+			"lh": {
+				"name": "Load: Hard Reload",
+				"command": "Reload your current page, ignoring cached content",
+				"shortcut": "cmd+shift+r"
+			},
+			"ls": {
+				"name": "Load: Stop",
+				"command": "Stop the page loading",
+				"shortcut": "esc"
+			},
+			"?g": { "name": "Goto" },
+			"ga": {
+				"name": "Goto: Account",
+				"command": "Log in as a different user, browse as a Guest, or access payment and password info",
+				"shortcut": "cmd+shift+m"
+			},
+			"gb": {
+				"name": "Goto: Bar",
+				"command": "Jump to the address bar",
+				"shortcut": "cmd+l"
+			},
+			"gm": {
+				"name": "Goto: Main Menu",
+				"command": "Jump to the main menu bar",
+				"shortcut": "control+f2"
+			},
+			"fs": {
+				"name": "Full Screen",
+				"command": "Turn on full-screen mode",
+				"shortcut": "fn+f"
+			},
+			"fso": {
+				"name": "Full Screen Off",
+				"command": "Turn off full-screen mode",
+				"shortcut": "fn+f"
+			},
+			"dt": {
+				"name": "Developer Tools",
+				"command": "Open Developer Tools",
+				"shortcut": "cmd+option+i"
+			},
+			"odb": {
+				"name": "Open Delete Browsing Data",
+				"command": "Open the Delete Browsing Data options",
+				"shortcut": "cmd+shift+delete"
+			},
+			"fd]": {
+				"name": "Focus Dialog Next",
+				"command": "Cycle focus to unfocused dialog (if showing) and all toolbars",
+				"shortcut": "cmd+option+up"
+			},
+			"fd[": {
+				"name": "Focus Dialog Previous",
+				"command": "Cycle focus to unfocused dialog (if showing) and all toolbars",
+				"shortcut": "cmd+option+down"
+			},
+			"ofb": {
+				"name": "Open Feedback",
+				"command": "Open a feedback form",
+				"shortcut": "cmd+option+shift+i"
+			},
+			"cb": {
+				"name": "Caret Browsing",
+				"command": "Turn on caret browsing",
+				"shortcut": "f7"
+			},
+			"fid": {
+				"name": "Focus Inactive Dialogs",
+				"command": "Focus on inactive dialogs",
+				"shortcut": "cmd+option+shift+a"
+			},
+			"sp": {
+				"name": "Split View",
+				"command": "Open split view in the active tab",
+				"shortcut": "cmd+option+n"
+			},
+			"rp": {
+				"name": "Remove Predictions",
+				"command": "Remove predictions from your address bar",
+				"shortcut": "shift+fn+delete"
+			},
+			"cab": {
+				"name": "Cursor to Address Bar",
+				"command": "Move cursor to the address bar",
+				"shortcut": "control+f5"
+			},
+			"ne": {
+				"name": "New Email",
+				"command": "Compose a new email message with a link to the current page",
+				"shortcut": "cmd+shift+i"
+			},
+			"pr": {
+				"name": "Print",
+				"command": "Open options to print the current page",
+				"shortcut": "cmd+p"
+			},
+			"of": {
+				"name": "Open File",
+				"command": "Open a file from your computer",
+				"shortcut": "cmd+o"
+			},
+			"sc": {
+				"name": "Source Code",
+				"command": "Display non-editable HTML source code for the current page",
+				"shortcut": "cmd+option+u"
+			},
+			"jc": {
+				"name": "JavaScript Console",
+				"command": "Open the JavaScript Console",
+				"shortcut": "cmd+option+j"
+			},
+			"sd": {
+				"name": "Scroll Down",
+				"command": "Scroll down a webpage, a screen at a time",
+				"shortcut": "space"
+			},
+			"su": {
+				"name": "Scroll Up",
+				"command": "Scroll up a webpage, a screen at a time",
+				"shortcut": "shift+space"
+			},
+			"sw": {
+				"name": "Search Web",
+				"command": "Search the web",
+				"shortcut": "cmd+option+f"
+			}
+		}
+	},
+	"chrome.desktop.toml": {
+		"name": "Chrome Desktop Shortcuts",
+		"import": [{ "file": "base.desktop.toml" }],
+		"chords": {
+			"t1": {
+				"name": "Tab 1",
+				"shortcut": "ctrl+1"
+			},
+			"t2": {
+				"name": "Tab 2",
+				"shortcut": "ctrl+2"
+			},
+			"t3": {
+				"name": "Tab 3",
+				"shortcut": "ctrl+3"
+			},
+			"t4": {
+				"name": "Tab 4",
+				"shortcut": "ctrl+4"
+			},
+			"t5": {
+				"name": "Tab 5",
+				"shortcut": "ctrl+5"
+			},
+			"t6": {
+				"name": "Tab 6",
+				"shortcut": "ctrl+6"
+			},
+			"t7": {
+				"name": "Tab 7",
+				"shortcut": "ctrl+7"
+			},
+			"t8": {
+				"name": "Tab 8",
+				"shortcut": "ctrl+8"
+			},
+			"t9": {
+				"name": "Last Tab",
+				"shortcut": "ctrl+9"
+			},
+			"ph": {
+				"name": "Page: History",
+				"shortcut": "ctrl+h"
+			},
+			"pd": {
+				"name": "Page: Downloads",
+				"shortcut": "ctrl+j"
+			},
+			"pm": {
+				"name": "Page: Home",
+				"shortcut": "alt+home"
+			},
+			"?b": { "name": "Bookmarks" },
+			"bt": {
+				"name": "Bookmarks: Toggle Bar",
+				"shortcut": "ctrl+shift+b"
+			},
+			"bm": {
+				"name": "Bookmarks: Manager",
+				"shortcut": "ctrl+shift+o"
+			},
+			"bs": {
+				"name": "Bookmark: Save",
+				"shortcut": "ctrl+d"
+			},
+			"bf": {
+				"name": "Bookmarks: Folder from Tabs",
+				"shortcut": "ctrl+shift+d"
+			},
+			"ga": {
+				"name": "Goto: Profile",
+				"shortcut": "ctrl+shift+m"
+			},
+			"gm": {
+				"name": "Goto: Browser Menu",
+				"shortcut": "alt+f"
+			},
+			"odb": {
+				"name": "Delete Browsing Data",
+				"shortcut": "ctrl+shift+delete"
+			},
+			"fd]": {
+				"name": "Focus Next Pane",
+				"shortcut": "f6"
+			},
+			"fd[": {
+				"name": "Focus Previous Pane",
+				"shortcut": "shift+f6"
+			},
+			"ofb": {
+				"name": "Open Feedback",
+				"shortcut": "alt+shift+i"
+			},
+			"cb": {
+				"name": "Caret Browsing",
+				"shortcut": "f7"
+			},
+			"sw": {
+				"name": "Search Web",
+				"shortcut": "ctrl+k"
+			}
+		}
+	},
+	"com": {
+		"brave": { "Browser": {
+			"linux.toml": {
+				"name": "Brave",
+				"executables": [
+					"brave",
+					"brave-browser",
+					"brave-browser-beta",
+					"brave-browser-nightly"
+				],
+				"import": [{ "file": "chrome.desktop.toml" }]
+			},
+			"macos.toml": {
+				"name": "Brave",
+				"on": { "js": {
+					"file": "chrome.js",
+					"args": ["/Applications/Brave.app"]
+				} },
+				"import": [{ "file": "base.toml" }]
+			},
+			"windows.toml": {
+				"name": "Brave",
+				"executables": ["brave.exe"],
+				"import": [{ "file": "chrome.desktop.toml" }, { "file": "window.windows.toml" }]
+			}
+		} },
+		"google": { "Chrome": {
+			"beta": { "macos.toml": {
+				"name": "Google Chrome Beta",
+				"on": { "js": {
+					"file": "chrome.js",
+					"args": ["/Applications/Google Chrome Beta.app"]
+				} },
+				"import": [{ "file": "com/google/Chrome/macos.toml" }]
+			} },
+			"canary": { "macos.toml": {
+				"name": "Google Chrome Canary",
+				"on": { "js": {
+					"file": "chrome.js",
+					"args": ["/Applications/Google Chrome Canary.app"]
+				} },
+				"import": [{ "file": "com/google/Chrome/macos.toml" }]
+			} },
+			"linux.toml": {
+				"name": "Google Chrome",
+				"executables": [
+					"chrome",
+					"google-chrome",
+					"google-chrome-stable",
+					"google-chrome-beta",
+					"google-chrome-unstable"
+				],
+				"import": [{ "file": "google.desktop.toml" }]
+			},
+			"macos.toml": {
+				"name": "Google Chrome",
+				"on": { "js": {
+					"file": "chrome.js",
+					"args": ["/Applications/Google Chrome.app"]
+				} },
+				"chords": {
+					"?w": { "name": "Window" },
+					"wn": {
+						"name": "Window: New",
+						"command": "Open a new window",
+						"shortcut": "cmd+n"
+					},
+					"wi": {
+						"name": "Window: Incognito",
+						"command": "Open a new window in Incognito mode",
+						"shortcut": "cmd+shift+n"
+					},
+					"wc": {
+						"name": "Window: Close",
+						"command": "Close the current window",
+						"shortcut": "cmd+shift+w"
+					},
+					"wm": {
+						"name": "Window: Minimize",
+						"command": "Minimize the window",
+						"shortcut": "cmd+m"
+					},
+					"wh": {
+						"name": "Window: Hide",
+						"command": "Hide Google Chrome",
+						"shortcut": "cmd+h"
+					},
+					"wq": {
+						"name": "Window: Quit",
+						"command": "Quit Google Chrome",
+						"shortcut": "cmd+q"
+					},
+					"?t": { "name": "Tab" },
+					"tq": {
+						"name": "Tab: Quit",
+						"command": "Close the current tab, or pop-up",
+						"shortcut": "cmd+w"
+					},
+					"tn": {
+						"name": "Tab: New",
+						"command": "Open a new tab, and jump to it",
+						"shortcut": "cmd+t"
+					},
+					"to": {
+						"name": "Tab: Reopen",
+						"command": "Reopen previously closed tabs in the order they were closed",
+						"shortcut": "cmd+shift+t"
+					},
+					"t]": {
+						"name": "Tab: Next",
+						"command": "Jump to the next open tab",
+						"shortcut": "ctrl+tab"
+					},
+					"t[": {
+						"name": "Tab: Previous",
+						"command": "Jump to the previous open tab",
+						"shortcut": "cmd+shift+tab"
+					},
+					"t1": {
+						"name": "Tab 1",
+						"command": "Jump to a specific tab",
+						"shortcut": "cmd+1"
+					},
+					"t2": {
+						"name": "Tab 2",
+						"command": "Jump to a specific tab",
+						"shortcut": "cmd+2"
+					},
+					"t3": {
+						"name": "Tab 3",
+						"command": "Jump to a specific tab",
+						"shortcut": "cmd+3"
+					},
+					"t4": {
+						"name": "Tab 4",
+						"command": "Jump to a specific tab",
+						"shortcut": "cmd+4"
+					},
+					"t5": {
+						"name": "Tab 5",
+						"command": "Jump to a specific tab",
+						"shortcut": "cmd+5"
+					},
+					"t6": {
+						"name": "Tab 6",
+						"command": "Jump to a specific tab",
+						"shortcut": "cmd+6"
+					},
+					"t7": {
+						"name": "Tab 7",
+						"command": "Jump to a specific tab",
+						"shortcut": "cmd+7"
+					},
+					"t8": {
+						"name": "Tab 8",
+						"command": "Jump to a specific tab",
+						"shortcut": "cmd+8"
+					},
+					"tl": {
+						"name": "Tab: Left Move",
+						"command": "Move tabs right or left",
+						"shortcut": "cmd+shift+pgup"
+					},
+					"tr": {
+						"name": "Tab: Right Move",
+						"command": "Move tabs right or left",
+						"shortcut": "cmd+shift+pgdown"
+					},
+					"?h": { "name": "History" },
+					"hb": {
+						"name": "History: Back",
+						"command": "Open the next page from your browsing history in the current tab",
+						"shortcut": "cmd+]"
+					},
+					"hf": {
+						"name": "History: Forward",
+						"command": "Open the previous page from your browsing history in the current tab",
+						"shortcut": "cmd+["
+					},
+					"?p": { "name": "Page" },
+					"p,": {
+						"name": "Page: Settings",
+						"command": "Open the Settings page in a new tab",
+						"shortcut": "cmd+,"
+					},
+					"ph": {
+						"name": "Page: History",
+						"command": "Open the History page in a new tab",
+						"shortcut": "cmd+y"
+					},
+					"pd": {
+						"name": "Page: Downloads",
+						"command": "Open the Downloads page in a new tab",
+						"shortcut": "cmd+shift+j"
+					},
+					"pm": {
+						"name": "Page: Home",
+						"command": "Open your home page in the current tab",
+						"shortcut": "cmd+shift+h"
+					},
+					"psd": {
+						"name": "Page Setup Dialog",
+						"command": "Open the Page Setup dialog",
+						"shortcut": "cmd+option+p"
+					},
+					"ps": {
+						"name": "Page: Save",
+						"command": "Open options to save the current page",
+						"shortcut": "cmd+s"
+					},
+					"?m": { "name": "Match" },
+					"m]": {
+						"name": "Match: Next",
+						"command": "Jump to the next match to your Find Bar search",
+						"shortcut": "cmd+g"
+					},
+					"m[": {
+						"name": "Match: Previous",
+						"command": "Jump to the previous match to your Find Bar search",
+						"shortcut": "cmd+shift+g"
+					},
+					"?b": { "name": "Bookmarks" },
+					"bt": {
+						"name": "Bookmarks: Toggle",
+						"command": "Show or hide the Bookmarks Bar",
+						"shortcut": "cmd+b"
+					},
+					"bm": {
+						"name": "Bookmarks: Manager",
+						"command": "Open the Bookmark Manager",
+						"shortcut": "cmd+option+b"
+					},
+					"bs": {
+						"name": "Bookmark: Save",
+						"command": "Save your current webpage as a bookmark",
+						"shortcut": "cmd+d"
+					},
+					"bf": {
+						"name": "Bookmarks: Folder from tabs",
+						"command": "Save all open tabs as bookmarks in a new folder",
+						"shortcut": "cmd+shift+d"
+					},
+					"?z": { "name": "Zoom" },
+					"zi": {
+						"name": "Zoom In",
+						"command": "Make everything on the page bigger",
+						"shortcut": "cmd+plus"
+					},
+					"zo": {
+						"name": "Zoom Out",
+						"command": "Make everything on the page smaller",
+						"shortcut": "cmd+minus"
+					},
+					"zr": {
+						"name": "Zoom Reset",
+						"command": "Return everything on the page to the default size",
+						"shortcut": "cmd+0"
+					},
+					"?l": { "name": "Load" },
+					"lr": {
+						"name": "Load: Reload",
+						"command": "Reload your current page",
+						"shortcut": "cmd+r"
+					},
+					"lh": {
+						"name": "Load: Hard Reload",
+						"command": "Reload your current page, ignoring cached content",
+						"shortcut": "cmd+shift+r"
+					},
+					"ls": {
+						"name": "Load: Stop",
+						"command": "Stop the page loading",
+						"shortcut": "esc"
+					},
+					"?g": { "name": "Goto" },
+					"ga": {
+						"name": "Goto: Account",
+						"command": "Log in as a different user, browse as a Guest, or access payment and password info",
+						"shortcut": "cmd+shift+m"
+					},
+					"gb": {
+						"name": "Goto: Bar",
+						"command": "Jump to the address bar",
+						"shortcut": "cmd+l"
+					},
+					"gm": {
+						"name": "Goto: Main Menu",
+						"command": "Jump to the main menu bar",
+						"shortcut": "control+f2"
+					},
+					"fs": {
+						"name": "Full Screen",
+						"command": "Turn on full-screen mode",
+						"shortcut": "fn+f"
+					},
+					"fso": {
+						"name": "Full Screen Off",
+						"command": "Turn off full-screen mode",
+						"shortcut": "fn+f"
+					},
+					"dt": {
+						"name": "Developer Tools",
+						"command": "Open Developer Tools",
+						"shortcut": "cmd+option+i"
+					},
+					"odb": {
+						"name": "Open Delete Browsing Data",
+						"command": "Open the Delete Browsing Data options",
+						"shortcut": "cmd+shift+delete"
+					},
+					"fd]": {
+						"name": "Focus Dialog Next",
+						"command": "Cycle focus to unfocused dialog (if showing) and all toolbars",
+						"shortcut": "cmd+option+up"
+					},
+					"fd[": {
+						"name": "Focus Dialog Previous",
+						"command": "Cycle focus to unfocused dialog (if showing) and all toolbars",
+						"shortcut": "cmd+option+down"
+					},
+					"ofb": {
+						"name": "Open Feedback",
+						"command": "Open a feedback form",
+						"shortcut": "cmd+option+shift+i"
+					},
+					"cb": {
+						"name": "Caret Browsing",
+						"command": "Turn on caret browsing",
+						"shortcut": "f7"
+					},
+					"fid": {
+						"name": "Focus Inactive Dialogs",
+						"command": "Focus on inactive dialogs",
+						"shortcut": "cmd+option+shift+a"
+					},
+					"sp": {
+						"name": "Split View",
+						"command": "Open split view in the active tab",
+						"shortcut": "cmd+option+n"
+					},
+					"rp": {
+						"name": "Remove Predictions",
+						"command": "Remove predictions from your address bar",
+						"shortcut": "shift+fn+delete"
+					},
+					"cab": {
+						"name": "Cursor to Address Bar",
+						"command": "Move cursor to the address bar",
+						"shortcut": "control+f5"
+					},
+					"ne": {
+						"name": "New Email",
+						"command": "Compose a new email message with a link to the current page",
+						"shortcut": "cmd+shift+i"
+					},
+					"pr": {
+						"name": "Print",
+						"command": "Open options to print the current page",
+						"shortcut": "cmd+p"
+					},
+					"of": {
+						"name": "Open File",
+						"command": "Open a file from your computer",
+						"shortcut": "cmd+o"
+					},
+					"sc": {
+						"name": "Source Code",
+						"command": "Display non-editable HTML source code for the current page",
+						"shortcut": "cmd+option+u"
+					},
+					"jc": {
+						"name": "JavaScript Console",
+						"command": "Open the JavaScript Console",
+						"shortcut": "cmd+option+j"
+					},
+					"sd": {
+						"name": "Scroll Down",
+						"command": "Scroll down a webpage, a screen at a time",
+						"shortcut": "space"
+					},
+					"su": {
+						"name": "Scroll Up",
+						"command": "Scroll up a webpage, a screen at a time",
+						"shortcut": "shift+space"
+					},
+					"sw": {
+						"name": "Search Web",
+						"command": "Search the web",
+						"shortcut": "cmd+option+f"
+					}
+				}
+			},
+			"windows.toml": {
+				"name": "Google Chrome",
+				"executables": ["chrome.exe"],
+				"import": [{ "file": "google.desktop.toml" }, { "file": "window.windows.toml" }]
+			}
+		} },
+		"microsoft": { "edgemac": {
+			"linux.toml": {
+				"name": "Microsoft Edge",
+				"executables": [
+					"msedge",
+					"microsoft-edge",
+					"microsoft-edge-stable",
+					"microsoft-edge-beta",
+					"microsoft-edge-dev"
+				],
+				"import": [{ "file": "chrome.desktop.toml" }]
+			},
+			"macos.toml": {
+				"name": "Microsoft Edge",
+				"on": { "js": {
+					"file": "chrome.js",
+					"args": ["/Applications/Microsoft Edge.app"]
+				} },
+				"import": [{ "file": "base.toml" }]
+			},
+			"windows.toml": {
+				"name": "Microsoft Edge",
+				"executables": ["msedge.exe"],
+				"import": [{ "file": "chrome.desktop.toml" }, { "file": "window.windows.toml" }]
+			}
+		} },
+		"operasoftware": { "Opera": {
+			"linux.toml": {
+				"name": "Opera",
+				"executables": [
+					"opera",
+					"opera-beta",
+					"opera-developer"
+				],
+				"import": [{ "file": "opera.desktop.toml" }]
+			},
+			"macos.toml": {
+				"name": "Opera",
+				"on": { "js": {
+					"file": "chrome.js",
+					"args": ["/Applications/Opera.app"]
+				} },
+				"import": [{ "file": "base.toml" }]
+			},
+			"windows.toml": {
+				"name": "Opera",
+				"executables": ["opera.exe"],
+				"import": [{ "file": "opera.desktop.toml" }, { "file": "window.windows.toml" }]
+			}
+		} },
+		"vivaldi": { "Vivaldi": {
+			"linux.toml": {
+				"name": "Vivaldi",
+				"executables": [
+					"vivaldi",
+					"vivaldi-bin",
+					"vivaldi-stable",
+					"vivaldi-snapshot"
+				],
+				"import": [{ "file": "vivaldi.desktop.toml" }],
+				"chords": { "wq": {
+					"name": "Window: Quit",
+					"shortcut": "ctrl+q"
+				} }
+			},
+			"macos.toml": {
+				"name": "Vivaldi",
+				"on": { "js": {
+					"file": "chrome.js",
+					"args": ["/Applications/Vivaldi.app"]
+				} },
+				"import": [{ "file": "base.toml" }]
+			},
+			"windows.toml": {
+				"name": "Vivaldi",
+				"executables": ["vivaldi.exe"],
+				"import": [{ "file": "vivaldi.desktop.toml" }, { "file": "window.windows.toml" }]
+			}
+		} }
+	},
+	"google.desktop.toml": {
+		"name": "Google Chrome Desktop Shortcuts",
+		"import": [{ "file": "chrome.desktop.toml" }],
+		"chords": {
+			"wq": {
+				"name": "Window: Quit",
+				"shortcut": "alt+f x"
+			},
+			"tl": {
+				"name": "Tab: Move Left",
+				"shortcut": "ctrl+shift+pgup"
+			},
+			"tr": {
+				"name": "Tab: Move Right",
+				"shortcut": "ctrl+shift+pgdown"
+			},
+			"fid": {
+				"name": "Focus Inactive Dialogs",
+				"shortcut": "alt+shift+a"
+			},
+			"sp": {
+				"name": "Split View",
+				"shortcut": "alt+shift+n"
+			},
+			"rp": {
+				"name": "Remove Address Bar Prediction",
+				"shortcut": "shift+delete"
+			},
+			"cab": {
+				"name": "Cursor to Address Bar",
+				"shortcut": "ctrl+f5"
+			}
+		}
+	},
+	"opera.desktop.toml": {
+		"name": "Opera Desktop Shortcuts",
+		"import": [{ "file": "base.desktop.toml" }],
+		"chords": {
+			"wq": {
+				"name": "Window: Quit",
+				"shortcut": "ctrl+shift+x"
+			},
+			"p,": {
+				"name": "Page: Settings",
+				"shortcut": "alt+p"
+			},
+			"ph": {
+				"name": "Page: History",
+				"shortcut": "ctrl+h"
+			},
+			"pd": {
+				"name": "Page: Downloads",
+				"shortcut": "ctrl+j"
+			},
+			"?b": { "name": "Bookmarks" },
+			"bt": {
+				"name": "Bookmarks: Toggle Bar",
+				"shortcut": "ctrl+shift+b"
+			}
+		}
+	},
+	"org": { "chromium": { "Chromium": { "linux.toml": {
+		"name": "Chromium",
+		"executables": ["chromium", "chromium-browser"],
+		"import": [{ "file": "google.desktop.toml" }]
+	} } } },
+	"vivaldi.desktop.toml": {
+		"name": "Vivaldi Desktop Shortcuts",
+		"import": [{ "file": "base.desktop.toml" }],
+		"chords": {
+			"tl": {
+				"name": "Tab: Move Left",
+				"shortcut": "ctrl+shift+pgup"
+			},
+			"tr": {
+				"name": "Tab: Move Right",
+				"shortcut": "ctrl+shift+pgdown"
+			},
+			"p,": {
+				"name": "Page: Settings",
+				"shortcut": "ctrl+f12"
+			},
+			"ph": {
+				"name": "Page: History",
+				"shortcut": "ctrl+h"
+			}
+		}
+	},
+	"window.windows.toml": {
+		"name": "Browser Window Shortcuts on Windows",
+		"chords": { "wm": {
+			"name": "Window: Minimize",
+			"shortcut": "alt+space n"
+		} }
+	}
 };
 var package_default = {
-  name,
-  displayName,
-  version,
-  description,
-  categories,
-  repository,
-  type,
-  dependencies,
-  devDependencies,
-  packageManager,
-  chords,
+	name,
+	displayName,
+	version,
+	description,
+	categories,
+	repository,
+	type,
+	dependencies,
+	devDependencies,
+	packageManager,
+	chords
 };
 //#endregion
-export {
-  categories,
-  chords,
-  package_default as default,
-  dependencies,
-  description,
-  devDependencies,
-  displayName,
-  name,
-  packageManager,
-  repository,
-  type,
-  version,
-};
+export { categories, chords, package_default as default, dependencies, description, devDependencies, displayName, name, packageManager, repository, type, version };

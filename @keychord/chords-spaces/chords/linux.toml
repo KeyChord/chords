@@ -1,0 +1,24 @@
+name = 'Linux Workspaces'
+
+[meta]
+chord = '>=0.3.4'
+
+[on.workspace]
+file = 'workspace.js'
+
+[placeholders]
+"<>" = { name = 'Desktop prefix', default = 'd' }
+
+[chords]
+'?<>' = { name = 'Workspaces' }
+'<>[' = { name = 'Workspace: Previous', '@input:workspace' = ['SWITCH', 'PREVIOUS'] }
+'<>]' = { name = 'Workspace: Next', '@input:workspace' = ['SWITCH', 'NEXT'] }
+'<>l' = { name = 'Workspace: Previous', '@input:workspace' = ['SWITCH', 'PREVIOUS'] }
+'<>r' = { name = 'Workspace: Next', '@input:workspace' = ['SWITCH', 'NEXT'] }
+'?<>"1-9"' = { name = 'Workspace: Switch to #' }
+'<>([1-9])' = { name = 'Workspace: Switch to $1', '@input:workspace' = ['SWITCH', '$1'] }
+'?<>m' = { name = 'Move Window to Workspace' }
+'<>m[' = { name = 'Window: Move to Previous Workspace', '@input:workspace' = ['MOVE', 'PREVIOUS'] }
+'<>m]' = { name = 'Window: Move to Next Workspace', '@input:workspace' = ['MOVE', 'NEXT'] }
+'?<>m"1-9"' = { name = 'Window: Move to Workspace #' }
+'<>m([1-9])' = { name = 'Window: Move to Workspace $1', '@input:workspace' = ['MOVE', '$1'] }

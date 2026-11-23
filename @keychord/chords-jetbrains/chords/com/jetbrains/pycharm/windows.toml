@@ -1,0 +1,5 @@
+name = 'PyCharm'
+executables = ['pycharm64.exe', 'pycharm.exe']
+
+[[import]]
+file = 'base-windows.toml'

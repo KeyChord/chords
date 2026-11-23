@@ -100,6 +100,21 @@ Add the `KeyChord/chords` monorepo in Chord and enable the packages you want, or
 an individual GitHub mirror. The [built-in macOS package list](./@keychord/chords-com.apple)
 links each app to its package.
 
+## Linux and Windows
+
+Use Chord 0.3.4 or later. Chord selects the current platform's TOML files at runtime. Linux bindings run in X11 sessions. Desktop shortcuts follow the defaults of the named window manager or application.
+
+| Package                                                           | Linux                                                    | Windows                                                          |
+| ----------------------------------------------------------------- | -------------------------------------------------------- | ---------------------------------------------------------------- |
+| Chord Controls, Click, Modifiers, Navigation                      | Built-in controls, pointer actions, and shortcuts        | Built-in controls, pointer actions, and shortcuts                |
+| Dock, Finder, Menu, Monitors, Spaces, Windows, System Preferences | GNOME or X11 desktop tools as documented by each package | Taskbar, File Explorer, Settings, monitors, and virtual desktops |
+| Chromium, JetBrains, Spotify, Terminal, VS Code, Warp             | App-specific shortcuts                                   | App-specific shortcuts                                           |
+| Instagram, LiveSplit One, Web, YouTube                            | Dedicated browser profiles                               | Dedicated browser profiles or WebView2                           |
+| WhatsApp                                                          | Dedicated Chromium app window                            | WhatsApp for Windows                                             |
+| AeroSpace, Apple Music, Apple TV, Raycast, Screenshot             | —                                                        | The documented Windows apps or port                              |
+
+The other Apple app packages use macOS apps or Accessibility and Swift APIs. BetterDisplay and Rift use their macOS apps. Each port's README lists the features and any setup it requires.
+
 ## Development
 
 > [!NOTE]

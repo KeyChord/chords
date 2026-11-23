@@ -1,0 +1,11 @@
+name = 'Microsoft Edge'
+executables = [
+  'msedge',
+  'microsoft-edge',
+  'microsoft-edge-stable',
+  'microsoft-edge-beta',
+  'microsoft-edge-dev',
+]
+
+[[import]]
+file = 'chrome.desktop.toml'

@@ -1,4 +1,4 @@
-type Target = { type: string; url: string; webSocketDebuggerUrl?: string };
+type Target = { type?: unknown; url?: unknown; webSocketDebuggerUrl?: unknown };
 type Evaluation = {
   id?: number;
   error?: { message: string };
@@ -8,19 +8,35 @@ type Evaluation = {
   };
 };
 
-function isYouTubeTarget(target: Target): boolean {
-  if (target.type !== "page" || !target.webSocketDebuggerUrl) return false;
-  try {
-    const { hostname } = new URL(target.url);
-    return hostname === "youtube.com" || hostname.endsWith(".youtube.com");
-  } catch {
-    return false;
-  }
+function youtubePageEndpoint(target: Target | null, port: number): string | undefined {
+  if (
+    target?.type !== "page" ||
+    typeof target.url !== "string" ||
+    typeof target.webSocketDebuggerUrl !== "string"
+  )
+    return;
+  const page = URL.parse(target.url);
+  if (
+    !page ||
+    page.protocol !== "https:" ||
+    !(page.hostname === "youtube.com" || page.hostname.endsWith(".youtube.com"))
+  )
+    return;
+  const socket = URL.parse(target.webSocketDebuggerUrl);
+  if (
+    socket?.protocol === "ws:" &&
+    socket.hostname === "127.0.0.1" &&
+    Number(socket.port || 80) === port &&
+    !socket.username &&
+    !socket.password &&
+    socket.pathname.startsWith("/devtools/page/")
+  )
+    return socket.href;
 }
 
-function evaluate(target: Target, expression: string): Promise<unknown> {
+function evaluate(endpoint: string, expression: string): Promise<unknown> {
   return new Promise((resolve, reject) => {
-    const socket = new WebSocket(target.webSocketDebuggerUrl!);
+    const socket = new WebSocket(endpoint);
     const finish = (error?: Error, value?: unknown) => {
       clearTimeout(timer);
       socket.onopen = socket.onmessage = socket.onerror = socket.onclose = null;
@@ -64,32 +80,56 @@ function evaluate(target: Target, expression: string): Promise<unknown> {
   });
 }
 
-export async function runYouTubeJavaScript(source: string, port: number): Promise<unknown> {
-  let targets: Target[];
+export async function runYouTubeJavaScript(
+  source: string,
+  port: number,
+  requireFocusedPage: boolean,
+): Promise<unknown> {
+  let pages: string[];
   try {
     const response = await fetch(`http://127.0.0.1:${port}/json/list`, {
       signal: AbortSignal.timeout(2000),
+      redirect: "error",
     });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    targets = ((await response.json()) as Target[]).filter(isYouTubeTarget);
-  } catch {
+    pages = ((await response.json()) as (Target | null)[]).flatMap((target) => {
+      const endpoint = youtubePageEndpoint(target, port);
+      return endpoint ? [endpoint] : [];
+    });
+  } catch (error) {
     throw new Error(
-      `Start Brave with --remote-debugging-port=${port} before using YouTube chords. See the chords-youtube README for setup.`,
+      `Start your browser with --remote-debugging-port=${port} before using YouTube chords. See the chords-youtube README for setup.`,
+      { cause: error },
     );
   }
-  if (targets.length === 0) throw new Error("Open the YouTube app before using video chords.");
+  if (pages.length === 0)
+    throw new Error("Open the YouTube app or a YouTube tab before using these chords.");
 
-  // Several YouTube tabs may exist. Only the focused page can receive this app's chord.
-  let target: Target | undefined;
-  if (targets.length === 1) target = targets[0];
-  else {
-    for (const candidate of targets) {
-      if (await evaluate(candidate, "document.hasFocus()")) {
-        target = candidate;
-        break;
-      }
-    }
-  }
-  if (!target) throw new Error("Focus the YouTube app before using video chords.");
-  return evaluate(target, source);
+  // The macOS binding is already scoped to the Brave web app. Desktop bindings
+  // are global, so even a single discovered tab needs to have document focus.
+  if (!requireFocusedPage && pages.length === 1) return evaluate(pages[0]!, source);
+  const focused = (
+    await Promise.all(
+      pages.map(async (endpoint) => {
+        try {
+          return (await evaluate(endpoint, "document.hasFocus()")) === true ? endpoint : undefined;
+        } catch {
+          return undefined;
+        }
+      }),
+    )
+  ).filter((endpoint) => endpoint !== undefined);
+  if (focused.length !== 1)
+    throw new Error("Focus the YouTube app or the web content in one YouTube tab.");
+  if (!requireFocusedPage) return evaluate(focused[0]!, source);
+
+  // Recheck in the same evaluation that changes the player. The target can
+  // lose focus or navigate between the discovery call and this call.
+  const guarded = `document.hasFocus() && location.protocol === "https:" &&
+    (location.hostname === "youtube.com" || location.hostname.endsWith(".youtube.com"))
+      ? (${source})
+      : null`;
+  const result = await evaluate(focused[0]!, guarded);
+  if (result === null) throw new Error("YouTube lost focus before the command ran.");
+  return result;
 }

@@ -18,7 +18,7 @@ export function createModuleNamespace(modulePath: string) {
   const triple = `${arch() === "arm64" ? "aarch64" : arch() === "x64" ? "x86_64" : arch()}-${platform() === "darwin" ? "apple-darwin" : platform() === "win32" ? "pc-windows-msvc" : "unknown-linux-gnu"}`;
 
   function resolvePackageFile(path: string): string {
-    const components = path.split("/");
+    const components = path.split(/[\\/]/);
     if (
       !path ||
       isAbsolute(path) ||

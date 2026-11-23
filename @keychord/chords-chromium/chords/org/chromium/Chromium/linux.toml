@@ -1,0 +1,5 @@
+name = 'Chromium'
+executables = ['chromium', 'chromium-browser']
+
+[[import]]
+file = 'google.desktop.toml'

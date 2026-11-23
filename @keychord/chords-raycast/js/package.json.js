@@ -27,44 +27,88 @@ var devDependencies = {
 };
 var packageManager = "pnpm@12.11.2";
 var chords = {
-	"com": { "raycast": { "macos": { "macos.toml": {
-		"name": "Raycast",
-		"meta": { "url": "https://manual.raycast.com/keyboard-shortcuts" },
-		"chords": {
-			"nn": {
-				"name": "Navigate: North",
-				"shortcut": "up"
-			},
-			"ne": {
-				"name": "Navigate: East",
-				"shortcut": "right"
-			},
-			"ns": {
-				"name": "Navigate: South",
-				"shortcut": "down"
-			},
-			"nw": {
-				"name": "Navigate: West",
-				"shortcut": "left"
-			},
-			"p[": {
-				"name": "Page: Previous",
-				"shortcut": "alt+up"
-			},
-			"p]": {
-				"name": "Page: Next",
-				"shortcut": "alt+down"
-			},
-			"s[": {
-				"name": "Section: Previous",
-				"shortcut": "cmd+up"
-			},
-			"s]": {
-				"name": "Section: Next",
-				"shortcut": "cmd+down"
+	"com": { "raycast": {
+		"macos": { "macos.toml": {
+			"name": "Raycast",
+			"meta": { "url": "https://manual.raycast.com/keyboard-shortcuts" },
+			"chords": {
+				"nn": {
+					"name": "Navigate: North",
+					"shortcut": "up"
+				},
+				"ne": {
+					"name": "Navigate: East",
+					"shortcut": "right"
+				},
+				"ns": {
+					"name": "Navigate: South",
+					"shortcut": "down"
+				},
+				"nw": {
+					"name": "Navigate: West",
+					"shortcut": "left"
+				},
+				"p[": {
+					"name": "Page: Previous",
+					"shortcut": "alt+up"
+				},
+				"p]": {
+					"name": "Page: Next",
+					"shortcut": "alt+down"
+				},
+				"s[": {
+					"name": "Section: Previous",
+					"shortcut": "cmd+up"
+				},
+				"s]": {
+					"name": "Section: Next",
+					"shortcut": "cmd+down"
+				}
 			}
-		}
-	} } } },
+		} },
+		"windows": { "windows.toml": {
+			"name": "Raycast",
+			"executables": ["Raycast.exe"],
+			"meta": {
+				"chord": ">=0.3.4",
+				"url": "https://manual.raycast.com/keyboard-shortcuts"
+			},
+			"chords": {
+				"nn": {
+					"name": "Navigate: North",
+					"shortcut": "up"
+				},
+				"ne": {
+					"name": "Navigate: East",
+					"shortcut": "right"
+				},
+				"ns": {
+					"name": "Navigate: South",
+					"shortcut": "down"
+				},
+				"nw": {
+					"name": "Navigate: West",
+					"shortcut": "left"
+				},
+				"p[": {
+					"name": "Page: Previous",
+					"shortcut": "alt+up"
+				},
+				"p]": {
+					"name": "Page: Next",
+					"shortcut": "alt+down"
+				},
+				"s[": {
+					"name": "Section: Previous",
+					"shortcut": "ctrl+up"
+				},
+				"s]": {
+					"name": "Section: Next",
+					"shortcut": "ctrl+down"
+				}
+			}
+		} }
+	} },
 	"macos.toml": {
 		"name": "Raycast",
 		"meta": { "chord": ">=0.3.0" },
@@ -77,6 +121,28 @@ var chords = {
 			"?<>": { "name": "Launch" },
 			"<>(.*)": {
 				"name": "Raycast: Search $1",
+				"fallback": true,
+				"@input:raycast": ["$1"]
+			}
+		}
+	},
+	"windows.toml": {
+		"name": "Raycast",
+		"meta": { "chord": ">=0.3.4" },
+		"on": { "raycast": { "file": "raycast-windows.js" } },
+		"placeholders": { "<>": {
+			"name": "Raycast prefix",
+			"default": "/"
+		} },
+		"chords": {
+			"?<>": { "name": "Launch" },
+			"<>": {
+				"name": "Raycast: Open",
+				"fallback": true,
+				"@input:raycast": []
+			},
+			"<>(raycast://extensions/.*)": {
+				"name": "Raycast: Open Command",
 				"fallback": true,
 				"@input:raycast": ["$1"]
 			}

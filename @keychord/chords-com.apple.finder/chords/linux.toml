@@ -1,0 +1,10 @@
+name = 'GNOME Files'
+
+[meta]
+chord = '>=0.3.4'
+
+[placeholders]
+"<>" = { name = 'Finder prefix', default = '/' }
+
+[chords]
+'<>f' = { name = 'Open GNOME Files', shell = 'gtk-launch -- org.gnome.Nautilus' }

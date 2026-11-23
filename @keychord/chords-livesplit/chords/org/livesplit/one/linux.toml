@@ -1,0 +1,12 @@
+name = 'LiveSplit One Web'
+executables = ['keychord-livesplit']
+
+[meta]
+chord = '>=0.3.4'
+
+[on.livesplit]
+file = 'livesplit-linux.js'
+
+[chords]
+
+'v,tm' = { name = 'Vary Setting: Time Milliseconds', '@input:livesplit' = ['TOGGLE_MILLISECONDS'] }

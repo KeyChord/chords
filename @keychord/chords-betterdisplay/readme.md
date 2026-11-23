@@ -22,6 +22,11 @@ below use the default.
 
 ## Requirements
 
+This package is macOS-only. Both the resolution chord and the reset chord depend
+on the running BetterDisplay app. Custom sizes and reset also use BetterDisplay's
+virtual-screen and mirroring commands. BetterDisplay ships its app and CLI for
+macOS. [BetterDisplay CLI reference](https://betterdisplay.pro/guide/integration/cli-reference/)
+
 Install and run BetterDisplay with CLI integration enabled (the default). The
 handler uses `BETTERDISPLAY_CLI` if it's set, otherwise `betterdisplaycli` from PATH,
 otherwise the CLI bundled in `/Applications/BetterDisplay.app` or

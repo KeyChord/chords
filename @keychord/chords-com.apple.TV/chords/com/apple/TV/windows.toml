@@ -1,0 +1,35 @@
+name = 'Apple TV'
+executables = ['AppleTV.exe']
+
+[meta]
+chord = '>=0.3.4'
+
+[chords]
+'?a' = { name = 'App' }
+'a,' = { name = 'App: Settings', shortcut = 'ctrl+comma' }
+'ah' = { name = 'App: Help', shortcut = 'f1' }
+'aa' = { name = 'App: Account Menu', shortcut = 'alt n u' }
+'?g' = { name = 'Goto' }
+'g/' = { name = 'Goto: Search', shortcut = 'alt n f' }
+'gr' = { name = 'Goto: Recently Added', shortcut = 'alt n n' }
+'gm' = { name = 'Goto: Movies', shortcut = 'alt n m' }
+'gt' = { name = 'Goto: TV Shows', shortcut = 'alt n t' }
+'g4' = { name = 'Goto: 4K HDR', shortcut = 'alt n 4' }
+'gl' = { name = 'Goto: Rentals', shortcut = 'alt n r' }
+'gh' = { name = 'Goto: Home Videos', shortcut = 'alt n e' }
+'gd' = { name = 'Goto: Downloaded', shortcut = 'alt n d' }
+'gg' = { name = 'Goto: Genres', shortcut = 'alt n g' }
+'?n' = { name = 'Playlist' }
+'np' = { name = 'Playlist: New', shortcut = 'ctrl+n' }
+'nc' = { name = 'Playlist: Copy Selected', shortcut = 'ctrl+c' }
+'nd' = { name = 'Playlist: Delete Selected', shortcut = 'backspace' }
+'?f' = { name = 'File' }
+'fi' = { name = 'File: Add to Library', shortcut = 'ctrl+o' }
+'fd' = { name = 'File: Add Folder to Library', shortcut = 'ctrl+shift+o' }
+'?v' = { name = 'View' }
+'va' = { name = 'View: Download Activity', shortcut = 'ctrl+shift+l' }
+'vs' = { name = 'View: Sidebar Actions', shortcut = 'alt m m' }
+'?p' = { name = 'Playback' }
+'pp' = { name = 'Playback: Play or Pause', shortcut = 'space' }
+'pu' = { name = 'Playback: Increase Volume', shortcut = 'ctrl+up' }
+'pd' = { name = 'Playback: Decrease Volume', shortcut = 'ctrl+down' }

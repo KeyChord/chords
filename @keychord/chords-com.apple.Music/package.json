@@ -2,8 +2,9 @@
   "name": "@keychord/chords-com.apple.Music",
   "displayName": "Music Chords",
   "version": "0.0.2",
-  "description": "Chords for Music (com.apple.Music).",
+  "description": "Chords for Apple Music on macOS and Windows.",
   "categories": [
+    "Windows",
     "macOS"
   ],
   "repository": {

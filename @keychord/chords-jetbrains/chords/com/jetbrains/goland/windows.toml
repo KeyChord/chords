@@ -1,0 +1,5 @@
+name = 'GoLand'
+executables = ['goland64.exe', 'goland.exe']
+
+[[import]]
+file = 'base-windows.toml'

@@ -1,0 +1,5 @@
+name = 'RustRover'
+executables = ['rustrover', 'jetbrains-rustrover']
+
+[[import]]
+file = 'base-linux.toml'

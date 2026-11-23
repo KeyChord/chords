@@ -1,0 +1,25 @@
+name = 'Modifier Keys'
+
+[meta]
+chord = '>=0.3.4'
+
+[on.keys]
+file = 'keys.js'
+
+[placeholders]
+"<>" = { name = 'Modifier keys prefix', default = 'k' }
+
+[chords]
+'?<>' = { name = 'Modifiers' }
+
+'?<>m' = { name = 'Super' }
+'<>(m.[acms]*)' = { name = 'Super Combo', '@input:keys' = ['$1'] }
+
+'?<>c' = { name = 'Control' }
+'<>(c.[acms]*)' = { name = 'Control Combo', '@input:keys' = ['$1'] }
+
+'?<>a' = { name = 'Alt' }
+'<>(a.[acms]*)' = { name = 'Alt Combo', '@input:keys' = ['$1'] }
+
+'?<>s' = { name = 'Shift' }
+'<>(s.[acms]*)' = { name = 'Shift Combo', '@input:keys' = ['$1'] }

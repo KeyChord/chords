@@ -1,0 +1,39 @@
+name = 'File Explorer'
+executables = ['CabinetWClass', 'ExploreWClass']
+
+[meta]
+chord = '>=0.3.4'
+
+[chords]
+'?g' = { name = 'Navigation' }
+'gb' = { name = 'Go Back', shortcut = 'alt+left' }
+'gn' = { name = 'Go Forward', shortcut = 'alt+right' }
+'gf' = { name = 'Enter Folder Location', shortcut = 'ctrl+l' }
+'g/' = { name = 'Search Files', shortcut = 'ctrl+f' }
+'gr' = { name = 'Refresh Folder', shortcut = 'f5' }
+
+'?d' = { name = 'Folder' }
+'du' = { name = 'Go to Parent Folder', shortcut = 'alt+up' }
+'dn' = { name = 'Create Folder', shortcut = 'ctrl+shift+n' }
+'dw' = { name = 'Open New Window', shortcut = 'ctrl+n' }
+
+'?f' = { name = 'Files and Selection' }
+'fa' = { name = 'Select All', shortcut = 'ctrl+a' }
+'fr' = { name = 'Rename Selected Item', shortcut = 'f2' }
+'fp' = { name = 'Show Properties', shortcut = 'alt+enter' }
+'fm' = { name = 'Open Context Menu', shortcut = 'shift+f10' }
+'fc' = { name = 'Copy Selected Items', shortcut = 'ctrl+c' }
+'fx' = { name = 'Cut Selected Items', shortcut = 'ctrl+x' }
+'fv' = { name = 'Paste Items', shortcut = 'ctrl+v' }
+
+'?a' = { name = 'View' }
+'ai' = { name = 'Show Large Icons', shortcut = 'ctrl+shift+2' }
+'al' = { name = 'Show Details View', shortcut = 'ctrl+shift+6' }
+'ap' = { name = 'Toggle Preview Pane', shortcut = 'alt+p' }
+'ad' = { name = 'Toggle Details Pane', shortcut = 'alt+shift+p' }
+
+'?t' = { name = 'Tabs (Windows 11)' }
+'tn' = { name = 'Open New Tab', shortcut = 'ctrl+t' }
+'tc' = { name = 'Close Current Tab or Window', shortcut = 'ctrl+w' }
+'t[' = { name = 'Previous Tab', shortcut = 'ctrl+shift+tab' }
+'t]' = { name = 'Next Tab', shortcut = 'ctrl+tab' }

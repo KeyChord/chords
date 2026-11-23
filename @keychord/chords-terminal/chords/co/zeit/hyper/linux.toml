@@ -1,0 +1,5 @@
+name = 'Hyper'
+executables = ['hyper']
+
+[[import]]
+file = 'tabs-ctrl.desktop.toml'

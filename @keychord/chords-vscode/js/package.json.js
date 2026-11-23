@@ -9,6 +9,7 @@ var repository = {
   url: "https://github.com/KeyChord/chords-vscode",
 };
 var type = "module";
+var scripts = { test: "bun test --isolate" };
 var dependencies = { "nano-spawn-compat": "latest" };
 var devDependencies = {
   "@keychord/chordtest": "workspace:*",
@@ -20,6 +21,1073 @@ var chords = {
   com: {
     microsoft: {
       VSCode: {
+        "linux.toml": {
+          name: "VSCode",
+          executables: ["code", "code-insiders"],
+          on: { command: { file: "vscode-command.js" } },
+          chords: {
+            "?f": { name: "Find / File" },
+            "f[": {
+              name: "Find Previous",
+              shortcut: "shift+f3",
+            },
+            "f]": {
+              name: "Find Next",
+              shortcut: "f3",
+            },
+            fr: {
+              name: "Find and Replace",
+              shortcut: "ctrl+h",
+            },
+            fg: {
+              name: "Find Globally",
+              shortcut: "ctrl+shift+f",
+            },
+            frg: {
+              name: "Find Replace Globally",
+              shortcut: "ctrl+shift+h",
+            },
+            fpa: {
+              name: "File: Copy Absolute Path",
+              shortcut: "ctrl+k p",
+            },
+            fpr: {
+              name: "File: Copy Relative Path",
+              shortcut: "ctrl+shift+alt+c",
+            },
+            frp: {
+              name: "File: Relative Path",
+              shortcut: "ctrl+shift+alt+c",
+            },
+            fn: {
+              name: "File: New",
+              "@input:command": ["workbench.action.files.newFile"],
+            },
+            fnn: {
+              name: "File: New Name",
+              "@input:command": ["renameFile"],
+            },
+            fh: {
+              name: "File: Here",
+              "@input:command": ["explorer.newFile"],
+            },
+            fd: {
+              name: "File: Directory",
+              "@input:command": ["explorer.newFolder"],
+            },
+            fc: {
+              name: "File: Close Directory",
+              shortcut: "ctrl+k f",
+            },
+            fnu: {
+              name: "File: New Untitled File",
+              shortcut: "ctrl+n",
+            },
+            ft: {
+              name: "File: Move to Trash",
+              "@input:command": ["moveFileToTrash"],
+            },
+            fm: {
+              name: "File: Format",
+              shortcut: "ctrl+shift+i",
+            },
+            fs: {
+              name: "File: Show",
+              "@input:command": ["revealInExplorer"],
+            },
+            fra: {
+              name: "search.action.replaceAllInFile",
+              shortcut: "ctrl+shift+enter",
+            },
+            fo: {
+              name: "File: Open",
+              shortcut: "ctrl+o",
+            },
+            for: {
+              name: "File: Open Recent",
+              shortcut: "ctrl+r",
+            },
+            "?ff": { name: "Folding: Fold" },
+            ff: {
+              name: "Folding: Fold",
+              shortcut: "ctrl+shift+[",
+            },
+            ffa: {
+              name: "Folding: Fold All",
+              shortcut: "ctrl+k ctrl+0",
+            },
+            ffc: {
+              name: "Folding: Fold Comments",
+              shortcut: "ctrl+k ctrl+/",
+            },
+            ffr: {
+              name: "Folding: Fold Recursively",
+              shortcut: "ctrl+k ctrl+[",
+            },
+            ffe: {
+              name: "Folding: Fold All Except",
+              shortcut: "ctrl+k ctrl+-",
+            },
+            ffm: {
+              name: "Folding: Fold All Marker Regions",
+              shortcut: "ctrl+k ctrl+8",
+            },
+            "?fu": { name: "Folding: Unfold" },
+            fu: {
+              name: "Folding: Unfold",
+              shortcut: "ctrl+shift+]",
+            },
+            fua: {
+              name: "Folding: Unfold All",
+              shortcut: "ctrl+k ctrl+j",
+            },
+            fur: {
+              name: "Folding: Unfold Recursively",
+              shortcut: "ctrl+k ctrl+]",
+            },
+            fue: {
+              name: "Folding: Unfold All Except",
+              shortcut: "ctrl+k ctrl+=",
+            },
+            fum: {
+              name: "Folding: Unfold All Marker Regions",
+              shortcut: "ctrl+k ctrl+9",
+            },
+            ffs: {
+              name: "Folding: From Selection",
+              shortcut: "ctrl+k ctrl+,",
+            },
+            frm: {
+              name: "Folding: Remove Manual",
+              shortcut: "ctrl+k ctrl+.",
+            },
+            ftr: {
+              name: "Folding: Toggle Recursively",
+              shortcut: "ctrl+k ctrl+shift+l",
+            },
+            '?f"1-7"': { name: "Folding: Level" },
+            f1: {
+              name: "editor.foldLevel1",
+              shortcut: "ctrl+k ctrl+1",
+            },
+            f2: {
+              name: "editor.foldLevel2",
+              shortcut: "ctrl+k ctrl+2",
+            },
+            f3: {
+              name: "editor.foldLevel3",
+              shortcut: "ctrl+k ctrl+3",
+            },
+            f4: {
+              name: "editor.foldLevel4",
+              shortcut: "ctrl+k ctrl+4",
+            },
+            f5: {
+              name: "editor.foldLevel5",
+              shortcut: "ctrl+k ctrl+5",
+            },
+            f6: {
+              name: "editor.foldLevel6",
+              shortcut: "ctrl+k ctrl+6",
+            },
+            f7: {
+              name: "editor.foldLevel7",
+              shortcut: "ctrl+k ctrl+7",
+            },
+            hb: {
+              name: "History: Back",
+              shortcut: "ctrl+alt+-",
+            },
+            hf: {
+              name: "History: Forward",
+              shortcut: "ctrl+shift+-",
+            },
+            "?p": { name: "Panel" },
+            pa: {
+              name: "Panel: AI",
+              shortcut: "ctrl+alt+i",
+            },
+            pd: {
+              name: "Panel: Debug",
+              shortcut: "ctrl+shift+d",
+            },
+            pe: {
+              name: "Panel: Explorer",
+              shortcut: "ctrl+shift+e",
+            },
+            pg: {
+              name: "Panel: Git",
+              shortcut: "ctrl+shift+g",
+            },
+            pmd: {
+              name: "Panel: Move Down",
+              shortcut: "ctrl+k down",
+            },
+            pml: {
+              name: "Panel: Move Left",
+              shortcut: "ctrl+k left",
+            },
+            pmr: {
+              name: "Panel: Move Right",
+              shortcut: "ctrl+k right",
+            },
+            pmu: {
+              name: "Panel: Move Up",
+              shortcut: "ctrl+k up",
+            },
+            pp: {
+              name: "Panel: Problems",
+              shortcut: "ctrl+shift+m",
+            },
+            ps: {
+              name: "Panel: Search",
+              shortcut: "ctrl+shift+f",
+            },
+            psb: {
+              name: "Panel: Side Bar",
+              shortcut: "ctrl+b",
+            },
+            pm: {
+              name: "Panel: Marketplace",
+              shortcut: "ctrl+shift+x",
+            },
+            po: {
+              name: "Panel: Open",
+              "@input:command": ["workbench.action.quickOpenView"],
+            },
+            pf: {
+              name: "Panel: Forward",
+              "@input:command": ["workbench.action.quickOpenNavigateNextInViewPicker"],
+            },
+            pb: {
+              name: "Panel: Back",
+              "@input:command": ["workbench.action.quickOpenNavigatePreviousInViewPicker"],
+            },
+            pi: {
+              name: "Panel: Info",
+              shortcut: "ctrl+j",
+            },
+            px: {
+              name: "Panel: Next",
+              shortcut: "f6",
+            },
+            pv: {
+              name: "Panel: Previous",
+              shortcut: "shift+f6",
+            },
+            pgk: {
+              name: "Page: Keybindings",
+              shortcut: "ctrl+k ctrl+s",
+            },
+            pgs: {
+              name: "Page: Settings",
+              shortcut: "ctrl+,",
+            },
+            "?e": { name: "Editor" },
+            ea: {
+              name: "Editor: Actions",
+              shortcut: "ctrl+.",
+            },
+            ek: {
+              name: "Editor: Kwik Fix",
+              shortcut: "ctrl+.",
+            },
+            es: {
+              name: "Editor: Focus",
+              "@input:command": ["workbench.action.focusActiveEditorGroup"],
+            },
+            ep: {
+              name: "Editor: Pin",
+              shortcut: "ctrl+k shift+enter",
+            },
+            eu: {
+              name: "Editor: Unpin",
+              shortcut: "ctrl+k shift+enter",
+            },
+            esa: {
+              name: "Editor: Show All",
+              shortcut: "ctrl+k ctrl+p",
+            },
+            eo: {
+              name: "Editor: Open Recently Closed",
+              shortcut: "ctrl+shift+t",
+            },
+            "e[": {
+              name: "Editor: Previous",
+              shortcut: "ctrl+k ctrl+pageup",
+            },
+            "e]": {
+              name: "Editor: Next",
+              shortcut: "ctrl+pagedown",
+            },
+            "e]g": {
+              name: "Editor: Next in Group",
+              shortcut: "ctrl+k ctrl+pagedown",
+            },
+            ef: {
+              name: "Editor: Forward",
+              shortcut: "ctrl+shift+tab",
+            },
+            eb: {
+              name: "Editor: Back",
+              shortcut: "ctrl+tab",
+            },
+            "?eq": { name: "Editor: Quit" },
+            eq: {
+              name: "Editor: Quit",
+              shortcut: "ctrl+w",
+            },
+            eqa: {
+              name: "Editor: Quit All",
+              shortcut: "ctrl+k ctrl+w",
+            },
+            eqo: {
+              name: "Editor: Quit Others",
+              "@input:command": ["workbench.action.closeOtherEditors"],
+            },
+            equ: {
+              name: "Split: Quit Unmodified",
+              shortcut: "ctrl+k u",
+            },
+            "?eg": { name: "Editor Group" },
+            egd: {
+              name: "workbench.action.moveActiveEditorGroupDown",
+              shortcut: "ctrl+k down",
+            },
+            egl: {
+              name: "workbench.action.moveActiveEditorGroupLeft",
+              shortcut: "ctrl+k left",
+            },
+            egr: {
+              name: "workbench.action.moveActiveEditorGroupRight",
+              shortcut: "ctrl+k right",
+            },
+            egu: {
+              name: "workbench.action.moveActiveEditorGroupUp",
+              shortcut: "ctrl+k up",
+            },
+            "?t": { name: "Tab / Terminal" },
+            t1: {
+              name: "Tab 1",
+              shortcut: "alt+1",
+            },
+            t2: {
+              name: "Tab 2",
+              shortcut: "alt+2",
+            },
+            t3: {
+              name: "Tab 3",
+              shortcut: "alt+3",
+            },
+            t4: {
+              name: "Tab 4",
+              shortcut: "alt+4",
+            },
+            t5: {
+              name: "Tab 5",
+              shortcut: "alt+5",
+            },
+            t6: {
+              name: "Tab 6",
+              shortcut: "alt+6",
+            },
+            t7: {
+              name: "Tab 7",
+              shortcut: "alt+7",
+            },
+            t8: {
+              name: "Tab 8",
+              shortcut: "alt+8",
+            },
+            t9: {
+              name: "Tab 9",
+              shortcut: "alt+9",
+            },
+            ta: {
+              name: "Terminal: Actions",
+              shortcut: "ctrl+.",
+            },
+            tc: {
+              name: "Terminal: Clear",
+              "@input:command": ["workbench.action.terminal.clear"],
+            },
+            ti: {
+              name: "Terminal: Input Chat",
+              shortcut: "ctrl+i",
+            },
+            tn: {
+              name: "Terminal: New",
+              shortcut: "ctrl+shift+`",
+            },
+            tt: {
+              name: "Terminal: Toggle",
+              shortcut: "ctrl+`",
+            },
+            tl: {
+              name: "Terminal: Link Open",
+              shortcut: "ctrl+shift+g",
+            },
+            ts: {
+              name: "Terminal: Split",
+              shortcut: "ctrl+shift+5",
+            },
+            ton: {
+              name: "Terminal: Open Native",
+              shortcut: "ctrl+shift+c",
+            },
+            "?s": { name: "Search / Split" },
+            sg: {
+              name: "Search Globally",
+              shortcut: "ctrl+p",
+            },
+            sf: {
+              name: "Search Files",
+              shortcut: "ctrl+p",
+            },
+            sa: {
+              name: "Split: Auto",
+              shortcut: "ctrl+backslash",
+            },
+            sl: {
+              name: "Split: Left",
+              shortcut: "ctrl+k ctrl+backslash",
+            },
+            sr: {
+              name: "Split: Right",
+              shortcut: "ctrl+k ctrl+backslash",
+            },
+            su: {
+              name: "Split Up",
+              shortcut: "ctrl+k ctrl+backslash",
+            },
+            sd: {
+              name: "Split: Down",
+              shortcut: "ctrl+k ctrl+backslash",
+            },
+            so: {
+              name: "Split: Orthogonal",
+              shortcut: "ctrl+k ctrl+backslash",
+            },
+            si: {
+              name: "Split: Inner",
+              shortcut: "ctrl+k ctrl+shift+backslash",
+            },
+            sn: {
+              name: "Split: North",
+              shortcut: "ctrl+k ctrl+up",
+            },
+            ss: {
+              name: "Split: South",
+              shortcut: "ctrl+k ctrl+down",
+            },
+            sw: {
+              name: "Split: West",
+              shortcut: "ctrl+k ctrl+left",
+            },
+            se: {
+              name: "Split: East",
+              shortcut: "ctrl+k ctrl+right",
+            },
+            s1: {
+              name: "Split: 1st",
+              shortcut: "ctrl+1",
+            },
+            s2: {
+              name: "Split: 2nd",
+              shortcut: "ctrl+2",
+            },
+            s3: {
+              name: "Split: 3rd",
+              shortcut: "ctrl+3",
+            },
+            s4: {
+              name: "Split: 4th",
+              shortcut: "ctrl+4",
+            },
+            s5: {
+              name: "Split: 5th",
+              shortcut: "ctrl+5",
+            },
+            s6: {
+              name: "Split: 6th",
+              shortcut: "ctrl+6",
+            },
+            s7: {
+              name: "Split: 7th",
+              shortcut: "ctrl+7",
+            },
+            s8: {
+              name: "Split: 8th",
+              shortcut: "ctrl+8",
+            },
+            sq: {
+              name: "Split: Quit",
+              shortcut: "ctrl+w",
+            },
+            sqe: {
+              name: "Split: Quit Editors",
+              shortcut: "ctrl+k w",
+            },
+            sqa: {
+              name: "Split: Quit All",
+              shortcut: "ctrl+k ctrl+shift+w",
+            },
+            "?g": { name: "Goto" },
+            gb: {
+              name: "Goto Bracket",
+              shortcut: "ctrl+shift+backslash",
+            },
+            gpx: {
+              name: "Goto Problem: Next",
+              shortcut: "f8",
+            },
+            gpv: {
+              name: "Goto Problem: Previous",
+              shortcut: "shift+f8",
+            },
+            gcx: {
+              name: "Goto Change: Next",
+              shortcut: "alt+f5",
+            },
+            gcv: {
+              name: "Goto Change: Previous",
+              shortcut: "shift+alt+f5",
+            },
+            gd: {
+              name: "Goto Declaration",
+              "@input:command": ["editor.action.goToDeclaration"],
+            },
+            gy: {
+              name: "Goto Type Definition",
+              "@input:command": ["editor.action.goToTypeDefinition"],
+            },
+            gi: {
+              name: "Goto Implementation",
+              shortcut: "ctrl+f12",
+            },
+            gip: {
+              name: "Goto Implementation Peek",
+              shortcut: "ctrl+shift+f12",
+            },
+            gl: {
+              name: "Goto Line",
+              shortcut: "ctrl+g",
+            },
+            gr: {
+              name: "Goto References",
+              shortcut: "shift+f12",
+            },
+            grv: {
+              name: "Goto Reference: Previous",
+              shortcut: "shift+f12",
+            },
+            grx: {
+              name: "Goto Reference: Next",
+              shortcut: "f12",
+            },
+            gs: {
+              name: "Goto Symbol",
+              shortcut: "ctrl+shift+o",
+            },
+            "?w": { name: "Window" },
+            woe: {
+              name: "Window: Open Editor",
+              shortcut: "ctrl+k o",
+            },
+            wq: {
+              name: "Window: Quit",
+              shortcut: "ctrl+shift+w",
+            },
+            wqo: {
+              name: "Window: Quit Others",
+              "@input:command": ["workbench.action.closeOtherWindows"],
+            },
+            wn: {
+              name: "Window: New",
+              shortcut: "ctrl+shift+n",
+            },
+            wr: {
+              name: "Window: Reload",
+              "@input:command": ["workbench.action.reloadWindow"],
+            },
+            ws: {
+              name: "Window: Switch",
+              "@input:command": ["workbench.action.switchWindow"],
+            },
+            wt: {
+              name: "Window: Terminal",
+              shortcut: "ctrl+shift+alt+`",
+            },
+            "?z": { name: "Zoom / Zen" },
+            zf: {
+              name: "Zoom: Full Screen",
+              shortcut: "f11",
+            },
+            zi: {
+              name: "Zoom In",
+              shortcut: "ctrl+=",
+            },
+            zo: {
+              name: "Zoom Out",
+              shortcut: "ctrl+-",
+            },
+            zr: {
+              name: "Zoom Reset",
+              shortcut: "ctrl+Numpad0",
+            },
+            zm: {
+              name: "Zen Mode",
+              shortcut: "ctrl+k z",
+            },
+            zq: {
+              name: "Zen: Quit",
+              shortcut: "escape escape",
+            },
+            "?d": { name: "Debug" },
+            da: {
+              name: "Debug: All",
+              shortcut: "ctrl+; ctrl+a",
+            },
+            dc: {
+              name: "Debug: Cursor",
+              shortcut: "ctrl+; ctrl+c",
+            },
+            df: {
+              name: "Debug: File",
+              shortcut: "ctrl+; ctrl+f",
+            },
+            dft: {
+              name: "Debug: Failed Tests",
+              shortcut: "ctrl+; ctrl+e",
+            },
+            dl: {
+              name: "Debug: Last",
+              shortcut: "ctrl+; ctrl+l",
+            },
+            dd: {
+              name: "Debug: Debug",
+              "@input:command": ["workbench.action.debug.selectandstart"],
+            },
+            ds: {
+              name: "Debug: Start",
+              shortcut: "f5",
+            },
+            db: {
+              name: "Debug: Breakpoint",
+              shortcut: "f9",
+            },
+            do: {
+              name: "Debug: Stop",
+              shortcut: "shift+f5",
+            },
+            du: {
+              name: "Debug: Pause",
+              shortcut: "f6",
+            },
+            dr: {
+              name: "Debug: Run",
+              shortcut: "ctrl+f5",
+            },
+            dv: {
+              name: "Debug: View",
+              "@input:command": ["debug.openView"],
+            },
+            dcw: {
+              name: "Debug: Copy Watch Expression",
+              shortcut: "ctrl+alt+c",
+            },
+            drs: {
+              name: "Debug: Restart",
+              shortcut: "ctrl+shift+f5",
+            },
+            dh: {
+              name: "Debug: Hover",
+              shortcut: "ctrl+k ctrl+i",
+            },
+            dit: {
+              name: "Debug: Into Target",
+              shortcut: "ctrl+f11",
+            },
+            "?ds": { name: "Debug: Step" },
+            dsi: {
+              name: "Debug: Step Into",
+              shortcut: "f11",
+            },
+            dso: {
+              name: "Debug: Step Out",
+              shortcut: "shift+f11",
+            },
+            dsv: {
+              name: "Debug: Step Over",
+              shortcut: "f10",
+            },
+            "?dc": { name: "Debug Console" },
+            "dc]": {
+              name: "workbench.action.debug.nextConsole",
+              shortcut: "ctrl+pagedown",
+            },
+            "dc[": {
+              name: "workbench.action.debug.prevConsole",
+              shortcut: "ctrl+pageup",
+            },
+            "?c": { name: "Code" },
+            ci: {
+              name: "Code: Imports",
+              shortcut: "shift+alt+o",
+            },
+            cd: {
+              name: "Code: Definition",
+              shortcut: "f12",
+            },
+            "c[": {
+              name: "Code: Previous",
+              shortcut: "alt+[",
+            },
+            "c]": {
+              name: "Code: Next",
+              shortcut: "alt+]",
+            },
+            cdp: {
+              name: "Code: Definition Peek",
+              shortcut: "ctrl+shift+f10",
+            },
+            ch: {
+              name: "Code: Hover",
+              shortcut: "ctrl+k ctrl+i",
+            },
+            cr: {
+              name: "Code: Refactor",
+              shortcut: "ctrl+shift+r",
+            },
+            crn: {
+              name: "Code: Re Name",
+              shortcut: "f2",
+            },
+            cs: {
+              name: "Code: Suggest",
+              shortcut: "ctrl+space",
+            },
+            "?cc": { name: "Code Comment" },
+            cc: {
+              name: "Code: Comment",
+              shortcut: "ctrl+/",
+            },
+            cca: {
+              name: "Code: Comment Add",
+              shortcut: "ctrl+k ctrl+alt+c",
+            },
+            ccb: {
+              name: "Code: Comment Block",
+              shortcut: "ctrl+shift+a",
+            },
+            ccl: {
+              name: "Code: Comment Line",
+              shortcut: "ctrl+k ctrl+c",
+            },
+            ccr: {
+              name: "Code Comment: Remove",
+              shortcut: "ctrl+k ctrl+u",
+            },
+            cch: {
+              name: "Code Comment: Hide",
+              shortcut: "shift+escape",
+            },
+            "?n": { name: "Notebook" },
+            "?nb": { name: "Notebook" },
+            "nb[": {
+              name: "Notebook: Previous",
+              shortcut: "shift+f3",
+            },
+            "nb]": {
+              name: "Notebook: Next",
+              shortcut: "f3",
+            },
+            nba: {
+              name: "Notebook: Add",
+              shortcut: "ctrl+d",
+            },
+            "?nbl": { name: "Notebook Language" },
+            nbld: {
+              name: "Notebook Language: Detect",
+              shortcut: "shift+alt+d",
+            },
+            nblc: {
+              name: "Notebook Language: Change",
+              shortcut: "ctrl+k m",
+            },
+            "?nc": { name: "Notebook Cell" },
+            nci: {
+              name: "Notebook Cell: Input Collapse",
+              shortcut: "ctrl+k ctrl+c",
+            },
+            "nc/": {
+              name: "Notebook Cell: Comment",
+              shortcut: "ctrl+/",
+            },
+            nco: {
+              name: "Notebook Cell: Output Collapse",
+              shortcut: "ctrl+k t",
+            },
+            nca: {
+              name: "Notebook Cell: AI",
+              shortcut: "ctrl+k i",
+            },
+            ncc: {
+              name: "Notebook Cell: Center",
+              shortcut: "ctrl+l",
+            },
+            ncei: {
+              name: "Notebook Cell: Expand Input",
+              shortcut: "ctrl+k ctrl+c",
+            },
+            nceo: {
+              name: "Notebook Cell: Expand Output",
+              shortcut: "ctrl+k t",
+            },
+            ncf: {
+              name: "Notebook Cell: Format",
+              shortcut: "ctrl+shift+i",
+            },
+            ncfa: {
+              name: "Notebook Cell: Failure Actions",
+              shortcut: "ctrl+.",
+            },
+            ncs: {
+              name: "Notebook Cell: Split",
+              shortcut: "ctrl+k ctrl+shift+backslash",
+            },
+            ncja: {
+              name: "Notebook Cell: Join Above",
+              "@input:command": ["notebook.cell.joinAbove"],
+            },
+            ncjb: {
+              name: "Notebook Cell: Join Below",
+              "@input:command": ["notebook.cell.joinBelow"],
+            },
+            ncp: {
+              name: "Notebook Cell: Paste Above",
+              shortcut: "ctrl+shift+v",
+            },
+            nct: {
+              name: "Notebook Cell: Toggle Output Scrolling",
+              shortcut: "ctrl+k y",
+            },
+            "?m": { name: "Marker" },
+            "m]": {
+              name: "editor.action.marker.next",
+              shortcut: "alt+f8",
+            },
+            "m]f": {
+              name: "editor.action.marker.nextInFiles",
+              shortcut: "f8",
+            },
+            "m[": {
+              name: "editor.action.marker.prev",
+              shortcut: "shift+alt+f8",
+            },
+            "m[f": {
+              name: "editor.action.marker.prevInFiles",
+              shortcut: "shift+f8",
+            },
+            "?i": { name: "Input (Chat)" },
+            ia: {
+              name: "Input: Accept All",
+              shortcut: "ctrl+alt+y",
+            },
+            iy: {
+              name: "Input: Yes",
+              shortcut: "ctrl+shift+y",
+            },
+            ir: {
+              name: "Input: Reject",
+              shortcut: "ctrl+shift+n",
+            },
+            in: {
+              name: "Input: New",
+              shortcut: "ctrl+l",
+            },
+            iad: {
+              name: "Input: Accessible Diff",
+              shortcut: "f7",
+            },
+            id: {
+              name: "Input: Diff",
+              shortcut: "shift+alt+f7",
+            },
+            ii: {
+              name: "Input: Inline",
+              shortcut: "ctrl+i",
+            },
+            is: {
+              name: "Input: Start",
+              shortcut: "ctrl+i",
+            },
+            io: {
+              name: "Input: Open",
+              shortcut: "ctrl+alt+i",
+            },
+            ic: {
+              name: "Input: Context",
+              shortcut: "ctrl+/",
+            },
+            iq: {
+              name: "Input: Quick",
+              shortcut: "ctrl+shift+alt+l",
+            },
+            "i]": {
+              name: "Input: Next",
+              shortcut: "alt+f5",
+            },
+            "i[": {
+              name: "Input: Previous",
+              shortcut: "shift+alt+f5",
+            },
+            "?h": { name: "Hunk" },
+            ha: {
+              name: "Hunk: Accept",
+              shortcut: "ctrl+y",
+            },
+            hu: {
+              name: "Hunk: Undo",
+              shortcut: "ctrl+n",
+            },
+            "?ac": { name: "Accessibility" },
+            ach: {
+              name: "Accessibility: Help",
+              "@input:command": ["editor.action.accessibilityHelp"],
+            },
+            ahca: {
+              name: "Accessibility: Configure Assigned Keybindings",
+              shortcut: "alt+a",
+            },
+            ahck: {
+              name: "Accessibility: Configure Keybindings",
+              shortcut: "alt+k",
+            },
+            aco: {
+              name: "Accessibility: Open Help Link",
+              shortcut: "alt+h",
+            },
+            "?av": { name: "Accessibility View" },
+            av: {
+              name: "Accessibility View",
+              "@input:command": ["editor.action.accessibleView"],
+            },
+            avg: {
+              name: "Accessibility View: Goto Symbol",
+              shortcut: "ctrl+shift+.",
+            },
+            ava: {
+              name: "Accessibility View: Accept Inline Completion",
+              shortcut: "ctrl+/",
+            },
+            avd: {
+              name: "Accessibility View: Disable Hint",
+              shortcut: "alt+f6",
+            },
+            "av]": {
+              name: "Accessibility View: Next",
+              shortcut: "alt+]",
+            },
+            "av[": {
+              name: "Accessibility View: Previous",
+              shortcut: "alt+[",
+            },
+            "?b": { name: "Breadcrumbs" },
+            bf: {
+              name: "Breadcrumbs: Focus",
+              shortcut: "ctrl+shift+;",
+            },
+            bs: {
+              name: "Breadcrumbs: Select",
+              shortcut: "ctrl+shift+.",
+            },
+            bo: {
+              name: "Breadcrumbs: On",
+              shortcut: "ctrl+shift+.",
+            },
+            "?q": { name: "QA (Testing)" },
+            qh: {
+              name: "QA: History",
+              shortcut: "alt+h",
+            },
+            qs: {
+              name: "QA: Run Tests Again",
+              shortcut: "ctrl+; l",
+            },
+            "?qc": { name: "QA Coverage" },
+            qci: {
+              name: "QA Coverage: Inline",
+              shortcut: "ctrl+; ctrl+shift+i",
+            },
+            "qc]": {
+              name: "QA Coverage: Next Missed Line",
+              shortcut: "alt+f9",
+            },
+            "qc[": {
+              name: "QA Coverage: Previous Missed Line",
+              shortcut: "shift+alt+f9",
+            },
+            qca: {
+              name: "QA Coverage: All",
+              shortcut: "ctrl+; ctrl+shift+a",
+            },
+            qcc: {
+              name: "QA Coverage: Cursor",
+              shortcut: "ctrl+; ctrl+shift+c",
+            },
+            qcf: {
+              name: "QA Coverage: File",
+              shortcut: "ctrl+; ctrl+shift+f",
+            },
+            qcl: {
+              name: "QA Coverage: Last Run",
+              shortcut: "ctrl+; ctrl+shift+l",
+            },
+            "?qr": { name: "QA Run / Refresh" },
+            qr: {
+              name: "QA Refresh",
+              shortcut: "ctrl+; ctrl+r",
+            },
+            qra: {
+              name: "QA Run: All",
+              shortcut: "ctrl+; a",
+            },
+            qri: {
+              name: "QA Run: Input Cursor",
+              shortcut: "ctrl+; c",
+            },
+            qrc: {
+              name: "QA Run: Cancel",
+              shortcut: "ctrl+; ctrl+x",
+            },
+            qrf: {
+              name: "QA Run File",
+              shortcut: "ctrl+; f",
+            },
+            qrr: {
+              name: "QA: Re-Run",
+              shortcut: "ctrl+; e",
+            },
+            qrl: {
+              name: "QA Run: Last Run",
+              shortcut: "ctrl+; l",
+            },
+            "?qo": { name: "QA Output" },
+            qop: {
+              name: "QA: Output Peek",
+              shortcut: "ctrl+; ctrl+m",
+            },
+            qor: {
+              name: "QA: Output Recent",
+              shortcut: "ctrl+; ctrl+o",
+            },
+            qoi: {
+              name: "QA: Output Inline",
+              shortcut: "ctrl+; ctrl+i",
+            },
+          },
+        },
         "macos.toml": {
           name: "VSCode",
           on: {
@@ -1349,10 +2417,1082 @@ var chords = {
             },
           },
         },
+        "windows.toml": {
+          name: "VSCode",
+          executables: ["Code.exe", "Code - Insiders.exe"],
+          on: { command: { file: "vscode-command.js" } },
+          chords: {
+            "?f": { name: "Find / File" },
+            "f[": {
+              name: "Find Previous",
+              shortcut: "shift+f3",
+            },
+            "f]": {
+              name: "Find Next",
+              shortcut: "f3",
+            },
+            fr: {
+              name: "Find and Replace",
+              shortcut: "ctrl+h",
+            },
+            fg: {
+              name: "Find Globally",
+              shortcut: "ctrl+shift+f",
+            },
+            frg: {
+              name: "Find Replace Globally",
+              shortcut: "ctrl+shift+h",
+            },
+            fpa: {
+              name: "File: Copy Absolute Path",
+              shortcut: "ctrl+k p",
+            },
+            fpr: {
+              name: "File: Copy Relative Path",
+              shortcut: "ctrl+k ctrl+shift+c",
+            },
+            frp: {
+              name: "File: Relative Path",
+              shortcut: "ctrl+k ctrl+shift+c",
+            },
+            fn: {
+              name: "File: New",
+              "@input:command": ["workbench.action.files.newFile"],
+            },
+            fnn: {
+              name: "File: New Name",
+              "@input:command": ["renameFile"],
+            },
+            fh: {
+              name: "File: Here",
+              "@input:command": ["explorer.newFile"],
+            },
+            fd: {
+              name: "File: Directory",
+              "@input:command": ["explorer.newFolder"],
+            },
+            fc: {
+              name: "File: Close Directory",
+              shortcut: "ctrl+k f",
+            },
+            fnu: {
+              name: "File: New Untitled File",
+              shortcut: "ctrl+n",
+            },
+            ft: {
+              name: "File: Move to Trash",
+              "@input:command": ["moveFileToTrash"],
+            },
+            fm: {
+              name: "File: Format",
+              shortcut: "shift+alt+f",
+            },
+            fs: {
+              name: "File: Show",
+              "@input:command": ["revealInExplorer"],
+            },
+            fra: {
+              name: "search.action.replaceAllInFile",
+              shortcut: "ctrl+shift+enter",
+            },
+            fo: {
+              name: "File: Open",
+              shortcut: "ctrl+o",
+            },
+            for: {
+              name: "File: Open Recent",
+              shortcut: "ctrl+r",
+            },
+            "?ff": { name: "Folding: Fold" },
+            ff: {
+              name: "Folding: Fold",
+              shortcut: "ctrl+shift+[",
+            },
+            ffa: {
+              name: "Folding: Fold All",
+              shortcut: "ctrl+k ctrl+0",
+            },
+            ffc: {
+              name: "Folding: Fold Comments",
+              shortcut: "ctrl+k ctrl+/",
+            },
+            ffr: {
+              name: "Folding: Fold Recursively",
+              shortcut: "ctrl+k ctrl+[",
+            },
+            ffe: {
+              name: "Folding: Fold All Except",
+              shortcut: "ctrl+k ctrl+-",
+            },
+            ffm: {
+              name: "Folding: Fold All Marker Regions",
+              shortcut: "ctrl+k ctrl+8",
+            },
+            "?fu": { name: "Folding: Unfold" },
+            fu: {
+              name: "Folding: Unfold",
+              shortcut: "ctrl+shift+]",
+            },
+            fua: {
+              name: "Folding: Unfold All",
+              shortcut: "ctrl+k ctrl+j",
+            },
+            fur: {
+              name: "Folding: Unfold Recursively",
+              shortcut: "ctrl+k ctrl+]",
+            },
+            fue: {
+              name: "Folding: Unfold All Except",
+              shortcut: "ctrl+k ctrl+=",
+            },
+            fum: {
+              name: "Folding: Unfold All Marker Regions",
+              shortcut: "ctrl+k ctrl+9",
+            },
+            ffs: {
+              name: "Folding: From Selection",
+              shortcut: "ctrl+k ctrl+,",
+            },
+            frm: {
+              name: "Folding: Remove Manual",
+              shortcut: "ctrl+k ctrl+.",
+            },
+            ftr: {
+              name: "Folding: Toggle Recursively",
+              shortcut: "ctrl+k ctrl+shift+l",
+            },
+            '?f"1-7"': { name: "Folding: Level" },
+            f1: {
+              name: "editor.foldLevel1",
+              shortcut: "ctrl+k ctrl+1",
+            },
+            f2: {
+              name: "editor.foldLevel2",
+              shortcut: "ctrl+k ctrl+2",
+            },
+            f3: {
+              name: "editor.foldLevel3",
+              shortcut: "ctrl+k ctrl+3",
+            },
+            f4: {
+              name: "editor.foldLevel4",
+              shortcut: "ctrl+k ctrl+4",
+            },
+            f5: {
+              name: "editor.foldLevel5",
+              shortcut: "ctrl+k ctrl+5",
+            },
+            f6: {
+              name: "editor.foldLevel6",
+              shortcut: "ctrl+k ctrl+6",
+            },
+            f7: {
+              name: "editor.foldLevel7",
+              shortcut: "ctrl+k ctrl+7",
+            },
+            hb: {
+              name: "History: Back",
+              shortcut: "alt+left",
+            },
+            hf: {
+              name: "History: Forward",
+              shortcut: "alt+right",
+            },
+            "?p": { name: "Panel" },
+            pa: {
+              name: "Panel: AI",
+              shortcut: "ctrl+alt+i",
+            },
+            pd: {
+              name: "Panel: Debug",
+              shortcut: "ctrl+shift+d",
+            },
+            pe: {
+              name: "Panel: Explorer",
+              shortcut: "ctrl+shift+e",
+            },
+            pg: {
+              name: "Panel: Git",
+              shortcut: "ctrl+shift+g",
+            },
+            pmd: {
+              name: "Panel: Move Down",
+              shortcut: "ctrl+k down",
+            },
+            pml: {
+              name: "Panel: Move Left",
+              shortcut: "ctrl+k left",
+            },
+            pmr: {
+              name: "Panel: Move Right",
+              shortcut: "ctrl+k right",
+            },
+            pmu: {
+              name: "Panel: Move Up",
+              shortcut: "ctrl+k up",
+            },
+            pp: {
+              name: "Panel: Problems",
+              shortcut: "ctrl+shift+m",
+            },
+            ps: {
+              name: "Panel: Search",
+              shortcut: "ctrl+shift+f",
+            },
+            psb: {
+              name: "Panel: Side Bar",
+              shortcut: "ctrl+b",
+            },
+            pm: {
+              name: "Panel: Marketplace",
+              shortcut: "ctrl+shift+x",
+            },
+            po: {
+              name: "Panel: Open",
+              shortcut: "ctrl+q",
+            },
+            pf: {
+              name: "Panel: Forward",
+              shortcut: "ctrl+q",
+            },
+            pb: {
+              name: "Panel: Back",
+              shortcut: "ctrl+shift+q",
+            },
+            pi: {
+              name: "Panel: Info",
+              shortcut: "ctrl+j",
+            },
+            px: {
+              name: "Panel: Next",
+              shortcut: "f6",
+            },
+            pv: {
+              name: "Panel: Previous",
+              shortcut: "shift+f6",
+            },
+            pgk: {
+              name: "Page: Keybindings",
+              shortcut: "ctrl+k ctrl+s",
+            },
+            pgs: {
+              name: "Page: Settings",
+              shortcut: "ctrl+,",
+            },
+            "?e": { name: "Editor" },
+            ea: {
+              name: "Editor: Actions",
+              shortcut: "ctrl+.",
+            },
+            ek: {
+              name: "Editor: Kwik Fix",
+              shortcut: "ctrl+.",
+            },
+            es: {
+              name: "Editor: Focus",
+              "@input:command": ["workbench.action.focusActiveEditorGroup"],
+            },
+            ep: {
+              name: "Editor: Pin",
+              shortcut: "ctrl+k shift+enter",
+            },
+            eu: {
+              name: "Editor: Unpin",
+              shortcut: "ctrl+k shift+enter",
+            },
+            esa: {
+              name: "Editor: Show All",
+              shortcut: "ctrl+k ctrl+p",
+            },
+            eo: {
+              name: "Editor: Open Recently Closed",
+              shortcut: "ctrl+shift+t",
+            },
+            "e[": {
+              name: "Editor: Previous",
+              shortcut: "ctrl+k ctrl+pageup",
+            },
+            "e]": {
+              name: "Editor: Next",
+              shortcut: "ctrl+pagedown",
+            },
+            "e]g": {
+              name: "Editor: Next in Group",
+              shortcut: "ctrl+k ctrl+pagedown",
+            },
+            ef: {
+              name: "Editor: Forward",
+              shortcut: "ctrl+shift+tab",
+            },
+            eb: {
+              name: "Editor: Back",
+              shortcut: "ctrl+tab",
+            },
+            "?eq": { name: "Editor: Quit" },
+            eq: {
+              name: "Editor: Quit",
+              shortcut: "ctrl+f4",
+            },
+            eqa: {
+              name: "Editor: Quit All",
+              shortcut: "ctrl+k ctrl+w",
+            },
+            eqo: {
+              name: "Editor: Quit Others",
+              "@input:command": ["workbench.action.closeOtherEditors"],
+            },
+            equ: {
+              name: "Split: Quit Unmodified",
+              shortcut: "ctrl+k u",
+            },
+            "?eg": { name: "Editor Group" },
+            egd: {
+              name: "workbench.action.moveActiveEditorGroupDown",
+              shortcut: "ctrl+k down",
+            },
+            egl: {
+              name: "workbench.action.moveActiveEditorGroupLeft",
+              shortcut: "ctrl+k left",
+            },
+            egr: {
+              name: "workbench.action.moveActiveEditorGroupRight",
+              shortcut: "ctrl+k right",
+            },
+            egu: {
+              name: "workbench.action.moveActiveEditorGroupUp",
+              shortcut: "ctrl+k up",
+            },
+            "?t": { name: "Tab / Terminal" },
+            t1: {
+              name: "Tab 1",
+              shortcut: "alt+1",
+            },
+            t2: {
+              name: "Tab 2",
+              shortcut: "alt+2",
+            },
+            t3: {
+              name: "Tab 3",
+              shortcut: "alt+3",
+            },
+            t4: {
+              name: "Tab 4",
+              shortcut: "alt+4",
+            },
+            t5: {
+              name: "Tab 5",
+              shortcut: "alt+5",
+            },
+            t6: {
+              name: "Tab 6",
+              shortcut: "alt+6",
+            },
+            t7: {
+              name: "Tab 7",
+              shortcut: "alt+7",
+            },
+            t8: {
+              name: "Tab 8",
+              shortcut: "alt+8",
+            },
+            t9: {
+              name: "Tab 9",
+              shortcut: "alt+9",
+            },
+            ta: {
+              name: "Terminal: Actions",
+              shortcut: "ctrl+.",
+            },
+            tc: {
+              name: "Terminal: Clear",
+              "@input:command": ["workbench.action.terminal.clear"],
+            },
+            ti: {
+              name: "Terminal: Input Chat",
+              shortcut: "ctrl+i",
+            },
+            tn: {
+              name: "Terminal: New",
+              shortcut: "ctrl+shift+`",
+            },
+            tt: {
+              name: "Terminal: Toggle",
+              shortcut: "ctrl+`",
+            },
+            tl: {
+              name: "Terminal: Link Open",
+              shortcut: "ctrl+shift+g",
+            },
+            ts: {
+              name: "Terminal: Split",
+              shortcut: "ctrl+shift+5",
+            },
+            ton: {
+              name: "Terminal: Open Native",
+              shortcut: "ctrl+shift+c",
+            },
+            "?s": { name: "Search / Split" },
+            sg: {
+              name: "Search Globally",
+              shortcut: "ctrl+p",
+            },
+            sf: {
+              name: "Search Files",
+              shortcut: "ctrl+p",
+            },
+            sa: {
+              name: "Split: Auto",
+              shortcut: "ctrl+backslash",
+            },
+            sl: {
+              name: "Split: Left",
+              shortcut: "ctrl+k ctrl+backslash",
+            },
+            sr: {
+              name: "Split: Right",
+              shortcut: "ctrl+k ctrl+backslash",
+            },
+            su: {
+              name: "Split Up",
+              shortcut: "ctrl+k ctrl+backslash",
+            },
+            sd: {
+              name: "Split: Down",
+              shortcut: "ctrl+k ctrl+backslash",
+            },
+            so: {
+              name: "Split: Orthogonal",
+              shortcut: "ctrl+k ctrl+backslash",
+            },
+            si: {
+              name: "Split: Inner",
+              shortcut: "ctrl+k ctrl+shift+backslash",
+            },
+            sn: {
+              name: "Split: North",
+              shortcut: "ctrl+k ctrl+up",
+            },
+            ss: {
+              name: "Split: South",
+              shortcut: "ctrl+k ctrl+down",
+            },
+            sw: {
+              name: "Split: West",
+              shortcut: "ctrl+k ctrl+left",
+            },
+            se: {
+              name: "Split: East",
+              shortcut: "ctrl+k ctrl+right",
+            },
+            s1: {
+              name: "Split: 1st",
+              shortcut: "ctrl+1",
+            },
+            s2: {
+              name: "Split: 2nd",
+              shortcut: "ctrl+2",
+            },
+            s3: {
+              name: "Split: 3rd",
+              shortcut: "ctrl+3",
+            },
+            s4: {
+              name: "Split: 4th",
+              shortcut: "ctrl+4",
+            },
+            s5: {
+              name: "Split: 5th",
+              shortcut: "ctrl+5",
+            },
+            s6: {
+              name: "Split: 6th",
+              shortcut: "ctrl+6",
+            },
+            s7: {
+              name: "Split: 7th",
+              shortcut: "ctrl+7",
+            },
+            s8: {
+              name: "Split: 8th",
+              shortcut: "ctrl+8",
+            },
+            sq: {
+              name: "Split: Quit",
+              shortcut: "ctrl+w",
+            },
+            sqe: {
+              name: "Split: Quit Editors",
+              shortcut: "ctrl+k w",
+            },
+            sqa: {
+              name: "Split: Quit All",
+              shortcut: "ctrl+k ctrl+shift+w",
+            },
+            "?g": { name: "Goto" },
+            gb: {
+              name: "Goto Bracket",
+              shortcut: "ctrl+shift+backslash",
+            },
+            gpx: {
+              name: "Goto Problem: Next",
+              shortcut: "f8",
+            },
+            gpv: {
+              name: "Goto Problem: Previous",
+              shortcut: "shift+f8",
+            },
+            gcx: {
+              name: "Goto Change: Next",
+              shortcut: "alt+f5",
+            },
+            gcv: {
+              name: "Goto Change: Previous",
+              shortcut: "shift+alt+f5",
+            },
+            gd: {
+              name: "Goto Declaration",
+              "@input:command": ["editor.action.goToDeclaration"],
+            },
+            gy: {
+              name: "Goto Type Definition",
+              "@input:command": ["editor.action.goToTypeDefinition"],
+            },
+            gi: {
+              name: "Goto Implementation",
+              shortcut: "ctrl+f12",
+            },
+            gip: {
+              name: "Goto Implementation Peek",
+              shortcut: "ctrl+shift+f12",
+            },
+            gl: {
+              name: "Goto Line",
+              shortcut: "ctrl+g",
+            },
+            gr: {
+              name: "Goto References",
+              shortcut: "shift+f12",
+            },
+            grv: {
+              name: "Goto Reference: Previous",
+              shortcut: "shift+f12",
+            },
+            grx: {
+              name: "Goto Reference: Next",
+              shortcut: "f12",
+            },
+            gs: {
+              name: "Goto Symbol",
+              shortcut: "ctrl+shift+o",
+            },
+            "?w": { name: "Window" },
+            woe: {
+              name: "Window: Open Editor",
+              shortcut: "ctrl+k o",
+            },
+            wq: {
+              name: "Window: Quit",
+              shortcut: "ctrl+shift+w",
+            },
+            wqo: {
+              name: "Window: Quit Others",
+              "@input:command": ["workbench.action.closeOtherWindows"],
+            },
+            wn: {
+              name: "Window: New",
+              shortcut: "ctrl+shift+n",
+            },
+            wr: {
+              name: "Window: Reload",
+              "@input:command": ["workbench.action.reloadWindow"],
+            },
+            ws: {
+              name: "Window: Switch",
+              "@input:command": ["workbench.action.switchWindow"],
+            },
+            wt: {
+              name: "Window: Terminal",
+              shortcut: "ctrl+shift+alt+`",
+            },
+            "?z": { name: "Zoom / Zen" },
+            zf: {
+              name: "Zoom: Full Screen",
+              shortcut: "f11",
+            },
+            zi: {
+              name: "Zoom In",
+              shortcut: "ctrl+=",
+            },
+            zo: {
+              name: "Zoom Out",
+              shortcut: "ctrl+-",
+            },
+            zr: {
+              name: "Zoom Reset",
+              shortcut: "ctrl+Numpad0",
+            },
+            zm: {
+              name: "Zen Mode",
+              shortcut: "ctrl+k z",
+            },
+            zq: {
+              name: "Zen: Quit",
+              shortcut: "escape escape",
+            },
+            "?d": { name: "Debug" },
+            da: {
+              name: "Debug: All",
+              shortcut: "ctrl+; ctrl+a",
+            },
+            dc: {
+              name: "Debug: Cursor",
+              shortcut: "ctrl+; ctrl+c",
+            },
+            df: {
+              name: "Debug: File",
+              shortcut: "ctrl+; ctrl+f",
+            },
+            dft: {
+              name: "Debug: Failed Tests",
+              shortcut: "ctrl+; ctrl+e",
+            },
+            dl: {
+              name: "Debug: Last",
+              shortcut: "ctrl+; ctrl+l",
+            },
+            dd: {
+              name: "Debug: Debug",
+              "@input:command": ["workbench.action.debug.selectandstart"],
+            },
+            ds: {
+              name: "Debug: Start",
+              shortcut: "f5",
+            },
+            db: {
+              name: "Debug: Breakpoint",
+              shortcut: "f9",
+            },
+            do: {
+              name: "Debug: Stop",
+              shortcut: "shift+f5",
+            },
+            du: {
+              name: "Debug: Pause",
+              shortcut: "f6",
+            },
+            dr: {
+              name: "Debug: Run",
+              shortcut: "ctrl+f5",
+            },
+            dv: {
+              name: "Debug: View",
+              "@input:command": ["debug.openView"],
+            },
+            dcw: {
+              name: "Debug: Copy Watch Expression",
+              shortcut: "ctrl+alt+c",
+            },
+            drs: {
+              name: "Debug: Restart",
+              shortcut: "ctrl+shift+f5",
+            },
+            dh: {
+              name: "Debug: Hover",
+              shortcut: "ctrl+k ctrl+i",
+            },
+            dit: {
+              name: "Debug: Into Target",
+              shortcut: "ctrl+f11",
+            },
+            "?ds": { name: "Debug: Step" },
+            dsi: {
+              name: "Debug: Step Into",
+              shortcut: "f11",
+            },
+            dso: {
+              name: "Debug: Step Out",
+              shortcut: "shift+f11",
+            },
+            dsv: {
+              name: "Debug: Step Over",
+              shortcut: "f10",
+            },
+            "?dc": { name: "Debug Console" },
+            "dc]": {
+              name: "workbench.action.debug.nextConsole",
+              shortcut: "ctrl+pagedown",
+            },
+            "dc[": {
+              name: "workbench.action.debug.prevConsole",
+              shortcut: "ctrl+pageup",
+            },
+            "?c": { name: "Code" },
+            ci: {
+              name: "Code: Imports",
+              shortcut: "shift+alt+o",
+            },
+            cd: {
+              name: "Code: Definition",
+              shortcut: "f12",
+            },
+            "c[": {
+              name: "Code: Previous",
+              shortcut: "alt+[",
+            },
+            "c]": {
+              name: "Code: Next",
+              shortcut: "alt+]",
+            },
+            cdp: {
+              name: "Code: Definition Peek",
+              shortcut: "alt+f12",
+            },
+            ch: {
+              name: "Code: Hover",
+              shortcut: "ctrl+k ctrl+i",
+            },
+            cr: {
+              name: "Code: Refactor",
+              shortcut: "ctrl+shift+r",
+            },
+            crn: {
+              name: "Code: Re Name",
+              shortcut: "f2",
+            },
+            cs: {
+              name: "Code: Suggest",
+              shortcut: "ctrl+space",
+            },
+            "?cc": { name: "Code Comment" },
+            cc: {
+              name: "Code: Comment",
+              shortcut: "ctrl+/",
+            },
+            cca: {
+              name: "Code: Comment Add",
+              shortcut: "ctrl+k ctrl+alt+c",
+            },
+            ccb: {
+              name: "Code: Comment Block",
+              shortcut: "shift+alt+a",
+            },
+            ccl: {
+              name: "Code: Comment Line",
+              shortcut: "ctrl+k ctrl+c",
+            },
+            ccr: {
+              name: "Code Comment: Remove",
+              shortcut: "ctrl+k ctrl+u",
+            },
+            cch: {
+              name: "Code Comment: Hide",
+              shortcut: "shift+escape",
+            },
+            "?n": { name: "Notebook" },
+            "?nb": { name: "Notebook" },
+            "nb[": {
+              name: "Notebook: Previous",
+              shortcut: "shift+f3",
+            },
+            "nb]": {
+              name: "Notebook: Next",
+              shortcut: "f3",
+            },
+            nba: {
+              name: "Notebook: Add",
+              shortcut: "ctrl+d",
+            },
+            "?nbl": { name: "Notebook Language" },
+            nbld: {
+              name: "Notebook Language: Detect",
+              shortcut: "shift+alt+d",
+            },
+            nblc: {
+              name: "Notebook Language: Change",
+              shortcut: "ctrl+k m",
+            },
+            "?nc": { name: "Notebook Cell" },
+            nci: {
+              name: "Notebook Cell: Input Collapse",
+              shortcut: "ctrl+k ctrl+c",
+            },
+            "nc/": {
+              name: "Notebook Cell: Comment",
+              shortcut: "ctrl+/",
+            },
+            nco: {
+              name: "Notebook Cell: Output Collapse",
+              shortcut: "ctrl+k t",
+            },
+            nca: {
+              name: "Notebook Cell: AI",
+              shortcut: "ctrl+k i",
+            },
+            ncc: {
+              name: "Notebook Cell: Center",
+              shortcut: "ctrl+l",
+            },
+            ncei: {
+              name: "Notebook Cell: Expand Input",
+              shortcut: "ctrl+k ctrl+c",
+            },
+            nceo: {
+              name: "Notebook Cell: Expand Output",
+              shortcut: "ctrl+k t",
+            },
+            ncf: {
+              name: "Notebook Cell: Format",
+              shortcut: "shift+alt+f",
+            },
+            ncfa: {
+              name: "Notebook Cell: Failure Actions",
+              shortcut: "ctrl+.",
+            },
+            ncs: {
+              name: "Notebook Cell: Split",
+              shortcut: "ctrl+k ctrl+shift+backslash",
+            },
+            ncja: {
+              name: "Notebook Cell: Join Above",
+              "@input:command": ["notebook.cell.joinAbove"],
+            },
+            ncjb: {
+              name: "Notebook Cell: Join Below",
+              "@input:command": ["notebook.cell.joinBelow"],
+            },
+            ncp: {
+              name: "Notebook Cell: Paste Above",
+              shortcut: "ctrl+shift+v",
+            },
+            nct: {
+              name: "Notebook Cell: Toggle Output Scrolling",
+              shortcut: "ctrl+k y",
+            },
+            "?m": { name: "Marker" },
+            "m]": {
+              name: "editor.action.marker.next",
+              shortcut: "alt+f8",
+            },
+            "m]f": {
+              name: "editor.action.marker.nextInFiles",
+              shortcut: "f8",
+            },
+            "m[": {
+              name: "editor.action.marker.prev",
+              shortcut: "shift+alt+f8",
+            },
+            "m[f": {
+              name: "editor.action.marker.prevInFiles",
+              shortcut: "shift+f8",
+            },
+            "?i": { name: "Input (Chat)" },
+            ia: {
+              name: "Input: Accept All",
+              shortcut: "ctrl+alt+y",
+            },
+            iy: {
+              name: "Input: Yes",
+              shortcut: "ctrl+shift+y",
+            },
+            ir: {
+              name: "Input: Reject",
+              shortcut: "ctrl+shift+n",
+            },
+            in: {
+              name: "Input: New",
+              shortcut: "ctrl+l",
+            },
+            iad: {
+              name: "Input: Accessible Diff",
+              shortcut: "f7",
+            },
+            id: {
+              name: "Input: Diff",
+              shortcut: "shift+alt+f7",
+            },
+            ii: {
+              name: "Input: Inline",
+              shortcut: "ctrl+i",
+            },
+            is: {
+              name: "Input: Start",
+              shortcut: "ctrl+i",
+            },
+            io: {
+              name: "Input: Open",
+              shortcut: "ctrl+alt+i",
+            },
+            ic: {
+              name: "Input: Context",
+              shortcut: "ctrl+/",
+            },
+            iq: {
+              name: "Input: Quick",
+              shortcut: "ctrl+shift+alt+l",
+            },
+            "i]": {
+              name: "Input: Next",
+              shortcut: "alt+f5",
+            },
+            "i[": {
+              name: "Input: Previous",
+              shortcut: "shift+alt+f5",
+            },
+            "?h": { name: "Hunk" },
+            ha: {
+              name: "Hunk: Accept",
+              shortcut: "ctrl+y",
+            },
+            hu: {
+              name: "Hunk: Undo",
+              shortcut: "ctrl+n",
+            },
+            "?ac": { name: "Accessibility" },
+            ach: {
+              name: "Accessibility: Help",
+              shortcut: "alt+f1",
+            },
+            ahca: {
+              name: "Accessibility: Configure Assigned Keybindings",
+              shortcut: "alt+a",
+            },
+            ahck: {
+              name: "Accessibility: Configure Keybindings",
+              shortcut: "alt+k",
+            },
+            aco: {
+              name: "Accessibility: Open Help Link",
+              shortcut: "alt+h",
+            },
+            "?av": { name: "Accessibility View" },
+            av: {
+              name: "Accessibility View",
+              shortcut: "alt+f2",
+            },
+            avg: {
+              name: "Accessibility View: Goto Symbol",
+              shortcut: "ctrl+shift+.",
+            },
+            ava: {
+              name: "Accessibility View: Accept Inline Completion",
+              shortcut: "ctrl+/",
+            },
+            avd: {
+              name: "Accessibility View: Disable Hint",
+              shortcut: "alt+f6",
+            },
+            "av]": {
+              name: "Accessibility View: Next",
+              shortcut: "alt+]",
+            },
+            "av[": {
+              name: "Accessibility View: Previous",
+              shortcut: "alt+[",
+            },
+            "?b": { name: "Breadcrumbs" },
+            bf: {
+              name: "Breadcrumbs: Focus",
+              shortcut: "ctrl+shift+;",
+            },
+            bs: {
+              name: "Breadcrumbs: Select",
+              shortcut: "ctrl+shift+.",
+            },
+            bo: {
+              name: "Breadcrumbs: On",
+              shortcut: "ctrl+shift+.",
+            },
+            "?q": { name: "QA (Testing)" },
+            qh: {
+              name: "QA: History",
+              shortcut: "alt+h",
+            },
+            qs: {
+              name: "QA: Run Tests Again",
+              shortcut: "ctrl+; l",
+            },
+            "?qc": { name: "QA Coverage" },
+            qci: {
+              name: "QA Coverage: Inline",
+              shortcut: "ctrl+; ctrl+shift+i",
+            },
+            "qc]": {
+              name: "QA Coverage: Next Missed Line",
+              shortcut: "alt+f9",
+            },
+            "qc[": {
+              name: "QA Coverage: Previous Missed Line",
+              shortcut: "shift+alt+f9",
+            },
+            qca: {
+              name: "QA Coverage: All",
+              shortcut: "ctrl+; ctrl+shift+a",
+            },
+            qcc: {
+              name: "QA Coverage: Cursor",
+              shortcut: "ctrl+; ctrl+shift+c",
+            },
+            qcf: {
+              name: "QA Coverage: File",
+              shortcut: "ctrl+; ctrl+shift+f",
+            },
+            qcl: {
+              name: "QA Coverage: Last Run",
+              shortcut: "ctrl+; ctrl+shift+l",
+            },
+            "?qr": { name: "QA Run / Refresh" },
+            qr: {
+              name: "QA Refresh",
+              shortcut: "ctrl+; ctrl+r",
+            },
+            qra: {
+              name: "QA Run: All",
+              shortcut: "ctrl+; a",
+            },
+            qri: {
+              name: "QA Run: Input Cursor",
+              shortcut: "ctrl+; c",
+            },
+            qrc: {
+              name: "QA Run: Cancel",
+              shortcut: "ctrl+; ctrl+x",
+            },
+            qrf: {
+              name: "QA Run File",
+              shortcut: "ctrl+; f",
+            },
+            qrr: {
+              name: "QA: Re-Run",
+              shortcut: "ctrl+; e",
+            },
+            qrl: {
+              name: "QA Run: Last Run",
+              shortcut: "ctrl+; l",
+            },
+            "?qo": { name: "QA Output" },
+            qop: {
+              name: "QA: Output Peek",
+              shortcut: "ctrl+; ctrl+m",
+            },
+            qor: {
+              name: "QA: Output Recent",
+              shortcut: "ctrl+; ctrl+o",
+            },
+            qoi: {
+              name: "QA: Output Inline",
+              shortcut: "ctrl+; ctrl+i",
+            },
+          },
+        },
       },
     },
     todesktop: {
       "230313mzl4w4u92": {
+        "linux.toml": {
+          name: "Cursor",
+          executables: ["cursor", "Cursor"],
+          import: [{ file: "com/microsoft/VSCode/linux.toml" }],
+        },
         "macos.toml": {
           name: "Cursor",
           on: {
@@ -1362,6 +3502,11 @@ var chords = {
             },
           },
           import: [{ file: "com/microsoft/VSCode/macos.toml" }],
+        },
+        "windows.toml": {
+          name: "Cursor",
+          executables: ["Cursor.exe"],
+          import: [{ file: "com/microsoft/VSCode/windows.toml" }],
         },
       },
     },
@@ -1375,6 +3520,7 @@ var package_default = {
   categories,
   repository,
   type,
+  scripts,
   dependencies,
   devDependencies,
   packageManager,
@@ -1392,6 +3538,7 @@ export {
   name,
   packageManager,
   repository,
+  scripts,
   type,
   version,
 };

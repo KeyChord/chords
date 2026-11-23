@@ -2,8 +2,9 @@
   "name": "@keychord/chords-com.apple.TV",
   "displayName": "TV Chords",
   "version": "0.0.2",
-  "description": "Chords for TV (com.apple.TV).",
+  "description": "Chords for the Apple TV app on macOS and Windows.",
   "categories": [
+    "Windows",
     "macOS"
   ],
   "repository": {

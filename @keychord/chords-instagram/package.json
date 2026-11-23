@@ -2,7 +2,7 @@
   "name": "@keychord/chords-instagram",
   "displayName": "Instagram Chords",
   "version": "0.0.1",
-  "description": "Chords for Instagram installed as a web app from Brave.",
+  "description": "Chords for Instagram in Brave.",
   "categories": [
     "Social"
   ],

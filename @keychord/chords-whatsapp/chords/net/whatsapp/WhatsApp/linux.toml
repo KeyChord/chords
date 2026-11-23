@@ -1,0 +1,21 @@
+name = 'WhatsApp Web'
+# The class belongs to the dedicated browser profile described in the README.
+executables = ['keychord-whatsapp']
+
+[meta]
+chord = '>=0.3.4'
+
+[chords]
+'?c' = { name = 'Chat' }
+'cq' = { name = 'Chat: Close', shortcut = 'escape' }
+'c/' = { name = 'Chat: Search', shortcut = 'ctrl+alt+shift+f' }
+'cn' = { name = 'Chat: New', shortcut = 'ctrl+alt+n' }
+'cp' = { name = 'Chat: Pin', shortcut = 'ctrl+alt+shift+p' }
+'ch' = { name = 'Chat: Archive', shortcut = 'ctrl+alt+shift+e' }
+'cm' = { name = 'Chat: Mute', shortcut = 'ctrl+alt+shift+m' }
+'cu' = { name = 'Chat: Mark Unread', shortcut = 'ctrl+alt+shift+u' }
+'cgc' = { name = 'Chat Groups > Create', shortcut = 'ctrl+alt+shift+n' }
+
+'?i' = { name = 'Info' }
+'i/' = { name = 'Info > Search', shortcut = 'ctrl+alt+shift+f' }
+'im' = { name = 'Info > Mute', shortcut = 'ctrl+alt+shift+m' }

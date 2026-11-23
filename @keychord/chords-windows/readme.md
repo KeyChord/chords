@@ -3,14 +3,36 @@
 > [!NOTE]
 > This document is largely AI-written, so parts of it may not be fully accurate. It will be replaced with a hand-written version when I get the time.
 
-Native macOS window geometry and application shortcuts for Chord, for whichever app is
-focused. To install, in [Chord](https://github.com/KeyChord/Chord) open Settings → Chords →
+Window management for the focused app in Chord. To install, in
+[Chord](https://github.com/KeyChord/Chord) open Settings → Chords →
 **Chord Monorepos** → **Add Monorepo**, enter `KeyChord/chords`, then tick
 `@keychord/chords-windows` under **Packages to use**.
 
 Every chord starts with the package's `<>` prefix, `;w` by default. To reach them with fewer
 keys, choose another prefix in Settings → Chords → **Placeholders**: with `-`, `;wl`
 becomes `-l`. The examples below use the default.
+
+## Linux and Windows
+
+The Linux bindings use GNOME's default X11 keyboard shortcuts. On other window
+managers, each shortcut follows that manager's keyboard configuration. The
+Windows bindings use built-in keyboard shortcuts. Top and bottom snapping
+(`;wt` and `;wb`) and Snap Layouts (`;wz`) require Windows 11.
+
+On both platforms, use `;wl` and `;wr` to tile or snap, `;wf` to maximize,
+`;wu` to restore, `;wm` to minimize, and `;wq` to close. If a window is
+maximized on Windows, `;wm` first restores it. Use `;wgl` and `;wgr` to move
+a window to another monitor. On GNOME, `;wp` and `;wd` start a move or resize
+with the arrow keys, and `;ws[` and `;ws]` move the window to a neighboring workspace.
+
+Linux and Windows shortcuts act on the window currently receiving keyboard input.
+The precise geometry, numbered Space moves, and captured-window operations
+described below use the macOS native handler.
+
+[GNOME keyboard shortcuts](https://help.gnome.org/gnome-help/keyboard-shortcuts-set.html) ·
+[Windows keyboard shortcuts](https://support.microsoft.com/en-au/accessibility/windows/keyboard-shortcuts-in-windows)
+
+## macOS
 
 `;ws<number>` moves the captured application's focused window to a desktop Space,
 numbered from 1 in Mission Control display order, excluding full-screen Spaces.

@@ -96,18 +96,34 @@ function buildYouTubeJavaScript(action, seconds) {
 }
 //#endregion
 //#region src/js/youtube/cdp.ts
-function isYouTubeTarget(target) {
-  if (target.type !== "page" || !target.webSocketDebuggerUrl) return false;
-  try {
-    const { hostname } = new URL(target.url);
-    return hostname === "youtube.com" || hostname.endsWith(".youtube.com");
-  } catch {
-    return false;
-  }
+function youtubePageEndpoint(target, port) {
+  if (
+    target?.type !== "page" ||
+    typeof target.url !== "string" ||
+    typeof target.webSocketDebuggerUrl !== "string"
+  )
+    return;
+  const page = URL.parse(target.url);
+  if (
+    !page ||
+    page.protocol !== "https:" ||
+    !(page.hostname === "youtube.com" || page.hostname.endsWith(".youtube.com"))
+  )
+    return;
+  const socket = URL.parse(target.webSocketDebuggerUrl);
+  if (
+    socket?.protocol === "ws:" &&
+    socket.hostname === "127.0.0.1" &&
+    Number(socket.port || 80) === port &&
+    !socket.username &&
+    !socket.password &&
+    socket.pathname.startsWith("/devtools/page/")
+  )
+    return socket.href;
 }
-function evaluate(target, expression) {
+function evaluate(endpoint, expression) {
   return new Promise((resolve, reject) => {
-    const socket = new WebSocket(target.webSocketDebuggerUrl);
+    const socket = new WebSocket(endpoint);
     const finish = (error, value) => {
       clearTimeout(timer);
       socket.onopen = socket.onmessage = socket.onerror = socket.onclose = null;
@@ -154,38 +170,60 @@ function evaluate(target, expression) {
     };
   });
 }
-async function runYouTubeJavaScript(source, port) {
-  let targets;
+async function runYouTubeJavaScript(source, port, requireFocusedPage) {
+  let pages;
   try {
     const response = await fetch(`http://127.0.0.1:${port}/json/list`, {
       signal: AbortSignal.timeout(2e3),
+      redirect: "error",
     });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    targets = (await response.json()).filter(isYouTubeTarget);
-  } catch {
+    pages = (await response.json()).flatMap((target) => {
+      const endpoint = youtubePageEndpoint(target, port);
+      return endpoint ? [endpoint] : [];
+    });
+  } catch (error) {
     throw new Error(
-      `Start Brave with --remote-debugging-port=${port} before using YouTube chords. See the chords-youtube README for setup.`,
+      `Start your browser with --remote-debugging-port=${port} before using YouTube chords. See the chords-youtube README for setup.`,
+      { cause: error },
     );
   }
-  if (targets.length === 0) throw new Error("Open the YouTube app before using video chords.");
-  let target;
-  if (targets.length === 1) target = targets[0];
-  else
-    for (const candidate of targets)
-      if (await evaluate(candidate, "document.hasFocus()")) {
-        target = candidate;
-        break;
-      }
-  if (!target) throw new Error("Focus the YouTube app before using video chords.");
-  return evaluate(target, source);
+  if (pages.length === 0)
+    throw new Error("Open the YouTube app or a YouTube tab before using these chords.");
+  if (!requireFocusedPage && pages.length === 1) return evaluate(pages[0], source);
+  const focused = (
+    await Promise.all(
+      pages.map(async (endpoint) => {
+        try {
+          return (await evaluate(endpoint, "document.hasFocus()")) === true ? endpoint : void 0;
+        } catch {
+          return;
+        }
+      }),
+    )
+  ).filter((endpoint) => endpoint !== void 0);
+  if (focused.length !== 1)
+    throw new Error("Focus the YouTube app or the web content in one YouTube tab.");
+  if (!requireFocusedPage) return evaluate(focused[0], source);
+  const guarded = `document.hasFocus() && location.protocol === "https:" &&
+    (location.hostname === "youtube.com" || location.hostname.endsWith(".youtube.com"))
+      ? (${source})
+      : null`;
+  const result = await evaluate(focused[0], guarded);
+  if (result === null) throw new Error("YouTube lost focus before the command ran.");
+  return result;
 }
 //#endregion
 //#region src/js/youtube.ts
-function buildHandler(port = 9222) {
+function buildHandler(port = 9222, requireFocusedPage = false) {
   if (!Number.isInteger(port) || port < 1 || port > 65535)
     throw new Error("The YouTube debugging port must be an integer between 1 and 65535.");
   return async function handler(action, seconds) {
-    const value = await runYouTubeJavaScript(buildYouTubeJavaScript(action, seconds), port);
+    const value = await runYouTubeJavaScript(
+      buildYouTubeJavaScript(action, seconds),
+      port,
+      requireFocusedPage,
+    );
     const result = JSON.parse(String(value));
     if (!result.ok) throw new Error(result.error ?? "YouTube action failed.");
     return true;

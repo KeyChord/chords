@@ -3,12 +3,17 @@
 > [!NOTE]
 > This document is largely AI-written, so parts of it may not be fully accurate. It will be replaced with a hand-written version when I get the time.
 
-For the installed Brave Instagram app (`com.brave.Browser.app.akpamiohjfcnimfljfndmaldlcfphjmp`):
-instagram.com installed from [Brave](https://brave.com/) as an app. Brave needs remote
-debugging, which Chord sets up for you (see [Browser setup](#browser-setup)).
+These chords control Instagram in [Brave](https://brave.com/). On macOS, install Instagram
+as a Brave app (`com.brave.Browser.app.akpamiohjfcnimfljfndmaldlcfphjmp`). Linux (X11) and
+Windows use a dedicated Brave profile with local debugging enabled.
 
 To install the package, add the `KeyChord/chords` monorepo under Settings → Chords →
 Chord Monorepos and tick `@keychord/chords-instagram`.
+
+On macOS, use the listed chords inside the installed Instagram app. On Linux and Windows,
+prefix them with `/i`, for example `/igh` opens Home and `/ihsr1` opens the first story's reply
+field. Change the `i` from Settings → Chords → Placeholders. These bindings require Chord 0.3.4
+or later.
 
 | Chord  | Action                                                                                           |
 | ------ | ------------------------------------------------------------------------------------------------ |
@@ -35,6 +40,21 @@ Story chords require Home to be open (`gh`) with no dialog. They count available
 `hsrN` leaves the reply editor ready for you to type and send. Stories with replies disabled report an error. Action arguments use screaming snake case: `hs.N` sends `['STORY', '$1']`, while `hsrN` sends `['STORY_REPLY', '$1']`.
 
 ## Browser setup
+
+### Linux and Windows
+
+Start Brave with both flags below, replacing the profile path with a dedicated local directory.
+
+```text
+--remote-debugging-port=9222 --user-data-dir=<separate-profile-directory>
+```
+
+Keep the debugging endpoint on its default loopback address. Open Instagram in that Brave profile
+and focus the webpage before using a chord. A tab or an installed web app window works when it
+shares the same debugging-enabled browser instance. Chord leaves background pages alone and
+does not restart Brave on either platform. [Brave command-line flags](https://support.brave.app/hc/en-us/articles/360044860011-How-Do-I-Use-Command-Line-Flags-in-Brave)
+
+### macOS
 
 The handler uses Brave's local Chrome DevTools Protocol endpoint. When the package loads or Brave launches, Chord checks the browser's debugging port. If it does not match the configured port (9222 by default), Chord gracefully terminates Brave and relaunches it with debugging enabled and `--restore-last-session`. This restarts the whole browser, including other Brave windows, because the installed Instagram app shares its browser process.
 

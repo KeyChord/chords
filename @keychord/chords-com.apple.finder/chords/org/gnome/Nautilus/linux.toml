@@ -1,0 +1,43 @@
+name = 'GNOME Files'
+executables = ['nautilus', 'org.gnome.Nautilus']
+
+[meta]
+chord = '>=0.3.4'
+
+[chords]
+'?g' = { name = 'Navigation' }
+'gb' = { name = 'Go Back', shortcut = 'alt+left' }
+'gn' = { name = 'Go Forward', shortcut = 'alt+right' }
+'gh' = { name = 'Go to Home Folder', shortcut = 'alt+home' }
+'gf' = { name = 'Enter Folder Location', shortcut = 'ctrl+l' }
+'g/' = { name = 'Search Files', shortcut = 'ctrl+f' }
+'gr' = { name = 'Refresh Folder', shortcut = 'f5' }
+
+'?d' = { name = 'Folder' }
+'du' = { name = 'Go to Parent Folder', shortcut = 'alt+up' }
+'dn' = { name = 'Create Folder', shortcut = 'ctrl+shift+n' }
+'db' = { name = 'Bookmark Current Folder', shortcut = 'ctrl+d' }
+'dw' = { name = 'Open New Window', shortcut = 'ctrl+n' }
+
+'?f' = { name = 'Files and Selection' }
+'fa' = { name = 'Select All', shortcut = 'ctrl+a' }
+'fi' = { name = 'Invert Selection', shortcut = 'ctrl+shift+i' }
+'fr' = { name = 'Rename Selected Item', shortcut = 'f2' }
+'fo' = { name = 'Open Selected Item', shortcut = 'ctrl+o' }
+'fp' = { name = 'Show Properties', shortcut = 'alt+enter' }
+'fm' = { name = 'Open Context Menu', shortcut = 'shift+f10' }
+'fc' = { name = 'Copy Selected Items', shortcut = 'ctrl+c' }
+'fx' = { name = 'Cut Selected Items', shortcut = 'ctrl+x' }
+'fv' = { name = 'Paste Items', shortcut = 'ctrl+v' }
+
+'?a' = { name = 'View' }
+'ai' = { name = 'Show Icons', shortcut = 'ctrl+2' }
+'al' = { name = 'Show List', shortcut = 'ctrl+1' }
+'ah' = { name = 'Toggle Hidden Files', shortcut = 'ctrl+h' }
+'as' = { name = 'Toggle Sidebar', shortcut = 'f9' }
+
+'?t' = { name = 'Tabs' }
+'tn' = { name = 'Open New Tab', shortcut = 'ctrl+t' }
+'tc' = { name = 'Close Current Tab or Window', shortcut = 'ctrl+w' }
+'t[' = { name = 'Previous Tab', shortcut = 'ctrl+pageup' }
+'t]' = { name = 'Next Tab', shortcut = 'ctrl+pagedown' }

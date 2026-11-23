@@ -1,0 +1,5 @@
+name = 'RustRover'
+executables = ['rustrover64.exe', 'rustrover.exe']
+
+[[import]]
+file = 'base-windows.toml'

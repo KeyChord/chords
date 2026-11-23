@@ -1,0 +1,27 @@
+name = 'Windows Window Management'
+
+[meta]
+chord = '>=0.3.0'
+
+[placeholders]
+"<>" = { name = 'Window prefix', default = 'w' }
+
+[chords]
+'?<>' = { name = 'Window' }
+'<>l' = { name = 'Window: Snap Left', shortcut = 'super+left' }
+'<>r' = { name = 'Window: Snap Right', shortcut = 'super+right' }
+'<>t' = { name = 'Window: Snap Top', shortcut = 'super+alt+up' }
+'<>b' = { name = 'Window: Snap Bottom', shortcut = 'super+alt+down' }
+'<>f' = { name = 'Window: Maximize', shortcut = 'super+up' }
+'<>tb' = { name = 'Window: Stretch Vertically', shortcut = 'super+shift+up' }
+'<>bt' = { name = 'Window: Stretch Vertically', shortcut = 'super+shift+up' }
+'<>u' = { name = 'Window: Restore', shortcut = 'super+shift+down' }
+'<>m' = { name = 'Window: Restore or Minimize', shortcut = 'super+down' }
+'<>q' = { name = 'Window: Close', shortcut = 'alt+f4' }
+'<>a' = { name = 'Window: Open Window Menu', shortcut = 'alt+space' }
+'<>z' = { name = 'Window: Show Snap Layouts', shortcut = 'super+z' }
+'<>[' = { name = 'Window: Switch Backward', shortcut = 'alt+shift+tab' }
+'<>]' = { name = 'Window: Switch Forward', shortcut = 'alt+tab' }
+'?<>g' = { name = 'Window: Move to Monitor' }
+'<>gl' = { name = 'Window: Move to Left Monitor', shortcut = 'super+shift+left' }
+'<>gr' = { name = 'Window: Move to Right Monitor', shortcut = 'super+shift+right' }

@@ -1,0 +1,4 @@
+name = 'Browser Window Shortcuts on Windows'
+
+[chords]
+'wm' = { name = 'Window: Minimize', shortcut = 'alt+space n' }

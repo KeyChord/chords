@@ -177,6 +177,9 @@ catalogs:
       specifier: ^1.2.0
       version: 1.2.0
 
+patchedDependencies:
+  '@keychord/config@0.0.12': 89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8
+
 importers:
 
   .:
@@ -207,7 +210,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-betterdisplay':
     dependencies:
@@ -226,7 +229,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -244,7 +247,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-chromium':
     dependencies:
@@ -269,7 +272,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -290,7 +293,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -305,7 +308,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.AccessibilityInspector':
     dependencies:
@@ -318,7 +321,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.ActivityMonitor':
     dependencies:
@@ -331,7 +334,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.AddressBook':
     dependencies:
@@ -344,7 +347,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.AppStore':
     dependencies:
@@ -357,7 +360,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.Automator':
     dependencies:
@@ -370,7 +373,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.BluetoothFileExchange':
     dependencies:
@@ -383,7 +386,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.Chess':
     dependencies:
@@ -396,7 +399,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.ColorSyncUtility':
     dependencies:
@@ -409,7 +412,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.Console':
     dependencies:
@@ -422,7 +425,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.DVDPlayer':
     dependencies:
@@ -435,7 +438,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.DeskCam':
     dependencies:
@@ -448,7 +451,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.Dictionary':
     dependencies:
@@ -461,7 +464,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.DigitalColorMeter':
     dependencies:
@@ -474,7 +477,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.DirectoryUtility':
     dependencies:
@@ -487,7 +490,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.DiskUtility':
     dependencies:
@@ -500,7 +503,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.FaceTime':
     dependencies:
@@ -513,7 +516,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.FolderActionsSetup':
     devDependencies:
@@ -522,7 +525,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.FontBook':
     dependencies:
@@ -535,7 +538,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.GenerativePlaygroundApp':
     dependencies:
@@ -548,7 +551,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.Home':
     dependencies:
@@ -561,7 +564,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.Image_Capture':
     dependencies:
@@ -574,7 +577,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.Magnifier':
     dependencies:
@@ -587,7 +590,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.Maps':
     dependencies:
@@ -600,7 +603,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.MigrateAssistant':
     dependencies:
@@ -613,7 +616,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.MobileSMS':
     dependencies:
@@ -626,7 +629,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.Music':
     dependencies:
@@ -639,7 +642,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.Notes':
     dependencies:
@@ -652,7 +655,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.Passwords':
     dependencies:
@@ -665,7 +668,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.PhotoBooth':
     dependencies:
@@ -678,7 +681,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.Photos':
     dependencies:
@@ -691,7 +694,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.Preview':
     dependencies:
@@ -704,7 +707,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.QuickTimePlayerX':
     dependencies:
@@ -717,7 +720,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.Safari':
     dependencies:
@@ -730,7 +733,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -752,7 +755,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -771,7 +774,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.ScriptEditor2':
     dependencies:
@@ -784,7 +787,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.Spotlight':
     devDependencies:
@@ -793,7 +796,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -812,7 +815,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.SystemProfiler':
     dependencies:
@@ -825,7 +828,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.TV':
     dependencies:
@@ -838,7 +841,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.TextEdit':
     dependencies:
@@ -851,7 +854,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.Ticket-Viewer':
     dependencies:
@@ -864,7 +867,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.VoiceMemos':
     dependencies:
@@ -877,7 +880,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.VoiceOverUtility':
     dependencies:
@@ -890,7 +893,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.airport.airportutility':
     dependencies:
@@ -903,7 +906,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.appleseed.FeedbackAssistant':
     dependencies:
@@ -916,7 +919,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.archiveutility':
     dependencies:
@@ -929,7 +932,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.audio.AudioMIDISetup':
     dependencies:
@@ -942,7 +945,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.calculator':
     dependencies:
@@ -955,7 +958,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.clock':
     dependencies:
@@ -968,7 +971,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.finder':
     dependencies:
@@ -981,7 +984,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.findmy':
     dependencies:
@@ -994,7 +997,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.freeform':
     dependencies:
@@ -1007,7 +1010,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.games':
     dependencies:
@@ -1020,7 +1023,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.grapher':
     dependencies:
@@ -1033,7 +1036,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.helpviewer':
     dependencies:
@@ -1046,7 +1049,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.iBooksX':
     dependencies:
@@ -1059,7 +1062,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.iCal':
     dependencies:
@@ -1072,7 +1075,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.journal':
     dependencies:
@@ -1085,7 +1088,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.keychainaccess':
     dependencies:
@@ -1098,7 +1101,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.mail':
     dependencies:
@@ -1111,7 +1114,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.mobilephone':
     dependencies:
@@ -1124,7 +1127,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.news':
     dependencies:
@@ -1137,7 +1140,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.podcasts':
     dependencies:
@@ -1150,7 +1153,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.printcenter':
     dependencies:
@@ -1163,7 +1166,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.reminders':
     dependencies:
@@ -1176,7 +1179,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.screencaptureui':
     dependencies:
@@ -1189,7 +1192,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.shortcuts':
     dependencies:
@@ -1202,7 +1205,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.stocks':
     dependencies:
@@ -1215,7 +1218,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.systempreferences':
     devDependencies:
@@ -1224,7 +1227,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -1243,7 +1246,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.wifi.diagnostics':
     dependencies:
@@ -1256,7 +1259,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-dock':
     devDependencies:
@@ -1268,7 +1271,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -1283,7 +1286,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -1311,7 +1314,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -1326,7 +1329,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -1344,7 +1347,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -1359,7 +1362,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -1374,7 +1377,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -1392,7 +1395,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -1420,7 +1423,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -1441,7 +1444,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -1456,7 +1459,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -1474,7 +1477,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -1492,7 +1495,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-vscode':
     dependencies:
@@ -1505,7 +1508,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -1530,7 +1533,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -1552,7 +1555,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -1567,7 +1570,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -1582,7 +1585,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -1597,7 +1600,7 @@ importers:
         version: link:../chordtest
       '@keychord/config':
         specifier: 'catalog:'
-        version: 0.0.12
+        version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
       '@keychord/tsconfig':
         specifier: 'catalog:'
         version: 0.0.6
@@ -3564,7 +3567,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.6.0
 
-  '@keychord/config@0.0.12':
+  '@keychord/config@0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)':
     dependencies:
       node-swift: 1.5.1
       smol-toml: 1.9.1

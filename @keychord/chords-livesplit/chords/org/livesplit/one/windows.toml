@@ -1,0 +1,12 @@
+name = 'LiveSplit One'
+executables = ['LiveSplit One.exe', 'livesplit-one.exe']
+
+[meta]
+chord = '>=0.3.4'
+
+[on.livesplit]
+file = 'livesplit-windows.js'
+
+[chords]
+
+'v,tm' = { name = 'Vary Setting: Time Milliseconds', '@input:livesplit' = ['TOGGLE_MILLISECONDS'] }

@@ -1,0 +1,11 @@
+name = 'Google Chrome'
+executables = [
+  'chrome',
+  'google-chrome',
+  'google-chrome-stable',
+  'google-chrome-beta',
+  'google-chrome-unstable',
+]
+
+[[import]]
+file = 'google.desktop.toml'

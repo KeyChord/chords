@@ -1,0 +1,8 @@
+name = 'Google Chrome'
+executables = ['chrome.exe']
+
+[[import]]
+file = 'google.desktop.toml'
+
+[[import]]
+file = 'window.windows.toml'

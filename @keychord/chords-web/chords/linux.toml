@@ -1,0 +1,17 @@
+name = 'Web chords'
+
+[meta]
+chord = '>=0.3.4'
+
+[on.scroll]
+file = 'web-desktop.js'
+
+[placeholders]
+"<>" = { name = 'Web scrolling prefix', default = 'b' }
+
+[chords]
+'?<>' = { name = 'Web scrolling' }
+'<>n' = { name = 'Scroll up', '@input:scroll' = ['NORTH'] }
+'<>s' = { name = 'Scroll down', '@input:scroll' = ['SOUTH'] }
+'<>e' = { name = 'Scroll right', '@input:scroll' = ['EAST'] }
+'<>w' = { name = 'Scroll left', '@input:scroll' = ['WEST'] }

@@ -8,6 +8,10 @@ Chord's own controls, in the `0` namespace. Chord bundles this package's
 there's nothing to install, and it can't be removed, disabled or overridden. Other
 packages can't define chords in the `0` namespace.
 
+These controls use Chord’s built-in actions on Linux, macOS, and Windows. The
+file keeps its original `macos.toml` name so saved bindings use the same path
+on every platform.
+
 | Chord                 | Result                                  |
 | --------------------- | --------------------------------------- |
 | `0,`                  | Open Chord's settings                   |

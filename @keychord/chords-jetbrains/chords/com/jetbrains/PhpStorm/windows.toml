@@ -1,0 +1,5 @@
+name = 'PhpStorm'
+executables = ['phpstorm64.exe', 'phpstorm.exe']
+
+[[import]]
+file = 'base-windows.toml'

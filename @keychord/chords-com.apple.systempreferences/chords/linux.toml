@@ -1,0 +1,10 @@
+name = 'GNOME Settings'
+
+[meta]
+chord = '>=0.3.4'
+
+[placeholders]
+"<>" = { name = 'System Settings prefix', default = '/' }
+
+[chords]
+'<>,' = { name = 'GNOME Settings', shell = 'command -v gnome-control-center >/dev/null && { gnome-control-center </dev/null >/dev/null 2>&1 & }' }

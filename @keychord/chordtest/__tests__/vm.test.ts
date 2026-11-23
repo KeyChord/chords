@@ -54,14 +54,17 @@ describe("isolated macOS testing", () => {
     expect(script).toContain("CHORD_SKIP_NATIVE=1 vp run build");
   });
 
-  test("quotes paths without interpreting shell metacharacters", () => {
-    const path = "packages/test's $(echo wrong)/__tests__";
-    const quoted = shellQuote(path);
-    const result = Bun.spawnSync(["/bin/sh", "-c", `printf '%s' ${quoted}`]);
-    expect(result.exitCode).toBe(0);
-    expect(result.stdout.toString()).toBe(path);
-    expect(() => guestTestScript([path])).toThrow("No macOS VM tests");
-  });
+  test.skipIf(process.platform === "win32")(
+    "quotes paths without interpreting shell metacharacters",
+    () => {
+      const path = "packages/test's $(echo wrong)/__tests__";
+      const quoted = shellQuote(path);
+      const result = Bun.spawnSync(["/bin/sh", "-c", `printf '%s' ${quoted}`]);
+      expect(result.exitCode).toBe(0);
+      expect(result.stdout.toString()).toBe(path);
+      expect(() => guestTestScript([path])).toThrow("No macOS VM tests");
+    },
+  );
 
   test("selected suites build only their packages and workspace dependencies", () => {
     const script = guestTestScript(["@keychord/chords-dock", "@keychord/chords-menu"]);

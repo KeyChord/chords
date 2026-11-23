@@ -1,0 +1,24 @@
+name = 'GNOME Settings'
+executables = ['gnome-control-center']
+
+[meta]
+chord = '>=0.3.4'
+
+[chords]
+'?g' = { name = 'Go to Settings Page' }
+'gwi' = { name = 'Go to Wi-Fi', shell = 'command -v gnome-control-center >/dev/null && { gnome-control-center wifi </dev/null >/dev/null 2>&1 & }' }
+'gbl' = { name = 'Go to Bluetooth', shell = 'command -v gnome-control-center >/dev/null && { gnome-control-center bluetooth </dev/null >/dev/null 2>&1 & }' }
+'gne' = { name = 'Go to Network', shell = 'command -v gnome-control-center >/dev/null && { gnome-control-center network </dev/null >/dev/null 2>&1 & }' }
+'gba' = { name = 'Go to Power', shell = 'command -v gnome-control-center >/dev/null && { gnome-control-center power </dev/null >/dev/null 2>&1 & }' }
+'gac' = { name = 'Go to Accessibility', shell = 'command -v gnome-control-center >/dev/null && { gnome-control-center universal-access </dev/null >/dev/null 2>&1 & }' }
+'gdd' = { name = 'Go to Multitasking', shell = 'command -v gnome-control-center >/dev/null && { gnome-control-center multitasking </dev/null >/dev/null 2>&1 & }' }
+'gdi' = { name = 'Go to Displays', shell = 'command -v gnome-control-center >/dev/null && { gnome-control-center display </dev/null >/dev/null 2>&1 & }' }
+'gsp' = { name = 'Go to Search', shell = 'command -v gnome-control-center >/dev/null && { gnome-control-center search </dev/null >/dev/null 2>&1 & }' }
+'gwa' = { name = 'Go to Background', shell = 'command -v gnome-control-center >/dev/null && { gnome-control-center background </dev/null >/dev/null 2>&1 & }' }
+'gno' = { name = 'Go to Notifications', shell = 'command -v gnome-control-center >/dev/null && { gnome-control-center notifications </dev/null >/dev/null 2>&1 & }' }
+'gso' = { name = 'Go to Sound', shell = 'command -v gnome-control-center >/dev/null && { gnome-control-center sound </dev/null >/dev/null 2>&1 & }' }
+'gps' = { name = 'Go to Privacy', shell = 'command -v gnome-control-center >/dev/null && { gnome-control-center privacy </dev/null >/dev/null 2>&1 & }' }
+'gia' = { name = 'Go to Online Accounts', shell = 'command -v gnome-control-center >/dev/null && { gnome-control-center online-accounts </dev/null >/dev/null 2>&1 & }' }
+'gke' = { name = 'Go to Keyboard', shell = 'command -v gnome-control-center >/dev/null && { gnome-control-center keyboard </dev/null >/dev/null 2>&1 & }' }
+'gtr' = { name = 'Go to Mouse & Touchpad', shell = 'command -v gnome-control-center >/dev/null && { gnome-control-center mouse </dev/null >/dev/null 2>&1 & }' }
+'gpr' = { name = 'Go to Printers', shell = 'command -v gnome-control-center >/dev/null && { gnome-control-center printers </dev/null >/dev/null 2>&1 & }' }

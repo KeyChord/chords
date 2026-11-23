@@ -1,0 +1,48 @@
+name = 'Windows Taskbar'
+
+[meta]
+chord = '>=0.3.4'
+
+[placeholders]
+"<>" = { name = 'Taskbar prefix', default = 't' }
+
+[chords]
+'?<>' = { name = 'Windows Taskbar' }
+'<>v' = { name = 'Focus Taskbar', shortcut = 'super+t' }
+'<>w[' = { name = 'Previous Taskbar Item', shortcut = 'super+shift+t' }
+'<>w]' = { name = 'Next Taskbar Item', shortcut = 'super+t' }
+
+'<>1' = { name = 'Open or Switch to Taskbar App 1', shortcut = 'super+1' }
+'<>2' = { name = 'Open or Switch to Taskbar App 2', shortcut = 'super+2' }
+'<>3' = { name = 'Open or Switch to Taskbar App 3', shortcut = 'super+3' }
+'<>4' = { name = 'Open or Switch to Taskbar App 4', shortcut = 'super+4' }
+'<>5' = { name = 'Open or Switch to Taskbar App 5', shortcut = 'super+5' }
+'<>6' = { name = 'Open or Switch to Taskbar App 6', shortcut = 'super+6' }
+'<>7' = { name = 'Open or Switch to Taskbar App 7', shortcut = 'super+7' }
+'<>8' = { name = 'Open or Switch to Taskbar App 8', shortcut = 'super+8' }
+'<>9' = { name = 'Open or Switch to Taskbar App 9', shortcut = 'super+9' }
+'<>0' = { name = 'Open or Switch to Taskbar App 10', shortcut = 'super+0' }
+
+'?<>n' = { name = 'Open New Taskbar Window' }
+'<>n1' = { name = 'Open New Taskbar Window 1', shortcut = 'super+shift+1' }
+'<>n2' = { name = 'Open New Taskbar Window 2', shortcut = 'super+shift+2' }
+'<>n3' = { name = 'Open New Taskbar Window 3', shortcut = 'super+shift+3' }
+'<>n4' = { name = 'Open New Taskbar Window 4', shortcut = 'super+shift+4' }
+'<>n5' = { name = 'Open New Taskbar Window 5', shortcut = 'super+shift+5' }
+'<>n6' = { name = 'Open New Taskbar Window 6', shortcut = 'super+shift+6' }
+'<>n7' = { name = 'Open New Taskbar Window 7', shortcut = 'super+shift+7' }
+'<>n8' = { name = 'Open New Taskbar Window 8', shortcut = 'super+shift+8' }
+'<>n9' = { name = 'Open New Taskbar Window 9', shortcut = 'super+shift+9' }
+'<>n0' = { name = 'Open New Taskbar Window 10', shortcut = 'super+shift+0' }
+
+'?<>j' = { name = 'Open Taskbar Jump List' }
+'<>j1' = { name = 'Open Taskbar Jump List 1', shortcut = 'super+alt+1' }
+'<>j2' = { name = 'Open Taskbar Jump List 2', shortcut = 'super+alt+2' }
+'<>j3' = { name = 'Open Taskbar Jump List 3', shortcut = 'super+alt+3' }
+'<>j4' = { name = 'Open Taskbar Jump List 4', shortcut = 'super+alt+4' }
+'<>j5' = { name = 'Open Taskbar Jump List 5', shortcut = 'super+alt+5' }
+'<>j6' = { name = 'Open Taskbar Jump List 6', shortcut = 'super+alt+6' }
+'<>j7' = { name = 'Open Taskbar Jump List 7', shortcut = 'super+alt+7' }
+'<>j8' = { name = 'Open Taskbar Jump List 8', shortcut = 'super+alt+8' }
+'<>j9' = { name = 'Open Taskbar Jump List 9', shortcut = 'super+alt+9' }
+'<>j0' = { name = 'Open Taskbar Jump List 10', shortcut = 'super+alt+0' }

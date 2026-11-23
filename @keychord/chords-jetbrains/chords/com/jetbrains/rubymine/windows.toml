@@ -1,0 +1,5 @@
+name = 'RubyMine'
+executables = ['rubymine64.exe', 'rubymine.exe']
+
+[[import]]
+file = 'base-windows.toml'

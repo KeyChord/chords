@@ -8,7 +8,7 @@ package, in [Chord](https://github.com/KeyChord/Chord) open Settings → Chords 
 **Chord Monorepos** → **Add Monorepo**, enter `KeyChord/chords`, then tick
 `@keychord/chords-raycast` under **Packages to use**.
 
-Use `/<query>` to activate Raycast's first result. For example, `/calculator`
+On macOS, use `/<query>` to activate Raycast's first result. For example, `/calculator`
 searches for `calculator` and opens its first match. Complete the chord using
 Chord's usual completion key. `/` alone opens Raycast.
 
@@ -24,6 +24,34 @@ While Raycast is focused, these chords press its keyboard shortcuts:
 | `nw` / `ne` | Navigate west / east (Left / Right)                 |
 | `p[` / `p]` | Previous / next page (Option-Up / Option-Down)      |
 | `s[` / `s]` | Previous / next section (Command-Up / Command-Down) |
+
+## Windows
+
+Install [Raycast for Windows](https://www.raycast.com/windows) and use Chord 0.3.4
+or newer. `/` opens Raycast using its registered URL protocol. The same
+navigation chords are available when Raycast is focused. Page navigation
+uses Alt-Up and Alt-Down, and section navigation uses Ctrl-Up and Ctrl-Down.
+[Raycast keyboard shortcuts](https://manual.raycast.com/keyboard-shortcuts)
+
+Use a command deeplink from Raycast's **Copy Deeplink** action to open a specific
+command. You can also use a deeplink as the argument to the `raycast` handler in
+a local copy of the package's Windows Chords file. For example, replace the URL
+below with the one Raycast copied for your command.
+
+```toml
+[chords]
+'<>clips' = { name = 'Clipboard History', '@input:raycast' = [
+  'raycast://extensions/raycast/clipboard-history/clipboard-history',
+] }
+```
+
+Raycast handles any confirmation prompt. The automatic first-result activation
+described below uses macOS Accessibility. For arbitrary queries on Windows, open
+Raycast with `/` and choose the result in Root Search.
+[Raycast command deeplinks](https://developers.raycast.com/information/lifecycle/deeplinks)
+
+Raycast is available for macOS and Windows. This package depends on Raycast's
+installed desktop app. [Raycast platform availability](https://www.raycast.com/faq)
 
 ## Direct command launches
 

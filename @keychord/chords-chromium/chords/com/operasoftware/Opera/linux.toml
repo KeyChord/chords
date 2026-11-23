@@ -1,0 +1,5 @@
+name = 'Opera'
+executables = ['opera', 'opera-beta', 'opera-developer']
+
+[[import]]
+file = 'opera.desktop.toml'

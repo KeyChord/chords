@@ -49,6 +49,15 @@ test("every chord runs exactly one aerospace command", () => {
   }
 });
 
+test("the Windows bindings dispatch the same supported commands through aerospace.exe", async () => {
+  const windows = await read(join(root, "chords/windows.toml"));
+  expect(windows.placeholders).toEqual(definition.placeholders);
+  expect(Object.keys(windows.chords).sort()).toEqual(Object.keys(definition.chords).sort());
+  for (const [input, { shell }] of chords) {
+    expect(windows.chords[input].shell).toBe(shell!.replace(/^aerospace /, "aerospace.exe "));
+  }
+});
+
 test("relative workspace commands opt out of stdin, which Chord's shell never has", () => {
   // Without a terminal, `workspace next|prev` and `move-node-to-workspace next|prev` fail with
   // "Implicit stdin is detected" unless --stdin or --no-stdin is given.

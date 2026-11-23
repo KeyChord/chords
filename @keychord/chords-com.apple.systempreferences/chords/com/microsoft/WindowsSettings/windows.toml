@@ -1,0 +1,29 @@
+name = 'Windows Settings'
+executables = ['SystemSettings.exe']
+
+[meta]
+chord = '>=0.3.4'
+
+[chords]
+'?g' = { name = 'Go to Settings Page' }
+'gaa' = { name = 'Go to Your Info', shell = 'start "" "ms-settings:yourinfo"' }
+'gwi' = { name = 'Go to Wi-Fi', shell = 'start "" "ms-settings:network-wifi"' }
+'gbl' = { name = 'Go to Bluetooth', shell = 'start "" "ms-settings:bluetooth"' }
+'gne' = { name = 'Go to Network & Internet', shell = 'start "" "ms-settings:network-status"' }
+'gvp' = { name = 'Go to VPN', shell = 'start "" "ms-settings:network-vpn"' }
+'gba' = { name = 'Go to Power & Battery', shell = 'start "" "ms-settings:powersleep"' }
+'gge' = { name = 'Go to About', shell = 'start "" "ms-settings:about"' }
+'gac' = { name = 'Go to Accessibility Display', shell = 'start "" "ms-settings:easeofaccess-display"' }
+'gap' = { name = 'Go to Personalization', shell = 'start "" "ms-settings:personalization"' }
+'gdd' = { name = 'Go to Taskbar', shell = 'start "" "ms-settings:taskbar"' }
+'gdi' = { name = 'Go to Display', shell = 'start "" "ms-settings:display"' }
+'gwa' = { name = 'Go to Background', shell = 'start "" "ms-settings:personalization-background"' }
+'gno' = { name = 'Go to Notifications', shell = 'start "" "ms-settings:notifications"' }
+'gso' = { name = 'Go to Sound', shell = 'start "" "ms-settings:sound"' }
+'gls' = { name = 'Go to Lock Screen', shell = 'start "" "ms-settings:lockscreen"' }
+'gps' = { name = 'Go to Privacy', shell = 'start "" "ms-settings:privacy"' }
+'gtp' = { name = 'Go to Sign-in Options', shell = 'start "" "ms-settings:signinoptions"' }
+'gia' = { name = 'Go to Email & Accounts', shell = 'start "" "ms-settings:emailandaccounts"' }
+'gke' = { name = 'Go to Typing', shell = 'start "" "ms-settings:typing"' }
+'gtr' = { name = 'Go to Mouse & Touchpad', shell = 'start "" "ms-settings:mousetouchpad"' }
+'gpr' = { name = 'Go to Printers & Scanners', shell = 'start "" "ms-settings:printers"' }

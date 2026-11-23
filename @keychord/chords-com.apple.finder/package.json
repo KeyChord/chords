@@ -2,7 +2,7 @@
   "name": "@keychord/chords-com.apple.finder",
   "displayName": "Finder Chords",
   "version": "0.0.2",
-  "description": "Chords for Finder and file open and save dialogs.",
+  "description": "Chords for Finder, GNOME Files, and Windows File Explorer.",
   "categories": [
     "macOS"
   ],

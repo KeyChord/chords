@@ -3,15 +3,18 @@
 > [!NOTE]
 > This document is largely AI-written, so parts of it may not be fully accurate. It will be replaced with a hand-written version when I get the time.
 
-Global macOS navigation through Accessibility, for whichever app is focused. The app
-captured when chord mode opens is brought forward before acting; a queued chord retains
-its own target. To install, in [Chord](https://github.com/KeyChord/Chord) open Settings →
+Global navigation chords for the focused app. To install, in [Chord](https://github.com/KeyChord/Chord) open Settings →
 Chords → **Chord Monorepos** → **Add Monorepo**, enter `KeyChord/chords`, then tick
 `@keychord/chords-navigation` under **Packages to use**.
 
 Every chord starts with the package's `<>` prefix, `;n` by default. To reach them with fewer
 keys, choose another prefix under Settings → Chords → **Placeholders**: with `[`, `;n[` becomes `[[`. The examples
 below use the default.
+
+## macOS
+
+Accessibility brings the app captured when Chord mode opens forward before acting.
+A queued chord retains its own target.
 
 - `;n[`: go back, or dismiss the active dialog/popover with cancel or Escape.
 - `;n]`: press the default action, or the next/continue button in the header.
@@ -34,3 +37,14 @@ Requires macOS 14+ and Chord's Accessibility permission. Build with `vp pack`;
 run handler tests with `vp run test` (`bun test --isolate`). From the monorepo root, run
 `vp run test:macos -- @keychord/chords-navigation` for native regression checks,
 including WhatsApp's group picker and wallpaper-style dialogs.
+
+## Linux and Windows
+
+These shortcuts go to the app that has keyboard focus when the chord runs. The app
+decides how to handle each key.
+
+- `;n[` sends Alt+Left to go back in apps with navigation history.
+- `;n]` sends Enter to activate the focused control or the dialog's default action.
+- `;nx` sends Escape to cancel or dismiss the current dialog or menu.
+
+Numbered option selection requires the macOS Accessibility handler.

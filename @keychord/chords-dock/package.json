@@ -2,7 +2,7 @@
   "name": "@keychord/chords-dock",
   "displayName": "Dock Chords",
   "version": "0.0.2",
-  "description": "Move keyboard focus to the macOS Dock and between its apps.",
+  "description": "Open and switch apps from the macOS Dock, GNOME Dash, or Windows taskbar.",
   "categories": [
     "macOS"
   ],

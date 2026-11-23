@@ -1,0 +1,172 @@
+name = "JetBrains Desktop Chords"
+
+# Shared bindings from JetBrains' Windows and XWin keymaps.
+[chords]
+'?e' = { name = "Editor" }
+'es' = { name = "Editor: Solutions", shortcut = "alt+enter" }
+'ef' = { name = "Editor: Focus", shortcut = "esc" }
+'eq' = { name = "Editor: Quit", shortcut = "ctrl+f4" }
+
+'?t' = { name = "Tab" }
+'tv' = { name = "Tab: Previous", shortcut = "alt+left" }
+'tx' = { name = "Tab: Next", shortcut = "alt+right" }
+'tb' = { name = "Tab: Switch to Recent", shortcut = "ctrl+tab" }
+
+'?f' = { name = "Find/File" }
+'fr' = { name = "Find and Replace", shortcut = "ctrl+r" }
+'f]' = { name = "Find: Next", shortcut = "f3" }
+'f[' = { name = "Find: Previous", shortcut = "shift+f3" }
+'fg' = { name = "Find Globally", shortcut = "ctrl+shift+f" }
+'frg' = { name = "Find and Replace Globally", shortcut = "ctrl+shift+r" }
+'fa' = { name = "Find Action", shortcut = "ctrl+shift+a" }
+
+'fp' = { name = "File: Path", shortcut = "ctrl+shift+c" }
+'fb' = { name = "File: Back", shortcut = "ctrl+e" }
+'fn' = { name = "File: New", shortcut = "ctrl+alt+insert" }
+'fns' = { name = "File: New Scratch", shortcut = "ctrl+alt+shift+insert" }
+'ft' = { name = "File: Safe Delete", shortcut = "alt+delete" }
+'fvs' = { name = "File: View Structure", shortcut = "ctrl+f12" }
+
+'?b' = { name = "Build" }
+'bp' = { name = "Build Project", shortcut = "ctrl+f9" }
+'br' = { name = "Build: Rebuild", shortcut = "ctrl+shift+f9" }
+
+'?s' = { name = "Search" }
+'sg' = { name = "Search: Globally", shortcut = "shift shift" }
+'st' = { name = "Search: Types", shortcut = "ctrl+n" }
+'sf' = { name = "Search: Files", shortcut = "ctrl+shift+n" }
+'sy' = { name = "Search: Symbols", shortcut = "ctrl+alt+shift+n" }
+'sa' = { name = "Search: All", shortcut = "ctrl+shift+a" }
+
+'ph' = { name = "Paste from History...", shortcut = "ctrl+shift+v" }
+'cpp' = { name = "Copy Paths", shortcut = "ctrl+shift+c" }
+'cpr' = { name = "Copy Reference", shortcut = "ctrl+alt+shift+c" }
+'sva' = { name = "Save All", shortcut = "ctrl+s" }
+'ud' = { name = "Undo", shortcut = "ctrl+z" }
+'rd' = { name = "Redo", shortcut = "ctrl+shift+z" }
+'is' = { name = "Indent Selection", shortcut = "tab" }
+'uis' = { name = "Unindent Selection", shortcut = "shift+tab" }
+'ail' = { name = "Auto-Indent Lines", shortcut = "ctrl+alt+i" }
+'ln' = { name = "Line: New", shortcut = "shift+enter" }
+'lb' = { name = "Line: Before New", shortcut = "ctrl+alt+enter" }
+'ld' = { name = "Line: Delete", shortcut = "ctrl+y" }
+'lj' = { name = "Line: Join", shortcut = "ctrl+shift+j" }
+'lc' = { name = "Line: Clone", shortcut = "ctrl+d" }
+'tgc' = { name = "Toggle Case", shortcut = "ctrl+shift+u" }
+'os' = { name = "Open Source", shortcut = "shift+f4" }
+'fsi' = { name = "Font Size: Increase", shortcut = "alt+shift+." }
+'fsd' = { name = "Font Size: Decrease", shortcut = "alt+shift+comma" }
+
+'?ff' = { name = "Folding" }
+'ff' = { name = "Folding: Fold", shortcut = "ctrl+numsub" }
+'ffs' = { name = "Folding: Fold Selection", shortcut = "ctrl+." }
+'ffa' = { name = "Folding: Fold All", shortcut = "ctrl+shift+numsub" }
+'ffr' = { name = "Folding: Fold Recursively", shortcut = "ctrl+alt+numsub" }
+
+'?fu' = { name = "Folding Unfold" }
+'fu' = { name = "Folding: Unfold", shortcut = "ctrl+numadd" }
+'fua' = { name = "Folding: Unfold All", shortcut = "ctrl+shift+numadd" }
+'fur' = { name = "Folding: Unfold Recursively", shortcut = "ctrl+alt+numadd" }
+
+'?c' = { name = "Completion / Code / Context" }
+'cb' = { name = "Completion: Basic", shortcut = "ctrl+space" }
+'ct' = { name = "Completion: Type-Matching", shortcut = "ctrl+shift+space" }
+'cs' = { name = "Completion: Second Basic", shortcut = "ctrl+alt+space" }
+'ccs' = { name = "Completion: Current Statement", shortcut = "ctrl+shift+enter" }
+'cf' = { name = "Code: Format", shortcut = "ctrl+alt+l" }
+'cd' = { name = "Code: Documentation", shortcut = "ctrl+q" }
+'cp' = { name = "Code: Parameter Info", shortcut = "ctrl+p" }
+'cc' = { name = "Code: Comment", shortcut = "ctrl+/" }
+'ccb' = { name = "Code: Comment Block", shortcut = "ctrl+shift+/" }
+'cg' = { name = "Code: Generate", shortcut = "alt+insert" }
+'csu' = { name = "Code: Statement Up", shortcut = "ctrl+shift+up" }
+'csd' = { name = "Code: Statement Down", shortcut = "ctrl+shift+down" }
+'cel' = { name = "Code: Element Left", shortcut = "ctrl+alt+shift+left" }
+'cer' = { name = "Code: Element Right", shortcut = "ctrl+alt+shift+right" }
+'clu' = { name = "Code: Line Up", shortcut = "alt+shift+up" }
+'cld' = { name = "Code: Line Down", shortcut = "alt+shift+down" }
+'ci' = { name = "Code: Intention Actions", shortcut = "alt+enter" }
+'ce' = { name = "Code: Error Description", shortcut = "ctrl+f1" }
+'c]' = { name = "Context: Next", shortcut = "ctrl+alt+right" }
+'c[' = { name = "Context: Previous", shortcut = "ctrl+alt+left" }
+
+'?g' = { name = "Goto / Git" }
+'gl' = { name = "Go to Line/Column...", shortcut = "ctrl+g" }
+'gk' = { name = "Goto Class", shortcut = "ctrl+n" }
+'gpx' = { name = "Goto Problem: Next", shortcut = "f2" }
+'gpv' = { name = "Goto Problem: Previous", shortcut = "shift+f2" }
+'gd' = { name = "Goto Declaration or Usages", shortcut = "ctrl+b" }
+'gy' = { name = "Goto Type Declaration", shortcut = "ctrl+shift+b" }
+'gsm' = { name = "Goto Super Method", shortcut = "ctrl+u" }
+'gi' = { name = "Goto Implementation(s)", shortcut = "ctrl+alt+b" }
+'gs' = { name = "Goto Symbol", shortcut = "ctrl+alt+shift+n" }
+'gt' = { name = "Goto Test", shortcut = "ctrl+shift+t" }
+'gcv' = { name = "Goto Change: Previous", shortcut = "ctrl+alt+shift+up" }
+'gcx' = { name = "Goto Change: Next", shortcut = "ctrl+alt+shift+down" }
+
+'?gb' = { name = "Goto Bookmark" }
+'gb0' = { name = "Goto Bookmark: 0", shortcut = "ctrl+0" }
+'gb1' = { name = "Goto Bookmark: 1", shortcut = "ctrl+1" }
+'gb2' = { name = "Goto Bookmark: 2", shortcut = "ctrl+2" }
+'gb3' = { name = "Goto Bookmark: 3", shortcut = "ctrl+3" }
+'gb4' = { name = "Goto Bookmark: 4", shortcut = "ctrl+4" }
+'gb5' = { name = "Goto Bookmark: 5", shortcut = "ctrl+5" }
+'gb6' = { name = "Goto Bookmark: 6", shortcut = "ctrl+6" }
+'gb7' = { name = "Goto Bookmark: 7", shortcut = "ctrl+7" }
+'gb8' = { name = "Goto Bookmark: 8", shortcut = "ctrl+8" }
+'gb9' = { name = "Goto Bookmark: 9", shortcut = "ctrl+9" }
+
+'go' = { name = "Git: Operations", shortcut = "alt+backtick" }
+'gc' = { name = "Git: Commit...", shortcut = "ctrl+k" }
+'gu' = { name = "Git: Update Project", shortcut = "ctrl+t" }
+'gr' = { name = "Git: Rollback", shortcut = "ctrl+alt+z" }
+'gp' = { name = "Git: Push...", shortcut = "ctrl+shift+k" }
+
+'?u' = { name = "Usages" }
+'uh' = { name = "Usages: Highlight in File", shortcut = "ctrl+shift+f7" }
+'uf' = { name = "Usages: Find", shortcut = "alt+f7" }
+
+'?r' = { name = "Run" }
+'ru' = { name = "Run...", shortcut = "alt+shift+f10" }
+'ra' = { name = "Run Anything", shortcut = "ctrl ctrl" }
+'rcc' = { name = "Run context configuration", shortcut = "shift+f10" }
+'rs' = { name = "Run: Stop", shortcut = "ctrl+f2" }
+'rr' = { name = "Run: Resume Program", shortcut = "f9" }
+'ri' = { name = "Run Inspection by Name...", shortcut = "ctrl+alt+shift+i" }
+
+'?d' = { name = "Diff" }
+'dc' = { name = "Diff: Compare Files", shortcut = "ctrl+d" }
+'ds' = { name = "Diff: Show", shortcut = "ctrl+d" }
+'dx' = { name = "Diff: Next", shortcut = "f7" }
+'dv' = { name = "Diff: Previous", shortcut = "shift+f7" }
+'do' = { name = "Diff: Opposite Pane", shortcut = "ctrl+shift+tab" }
+'dl' = { name = "Diff: Left Accept", shortcut = "ctrl+alt+r" }
+'dr' = { name = "Diff: Right Accept", shortcut = "ctrl+alt+a" }
+'dss' = { name = "Diff: Show Settings", shortcut = "ctrl+shift+d" }
+
+'?p' = { name = "Panel" }
+
+'?ph' = { name = "Panel: Hide" }
+'phc' = { name = "Panel: Hide Current", shortcut = "shift+esc" }
+'pha' = { name = "Panel: Hide All", shortcut = "ctrl+shift+f12" }
+
+'?pr' = { name = "Panel: Run / Resize" }
+'pr' = { name = "Panel: Run", shortcut = "alt+4" }
+'prl' = { name = "Panel: Resize Left", shortcut = "ctrl+alt+shift+left" }
+'prr' = { name = "Panel: Resize Right", shortcut = "ctrl+alt+shift+right" }
+'pru' = { name = "Panel: Resize Top", shortcut = "ctrl+alt+shift+up" }
+'prd' = { name = "Panel: Resize Down", shortcut = "ctrl+alt+shift+down" }
+
+'p[' = { name = "Panel: Back", shortcut = "f12" }
+'pp' = { name = "Panel: Project", shortcut = "alt+1" }
+'pm' = { name = "Panel: Marks", shortcut = "alt+2" }
+'pf' = { name = "Panel: Find", shortcut = "alt+3" }
+'pd' = { name = "Panel: Debug", shortcut = "alt+5" }
+'pi' = { name = "Panel: Issues", shortcut = "alt+6" }
+'ps' = { name = "Panel: Structure", shortcut = "alt+7" }
+'pv' = { name = "Panel: Services", shortcut = "alt+8" }
+'pg' = { name = "Panel: Git", shortcut = "alt+9" }
+'pc' = { name = "Panel: Commit", shortcut = "alt+0" }
+'pt' = { name = "Panel: Terminal", shortcut = "alt+f12" }
+
+'?z' = { name = "Zoom" }

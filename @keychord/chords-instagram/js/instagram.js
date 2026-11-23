@@ -328,6 +328,19 @@ function isInstagramTarget(target) {
     return false;
   }
 }
+function desktopEndpoint(target, port) {
+  if (!isInstagramTarget(target) || new URL(target.url).protocol !== "https:") return;
+  const endpoint = URL.parse(target.webSocketDebuggerUrl);
+  if (
+    endpoint?.protocol === "ws:" &&
+    endpoint.hostname === "127.0.0.1" &&
+    Number(endpoint.port || 80) === port &&
+    !endpoint.username &&
+    !endpoint.password &&
+    endpoint.pathname.startsWith("/devtools/page/")
+  )
+    return endpoint.href;
+}
 function evaluate(target, expression) {
   return new Promise((resolve, reject) => {
     const socket = new WebSocket(target.webSocketDebuggerUrl);
@@ -404,6 +417,59 @@ async function runInstagramJavaScript(source, port) {
   }
   if (!target) throw new Error("Focus the Instagram app before using Instagram chords.");
   return evaluate(target, source);
+}
+const pageHasFocus = `(
+  location.protocol === "https:" &&
+  (location.hostname === "instagram.com" || location.hostname.endsWith(".instagram.com")) &&
+  document.hasFocus()
+)`;
+async function runDesktopInstagramJavaScript(source, port) {
+  let targets;
+  try {
+    const response = await fetch(`http://127.0.0.1:${port}/json/list`, {
+      signal: AbortSignal.timeout(2e3),
+      redirect: "error",
+    });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    targets = await response.json();
+    if (!Array.isArray(targets)) throw new Error("Invalid browser target list.");
+  } catch (error) {
+    throw new Error(
+      `Start Brave with --remote-debugging-port=${port} and a dedicated profile. See the Instagram Chords README.`,
+      { cause: error },
+    );
+  }
+  const viable = targets.flatMap((target) => {
+    const endpoint = target && desktopEndpoint(target, port);
+    return endpoint
+      ? [
+          {
+            ...target,
+            webSocketDebuggerUrl: endpoint,
+          },
+        ]
+      : [];
+  });
+  const pages = (
+    await Promise.all(
+      viable.map(async (target) => {
+        try {
+          return (await evaluate(target, pageHasFocus)) === true ? target : null;
+        } catch {
+          return null;
+        }
+      }),
+    )
+  ).filter((target) => target !== null);
+  if (pages.length !== 1)
+    throw new Error("Focus one Instagram page in Brave before using Instagram chords.");
+  return evaluate(
+    pages[0],
+    `(() => {
+      if (!${pageHasFocus}) throw new Error("The Instagram page lost focus.");
+      return ${source};
+    })()`,
+  );
 }
 //#endregion
 //#region src/js/instagram/browser.ts
@@ -493,19 +559,31 @@ function configureBraveDebugging(port) {
 }
 //#endregion
 //#region src/js/instagram.ts
-function buildHandler(port = 9222) {
+const braveAppIds = /* @__PURE__ */ new Set([
+  "com.brave.browser",
+  "executable.brave",
+  "executable.brave-browser",
+  "executable.brave-browser-stable",
+  "executable.brave-browser-beta",
+  "executable.brave-browser-nightly",
+]);
+function buildHandler(port = 9222, mode = "macos") {
   if (!Number.isInteger(port) || port < 1 || port > 65535)
     throw new Error("The Instagram debugging port must be an integer between 1 and 65535.");
-  let startup = configureBraveDebugging(port);
+  let startup = mode === "desktop" ? Promise.resolve() : configureBraveDebugging(port);
   startup.catch((error) => console.error("Could not enable Brave debugging:", error));
   let previous = Promise.resolve();
   return function handler(action, storyNumber) {
     const pending = previous.then(async () => {
       const source = buildInstagramJavaScript(action, storyNumber);
+      if (mode === "desktop" && !braveAppIds.has(this?.focusedAppId?.toLowerCase() ?? ""))
+        throw new Error("Focus Instagram in Brave before using Instagram chords.");
       const initializing = startup;
       startup = Promise.resolve();
       await initializing;
-      const value = await runInstagramJavaScript(source, port);
+      const value = await (
+        mode === "desktop" ? runDesktopInstagramJavaScript : runInstagramJavaScript
+      )(source, port);
       const result = JSON.parse(String(value));
       if (result.ok !== true) throw new Error(result.error ?? "Instagram action failed.");
       return true;

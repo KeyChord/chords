@@ -1,7 +1,8 @@
 # @keychord/chords-rift
 
 Global `;r` chords for the [Rift](https://github.com/acsandmann/rift) tiling window
-manager. Chords need `rift-cli` on your login shell's `PATH` (Homebrew's
+manager on macOS. The package needs Rift's Mach-port service, which is available
+only on macOS. Chords need `rift-cli` on your login shell's `PATH` (Homebrew's
 `brew install acsandmann/tap/rift` puts it in `/opt/homebrew/bin`). Window management and
 config reload require Rift to be running. The `;rm`, `;rf`, `;rk`, `;rt`, and `;rb` chords run a
 handler that queries the current layout first. Rift reports success even for commands that

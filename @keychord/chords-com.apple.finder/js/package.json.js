@@ -1,8 +1,8 @@
-//#region package.json
+// package.json
 var name = "@keychord/chords-com.apple.finder";
 var displayName = "Finder Chords";
 var version = "0.0.2";
-var description = "Chords for Finder and file open and save dialogs.";
+var description = "Chords for Finder, GNOME Files, and Windows File Explorer.";
 var categories = ["macOS"];
 var repository = {
 	"type": "git",
@@ -374,287 +374,405 @@ var chords = {
 			}
 		}
 	} } } },
-	"com": { "apple": { "finder": { "macos.toml": {
-		"name": "Finder",
-		"on": { "menu": { "file": "@keychord/chords-menu/js/menu.js" } },
-		"chords": {
-			"?g": { "name": "Goto" },
-			"gr": {
-				"name": "Goto Recents",
-				"@input:menu": ["BY_PATH", ["Go", "Recents"]]
-			},
-			"gd": {
-				"name": "Goto Downloads",
-				"@input:menu": ["BY_PATH", ["Go", "Downloads"]]
-			},
-			"gdo": {
-				"name": "Goto Documents",
-				"@input:menu": ["BY_PATH", ["Go", "Documents"]]
-			},
-			"gde": {
-				"name": "Goto Desktop",
-				"shortcut": "cmd+shift+d"
-			},
-			"gh": {
-				"name": "Goto Home",
-				"shortcut": "cmd+shift+h"
-			},
-			"gc": {
-				"name": "Goto Computer",
-				"shortcut": "cmd+shift+c"
-			},
-			"gad": {
-				"name": "Goto AirDrop",
-				"shortcut": "cmd+shift+r"
-			},
-			"gn": {
-				"name": "Goto Network",
-				"shortcut": "cmd+shift+k"
-			},
-			"gid": {
-				"name": "Goto iCloud Drive",
-				"shortcut": "cmd+shift+i"
-			},
-			"gs": {
-				"name": "Goto Shared",
-				"@input:menu": ["BY_PATH", ["Go", "Shared"]]
-			},
-			"ga": {
-				"name": "Goto Applications",
-				"shortcut": "cmd+shift+a"
-			},
-			"gu": {
-				"name": "Goto Utilities",
-				"@input:menu": ["BY_PATH", ["Go", "Utilities"]]
-			},
-			"gf": {
-				"name": "Goto Folder",
-				"shortcut": "cmd+shift+g"
-			},
-			"gt": {
-				"name": "Goto Trash",
-				"shell": "open -b com.apple.finder \"$HOME/.Trash\""
-			},
-			"?d": { "name": "Directory" },
-			"du": {
-				"name": "Directory: Up",
-				"shortcut": "cmd+up"
-			},
-			"duw": {
-				"name": "Directory: Up Window",
-				"@input:menu": ["BY_KEY", ["Go", "Enclosing Folder in New Window"]]
-			},
-			"?f": { "name": "File" },
-			"fa": {
-				"name": "File: Alias",
-				"shortcut": "ctrl+cmd+a"
-			},
-			"fe": {
-				"name": "File: Eject",
-				"@input:menu": ["BY_PATH", ["File", "Eject"]]
-			},
-			"fc": {
-				"name": "File: Compress",
-				"@input:menu": ["BY_PATH", ["File", "Compress"]]
-			},
-			"fr": {
-				"name": "File: Rename",
-				"@input:menu": ["BY_PATH", ["File", "Rename"]]
-			},
-			"ft": {
-				"name": "File: Trash",
-				"@input:menu": ["BY_PATH", ["File", "Move to Trash"]]
-			},
-			"fd": {
-				"name": "File: Duplicate",
-				"shortcut": "cmd+d"
-			},
-			"fq": {
-				"name": "File: Quick Look",
-				"@input:menu": ["BY_PATH", ["File", "Quick Look"]]
-			},
-			"fo": {
-				"name": "File: Open",
-				"shortcut": "cmd+down"
-			},
-			"?a": { "name": "as" },
-			"ai": {
-				"name": "as Icons",
-				"@input:menu": ["BY_PATH", ["View", "as Icons"]]
-			},
-			"al": {
-				"name": "as List",
-				"@input:menu": ["BY_PATH", ["View", "as List"]]
-			},
-			"ac": {
-				"name": "as Columns",
-				"@input:menu": ["BY_PATH", ["View", "as Columns"]]
-			},
-			"ag": {
-				"name": "as Gallery",
-				"@input:menu": ["BY_PATH", ["View", "as Gallery"]]
-			},
-			"?s": { "name": "Sort" },
-			"sn": {
-				"name": "Sort: Name",
-				"@input:menu": ["BY_PATH", [
-					"View",
-					"Sort By",
-					"Name"
-				]]
-			},
-			"sk": {
-				"name": "Sort: Kind",
-				"@input:menu": ["BY_PATH", [
-					"View",
-					"Sort By",
-					"Kind"
-				]]
-			},
-			"so": {
-				"name": "Sort: Opened Date",
-				"@input:menu": ["BY_PATH", [
-					"View",
-					"Sort By",
-					"Date Last Opened"
-				]]
-			},
-			"sa": {
-				"name": "Sort: Added Date",
-				"@input:menu": ["BY_PATH", [
-					"View",
-					"Sort By",
-					"Date Added"
-				]]
-			},
-			"sm": {
-				"name": "Sort: Modified Date",
-				"@input:menu": ["BY_PATH", [
-					"View",
-					"Sort By",
-					"Date Modified"
-				]]
-			},
-			"sc": {
-				"name": "Sort: Created Date",
-				"@input:menu": ["BY_PATH", [
-					"View",
-					"Sort By",
-					"Date Created"
-				]]
-			},
-			"ss": {
-				"name": "Sort: Size",
-				"@input:menu": ["BY_PATH", [
-					"View",
-					"Sort By",
-					"Size"
-				]]
-			},
-			"st": {
-				"name": "Sort: Tags",
-				"@input:menu": ["BY_PATH", [
-					"View",
-					"Sort By",
-					"Tags"
-				]]
-			},
-			"?c": { "name": "Clean" },
-			"cn": {
-				"name": "Clean: Name",
-				"@input:menu": ["BY_PATH", [
-					"View",
-					"Clean Up By",
-					"Name"
-				]]
-			},
-			"ck": {
-				"name": "Clean: Kind",
-				"@input:menu": ["BY_PATH", [
-					"View",
-					"Clean Up By",
-					"Kind"
-				]]
-			},
-			"cm": {
-				"name": "Clean: Modified Date",
-				"@input:menu": ["BY_PATH", [
-					"View",
-					"Clean Up By",
-					"Date Modified"
-				]]
-			},
-			"cc": {
-				"name": "Clean: Created Date",
-				"@input:menu": ["BY_PATH", [
-					"View",
-					"Clean Up By",
-					"Date Created"
-				]]
-			},
-			"cs": {
-				"name": "Clean: Size",
-				"@input:menu": ["BY_PATH", [
-					"View",
-					"Clean Up By",
-					"Size"
-				]]
-			},
-			"ct": {
-				"name": "Clean: Tags",
-				"@input:menu": ["BY_PATH", [
-					"View",
-					"Clean Up By",
-					"Tags"
-				]]
-			},
-			"?t": { "name": "Toggle" },
-			"ta": {
-				"name": "Tabs: All",
-				"@input:menu": ["BY_PATH", ["View", "Show All Tabs"]]
-			},
-			"tg": {
-				"name": "Toggle: Groups",
-				"@input:menu": ["BY_PATH", ["View", "Use Groups"]]
-			},
-			"tt": {
-				"name": "Toggle: Tabs",
-				"@input:menu": ["SEARCH", "Tab Bar"]
-			},
-			"th": {
-				"name": "Toggle: Hidden",
-				"shortcut": "cmd+shift+."
-			},
-			"ts": {
-				"name": "Toggle Sidebar",
-				"shortcut": "cmd+ctrl+s"
-			},
-			"tp": {
-				"name": "Toggle Preview",
-				"shortcut": "cmd+shift+p"
-			},
-			"tb": {
-				"name": "Toggle Status Bar",
-				"@input:menu": ["SEARCH", "Status Bar"]
-			},
-			"to": {
-				"name": "Toggle Toolbar",
-				"shortcut": "cmd+opt+t"
-			},
-			"t/": {
-				"name": "Toggle Path Bar",
-				"shortcut": "cmd+opt+p"
-			},
-			"te": {
-				"name": "Trash: Empty",
-				"@input:menu": ["BY_PATH", ["Finder", "Empty Trash…"]]
-			},
-			"tef": {
-				"name": "Trash: Empty Force",
-				"@input:menu": ["BY_KEY", ["Finder", "Empty Trash"]]
+	"com": {
+		"apple": { "finder": { "macos.toml": {
+			"name": "Finder",
+			"on": { "menu": { "file": "@keychord/chords-menu/js/menu.js" } },
+			"chords": {
+				"?g": { "name": "Goto" },
+				"gr": {
+					"name": "Goto Recents",
+					"@input:menu": ["BY_PATH", ["Go", "Recents"]]
+				},
+				"gd": {
+					"name": "Goto Downloads",
+					"@input:menu": ["BY_PATH", ["Go", "Downloads"]]
+				},
+				"gdo": {
+					"name": "Goto Documents",
+					"@input:menu": ["BY_PATH", ["Go", "Documents"]]
+				},
+				"gde": {
+					"name": "Goto Desktop",
+					"shortcut": "cmd+shift+d"
+				},
+				"gh": {
+					"name": "Goto Home",
+					"shortcut": "cmd+shift+h"
+				},
+				"gc": {
+					"name": "Goto Computer",
+					"shortcut": "cmd+shift+c"
+				},
+				"gad": {
+					"name": "Goto AirDrop",
+					"shortcut": "cmd+shift+r"
+				},
+				"gn": {
+					"name": "Goto Network",
+					"shortcut": "cmd+shift+k"
+				},
+				"gid": {
+					"name": "Goto iCloud Drive",
+					"shortcut": "cmd+shift+i"
+				},
+				"gs": {
+					"name": "Goto Shared",
+					"@input:menu": ["BY_PATH", ["Go", "Shared"]]
+				},
+				"ga": {
+					"name": "Goto Applications",
+					"shortcut": "cmd+shift+a"
+				},
+				"gu": {
+					"name": "Goto Utilities",
+					"@input:menu": ["BY_PATH", ["Go", "Utilities"]]
+				},
+				"gf": {
+					"name": "Goto Folder",
+					"shortcut": "cmd+shift+g"
+				},
+				"gt": {
+					"name": "Goto Trash",
+					"shell": "open -b com.apple.finder \"$HOME/.Trash\""
+				},
+				"?d": { "name": "Directory" },
+				"du": {
+					"name": "Directory: Up",
+					"shortcut": "cmd+up"
+				},
+				"duw": {
+					"name": "Directory: Up Window",
+					"@input:menu": ["BY_KEY", ["Go", "Enclosing Folder in New Window"]]
+				},
+				"?f": { "name": "File" },
+				"fa": {
+					"name": "File: Alias",
+					"shortcut": "ctrl+cmd+a"
+				},
+				"fe": {
+					"name": "File: Eject",
+					"@input:menu": ["BY_PATH", ["File", "Eject"]]
+				},
+				"fc": {
+					"name": "File: Compress",
+					"@input:menu": ["BY_PATH", ["File", "Compress"]]
+				},
+				"fr": {
+					"name": "File: Rename",
+					"@input:menu": ["BY_PATH", ["File", "Rename"]]
+				},
+				"ft": {
+					"name": "File: Trash",
+					"@input:menu": ["BY_PATH", ["File", "Move to Trash"]]
+				},
+				"fd": {
+					"name": "File: Duplicate",
+					"shortcut": "cmd+d"
+				},
+				"fq": {
+					"name": "File: Quick Look",
+					"@input:menu": ["BY_PATH", ["File", "Quick Look"]]
+				},
+				"fo": {
+					"name": "File: Open",
+					"shortcut": "cmd+down"
+				},
+				"?a": { "name": "as" },
+				"ai": {
+					"name": "as Icons",
+					"@input:menu": ["BY_PATH", ["View", "as Icons"]]
+				},
+				"al": {
+					"name": "as List",
+					"@input:menu": ["BY_PATH", ["View", "as List"]]
+				},
+				"ac": {
+					"name": "as Columns",
+					"@input:menu": ["BY_PATH", ["View", "as Columns"]]
+				},
+				"ag": {
+					"name": "as Gallery",
+					"@input:menu": ["BY_PATH", ["View", "as Gallery"]]
+				},
+				"?s": { "name": "Sort" },
+				"sn": {
+					"name": "Sort: Name",
+					"@input:menu": ["BY_PATH", [
+						"View",
+						"Sort By",
+						"Name"
+					]]
+				},
+				"sk": {
+					"name": "Sort: Kind",
+					"@input:menu": ["BY_PATH", [
+						"View",
+						"Sort By",
+						"Kind"
+					]]
+				},
+				"so": {
+					"name": "Sort: Opened Date",
+					"@input:menu": ["BY_PATH", [
+						"View",
+						"Sort By",
+						"Date Last Opened"
+					]]
+				},
+				"sa": {
+					"name": "Sort: Added Date",
+					"@input:menu": ["BY_PATH", [
+						"View",
+						"Sort By",
+						"Date Added"
+					]]
+				},
+				"sm": {
+					"name": "Sort: Modified Date",
+					"@input:menu": ["BY_PATH", [
+						"View",
+						"Sort By",
+						"Date Modified"
+					]]
+				},
+				"sc": {
+					"name": "Sort: Created Date",
+					"@input:menu": ["BY_PATH", [
+						"View",
+						"Sort By",
+						"Date Created"
+					]]
+				},
+				"ss": {
+					"name": "Sort: Size",
+					"@input:menu": ["BY_PATH", [
+						"View",
+						"Sort By",
+						"Size"
+					]]
+				},
+				"st": {
+					"name": "Sort: Tags",
+					"@input:menu": ["BY_PATH", [
+						"View",
+						"Sort By",
+						"Tags"
+					]]
+				},
+				"?c": { "name": "Clean" },
+				"cn": {
+					"name": "Clean: Name",
+					"@input:menu": ["BY_PATH", [
+						"View",
+						"Clean Up By",
+						"Name"
+					]]
+				},
+				"ck": {
+					"name": "Clean: Kind",
+					"@input:menu": ["BY_PATH", [
+						"View",
+						"Clean Up By",
+						"Kind"
+					]]
+				},
+				"cm": {
+					"name": "Clean: Modified Date",
+					"@input:menu": ["BY_PATH", [
+						"View",
+						"Clean Up By",
+						"Date Modified"
+					]]
+				},
+				"cc": {
+					"name": "Clean: Created Date",
+					"@input:menu": ["BY_PATH", [
+						"View",
+						"Clean Up By",
+						"Date Created"
+					]]
+				},
+				"cs": {
+					"name": "Clean: Size",
+					"@input:menu": ["BY_PATH", [
+						"View",
+						"Clean Up By",
+						"Size"
+					]]
+				},
+				"ct": {
+					"name": "Clean: Tags",
+					"@input:menu": ["BY_PATH", [
+						"View",
+						"Clean Up By",
+						"Tags"
+					]]
+				},
+				"?t": { "name": "Toggle" },
+				"ta": {
+					"name": "Tabs: All",
+					"@input:menu": ["BY_PATH", ["View", "Show All Tabs"]]
+				},
+				"tg": {
+					"name": "Toggle: Groups",
+					"@input:menu": ["BY_PATH", ["View", "Use Groups"]]
+				},
+				"tt": {
+					"name": "Toggle: Tabs",
+					"@input:menu": ["SEARCH", "Tab Bar"]
+				},
+				"th": {
+					"name": "Toggle: Hidden",
+					"shortcut": "cmd+shift+."
+				},
+				"ts": {
+					"name": "Toggle Sidebar",
+					"shortcut": "cmd+ctrl+s"
+				},
+				"tp": {
+					"name": "Toggle Preview",
+					"shortcut": "cmd+shift+p"
+				},
+				"tb": {
+					"name": "Toggle Status Bar",
+					"@input:menu": ["SEARCH", "Status Bar"]
+				},
+				"to": {
+					"name": "Toggle Toolbar",
+					"shortcut": "cmd+opt+t"
+				},
+				"t/": {
+					"name": "Toggle Path Bar",
+					"shortcut": "cmd+opt+p"
+				},
+				"te": {
+					"name": "Trash: Empty",
+					"@input:menu": ["BY_PATH", ["Finder", "Empty Trash…"]]
+				},
+				"tef": {
+					"name": "Trash: Empty Force",
+					"@input:menu": ["BY_KEY", ["Finder", "Empty Trash"]]
+				}
 			}
-		}
-	} } } },
+		} } },
+		"microsoft": { "FileExplorer": { "windows.toml": {
+			"name": "File Explorer",
+			"executables": ["CabinetWClass", "ExploreWClass"],
+			"meta": { "chord": ">=0.3.4" },
+			"chords": {
+				"?g": { "name": "Navigation" },
+				"gb": {
+					"name": "Go Back",
+					"shortcut": "alt+left"
+				},
+				"gn": {
+					"name": "Go Forward",
+					"shortcut": "alt+right"
+				},
+				"gf": {
+					"name": "Enter Folder Location",
+					"shortcut": "ctrl+l"
+				},
+				"g/": {
+					"name": "Search Files",
+					"shortcut": "ctrl+f"
+				},
+				"gr": {
+					"name": "Refresh Folder",
+					"shortcut": "f5"
+				},
+				"?d": { "name": "Folder" },
+				"du": {
+					"name": "Go to Parent Folder",
+					"shortcut": "alt+up"
+				},
+				"dn": {
+					"name": "Create Folder",
+					"shortcut": "ctrl+shift+n"
+				},
+				"dw": {
+					"name": "Open New Window",
+					"shortcut": "ctrl+n"
+				},
+				"?f": { "name": "Files and Selection" },
+				"fa": {
+					"name": "Select All",
+					"shortcut": "ctrl+a"
+				},
+				"fr": {
+					"name": "Rename Selected Item",
+					"shortcut": "f2"
+				},
+				"fp": {
+					"name": "Show Properties",
+					"shortcut": "alt+enter"
+				},
+				"fm": {
+					"name": "Open Context Menu",
+					"shortcut": "shift+f10"
+				},
+				"fc": {
+					"name": "Copy Selected Items",
+					"shortcut": "ctrl+c"
+				},
+				"fx": {
+					"name": "Cut Selected Items",
+					"shortcut": "ctrl+x"
+				},
+				"fv": {
+					"name": "Paste Items",
+					"shortcut": "ctrl+v"
+				},
+				"?a": { "name": "View" },
+				"ai": {
+					"name": "Show Large Icons",
+					"shortcut": "ctrl+shift+2"
+				},
+				"al": {
+					"name": "Show Details View",
+					"shortcut": "ctrl+shift+6"
+				},
+				"ap": {
+					"name": "Toggle Preview Pane",
+					"shortcut": "alt+p"
+				},
+				"ad": {
+					"name": "Toggle Details Pane",
+					"shortcut": "alt+shift+p"
+				},
+				"?t": { "name": "Tabs (Windows 11)" },
+				"tn": {
+					"name": "Open New Tab",
+					"shortcut": "ctrl+t"
+				},
+				"tc": {
+					"name": "Close Current Tab or Window",
+					"shortcut": "ctrl+w"
+				},
+				"t[": {
+					"name": "Previous Tab",
+					"shortcut": "ctrl+shift+tab"
+				},
+				"t]": {
+					"name": "Next Tab",
+					"shortcut": "ctrl+tab"
+				}
+			}
+		} } }
+	},
+	"linux.toml": {
+		"name": "GNOME Files",
+		"meta": { "chord": ">=0.3.4" },
+		"placeholders": { "<>": {
+			"name": "Finder prefix",
+			"default": "/"
+		} },
+		"chords": { "<>f": {
+			"name": "Open GNOME Files",
+			"shell": "gtk-launch -- org.gnome.Nautilus"
+		} }
+	},
 	"macos.toml": {
 		"name": "Finder",
 		"meta": { "chord": ">=0.3.0" },
@@ -665,6 +783,138 @@ var chords = {
 		"chords": { "<>f": {
 			"name": "Finder",
 			"shell": "open -a Finder"
+		} }
+	},
+	"org": { "gnome": { "Nautilus": { "linux.toml": {
+		"name": "GNOME Files",
+		"executables": ["nautilus", "org.gnome.Nautilus"],
+		"meta": { "chord": ">=0.3.4" },
+		"chords": {
+			"?g": { "name": "Navigation" },
+			"gb": {
+				"name": "Go Back",
+				"shortcut": "alt+left"
+			},
+			"gn": {
+				"name": "Go Forward",
+				"shortcut": "alt+right"
+			},
+			"gh": {
+				"name": "Go to Home Folder",
+				"shortcut": "alt+home"
+			},
+			"gf": {
+				"name": "Enter Folder Location",
+				"shortcut": "ctrl+l"
+			},
+			"g/": {
+				"name": "Search Files",
+				"shortcut": "ctrl+f"
+			},
+			"gr": {
+				"name": "Refresh Folder",
+				"shortcut": "f5"
+			},
+			"?d": { "name": "Folder" },
+			"du": {
+				"name": "Go to Parent Folder",
+				"shortcut": "alt+up"
+			},
+			"dn": {
+				"name": "Create Folder",
+				"shortcut": "ctrl+shift+n"
+			},
+			"db": {
+				"name": "Bookmark Current Folder",
+				"shortcut": "ctrl+d"
+			},
+			"dw": {
+				"name": "Open New Window",
+				"shortcut": "ctrl+n"
+			},
+			"?f": { "name": "Files and Selection" },
+			"fa": {
+				"name": "Select All",
+				"shortcut": "ctrl+a"
+			},
+			"fi": {
+				"name": "Invert Selection",
+				"shortcut": "ctrl+shift+i"
+			},
+			"fr": {
+				"name": "Rename Selected Item",
+				"shortcut": "f2"
+			},
+			"fo": {
+				"name": "Open Selected Item",
+				"shortcut": "ctrl+o"
+			},
+			"fp": {
+				"name": "Show Properties",
+				"shortcut": "alt+enter"
+			},
+			"fm": {
+				"name": "Open Context Menu",
+				"shortcut": "shift+f10"
+			},
+			"fc": {
+				"name": "Copy Selected Items",
+				"shortcut": "ctrl+c"
+			},
+			"fx": {
+				"name": "Cut Selected Items",
+				"shortcut": "ctrl+x"
+			},
+			"fv": {
+				"name": "Paste Items",
+				"shortcut": "ctrl+v"
+			},
+			"?a": { "name": "View" },
+			"ai": {
+				"name": "Show Icons",
+				"shortcut": "ctrl+2"
+			},
+			"al": {
+				"name": "Show List",
+				"shortcut": "ctrl+1"
+			},
+			"ah": {
+				"name": "Toggle Hidden Files",
+				"shortcut": "ctrl+h"
+			},
+			"as": {
+				"name": "Toggle Sidebar",
+				"shortcut": "f9"
+			},
+			"?t": { "name": "Tabs" },
+			"tn": {
+				"name": "Open New Tab",
+				"shortcut": "ctrl+t"
+			},
+			"tc": {
+				"name": "Close Current Tab or Window",
+				"shortcut": "ctrl+w"
+			},
+			"t[": {
+				"name": "Previous Tab",
+				"shortcut": "ctrl+pageup"
+			},
+			"t]": {
+				"name": "Next Tab",
+				"shortcut": "ctrl+pagedown"
+			}
+		}
+	} } } },
+	"windows.toml": {
+		"name": "File Explorer",
+		"meta": { "chord": ">=0.3.4" },
+		"placeholders": { "<>": {
+			"name": "Finder prefix",
+			"default": "/"
+		} },
+		"chords": { "<>f": {
+			"name": "Open File Explorer",
+			"shortcut": "super+e"
 		} }
 	}
 };
@@ -682,5 +932,4 @@ var package_default = {
 	packageManager,
 	chords
 };
-//#endregion
 export { categories, chords, package_default as default, dependencies, description, devDependencies, displayName, name, packageManager, repository, scripts, type, version };

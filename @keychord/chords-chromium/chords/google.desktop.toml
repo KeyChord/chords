@@ -1,0 +1,13 @@
+name = 'Google Chrome Desktop Shortcuts'
+
+[[import]]
+file = 'chrome.desktop.toml'
+
+[chords]
+'wq' = { name = 'Window: Quit', shortcut = 'alt+f x' }
+'tl' = { name = 'Tab: Move Left', shortcut = 'ctrl+shift+pgup' }
+'tr' = { name = 'Tab: Move Right', shortcut = 'ctrl+shift+pgdown' }
+'fid' = { name = 'Focus Inactive Dialogs', shortcut = 'alt+shift+a' }
+'sp' = { name = 'Split View', shortcut = 'alt+shift+n' }
+'rp' = { name = 'Remove Address Bar Prediction', shortcut = 'shift+delete' }
+'cab' = { name = 'Cursor to Address Bar', shortcut = 'ctrl+f5' }

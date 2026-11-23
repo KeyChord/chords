@@ -11,6 +11,9 @@
     "url": "https://github.com/KeyChord/chords-web"
   },
   "type": "module",
+  "scripts": {
+    "test": "bun test --isolate"
+  },
   "dependencies": {
     "jquery-as-string": "^0.4.0",
     "outdent": "^0.8.0"

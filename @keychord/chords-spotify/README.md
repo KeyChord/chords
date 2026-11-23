@@ -3,9 +3,26 @@
 > [!NOTE]
 > This document is largely AI-written, so parts of it may not be fully accurate. It will be replaced with a hand-written version when I get the time.
 
-Commands for the macOS Spotify desktop app (`com.spotify.client`). To install, in [Chord](https://github.com/KeyChord/Chord) open Settings → Chords → **Chord Monorepos** → **Add Monorepo**, enter `KeyChord/chords`, then tick `@keychord/chords-spotify` under **Packages to use**. Spotify must be installed; see [Setup](#setup) for how Chord connects to it.
+Commands for the Spotify desktop app. To install, in [Chord](https://github.com/KeyChord/Chord) open Settings → Chords → **Chord Monorepos** → **Add Monorepo**, enter `KeyChord/chords`, then tick `@keychord/chords-spotify` under **Packages to use**. Spotify must be installed.
 
-App bindings live in `chords/com/spotify/client/macos.toml`, the path Chord uses to discover Spotify's chords.
+## Linux and Windows
+
+These bindings use [Spotify's keyboard shortcuts](https://support.spotify.com/us/article/keyboard-shortcuts/). Open and focus the Spotify desktop app to use them. The Linux build of Spotify may offer a different set of shortcuts depending on how it was installed.
+
+| Chord                          | Action                                      |
+| ------------------------------ | ------------------------------------------- |
+| `g/`, `gh`                     | Search, Home                                |
+| `gl`, `gls`                    | Library, Liked Songs                        |
+| `glpl`, `glpo`, `glal`, `glar` | Playlists, Podcasts, Albums, Artists        |
+| `lv`                           | Toggle the Library sidebar                  |
+| `p/`                           | Filter a playlist                           |
+| `bt`, `br`, `bs`               | Play or pause, repeat, shuffle              |
+| `bq`, `npv`                    | Go to queue, toggle the Now Playing sidebar |
+| `b[`, `b]`                     | Previous and next track on Windows          |
+
+## macOS
+
+App bindings live in `chords/com/spotify/client/macos.toml`. The numbered playlist actions and detailed playback controls below use Spotify's desktop renderer on macOS. See [Setup](#setup) for how Chord connects to it.
 
 | Chord   | Action                                                   |
 | ------- | -------------------------------------------------------- |
@@ -60,7 +77,7 @@ Replace `37` with any non-negative whole second (`bs0` returns to the start). A 
 
 ## Setup
 
-All actions use the Chrome DevTools Protocol against Spotify's desktop renderer. When the package loads or Spotify launches, Chord checks its debugging port. If it does not match the configured port (9223 by default), Chord gracefully terminates Spotify and relaunches it with debugging enabled.
+The macOS actions use the Chrome DevTools Protocol against Spotify's desktop renderer. When the package loads or Spotify launches, Chord checks its debugging port. If it does not match the configured port (9223 by default), Chord gracefully terminates Spotify and relaunches it with debugging enabled.
 
 Spotify appears in Chord's apps-needing-relaunch settings until a launch with the correct port is observed. A normal quit stays quit. If a chord runs before Spotify finishes relaunching, try it again once Spotify is open. Port 9223 leaves the usual browser debugging port 9222 available.
 

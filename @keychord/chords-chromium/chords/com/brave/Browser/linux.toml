@@ -1,0 +1,5 @@
+name = 'Brave'
+executables = ['brave', 'brave-browser', 'brave-browser-beta', 'brave-browser-nightly']
+
+[[import]]
+file = 'chrome.desktop.toml'

@@ -1,0 +1,9 @@
+name = 'Spotify'
+executables = ['Spotify.exe']
+
+[[import]]
+file = 'desktop.toml'
+
+[chords]
+'b[' = { name = 'Bar: Previous track', shortcut = 'ctrl+left' }
+'b]' = { name = 'Bar: Next track', shortcut = 'ctrl+right' }

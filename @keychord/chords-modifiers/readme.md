@@ -24,12 +24,12 @@ key, and optional additional modifier letters:
 ;ka[         Alt+[
 ```
 
-Modifier letters are `a` (Alt/Option), `c` (Control), `f` (Fn), `m` (Meta/Command),
-and `s` (Shift). The first modifier determines the entry point; the next character
-is always the regular key, even when it is also a modifier letter. Additional
-modifiers can follow in any order, and repeated modifiers are applied only once.
-All 31 nonempty modifier combinations are supported from any included modifier's
-entry point. No separator is needed: `;km-` sends Command+Minus.
+Modifier letters are `a` (Alt/Option), `c` (Control), `m` (Meta), and `s` (Shift).
+Meta sends Command on macOS, Super on Linux, and the Windows key on Windows.
+macOS also supports `f` (Fn). The first modifier determines the entry point. The
+next character is always the regular key, even when it is also a modifier letter.
+Additional modifiers can follow in any order, and repeated modifiers are applied
+only once. For example, `;km-` sends Meta+Minus.
 
 Each chord sends one shortcut. Use separate chords for separate shortcuts, such as
 `;kmc` for Command+C and `;kmv` for Command+V.

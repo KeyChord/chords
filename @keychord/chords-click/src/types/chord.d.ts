@@ -1,6 +1,6 @@
 declare module "chord" {
   export type WindowBounds = { x: number; y: number; width: number; height: number };
-  /** The display containing the pointer, in global macOS logical points. */
+  /** The screen bounds used for global mouse input. */
   export function getScreenBounds(): WindowBounds;
   /** Omit windowId for ordinary global input. Up releases even a vanished window. */
   export function mouse(options: {
@@ -20,7 +20,7 @@ declare module "chord" {
     bounds: WindowBounds;
     title: string | null;
   }[];
-  /** Click in window-local top-left macOS points without activating the target. */
+  /** Click in window-local top-left coordinates. */
   export function click(options: {
     windowId: number;
     x: number;
