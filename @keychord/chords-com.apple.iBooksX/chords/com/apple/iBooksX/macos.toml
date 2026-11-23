@@ -1,0 +1,40 @@
+name = 'Books'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?a' = { name = 'App' }
+'a,' = { name = 'App: Settings', '@input:menu' = ['BY_PATH', ['Books', 'Settings…']] }
+'?g' = { name = 'Goto' }
+'g/' = { name = 'Goto: Find in Book', '@input:menu' = ['BY_PATH', ['Edit', 'Find', 'Find…']] }
+'?f' = { name = 'File' }
+'fi' = { name = 'File: Import', '@input:menu' = ['BY_PATH', ['File', 'Import…']] }
+'fn' = { name = 'File: New Collection', '@input:menu' = ['BY_PATH', ['File', 'New Collection']] }
+'?v' = { name = 'View' }
+'vc' = { name = 'View: Table of Contents', '@input:menu' = [
+  'BY_PATH',
+  [
+    'View',
+    'Show Table of Contents',
+  ],
+] }
+'vb' = { name = 'View: Bookmarks', '@input:menu' = ['BY_PATH', ['View', 'Show Bookmarks']] }
+'vn' = { name = 'View: Highlights & Notes', '@input:menu' = [
+  'BY_PATH',
+  [
+    'View',
+    'Show Highlights & Notes',
+  ],
+] }
+'vg' = { name = 'View: Grid', '@input:menu' = ['BY_PATH', ['View', 'View As', 'Grid']] }
+'vl' = { name = 'View: List', '@input:menu' = ['BY_PATH', ['View', 'View As', 'List']] }
+'?s' = { name = 'Sort' }
+'st' = { name = 'Sort: Title', '@input:menu' = ['BY_PATH', ['View', 'Sort By', 'Title']] }
+'sa' = { name = 'Sort: Author', '@input:menu' = ['BY_PATH', ['View', 'Sort By', 'Author']] }
+'sr' = { name = 'Sort: Recent', '@input:menu' = ['BY_PATH', ['View', 'Sort By', 'Recent']] }
+'?p' = { name = 'Page' }
+'p[' = { name = 'Page: Previous', shortcut = 'left' }
+'p]' = { name = 'Page: Next', shortcut = 'right' }
+'pb' = { name = 'Page: Bookmark', '@input:menu' = ['BY_PATH', ['Edit', 'Bookmark Page']] }
+'pr' = { name = 'Page: Remove Bookmark', '@input:menu' = ['BY_PATH', ['Edit', 'Remove Bookmark']] }
