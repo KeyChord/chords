@@ -1,0 +1,11 @@
+name = 'Phone'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?g' = { name = 'Goto' }
+'g,' = { name = 'Goto: Settings', '@input:menu' = ['BY_PATH', ['Phone', 'Settings…']] }
+
+'?v' = { name = 'Vary Call' }
+'vm' = { name = 'Vary Call: Mute', '@input:menu' = ['BY_PATH', ['Audio', 'Mute']] }

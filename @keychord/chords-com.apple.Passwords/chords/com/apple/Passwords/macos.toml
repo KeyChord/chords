@@ -1,0 +1,36 @@
+name = 'Passwords'
+
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
+
+[chords]
+'?j' = { name = 'Jump' }
+'j/' = { name = 'Jump: Search Passwords', '@input:menu' = ['BY_PATH', ['Edit', 'Search']] }
+
+'?n' = { name = 'New' }
+'np' = { name = 'New: Password', '@input:menu' = ['BY_PATH', ['File', 'New Password…']] }
+'ng' = { name = 'New: Shared Group', '@input:menu' = ['BY_PATH', ['File', 'New Shared Group…']] }
+
+'?g' = { name = 'Goto' }
+'g,' = { name = 'Goto: Settings', '@input:menu' = ['BY_PATH', ['Passwords', 'Settings…']] }
+'ga' = { name = 'Goto: All', '@input:menu' = ['BY_PATH', ['View', 'All']] }
+'gp' = { name = 'Goto: Passkeys', '@input:menu' = ['BY_PATH', ['View', 'Passkeys']] }
+'gc' = { name = 'Goto: Codes', '@input:menu' = ['BY_PATH', ['View', 'Codes']] }
+'gs' = { name = 'Goto: Security', '@input:menu' = ['BY_PATH', ['View', 'Security']] }
+'gd' = { name = 'Goto: Deleted', '@input:menu' = ['BY_PATH', ['View', 'Deleted']] }
+
+'?f' = { name = 'File' }
+'fi' = { name = 'File: Import Passwords', '@input:menu' = [
+  'BY_PATH',
+  [
+    'File',
+    'Import Passwords from File…',
+  ],
+] }
+'fe' = { name = 'File: Export All Passwords', '@input:menu' = [
+  'BY_PATH',
+  [
+    'File',
+    'Export All Passwords to File…',
+  ],
+] }
