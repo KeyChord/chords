@@ -13,6 +13,6 @@ file = '@keychord/chords-menu/js/menu.js'
   'BY_PATH',
   [
     'Bluetooth File Exchange',
-    'Preferences...',
+    'Settings…',
   ],
 ] }

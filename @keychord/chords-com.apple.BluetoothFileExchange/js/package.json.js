@@ -1,7 +1,7 @@
 //#region package.json
 var name = "@keychord/chords-com.apple.BluetoothFileExchange";
 var displayName = "Bluetooth File Exchange Chords";
-var version = "0.0.2";
+var version = "0.0.3";
 var description = "Chords for Bluetooth File Exchange (com.apple.BluetoothFileExchange).";
 var categories = ["macOS"];
 var repository = {
@@ -390,7 +390,7 @@ var chords = {
 			"?g": { "name": "Goto" },
 			"gs": {
 				"name": "Goto: Settings",
-				"@input:menu": ["BY_PATH", ["Bluetooth File Exchange", "Preferences..."]]
+				"@input:menu": ["BY_PATH", ["Bluetooth File Exchange", "Settings…"]]
 			}
 		}
 	} } } },

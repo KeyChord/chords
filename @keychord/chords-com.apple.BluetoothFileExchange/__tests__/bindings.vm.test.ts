@@ -81,6 +81,14 @@ test.skipIf(!macOSUITestsEnabled)(
             (node) => node.title === "Bluetooth File Exchange Settings",
           );
         expect(await settings()).toBeUndefined();
+        if ((await probe.menu(bundle, "Bluetooth File Exchange", "Settings…")).enabled === false) {
+          await app.expectFailure(
+            "gs",
+            /Menu item "Settings…" in path "Bluetooth File Exchange > Settings…" is disabled/,
+          );
+          expect(await settings()).toBeUndefined();
+          return;
+        }
         try {
           await app.runChecked("gs");
           await waitFor(settings, 12_000);
