@@ -65,8 +65,20 @@ test.skipIf(!macOSUITestsEnabled)(
           expect(await picker()).toBeUndefined();
           await app.runChecked("fo");
           await waitFor(picker, 10_000);
-          await probe.key(53);
-          await waitFor(async () => ((await picker()) ? undefined : true));
+          const cancel = await waitFor(async () =>
+            flattenAX(await probe.windows(player, 8)).find(
+              ({ role, title, description, enabled, position, size }) =>
+                role === "AXButton" &&
+                [title, description].includes("Cancel") &&
+                enabled &&
+                position &&
+                size,
+            ),
+          );
+          const [x, y] = cancel.position!;
+          const [width, height] = cancel.size!;
+          await probe.clickPoint(x + width / 2, y + height / 2);
+          await waitFor(async () => !(await picker()) || undefined);
 
           for (const [sequence, path] of Object.entries(discCases)) {
             const item = await probe.menu(player, ...path);

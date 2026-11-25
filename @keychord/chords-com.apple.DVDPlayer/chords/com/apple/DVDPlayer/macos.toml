@@ -47,5 +47,17 @@ file = '@keychord/chords-menu/js/menu.js'
 'gm' = { name = 'Goto: DVD Menu', '@input:menu' = ['BY_PATH', ['Go', 'DVD Menu']] }
 
 '?v' = { name = 'View' }
-'vf' = { name = 'View: Toggle Full Screen', '@input:menu' = ['SEARCH', 'Full Screen'] }
+'vf' = { name = 'View: Toggle Full Screen', '@input:menu' = [
+  'BY_FIRST_PATH',
+  [
+    [
+      'View',
+      'Enter Full Screen',
+    ],
+    [
+      'View',
+      'Exit Full Screen',
+    ],
+  ],
+] }
 'vc' = { name = 'View: Toggle Closed Captioning', '@input:menu' = ['SEARCH', 'Closed Captioning'] }

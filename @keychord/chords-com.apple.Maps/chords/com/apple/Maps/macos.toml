@@ -7,9 +7,6 @@ file = '@keychord/chords-menu/js/menu.js'
 '?w' = { name = 'Window' }
 'wn' = { name = 'Window: New', '@input:menu' = ['BY_PATH', ['File', 'New Window']] }
 
-'?t' = { name = 'Tab' }
-'tn' = { name = 'Tab: New', '@input:menu' = ['BY_PATH', ['File', 'New Tab']] }
-
 '?j' = { name = 'Jump' }
 'js' = { name = 'Jump: Search', '@input:menu' = ['BY_PATH', ['Edit', 'Search']] }
 
@@ -20,10 +17,18 @@ file = '@keychord/chords-menu/js/menu.js'
 'ms' = { name = 'Map: Satellite', '@input:menu' = ['BY_PATH', ['View', 'Satellite']] }
 
 '?v' = { name = 'Vary' }
-'vs' = { name = 'Vary: Sidebar', '@input:menu' = ['SEARCH', 'Sidebar'] }
-'vd' = { name = 'Vary: Directions', '@input:menu' = ['SEARCH', 'Directions'] }
-'vm' = { name = 'Vary: 3D Map', '@input:menu' = ['SEARCH', '3D Map'] }
-'vc' = { name = 'Vary: Scale', '@input:menu' = ['SEARCH', 'Scale'] }
+'vd' = { name = 'Vary: Directions', '@input:menu' = ['BY_FIRST_PATH', [
+  ['View', 'Show Directions'],
+  ['View', 'Hide Directions'],
+]] }
+'vm' = { name = 'Vary: 3D Map', '@input:menu' = ['BY_FIRST_PATH', [
+  ['View', 'Show 3D Map'],
+  ['View', 'Hide 3D Map'],
+]] }
+'vc' = { name = 'Vary: Scale', '@input:menu' = ['BY_FIRST_PATH', [
+  ['View', 'Show Scale'],
+  ['View', 'Hide Scale'],
+]] }
 
 '?z' = { name = 'Zoom' }
 'zi' = { name = 'Zoom: In', '@input:menu' = ['BY_PATH', ['View', 'Zoom In']] }

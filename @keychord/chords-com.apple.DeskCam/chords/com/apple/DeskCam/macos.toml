@@ -15,14 +15,19 @@ file = '@keychord/chords-menu/js/menu.js'
     'Always Show Setup',
   ],
 ] }
-'va' = { name = 'View: Toggle Auto Zoom During Setup', '@input:menu' = [
-  'BY_PATH',
+'vf' = { name = 'View: Toggle Full Screen', '@input:menu' = [
+  'BY_FIRST_PATH',
   [
-    'View',
-    'Use Auto Zoom During Setup',
+    [
+      'View',
+      'Enter Full Screen',
+    ],
+    [
+      'View',
+      'Exit Full Screen',
+    ],
   ],
 ] }
-'vf' = { name = 'View: Toggle Full Screen', '@input:menu' = ['SEARCH', 'Full Screen'] }
 
 '?z' = { name = 'Zoom' }
 'z=' = { name = 'Zoom: In', '@input:menu' = ['BY_PATH', ['View', 'Zoom In']] }

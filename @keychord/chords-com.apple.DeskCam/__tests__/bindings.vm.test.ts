@@ -11,7 +11,6 @@ import {
 const deskView = "com.apple.DeskCam";
 const settingCases = {
   vs: "Always Show Setup",
-  va: "Use Auto Zoom During Setup",
 };
 const zoomCases = {
   "z=": ["Zoom In", "Zoom Out", 1],
@@ -51,7 +50,22 @@ test.skipIf(!macOSUITestsEnabled)(
         const view = (title: string) => probe.menu(deskView, "View", title);
         const disabled = /Menu item .* is disabled/;
         try {
-          await waitFor(() => probe.menu(deskView, "View").catch(() => undefined), 15_000);
+          await waitFor(async () => {
+            const intro = flattenAX(await probe.windows(deskView, 9)).find(
+              ({ role, title, id, enabled }) =>
+                role === "AXButton" && title === "Continue" && id === "Primary Button" && enabled,
+            );
+            if (intro?.position && intro.size) {
+              await probe.clickPoint(
+                intro.position[0] + intro.size[0] / 2,
+                intro.position[1] + intro.size[1] / 2,
+              );
+              return;
+            }
+            const window = await probe.window(deskView);
+            if (window.role === "AXWindow")
+              return probe.menu(deskView, "View").catch(() => undefined);
+          }, 15_000);
           for (const [sequence, title] of Object.entries(settingCases)) {
             const before = await view(title);
             if (before.enabled === false) {
@@ -90,14 +104,61 @@ test.skipIf(!macOSUITestsEnabled)(
             await waitFor(async () => ((await zoomValue()) === before ? true : undefined));
           }
 
-          const fullscreen = () => view("Enter Full Screen");
-          if ((await fullscreen()).enabled === false) {
-            await app.expectFailure("vf", disabled);
-          } else {
+          const enter = () => view("Enter Full Screen").catch(() => undefined);
+          const exit = () => view("Exit Full Screen").catch(() => undefined);
+          await waitFor(async () => (await enter())?.enabled || undefined);
+          const beforeFullscreen = await probe.window(deskView);
+          expect(beforeFullscreen.size).toBeDefined();
+          try {
             await app.runChecked("vf");
-            await waitFor(() => view("Exit Full Screen").catch(() => undefined), 12_000);
+            await waitFor(async () => {
+              if ((await exit())?.enabled) return true;
+              const { size } = await probe.window(deskView);
+              if (
+                size &&
+                beforeFullscreen.size &&
+                size.every((length, index) => length > beforeFullscreen.size![index])
+              )
+                return true;
+            }, 12_000).catch(async (cause) => {
+              throw new Error(
+                "Desk View did not enter fullscreen: " +
+                  JSON.stringify({
+                    before: beforeFullscreen,
+                    after: await probe.window(deskView),
+                    enter: await enter(),
+                    exit: await exit(),
+                  }),
+                { cause },
+              );
+            });
+            const fullscreenSize = (await probe.window(deskView)).size;
+            const exitWasEnabled = (await exit())?.enabled === true;
             await app.runChecked("vf");
-            await waitFor(() => fullscreen().catch(() => undefined), 12_000);
+            await waitFor(async () => {
+              if (exitWasEnabled && (await enter())?.enabled && !(await exit())?.enabled)
+                return true;
+              const { size } = await probe.window(deskView);
+              if (
+                size &&
+                fullscreenSize &&
+                size.some((length, index) => length < fullscreenSize[index])
+              )
+                return true;
+            }, 12_000).catch(async (cause) => {
+              throw new Error(
+                "Desk View did not leave fullscreen: " +
+                  JSON.stringify({
+                    fullscreenSize,
+                    after: await probe.window(deskView),
+                    enter: await enter(),
+                    exit: await exit(),
+                  }),
+                { cause },
+              );
+            });
+          } finally {
+            if ((await exit())?.enabled) await probe.press(deskView, "View", "Exit Full Screen");
           }
 
           if ((await view("Start Desk View")).enabled === false) {
