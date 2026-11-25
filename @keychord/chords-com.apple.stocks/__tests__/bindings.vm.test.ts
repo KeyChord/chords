@@ -10,7 +10,6 @@ import {
 } from "@keychord/chordtest";
 
 const bundle = "com.apple.stocks";
-const command = 1 << 20;
 const definition = Bun.TOML.parse(
   await Bun.file(new URL("../chords/com/apple/stocks/macos.toml", import.meta.url)).text(),
 ) as { chords: Record<string, unknown> };
@@ -23,90 +22,160 @@ const controls = async (probe: MacOSProbe, depth = 5) =>
 const menu = (probe: MacOSProbe, ...path: string[]) =>
   probe.menu(bundle, ...path).catch(() => undefined);
 
-async function dismiss(probe: MacOSProbe, labels: string[]) {
-  const button = (await controls(probe, 8)).find(
+async function dismiss(probe: MacOSProbe, labels: string[], triedDisabled: Set<string>) {
+  const window = await probe.window(bundle, 10);
+  const dialogs = flattenAX([window]).filter(
+    (node) => node.role === "AXSheet" || node.subrole === "AXDialog",
+  );
+  const button = flattenAX(dialogs).find(
     (node) =>
       node.role === "AXButton" &&
-      labels.some((label) => [node.title, node.description].includes(label)),
+      (labels.some((label) => [node.title, node.description].includes(label)) ||
+        (node.description === "close" && node.id?.startsWith("modal-host-vc-close-"))),
   );
-  if (!button) return false;
-  await probe.pressControl(bundle, "AXButton", button.title || button.description!);
+  if (!button?.position || !button.size) return false;
+  const label = button.title ?? button.description!;
+  if (button.enabled === false) {
+    if (triedDisabled.has(label)) return false;
+    triedDisabled.add(label);
+  }
+  const [x, y] = button.position;
+  const [width, height] = button.size;
+  await probe.clickPoint(x + width / 2, y + height / 2);
   return true;
 }
 
 async function newWindow(app: ChordApp, probe: MacOSProbe, key: string) {
-  const count = async () =>
-    (await probe.windows(bundle)).filter((window) => window.subrole === "AXStandardWindow").length;
-  const before = await count();
-  expect(before).toBeGreaterThan(0);
-  try {
-    await app.runChecked(key);
-    await waitFor(async () => ((await count()) === before + 1 ? true : undefined));
-  } finally {
-    if ((await count()) > before) {
-      await probe.key(13, command);
-      await waitFor(async () => ((await count()) === before ? true : undefined));
-    }
-  }
-}
-
-async function tabs(probe: MacOSProbe) {
-  return (await controls(probe, 6))
-    .filter((node) => node.role === "AXTabGroup")
-    .flatMap((group) => group.children ?? [])
-    .filter((node) => node.role === "AXRadioButton" || node.subrole === "AXTabButton");
+  const windows = async () =>
+    (await probe.windows(bundle)).filter((window) => window.subrole === "AXStandardWindow");
+  const before = await windows();
+  expect(before.length).toBeGreaterThan(0);
+  await app.runChecked(key);
+  await waitFor(
+    async () => (await windows()).length === before.length + 1 || undefined,
+    12_000,
+  ).catch(async (cause) => {
+    throw new Error(
+      "Stocks did not open another window: " + JSON.stringify({ before, after: await windows() }),
+      { cause },
+    );
+  });
 }
 
 async function newTab(app: ChordApp, probe: MacOSProbe, key: string) {
-  const count = async () => (await tabs(probe)).length || 1;
-  const before = await count();
-  try {
-    await app.runChecked(key);
-    await waitFor(async () => ((await count()) === before + 1 ? true : undefined));
-  } finally {
-    if ((await count()) > before) {
-      await probe.key(13, command);
-      await waitFor(async () => ((await count()) === before ? true : undefined));
-    }
-  }
+  const windows = () => probe.windows(bundle);
+  const before = await windows();
+  const focused = await probe.window(bundle);
+  const original =
+    focused.subrole === "AXStandardWindow" && focused.position && focused.size
+      ? focused
+      : before.find(
+          (window) => window.subrole === "AXStandardWindow" && window.position && window.size,
+        );
+  expect(original).toBeDefined();
+  expect((await menu(probe, "File", "New Tab"))?.enabled).toBe(true);
+  const tabGroup = async () => {
+    if ((await menu(probe, "Window", "Move Tab to New Window"))?.enabled === true) return true;
+    return (await controls(probe, 9)).some(
+      (node) =>
+        node.role === "AXTabGroup" &&
+        (node.children ?? []).filter(
+          ({ role, subrole }) =>
+            role === "AXTab" || role === "AXRadioButton" || subrole === "AXTabButton",
+        ).length > 1,
+    );
+  };
+  expect(await tabGroup()).toBe(false);
+  await app.runChecked(key);
+  await waitFor(async () => {
+    if (await tabGroup()) return true;
+    const current = await windows();
+    return (
+      (current.length === before.length + 1 &&
+        current.some(({ title }) => title === original?.title) &&
+        current.some(
+          (view) =>
+            view.title &&
+            !before.some(({ title }) => title === view.title) &&
+            view.position?.join(",") === original?.position?.join(",") &&
+            view.size?.join(",") === original?.size?.join(","),
+        )) ||
+      undefined
+    );
+  }, 12_000).catch(async (cause) => {
+    throw new Error(
+      "Stocks did not open a tab: " + JSON.stringify({ original, windows: await windows() }),
+      { cause },
+    );
+  });
 }
 
 async function focusSearch(app: ChordApp, probe: MacOSProbe, key: string) {
-  const focused = async () => (await probe.focus(bundle)).subrole === "AXSearchField";
+  const focused = async () => {
+    const focus = await probe.focus(bundle);
+    return (
+      focus.subrole === "AXSearchField" ||
+      (focus.role === "AXTextField" && [focus.title, focus.description].includes("Search"))
+    );
+  };
+  if (await focused()) await probe.key(53);
   if (await focused()) await probe.key(48);
-  await waitFor(async () => ((await focused()) ? undefined : true));
-  try {
-    await app.runChecked(key);
-    await waitFor(async () => ((await focused()) ? true : undefined));
-  } finally {
-    if (await focused()) await probe.key(53);
-  }
+  await waitFor(async () => !(await focused()) || undefined).catch(async (cause) => {
+    throw new Error(
+      "Stocks Search already had focus before the chord: " +
+        JSON.stringify(await probe.focus(bundle)),
+      { cause },
+    );
+  });
+  await app.runChecked(key);
+  await waitFor(async () => (await focused()) || undefined).catch(async (cause) => {
+    const dialogs = (await controls(probe, 9)).filter(
+      (node) => node.role === "AXSheet" || node.subrole === "AXDialog",
+    );
+    throw new Error(
+      "Stocks did not focus Search: " +
+        JSON.stringify({ focus: await probe.focus(bundle), dialogs }),
+      { cause },
+    );
+  });
 }
 
-function toggleView(label: string): Behavior {
-  return async (app, probe, key) => {
-    const menuTitle = async () => {
-      const view = await menu(probe, "View");
-      return (
-        view &&
-        flattenAX([view]).find(
-          (node) =>
-            node.enabled && (node.title === `Show ${label}` || node.title === `Hide ${label}`),
-        )?.title
-      );
-    };
-    const before = await waitFor(menuTitle);
-    const after = before === `Show ${label}` ? `Hide ${label}` : `Show ${label}`;
-    try {
-      await app.runChecked(key);
-      await waitFor(async () => ((await menuTitle()) === after ? true : undefined));
-    } finally {
-      if ((await menuTitle()) === after) {
-        await probe.press(bundle, "View", after);
-        await waitFor(async () => ((await menuTitle()) === before ? true : undefined));
-      }
-    }
+async function toggleSidebar(app: ChordApp, probe: MacOSProbe, key: string) {
+  const commands = async () => {
+    const view = await menu(probe, "View");
+    return view
+      ? flattenAX([view]).filter(
+          ({ title }) => title === "Show Sidebar" || title === "Hide Sidebar",
+        )
+      : [];
   };
+  const sidebarCommand = async () => (await commands()).find((item) => item.enabled)?.title;
+  const waitForSidebarCommand = (expected?: string) =>
+    waitFor(async () => {
+      const command = await sidebarCommand();
+      return command && (!expected || command === expected) ? command : undefined;
+    }, 10_000).catch(async (cause) => {
+      throw new Error(
+        "Stocks sidebar did not reach " +
+          (expected ?? "an enabled command") +
+          ": " +
+          JSON.stringify({
+            window: await probe.window(bundle),
+            focus: await probe.focus(bundle),
+            commands: await commands(),
+          }),
+        { cause },
+      );
+    });
+  const before = await waitForSidebarCommand();
+  const after = before === "Show Sidebar" ? "Hide Sidebar" : "Show Sidebar";
+  try {
+    await app.runChecked(key);
+    await waitForSidebarCommand(after);
+  } finally {
+    if ((await sidebarCommand()) === after) await app.runChecked(key);
+    await waitForSidebarCommand(before);
+  }
 }
 
 const sortFields = ["Manual", "Symbol", "Name", "Price Change", "Percentage Change", "Market Cap"];
@@ -127,7 +196,10 @@ function sortWatchlist(title: string): Behavior {
     const original = await waitFor(() => selectedSort(probe, sortFields));
     const order = await selectedSort(probe, sortOrders);
     const group = sortOrders.includes(title) ? sortOrders : sortFields;
-    if (group === sortOrders && original === "Manual") await chooseSort(probe, "Symbol");
+    if (group === sortOrders && original === "Manual") {
+      await chooseSort(probe, "Symbol");
+      await waitFor(async () => (await selectedSort(probe, sortFields)) === "Symbol" || undefined);
+    }
     if ((await selectedSort(probe, group)) === title) {
       await chooseSort(
         probe,
@@ -135,15 +207,25 @@ function sortWatchlist(title: string): Behavior {
       );
     }
     try {
-      await waitFor(async () => ((await selectedSort(probe, group)) !== title ? true : undefined));
+      await waitFor(async () => {
+        const selected = await selectedSort(probe, group);
+        return selected &&
+          selected !== title &&
+          (await menu(probe, "View", "Sort Watchlist By", title))?.enabled
+          ? true
+          : undefined;
+      });
       await app.runChecked(key);
       await waitFor(async () => ((await selectedSort(probe, group)) === title ? true : undefined));
     } finally {
-      if (order && original !== "Manual") await chooseSort(probe, order);
       await chooseSort(probe, original);
       await waitFor(async () =>
         (await selectedSort(probe, sortFields)) === original ? true : undefined,
       );
+      if (order && original !== "Manual") {
+        await chooseSort(probe, order);
+        await waitFor(async () => (await selectedSort(probe, sortOrders)) === order || undefined);
+      }
     }
   };
 }
@@ -151,30 +233,47 @@ function sortWatchlist(title: string): Behavior {
 function watchlistDialog(label: string): Behavior {
   return async (app, probe, key) => {
     const dialog = async () =>
-      (await controls(probe, 8)).find(
-        (node) =>
-          node.role === "AXSheet" ||
-          node.role === "AXPopover" ||
-          [node.title, node.description, node.value].includes(label),
+      (await controls(probe, 8)).find((node) =>
+        [node.title, node.description, node.value].includes(label),
       );
     expect(await dialog()).toBeUndefined();
     try {
       await app.runChecked(key);
-      await waitFor(dialog, 12_000);
+      await waitFor(dialog, 12_000).catch(async (cause) => {
+        const controls = flattenAX(await probe.windows(bundle, 8))
+          .filter(({ role }) =>
+            ["AXSheet", "AXTextField", "AXButton", "AXHeading"].includes(role ?? ""),
+          )
+          .map(({ role, title, description, id }) => ({ role, title, description, id }));
+        throw new Error(
+          "Stocks did not open " + label + ": " + JSON.stringify(controls.slice(0, 30)),
+          { cause },
+        );
+      });
     } finally {
       if (await dialog()) {
-        await probe.key(53);
-        await waitFor(async () => ((await dialog()) ? undefined : true));
+        const dismiss = (await controls(probe, 8)).find(
+          (node) =>
+            node.role === "AXButton" &&
+            node.enabled &&
+            [node.title, node.description].some((text) => text === "Done" || text === "Cancel"),
+        );
+        if (dismiss?.position && dismiss.size?.every((dimension) => dimension > 0)) {
+          const [x, y] = dismiss.position;
+          const [width, height] = dismiss.size;
+          await probe.clickPoint(x + width / 2, y + height / 2);
+        }
+        if (await dialog()) await probe.key(53);
+        await waitFor(async () => ((await dialog()) ? undefined : true), 12_000).catch((cause) => {
+          throw new Error(`Stocks did not dismiss ${label}`, { cause });
+        });
       }
     }
   };
 }
 
 const cases: Record<string, Behavior> = {
-  wn: newWindow,
-  tn: newTab,
-  js: focusSearch,
-  vs: toggleView("Sidebar"),
+  vs: toggleSidebar,
   ln: watchlistDialog("Enter a name for this watchlist."),
   lm: watchlistDialog("Manage Watchlists"),
   sm: sortWatchlist("Manual"),
@@ -185,6 +284,10 @@ const cases: Record<string, Behavior> = {
   sk: sortWatchlist("Market Cap"),
   sa: sortWatchlist("Ascending"),
   sd: sortWatchlist("Descending"),
+  // The disposable guest keeps the new windows and the final Search focus.
+  wn: newWindow,
+  tn: newTab,
+  js: focusSearch,
 };
 
 test("every Stocks binding has a behavior case", () => {
@@ -205,14 +308,59 @@ test.skipIf(!macOSUITestsEnabled)(
     await withChordPackage(import.meta.url, (app) =>
       withMacOSProbe(async (probe) => {
         await probe.activate(bundle);
-        await waitFor(async () => {
-          if (await dismiss(probe, ["Continue", "Not Now"])) return;
-          return (await menu(probe, "View", "Sort Watchlist By"))?.enabled ? true : undefined;
-        }, 30_000);
+        const triedDisabled = new Set<string>();
+        const dismissIntro = () =>
+          dismiss(
+            probe,
+            ["Continue", "Turn Off Personalized Ads", "Not Now", "Done"],
+            triedDisabled,
+          );
+        const ready = () =>
+          waitFor(async () => {
+            if (await dismissIntro()) return;
+            const main = await probe.window(bundle);
+            return (
+              (main.role === "AXWindow" &&
+                main.subrole === "AXStandardWindow" &&
+                (await menu(probe, "View", "Sort Watchlist By"))?.enabled) ||
+              undefined
+            );
+          }, 20_000).catch(async (cause) => {
+            const firstRun = (await controls(probe, 8))
+              .filter(({ role }) => role === "AXSheet" || role === "AXButton")
+              .map(({ role, title, description, id, enabled }) => ({
+                role,
+                title,
+                description,
+                id,
+                enabled,
+              }));
+            throw new Error(
+              "Stocks did not open its watchlist: " +
+                JSON.stringify({
+                  window: await probe.window(bundle),
+                  focus: await probe.focus(bundle),
+                  firstRun: firstRun.slice(0, 30),
+                }),
+              { cause },
+            );
+          });
+        await ready();
         const failures: string[] = [];
         for (const [key, behavior] of Object.entries(cases)) {
           try {
-            await behavior(app, probe, key);
+            const watchlistControl = key === "js" || key === "vs";
+            for (let prompts = 0; ; prompts++) {
+              if (watchlistControl) await ready();
+              try {
+                await behavior(app, probe, key);
+                break;
+              } catch (cause) {
+                // The ads prompt and the News offer can both appear during the first action.
+                if (!watchlistControl || prompts >= 2 || !(await dismissIntro())) throw cause;
+                console.log("Stocks dismissed a late native prompt before retesting " + key);
+              }
+            }
             console.log(`Stocks ${key} passed`);
           } catch (error) {
             const failure = `Stocks ${key}: ${error}`;

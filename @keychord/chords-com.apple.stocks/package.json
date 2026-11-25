@@ -1,7 +1,7 @@
 {
   "name": "@keychord/chords-com.apple.stocks",
   "displayName": "Stocks Chords",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Chords for Stocks (com.apple.stocks).",
   "categories": [
     "macOS"

@@ -11,10 +11,22 @@ file = '@keychord/chords-menu/js/menu.js'
 'tn' = { name = 'Tab: New', '@input:menu' = ['BY_PATH', ['File', 'New Tab']] }
 
 '?j' = { name = 'Jump' }
-'js' = { name = 'Jump: Ticker Search', '@input:menu' = ['FOCUS', 'AXSearchField'] }
+'js' = { name = 'Jump: Ticker Search', shortcut = 'cmd+f' }
 
 '?v' = { name = 'Vary' }
-'vs' = { name = 'Vary: Sidebar', '@input:menu' = ['SEARCH', 'Sidebar'] }
+'vs' = { name = 'Vary: Sidebar', '@input:menu' = [
+  'BY_FIRST_PATH',
+  [
+    [
+      'View',
+      'Show Sidebar',
+    ],
+    [
+      'View',
+      'Hide Sidebar',
+    ],
+  ],
+] }
 
 '?l' = { name = 'Watchlist' }
 'ln' = { name = 'Watchlist: New', '@input:menu' = ['BY_PATH', ['File', 'New Watchlist']] }
