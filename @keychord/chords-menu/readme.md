@@ -131,3 +131,5 @@ including when vendored into other chord packages. Requires macOS 14+ and Access
 Build with `vp pack` (Swift 6.2+). Run unit tests with `vp run test` (`bun test --isolate`)
 in this directory, and real menu/tray checks in the disposable macOS VM with
 `vp run test:macos -- @keychord/chords-menu` from the monorepo root.
+
+`BY_FIRST_PATH` accepts a list of exact menu paths and invokes the first enabled match.

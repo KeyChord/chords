@@ -2,6 +2,7 @@ import { expect, test } from "bun:test";
 import {
   flattenAX,
   macOSUITestsEnabled,
+  runCommand,
   waitFor,
   withChordPackage,
   withMacOSProbe,
@@ -10,7 +11,6 @@ import {
 } from "@keychord/chordtest";
 
 const bundle = "com.apple.news";
-const command = 1 << 20;
 const definition = Bun.TOML.parse(
   await Bun.file(new URL("../chords/com/apple/news/macos.toml", import.meta.url)).text(),
 ) as { chords: Record<string, unknown> };
@@ -22,35 +22,68 @@ const controls = async (probe: MacOSProbe, depth = 5) =>
 
 const menu = (probe: MacOSProbe, ...path: string[]) =>
   probe.menu(bundle, ...path).catch(() => undefined);
+const startupButtons = [
+  "Continue",
+  "No Thanks",
+  "Not Now",
+  "Done",
+  "close",
+  "Turn Off Personalized Ads",
+];
 
-async function dismiss(probe: MacOSProbe, labels: string[]) {
-  const button = (await controls(probe, 8)).find(
+async function dismiss(probe: MacOSProbe, labels: string[], triedDisabled?: Set<string>) {
+  const window = await probe.window(bundle, 10).catch((error: unknown) => {
+    if (/com\.apple\.news is not running/.test(String(error))) return undefined;
+    throw error;
+  });
+  if (!window) return false;
+  const dialogs = flattenAX([window]).filter(
+    (node) => node.role === "AXSheet" || node.subrole === "AXDialog",
+  );
+  const button = flattenAX(dialogs).find(
     (node) =>
       node.role === "AXButton" &&
       labels.some((label) => [node.title, node.description].includes(label)),
   );
-  if (!button) return false;
-  await probe.pressControl(bundle, "AXButton", button.title || button.description!);
+  if (!button?.position || !button.size) return false;
+  const label = button.title ?? button.description!;
+  if (button.enabled === false) {
+    if (!triedDisabled || triedDisabled.has(label)) return false;
+    triedDisabled.add(label);
+  }
+  const [x, y] = button.position;
+  const [width, height] = button.size!;
+  await probe.clickPoint(x + width / 2, y + height / 2);
   return true;
+}
+
+async function closeDocument(probe: MacOSProbe, kind: "Window" | "Tab") {
+  const close = await waitFor(async () => {
+    if (await dismiss(probe, startupButtons)) return;
+    for (const title of [`Close ${kind}`, "Close"]) {
+      if ((await menu(probe, "File", title))?.enabled) return title;
+    }
+  });
+  await probe.press(bundle, "File", close);
 }
 
 async function newWindow(app: ChordApp, probe: MacOSProbe, key: string) {
   const count = async () =>
-    (await probe.windows(bundle)).filter((window) => window.subrole === "AXStandardWindow").length;
-  const before = await count();
-  expect(before).toBeGreaterThan(0);
+    (await probe.windows(bundle)).filter((window) => window.id === "SceneWindow").length;
+  const before = await waitFor(async () => (await count()) || undefined);
   try {
     await app.runChecked(key);
-    await waitFor(async () => ((await count()) === before + 1 ? true : undefined));
+    await waitFor(async () => (await count()) === before + 1 || undefined, 12_000);
   } finally {
     if ((await count()) > before) {
-      await probe.key(13, command);
+      await closeDocument(probe, "Window");
       await waitFor(async () => ((await count()) === before ? true : undefined));
     }
   }
 }
 
 async function tabs(probe: MacOSProbe) {
+  if (await dismiss(probe, startupButtons)) return [];
   return (await controls(probe, 6))
     .filter((node) => node.role === "AXTabGroup")
     .flatMap((group) => group.children ?? [])
@@ -58,15 +91,28 @@ async function tabs(probe: MacOSProbe) {
 }
 
 async function newTab(app: ChordApp, probe: MacOSProbe, key: string) {
-  const count = async () => (await tabs(probe)).length || 1;
-  const before = await count();
+  const triedDisabled = new Set<string>();
+  const multiple = async () =>
+    (await menu(probe, "Window", "Move Tab to New Window"))?.enabled === true;
+  expect(await multiple()).toBe(false);
   try {
     await app.runChecked(key);
-    await waitFor(async () => ((await count()) === before + 1 ? true : undefined));
+    await waitFor(async () => {
+      if (await dismiss(probe, startupButtons, triedDisabled)) return;
+      return (await multiple()) || undefined;
+    }, 15_000).catch(async (cause) => {
+      const dialog = await probe.window(bundle, 7);
+      const buttons = flattenAX([dialog])
+        .filter(({ role }) => role === "AXButton" || role === "AXHeading")
+        .map(({ title, description, id, enabled }) => ({ title, description, id, enabled }));
+      throw new Error("News did not create a tab: " + JSON.stringify(buttons.slice(0, 15)), {
+        cause,
+      });
+    });
   } finally {
-    if ((await count()) > before) {
-      await probe.key(13, command);
-      await waitFor(async () => ((await count()) === before ? true : undefined));
+    if (await multiple()) {
+      await closeDocument(probe, "Tab");
+      await waitFor(async () => !(await multiple()) || undefined);
     }
   }
 }
@@ -75,19 +121,39 @@ async function discoverChannels(app: ChordApp, probe: MacOSProbe, key: string) {
   const picker = async () =>
     (await controls(probe, 9)).find(
       (node) =>
-        (node.role === "AXSheet" || node.role === "AXWindow" || node.role === "AXHeading") &&
+        ["AXSheet", "AXWindow", "AXHeading", "AXPopover", "AXDialog"].includes(node.role ?? "") &&
         [node.title, node.description, node.value].some(
           (text) => typeof text === "string" && /Discover Channels|Channels & Topics/.test(text),
         ),
     );
+  const controlsForPicker = async () =>
+    (await controls(probe, 11)).filter(
+      ({ role, title, description }) =>
+        ["AXSheet", "AXPopover", "AXHeading", "AXDialog"].includes(role ?? "") ||
+        /Discover|Channels|Topics/i.test([title, description].filter(Boolean).join(" ")),
+    );
   expect(await picker()).toBeUndefined();
   try {
     await app.runChecked(key);
-    await waitFor(picker, 15_000);
+    await waitFor(picker, 15_000).catch(async (cause) => {
+      const controls = (await controlsForPicker()).map(({ role, title, description, id }) => ({
+        role,
+        title,
+        description,
+        id,
+      }));
+      throw new Error(
+        "News did not open Discover Channels: " + JSON.stringify(controls.slice(0, 35)),
+        { cause },
+      );
+    });
   } finally {
     if (await picker()) {
-      await probe.key(53);
-      await waitFor(async () => ((await picker()) ? undefined : true));
+      if (!(await dismiss(probe, ["Done", "Close", "close", "Cancel"]))) await probe.key(53);
+      await waitFor(async () => {
+        const window = await probe.window(bundle);
+        return !(await picker()) && window.role !== "AXSheet" ? true : undefined;
+      }, 12_000);
     }
   }
 }
@@ -96,19 +162,26 @@ async function tabOverview(app: ChordApp, probe: MacOSProbe, key: string) {
   const overview = async () => (await menu(probe, "View", "Exit Tab Overview"))?.enabled;
   const count = async () => (await tabs(probe)).length || 1;
   const before = await count();
+  await waitFor(async () => (await menu(probe, "File", "New Tab"))?.enabled || undefined);
   await probe.press(bundle, "File", "New Tab");
   try {
-    await waitFor(async () => ((await count()) === before + 1 ? true : undefined));
+    await waitFor(
+      async () =>
+        (await count()) === before + 1 ||
+        (await menu(probe, "Window", "Move Tab to New Window"))?.enabled ||
+        undefined,
+      12_000,
+    );
     expect(await overview()).toBeFalsy();
     await app.runChecked(key);
-    await waitFor(async () => ((await overview()) ? true : undefined));
+    await waitFor(async () => ((await overview()) ? true : undefined), 12_000);
   } finally {
     if (await overview()) {
       await probe.press(bundle, "View", "Exit Tab Overview");
       await waitFor(async () => ((await overview()) ? undefined : true));
     }
     if ((await count()) > before) {
-      await probe.key(13, command);
+      await closeDocument(probe, "Tab");
       await waitFor(async () => ((await count()) === before ? true : undefined));
     }
   }
@@ -133,7 +206,7 @@ function toggleView(label: string): Behavior {
       await waitFor(async () => ((await menuTitle()) === after ? true : undefined));
     } finally {
       if ((await menuTitle()) === after) {
-        await probe.press(bundle, "View", after);
+        await app.runChecked(key);
         await waitFor(async () => ((await menuTitle()) === before ? true : undefined));
       }
     }
@@ -141,73 +214,90 @@ function toggleView(label: string): Behavior {
 }
 
 async function openSettings(app: ChordApp, probe: MacOSProbe, key: string) {
-  const before = (await probe.windows(bundle)).length;
-  const settings = async () => {
-    const windows = await probe.windows(bundle, 3);
-    return (
-      windows.length > before &&
-      windows.some((node) => /Settings|Preferences|General|Sources/.test(node.title ?? ""))
-    );
-  };
-  expect(await settings()).toBe(false);
+  const settings = async () =>
+    (await probe.windows(bundle)).find((node) => node.title === "News Settings");
+  expect(await settings()).toBeUndefined();
   try {
     await app.runChecked(key);
-    await waitFor(async () => ((await settings()) ? true : undefined), 10_000);
+    await waitFor(settings, 10_000);
   } finally {
-    if (await settings()) {
-      await probe.key(13, 1 << 20);
-      await waitFor(async () => ((await settings()) ? undefined : true));
+    const opened = await settings();
+    if (opened?.title) {
+      await probe.closeWindow(bundle, opened.title);
+      await waitFor(async () => !(await settings()) || undefined);
     }
   }
 }
 
-function switchTab(direction: "Previous" | "Next"): Behavior {
-  return async (app, probe, key) => {
-    const initial = (await tabs(probe)).length || 1;
-    const selectedIndex = async () =>
-      (await tabs(probe)).findIndex((tab) => tab.selected || tab.value === 1 || tab.value === true);
-    let createdTab: number | undefined;
-    await probe.press(bundle, "File", "New Tab");
-    try {
-      await waitFor(async () => ((await tabs(probe)).length === initial + 1 ? true : undefined));
-      createdTab = await waitFor(async () => {
-        const index = await selectedIndex();
-        return index < 0 ? undefined : index;
-      });
-      const newTab = createdTab;
-      const previous = (newTab + initial) % (initial + 1);
-      if (direction === "Next") {
-        await probe.press(bundle, "Window", "Show Previous Tab");
-        await waitFor(async () => ((await selectedIndex()) === previous ? true : undefined));
-      }
-      await app.runChecked(key);
-      const expected = direction === "Next" ? newTab : previous;
-      await waitFor(async () => ((await selectedIndex()) === expected ? true : undefined));
-    } finally {
-      if (createdTab !== undefined) {
-        if ((await selectedIndex()) !== createdTab) {
-          await probe.press(bundle, "Window", "Show Next Tab");
-          await waitFor(async () => ((await selectedIndex()) === createdTab ? true : undefined));
-        }
-        await probe.key(13, command);
-        await waitFor(async () =>
-          ((await tabs(probe)).length || 1) === initial ? true : undefined,
-        );
-      }
-    }
+const tabKeys = ["t[", "t]"] as const;
+
+async function switchTabs(app: ChordApp, probe: MacOSProbe) {
+  const count = async () => (await tabs(probe)).length || 1;
+  const selected = async () =>
+    (await tabs(probe)).findIndex((tab) => tab.selected || tab.value === 1 || tab.value === true);
+  const original = await count();
+  expect(original).toBe(1);
+  await probe.press(bundle, "File", "New Tab");
+  await waitFor(async () => (await count()) === 2 || undefined, 12_000);
+  const added = await waitFor(async () => {
+    const index = await selected();
+    if (index >= 0) return index;
+  });
+  const selectTab = async (index: number) => {
+    if ((await selected()) === index) return;
+    const tab = (await tabs(probe))[index];
+    expect(tab?.position && tab.size).toBeDefined();
+    const [x, y] = tab.position!;
+    const [width, height] = tab.size!;
+    await probe.clickPoint(x + width / 2, y + height / 2);
+    await waitFor(async () => (await selected()) === index || undefined);
   };
+  try {
+    await selectTab(1);
+    for (const [index, key] of tabKeys.entries()) {
+      const title = index === 0 ? "Show Previous Tab" : "Show Next Tab";
+      await waitFor(async () => (await menu(probe, "Window", title))?.enabled || undefined).catch(
+        async (cause) => {
+          throw new Error(
+            "News did not enable " +
+              title +
+              ": " +
+              JSON.stringify({ selected: await selected(), tabs: await tabs(probe) }),
+            { cause },
+          );
+        },
+      );
+      await app.runChecked(key);
+      await waitFor(async () => (await selected()) === index || undefined, 12_000).catch(
+        async (cause) => {
+          const states = (await tabs(probe)).map(({ title, value, selected }) => ({
+            title,
+            value,
+            selected,
+          }));
+          throw new Error(
+            "News did not select the tab after " + key + ": " + JSON.stringify(states),
+            { cause },
+          );
+        },
+      );
+      console.log("News " + key + " passed");
+    }
+  } finally {
+    await selectTab(added);
+    await closeDocument(probe, "Tab");
+    await waitFor(async () => (await count()) === original || undefined);
+  }
 }
 
 const cases: Record<string, Behavior> = {
-  wn: newWindow,
-  tn: newTab,
-  "t[": switchTab("Previous"),
-  "t]": switchTab("Next"),
-  ta: tabOverview,
-  gd: discoverChannels,
   vs: toggleView("Sidebar"),
+  tn: newTab,
+  ta: tabOverview,
   vt: toggleView("Tab Bar"),
   sa: openSettings,
+  gd: discoverChannels,
+  wn: newWindow,
 };
 
 test("every News binding has a behavior case", () => {
@@ -215,7 +305,7 @@ test("every News binding has a behavior case", () => {
     Object.keys(definition.chords)
       .filter((key) => !key.startsWith("?"))
       .sort(),
-  ).toEqual(Object.keys(cases).sort());
+  ).toEqual([...Object.keys(cases), ...tabKeys].sort());
 });
 
 test.skipIf(!macOSUITestsEnabled)(
@@ -227,19 +317,58 @@ test.skipIf(!macOSUITestsEnabled)(
     );
     await withChordPackage(import.meta.url, (app) =>
       withMacOSProbe(async (probe) => {
-        await probe.activate(bundle);
-        await waitFor(async () => {
-          if (await dismiss(probe, ["Continue", "No Thanks", "Not Now", "Done"])) return;
-          return (await menu(probe, "File", "New Window"))?.enabled ? true : undefined;
-        }, 45_000);
+        const triedDisabled = new Set<string>();
+        const ready = () => {
+          let requestedForeground = false;
+          return waitFor(async () => {
+            if (await dismiss(probe, startupButtons, triedDisabled)) return;
+            if (!(await probe.running(bundle)) || (await probe.front()) !== bundle) {
+              if (!requestedForeground) {
+                await runCommand(["/usr/bin/open", "-b", bundle]);
+                requestedForeground = true;
+              }
+              return;
+            }
+            const main = await probe.window(bundle).catch((error: unknown) => {
+              if (/com\.apple\.news is not running/.test(String(error))) return undefined;
+              throw error;
+            });
+            const ready = main?.role === "AXWindow" && main.subrole === "AXStandardWindow";
+            if (ready && (await menu(probe, "File", "New Window"))?.enabled) return main;
+          }, 30_000).catch(async (cause) => {
+            const views = (await controls(probe, 9))
+              .filter(({ role }) => ["AXButton", "AXHeading", "AXSheet"].includes(role ?? ""))
+              .map(({ role, title, description, id, enabled }) => ({
+                role,
+                title,
+                description,
+                id,
+                enabled,
+              }));
+            throw new Error(
+              "News did not reach its browser window: " +
+                JSON.stringify({
+                  window: await probe.window(bundle),
+                  views: views.slice(0, 30),
+                }),
+              { cause },
+            );
+          });
+        };
         const failures: string[] = [];
+        await ready();
+        await switchTabs(app, probe).catch((error: unknown) => {
+          failures.push("News tab switching: " + String(error));
+        });
         for (const [key, behavior] of Object.entries(cases)) {
+          await ready();
           try {
             await behavior(app, probe, key);
             console.log(`News ${key} passed`);
           } catch (error) {
             const failure = `News ${key}: ${error}`;
-            console.error(failure);
+            const window = await probe.window(bundle).catch(() => undefined);
+            console.error(failure, JSON.stringify({ window }));
             failures.push(failure);
           }
         }

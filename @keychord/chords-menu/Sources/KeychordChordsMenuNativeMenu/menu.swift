@@ -61,7 +61,7 @@ public enum MenuError: Error, CustomStringConvertible {
         case .ambiguousSearch(let query, let paths):
             return "Menu search \"\(query)\" is ambiguous: \(paths.joined(separator: ", ")). Include a menu path such as Window > Center."
         case .invalidAction(let action):
-            return "unknown menu action \"\(action)\" (expected \"BY_INDEX\", \"BY_LETTERS\", \"BY_PATH\", \"BY_KEY\", \"SEARCH\", or \"FOCUS\")"
+            return "unknown menu action \"\(action)\" (expected \"BY_INDEX\", \"BY_LETTERS\", \"BY_PATH\", \"BY_FIRST_PATH\", \"BY_KEY\", \"SEARCH\", or \"FOCUS\")"
         case .applicationNotFound(let name):
             return "application \"\(name)\" is not running and could not be launched"
         case .noFrontmostApplication:
@@ -291,7 +291,12 @@ private func parseMenuPath(_ value: String) throws -> [String] {
     } catch {
         throw MenuError.invalidPath("expected a JSON array of strings")
     }
-    guard path.count >= 1 else {
+    return try cleanMenuPath(path)
+}
+
+@MainActor
+private func cleanMenuPath(_ path: [String]) throws -> [String] {
+    guard !path.isEmpty else {
         throw MenuError.invalidPath("expected at least a top-level menu")
     }
     let cleanedPath = path.map(cleanTitle)
@@ -329,6 +334,29 @@ private func clickMenuItem(_ items: [Element], path: [String]) throws {
     let label = path.joined(separator: " > ")
     log("Clicking menu path: \(label)")
     try axPress(menuItem(items, path: path), label: "menu path \"\(label)\"")
+}
+
+@MainActor
+private func clickFirstMenuPath(_ items: [Element], value: String) throws {
+    guard let paths = try? JSONDecoder().decode([[String]].self, from: Data(value.utf8)),
+          !paths.isEmpty else {
+        throw MenuError.invalidPath("expected one or more exact menu paths")
+    }
+    let candidates = try paths.map { try cleanMenuPath($0) }
+    var firstError: Error?
+    for path in candidates {
+        let item: Element
+        do {
+            item = try menuItem(items, path: path)
+        } catch {
+            if firstError == nil { firstError = error }
+            continue
+        }
+        let label = path.joined(separator: " > ")
+        try axPress(item, label: "menu path \"\(label)\"")
+        return
+    }
+    throw firstError ?? MenuError.invalidPath("no matching menu path")
 }
 
 @MainActor
@@ -531,6 +559,8 @@ public func runMenuAction(processName: String?, action: String, value: String) a
         }
     case "BY_PATH":
         try clickMenuItem(items, path: try parseMenuPath(value))
+    case "BY_FIRST_PATH":
+        try clickFirstMenuPath(items, value: value)
     case "BY_KEY":
         try pressKeyEquivalent(menuItem(items, path: parseMenuPath(value)), target: target)
     default:

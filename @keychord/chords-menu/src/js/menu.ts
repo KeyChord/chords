@@ -9,10 +9,19 @@
  */
 import addon from "./menu.node";
 
-export type MenuAction = "BY_INDEX" | "BY_LETTERS" | "BY_PATH" | "BY_KEY" | "SEARCH" | "FOCUS";
+export type MenuAction =
+  | "BY_INDEX"
+  | "BY_LETTERS"
+  | "BY_PATH"
+  | "BY_FIRST_PATH"
+  | "BY_KEY"
+  | "SEARCH"
+  | "FOCUS";
 
 /** An exact menu path, starting at a top-level menu and ending at the item to invoke. */
 export type MenuPath = readonly [menu: string, ...subitems: string[]];
+
+type MenuPaths = readonly [MenuPath, ...MenuPath[]];
 
 export type MenuHandlerContext = {
   /** Bundle identifier captured by Chord when it resolved the chord. */
@@ -22,7 +31,8 @@ export type MenuHandlerContext = {
 export type MenuArguments =
   | [action: "BY_INDEX", menuIndex: number | string]
   | [action: "BY_LETTERS" | "SEARCH" | "FOCUS", query: string]
-  | [action: "BY_PATH" | "BY_KEY", path: MenuPath];
+  | [action: "BY_PATH" | "BY_KEY", path: MenuPath]
+  | [action: "BY_FIRST_PATH", paths: MenuPaths];
 
 /** Resolves when the native action completes; rejects on validation or accessibility errors. */
 export type MenuHandler = {
@@ -57,14 +67,29 @@ export type MenuHandler = {
    * `["Window", "Move Tab to New Window"]`.
    */
   (this: MenuHandlerContext | void, action: "BY_PATH" | "BY_KEY", path: MenuPath): Promise<void>;
+  (this: MenuHandlerContext | void, action: "BY_FIRST_PATH", paths: MenuPaths): Promise<void>;
   (this: MenuHandlerContext | void, ...args: MenuArguments): Promise<void>;
 };
+
+function isMenuPath(value: unknown): value is MenuPath {
+  return (
+    Array.isArray(value) &&
+    value.length > 0 &&
+    value.every((component) => typeof component === "string" && component.trim())
+  );
+}
 
 export async function runMenuAction(
   processName: string | undefined,
   action: MenuAction,
-  value: number | string | MenuPath,
+  value: number | string | MenuPath | MenuPaths,
 ): Promise<void> {
+  if (action === "BY_FIRST_PATH") {
+    if (!Array.isArray(value) || !value.length || !value.every(isMenuPath)) {
+      throw new TypeError('"BY_FIRST_PATH" expects one or more exact menu paths');
+    }
+    return addon.runMenuAction(processName, action, JSON.stringify(value));
+  }
   if (action === "BY_PATH" || action === "BY_KEY") {
     if (
       !Array.isArray(value) ||
@@ -94,7 +119,7 @@ export default function buildMenuHandler(processName?: string): MenuHandler {
   return function menu(
     this: MenuHandlerContext | void,
     action: MenuAction,
-    value: number | string | MenuPath = 0,
+    value: number | string | MenuPath | MenuPaths = 0,
   ) {
     return runMenuAction(processName ?? this?.focusedAppId, action, value);
   } as MenuHandler;

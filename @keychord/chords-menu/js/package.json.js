@@ -1,7 +1,7 @@
 //#region package.json
 var name = "@keychord/chords-menu";
 var displayName = "Menu Chords";
-var version = "0.0.4";
+var version = "0.0.5";
 var description = "System shortcuts for Linux and Windows, plus application menus and the menu bar on macOS.";
 var categories = ["macOS"];
 var repository = {

@@ -18,12 +18,24 @@ file = '@keychord/chords-menu/js/menu.js'
   'BY_PATH',
   [
     'File',
-    'Discover Channels',
+    'Discover Channels…',
   ],
 ] }
 
 '?v' = { name = 'Vary' }
-'vs' = { name = 'Vary: Sidebar', '@input:menu' = ['SEARCH', 'Sidebar'] }
+'vs' = { name = 'Vary: Sidebar', '@input:menu' = [
+  'BY_FIRST_PATH',
+  [
+    [
+      'View',
+      'Show Sidebar',
+    ],
+    [
+      'View',
+      'Hide Sidebar',
+    ],
+  ],
+] }
 'vt' = { name = 'Vary: Tab Bar', '@input:menu' = ['SEARCH', 'Tab Bar'] }
 
 '?s' = { name = 'Settings' }
