@@ -33,7 +33,7 @@ file = '@keychord/chords-menu/js/menu.js'
     'Ticket Viewer',
   ],
 ] }
-'gc' = { name = 'Goto: Settings', '@input:menu' = ['BY_PATH', ['Keychain Access', 'Preferences…']] }
+'gc' = { name = 'Goto: Settings', '@input:menu' = ['BY_PATH', ['Keychain Access', 'Settings…']] }
 'gi' = { name = 'Goto: Item Info', '@input:menu' = ['BY_PATH', ['File', 'Get Info']] }
 
 '?v' = { name = 'Vary' }

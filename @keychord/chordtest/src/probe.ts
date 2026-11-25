@@ -12,6 +12,7 @@ export type AXNode = {
   id?: string;
   description?: string;
   mark?: string;
+  sortDirection?: string;
   key?: string;
   keyModifiers?: number;
   keyGlyph?: number;
@@ -148,8 +149,16 @@ export class MacOSProbe {
     return this.read("windows", bundleId, String(depth));
   }
 
+  visibleRows(bundleId: string, depth = 0): Promise<AXNode[]> {
+    return this.read("visible-rows", bundleId, String(depth));
+  }
+
   async raiseWindow(bundleId: string, identifier: string) {
     await runCommand([this.executable, "raise-window", bundleId, identifier]);
+  }
+
+  async closeWindow(bundleId: string, titleOrIdentifier: string) {
+    await runCommand([this.executable, "close-window", bundleId, titleOrIdentifier]);
   }
 
   window(bundleId: string, depth = 0): Promise<AXNode> {

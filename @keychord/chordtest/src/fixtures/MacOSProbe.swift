@@ -64,34 +64,63 @@ func application(_ bundleId: String) throws -> AXUIElement {
 }
 
 func node(_ element: AXUIElement, depth: Int, menu: Bool = false) -> [String: Any] {
-    var result: [String: Any] = [:]
-    for (key, attributeName) in [
+    let textAttributes = [
         ("role", kAXRoleAttribute), ("subrole", kAXSubroleAttribute), ("title", kAXTitleAttribute),
         ("id", kAXIdentifierAttribute), ("description", kAXDescriptionAttribute),
         ("mark", kAXMenuItemMarkCharAttribute), ("key", kAXMenuItemCmdCharAttribute),
-    ] {
-        if let value: String = attribute(element, attributeName), !value.isEmpty { result[key] = value }
-    }
-    for (key, attributeName) in [
+        ("sortDirection", kAXSortDirectionAttribute),
+    ]
+    let booleanAttributes = [
         ("enabled", kAXEnabledAttribute), ("selected", kAXSelectedAttribute),
         ("minimized", kAXMinimizedAttribute), ("focused", kAXFocusedAttribute),
+    ]
+    let numberAttributes = [
         ("keyModifiers", kAXMenuItemCmdModifiersAttribute), ("keyGlyph", kAXMenuItemCmdGlyphAttribute),
         ("keyVirtual", kAXMenuItemCmdVirtualKeyAttribute),
-    ] {
-        if let value: NSNumber = attribute(element, attributeName) { result[key] = value }
+    ]
+    var names = (textAttributes + booleanAttributes + numberAttributes).map { $0.1 }
+    if !menu { names += [kAXURLAttribute, kAXValueAttribute, kAXPositionAttribute, kAXSizeAttribute] }
+    if depth > 0 { names.append(kAXChildrenAttribute) }
+    var values: CFArray?
+    let batch: [String: AnyObject]?
+    if AXUIElementCopyMultipleAttributeValues(element, names as CFArray, [], &values) == .success,
+       let entries = values as? [AnyObject], entries.count == names.count {
+        batch = Dictionary(uniqueKeysWithValues: zip(names, entries))
+    } else {
+        batch = nil
+    }
+    func read<T>(_ name: String) -> T? {
+        if let batch {
+            guard let value = batch[name], !(value is NSNull) else { return nil }
+            if CFGetTypeID(value) == AXValueGetTypeID(),
+               AXValueGetType(value as! AXValue) == .axError { return nil }
+            return value as? T
+        }
+        return attribute(element, name)
+    }
+
+    var result: [String: Any] = [:]
+    for (key, name) in textAttributes {
+        if let value: String = read(name), !value.isEmpty { result[key] = value }
+    }
+    for (key, name) in booleanAttributes {
+        if let value: NSNumber = read(name) { result[key] = value.boolValue }
+    }
+    for (key, name) in numberAttributes {
+        if let value: NSNumber = read(name) { result[key] = value }
     }
     if !menu {
-        if let url: URL = attribute(element, kAXURLAttribute) { result["url"] = url.absoluteString }
-        let value: AnyObject? = attribute(element, kAXValueAttribute)
+        if let url: URL = read(kAXURLAttribute) { result["url"] = url.absoluteString }
+        let value: AnyObject? = read(kAXValueAttribute)
         if let value = value as? String { result["value"] = value }
         else if let value = value as? NSNumber, value.doubleValue.isFinite { result["value"] = value }
-        if let position: AXValue = attribute(element, kAXPositionAttribute) {
+        if let position: AXValue = read(kAXPositionAttribute) {
             var point = CGPoint.zero
             if AXValueGetValue(position, .cgPoint, &point), point.x.isFinite, point.y.isFinite {
                 result["position"] = [point.x, point.y]
             }
         }
-        if let value: AXValue = attribute(element, kAXSizeAttribute) {
+        if let value: AXValue = read(kAXSizeAttribute) {
             var size = CGSize.zero
             if AXValueGetValue(value, .cgSize, &size), size.width.isFinite, size.height.isFinite {
                 result["size"] = [size.width, size.height]
@@ -99,7 +128,8 @@ func node(_ element: AXUIElement, depth: Int, menu: Bool = false) -> [String: An
         }
     }
     if depth > 0 {
-        let contents = children(element).map { node($0, depth: depth - 1, menu: menu) }
+        let elements: [AXUIElement] = read(kAXChildrenAttribute) ?? []
+        let contents = elements.map { node($0, depth: depth - 1, menu: menu) }
         if !contents.isEmpty { result["children"] = contents }
     }
     return result
@@ -272,6 +302,19 @@ func inspect(_ args: [String]) throws {
         let root = try application(args[1])
         let windows: [AXUIElement] = attribute(root, kAXWindowsAttribute) ?? []
         try writeJSON(windows.map { node($0, depth: Int(args[2])!, menu: false) })
+    case "visible-rows":
+        let root = try application(args[1])
+        func visibleRows(_ element: AXUIElement, depth: Int) -> [AXUIElement] {
+            let role: String? = attribute(element, kAXRoleAttribute)
+            if role == kAXTableRole || role == kAXOutlineRole {
+                return attribute(element, kAXVisibleRowsAttribute) ?? []
+            }
+            guard depth > 0 else { return [] }
+            return children(element).flatMap { visibleRows($0, depth: depth - 1) }
+        }
+        let windows: [AXUIElement] = attribute(root, kAXWindowsAttribute) ?? []
+        let rows = windows.flatMap { visibleRows($0, depth: 7) }
+        try writeJSON(rows.map { node($0, depth: Int(args[2])!) })
     case "raise-window":
         let root = try application(args[1])
         let windows: [AXUIElement] = attribute(root, kAXWindowsAttribute) ?? []
@@ -281,6 +324,17 @@ func inspect(_ args: [String]) throws {
         _ = AXUIElementSetAttributeValue(target, kAXMainAttribute as CFString, kCFBooleanTrue)
         let status = AXUIElementPerformAction(target, kAXRaiseAction as CFString)
         guard status == .success else { throw ProbeError("Cannot raise the window (AX error \(status.rawValue))") }
+    case "close-window":
+        let root = try application(args[1])
+        let windows: [AXUIElement] = attribute(root, kAXWindowsAttribute) ?? []
+        let target = windows.first(where: { attribute($0, kAXTitleAttribute) == args[2] }) ??
+            windows.first(where: { attribute($0, kAXIdentifierAttribute) == args[2] })
+        guard let target,
+              let button: AXUIElement = attribute(target, kAXCloseButtonAttribute) else {
+            throw ProbeError("No close button for window \(args[2])")
+        }
+        let status = AXUIElementPerformAction(button, kAXPressAction as CFString)
+        guard status == .success else { throw ProbeError("Cannot close the window (AX error \(status.rawValue))") }
     case "window":
         let root = try application(args[1])
         let window: AXUIElement? = attribute(root, kAXFocusedWindowAttribute)

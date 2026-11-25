@@ -1,7 +1,7 @@
 {
   "name": "@keychord/chords-com.apple.keychainaccess",
   "displayName": "Keychain Access Chords",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Chords for Keychain Access (com.apple.keychainaccess).",
   "categories": [
     "macOS"
