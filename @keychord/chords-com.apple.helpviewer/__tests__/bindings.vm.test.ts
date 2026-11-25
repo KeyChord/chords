@@ -7,7 +7,6 @@ import {
   withMacOSProbe,
   type ChordApp,
   type MacOSProbe,
-  type AXNode,
 } from "@keychord/chordtest";
 
 const bundle = "com.apple.helpviewer";
@@ -23,15 +22,56 @@ const controls = async (probe: MacOSProbe, depth = 5) =>
 const menu = (probe: MacOSProbe, ...path: string[]) =>
   probe.menu(bundle, ...path).catch(() => undefined);
 
+async function focusGuideContent(probe: MacOSProbe) {
+  const heading = (await controls(probe, 13)).find(
+    (node) =>
+      node.role === "AXHeading" &&
+      [node.title, node.description].some((title) => /^Mac User Guide(?: |$)/.test(title ?? "")) &&
+      node.position &&
+      node.size,
+  );
+  if (heading) {
+    const [x, y] = heading.position!;
+    const [width, height] = heading.size!;
+    await probe.clickPoint(x + width / 2, y + height / 2);
+  }
+}
+
 async function focusSearch(app: ChordApp, probe: MacOSProbe, key: string) {
-  const focused = async () => (await probe.focus(bundle)).subrole === "AXSearchField";
+  const focused = async () => {
+    const field = await probe.focus(bundle);
+    return (
+      field.subrole === "AXSearchField" ||
+      field.role === "AXSearchField" ||
+      (field.role === "AXTextField" &&
+        [field.title, field.description, field.id].some((label) => /search/i.test(label ?? "")))
+    );
+  };
+  const searchField = () =>
+    probe.windowElement(bundle, "AXSearchField", "AXTextField", "AXSearchField");
+  if (await focused()) await probe.key(53);
+  if (await focused()) await focusGuideContent(probe);
   if (await focused()) await probe.key(48);
-  await waitFor(async () => ((await focused()) ? undefined : true));
+  await waitFor(async () => ((await focused()) ? undefined : true)).catch(async (cause) => {
+    throw new Error("Tips search already had focus: " + JSON.stringify(await probe.focus(bundle)), {
+      cause,
+    });
+  });
+  const before = await searchField();
   try {
     await app.runChecked(key);
-    await waitFor(async () => ((await focused()) ? true : undefined));
+    await waitFor(async () => {
+      if (await focused()) return true;
+      return !before && (await searchField()) ? true : undefined;
+    }, 10_000).catch(async (cause) => {
+      throw new Error(
+        "Tips did not open its Guide search: " +
+          JSON.stringify({ window: await probe.window(bundle), focus: await probe.focus(bundle) }),
+        { cause },
+      );
+    });
   } finally {
-    if (await focused()) await probe.key(53);
+    if ((await focused()) || (!before && (await searchField()))) await probe.key(53);
   }
 }
 
@@ -62,12 +102,80 @@ function toggleView(label: string): Behavior {
 }
 
 async function pageMatches(probe: MacOSProbe, title: string) {
-  const window = await probe.window(bundle, 9);
-  const match = (label: AXNode) =>
-    [label.title, label.description].some((text) => text?.includes(title));
-  return (
-    match(window) || flattenAX([window]).some((node) => node.role === "AXWebArea" && match(node))
+  const nodes = await controls(probe, 13);
+  if (title === "What’s New in macOS") {
+    return ["What’s New", "See what’s new in macOS."].every((label) =>
+      nodes.some(
+        (node) =>
+          node.role === "AXStaticText" &&
+          [node.title, node.description, node.value].includes(label),
+      ),
+    );
+  }
+  const expected = title.toLowerCase();
+  return nodes.some(
+    (node) =>
+      node.role === "AXHeading" &&
+      node.value === 1 &&
+      [node.title, node.description].some((text) => {
+        const heading = text?.toLowerCase().replace(/['’]/g, "’");
+        return heading === expected || heading?.startsWith(expected + " ");
+      }),
   );
+}
+
+async function waitForPage(probe: MacOSProbe, title: string) {
+  await waitFor(async () => (await pageMatches(probe, title)) || undefined, 25_000).catch(
+    async (cause) => {
+      const visible = (await controls(probe, 13))
+        .filter(({ role }) => ["AXHeading", "AXStaticText", "AXWebArea"].includes(role ?? ""))
+        .map(({ role, title, description, value, url }) => ({
+          role,
+          title,
+          description,
+          value,
+          url,
+        }));
+      throw new Error(
+        "Tips did not open " +
+          title +
+          ": " +
+          JSON.stringify({ window: await probe.window(bundle), visible: visible.slice(0, 35) }),
+        { cause },
+      );
+    },
+  );
+}
+
+async function leavePage(probe: MacOSProbe, title: string) {
+  const home = (await controls(probe, 6)).find(
+    (node) => node.role === "AXButton" && node.id === "house" && node.enabled,
+  );
+  if (home) await probe.clickControl(bundle, "AXButton", "house");
+  else await probe.key(33, 1 << 20);
+  const left = async () => !(await pageMatches(probe, title)) || undefined;
+  if (!(await waitFor(left, 2_000).catch(() => undefined))) {
+    await probe.key(53);
+    if (await pageMatches(probe, title)) await probe.key(33, 1 << 20);
+  }
+  await waitFor(left, 12_000).catch((cause) => {
+    throw new Error("Tips did not leave " + title, { cause });
+  });
+}
+
+function inGuide(behavior: Behavior, leave = true): Behavior {
+  return async (app, probe, key) => {
+    const guide = "Mac User Guide";
+    if (!(await pageMatches(probe, guide))) {
+      await probe.press(bundle, "Help", guide);
+      await waitForPage(probe, guide);
+    }
+    try {
+      await behavior(app, probe, key);
+    } finally {
+      if (leave) await leavePage(probe, guide);
+    }
+  };
 }
 
 function openGuide(title: string): Behavior {
@@ -75,50 +183,56 @@ function openGuide(title: string): Behavior {
     expect(await pageMatches(probe, title)).toBe(false);
     try {
       await app.runChecked(key);
-      await waitFor(async () => ((await pageMatches(probe, title)) ? true : undefined), 20_000);
+      await waitForPage(probe, title);
     } finally {
-      if (await pageMatches(probe, title)) {
-        // Command-[ returns to the help landing page.
-        await probe.key(33, 1 << 20);
-        await waitFor(async () => ((await pageMatches(probe, title)) ? undefined : true));
-      }
+      if (await pageMatches(probe, title)) await leavePage(probe, title);
     }
   };
 }
 
 async function findOnPage(app: ChordApp, probe: MacOSProbe, key: string) {
-  await probe.press(bundle, "Help", "Mac User Guide");
-  try {
-    await waitFor(
-      async () => ((await pageMatches(probe, "Mac User Guide")) ? true : undefined),
-      20_000,
+  await focusGuideContent(probe);
+  const find = await waitFor(() => menu(probe, "Edit", "Search", "Find…"), 12_000);
+  if (find.enabled === false) {
+    await app.expectFailure(key, /Menu item "Find…".*is disabled/);
+    return;
+  }
+  const findBar = async () =>
+    (await controls(probe, 9)).find(
+      (node) =>
+        (node.role === "AXButton" && [node.title, node.description].includes("Done")) ||
+        (node.role === "AXTextField" &&
+          [node.title, node.description, node.id].some(
+            (label) => typeof label === "string" && /^Find(?:\b|InPage)/i.test(label),
+          )),
     );
-    const findBar = async () =>
-      (await controls(probe, 9)).find(
-        (node) => node.role === "AXButton" && [node.title, node.description].includes("Done"),
+  expect(await findBar()).toBeUndefined();
+  try {
+    await app.runChecked(key);
+    await waitFor(findBar, 12_000).catch(async (cause) => {
+      throw new Error(
+        "Tips did not show Find on Page: " + JSON.stringify(await probe.focus(bundle)),
+        { cause },
       );
-    expect(await findBar()).toBeUndefined();
-    try {
-      await app.runChecked(key);
-      await waitFor(findBar);
-    } finally {
-      if (await findBar()) {
+    });
+  } finally {
+    const bar = await findBar();
+    if (bar) {
+      if (bar.role === "AXButton") await probe.clickControl(bundle, "AXButton", "Done");
+      else await probe.key(53);
+      if (!(await waitFor(async () => !(await findBar()) || undefined, 2_000).catch(() => false))) {
         await probe.key(53);
-        await waitFor(async () => ((await findBar()) ? undefined : true));
       }
     }
-  } finally {
-    await probe.key(33, 1 << 20);
-    await waitFor(async () => ((await pageMatches(probe, "Mac User Guide")) ? undefined : true));
   }
 }
 
 const cases: Record<string, Behavior> = {
-  js: focusSearch,
-  vs: toggleView("Sidebar"),
+  js: inGuide(focusSearch),
+  vs: inGuide(toggleView("Sidebar")),
   gg: openGuide("Mac User Guide"),
   gn: openGuide("What’s New in macOS"),
-  ff: findOnPage,
+  ff: inGuide(findOnPage, false),
 };
 
 test("every Tips binding has a behavior case", () => {

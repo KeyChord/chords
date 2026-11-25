@@ -5,14 +5,23 @@ file = '@keychord/chords-menu/js/menu.js'
 
 [chords]
 '?j' = { name = 'Jump' }
-'js' = { name = 'Jump: Help Search', '@input:menu' = ['SEARCH', 'Help Search'] }
+'js' = { name = 'Jump: Help Search', '@input:menu' = ['CLICK_TOOLBAR_BUTTON', 'Search'] }
 
 '?v' = { name = 'Vary' }
-'vs' = { name = 'Vary: Sidebar', '@input:menu' = ['SEARCH', 'Sidebar'] }
+'vs' = { name = 'Vary: Sidebar', '@input:menu' = [
+  'BY_FIRST_PATH',
+  [
+    ['View', 'Show Sidebar'],
+    ['View', 'Hide Sidebar'],
+  ],
+] }
 
 '?g' = { name = 'Goto' }
-'gg' = { name = 'Goto: Mac User Guide', '@input:menu' = ['SEARCH', 'Mac User Guide'] }
-'gn' = { name = 'Goto: What’s New in macOS', '@input:menu' = ['SEARCH', 'What’s New in macOS'] }
+'gg' = { name = 'Goto: Mac User Guide', '@input:menu' = ['BY_PATH', ['Help', 'Mac User Guide']] }
+'gn' = { name = 'Goto: What’s New in macOS', '@input:menu' = [
+  'BY_PATH',
+  ['Help', 'What’s New in macOS'],
+] }
 
 '?f' = { name = 'Find' }
-'ff' = { name = 'Find: On Page', '@input:menu' = ['SEARCH', 'Find…'] }
+'ff' = { name = 'Find: On Page', '@input:menu' = ['BY_PATH', ['Edit', 'Search', 'Find…']] }
