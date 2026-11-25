@@ -8,10 +8,16 @@ file = '@keychord/chords-menu/js/menu.js'
 'a,' = { name = 'App: Settings', '@input:menu' = ['BY_PATH', ['Music', 'Settings…']] }
 '?g' = { name = 'Goto' }
 'g/' = { name = 'Goto: Search', shortcut = 'cmd+f' }
-'gr' = { name = 'Goto: Recently Added', shortcut = 'ctrl+cmd+1' }
-'ga' = { name = 'Goto: Artists', shortcut = 'ctrl+cmd+2' }
-'gb' = { name = 'Goto: Albums', shortcut = 'ctrl+cmd+3' }
-'gs' = { name = 'Goto: Songs', shortcut = 'ctrl+cmd+4' }
+'gr' = { name = 'Goto: Recently Added', '@input:menu' = [
+  'SELECT_ROW',
+  [
+    'outline',
+    'Recently Added',
+  ],
+] }
+'ga' = { name = 'Goto: Artists', '@input:menu' = ['SELECT_ROW', ['outline', 'Artists']] }
+'gb' = { name = 'Goto: Albums', '@input:menu' = ['SELECT_ROW', ['outline', 'Albums']] }
+'gs' = { name = 'Goto: Songs', '@input:menu' = ['SELECT_ROW', ['outline', 'Songs']] }
 '?n' = { name = 'New' }
 'np' = { name = 'New: Playlist', '@input:menu' = ['BY_PATH', ['File', 'New', 'Playlist']] }
 'ns' = { name = 'New: Smart Playlist', '@input:menu' = [
