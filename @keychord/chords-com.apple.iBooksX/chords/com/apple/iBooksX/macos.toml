@@ -27,12 +27,39 @@ file = '@keychord/chords-menu/js/menu.js'
     'Show Highlights & Notes',
   ],
 ] }
-'vg' = { name = 'View: Grid', '@input:menu' = ['BY_PATH', ['View', 'View As', 'Grid']] }
-'vl' = { name = 'View: List', '@input:menu' = ['BY_PATH', ['View', 'View As', 'List']] }
+'vg' = { name = 'View: Grid', '@input:menu' = ['BY_PATH', ['View', 'Grid']] }
+'vl' = { name = 'View: List', '@input:menu' = ['BY_PATH', ['View', 'List']] }
 '?s' = { name = 'Sort' }
-'st' = { name = 'Sort: Title', '@input:menu' = ['BY_PATH', ['View', 'Sort By', 'Title']] }
-'sa' = { name = 'Sort: Author', '@input:menu' = ['BY_PATH', ['View', 'Sort By', 'Author']] }
-'sr' = { name = 'Sort: Recent', '@input:menu' = ['BY_PATH', ['View', 'Sort By', 'Recent']] }
+'st' = { name = 'Sort: Title', '@input:menu' = [
+  'BY_POPUP',
+  [
+    'Library Actions',
+    'Title',
+    'View',
+    'Sort By',
+    'Title',
+  ],
+] }
+'sa' = { name = 'Sort: Author', '@input:menu' = [
+  'BY_POPUP',
+  [
+    'Library Actions',
+    'Author',
+    'View',
+    'Sort By',
+    'Author',
+  ],
+] }
+'sr' = { name = 'Sort: Recent', '@input:menu' = [
+  'BY_POPUP',
+  [
+    'Library Actions',
+    'Recent',
+    'View',
+    'Sort By',
+    'Recent',
+  ],
+] }
 '?p' = { name = 'Page' }
 'p[' = { name = 'Page: Previous', shortcut = 'left' }
 'p]' = { name = 'Page: Next', shortcut = 'right' }
