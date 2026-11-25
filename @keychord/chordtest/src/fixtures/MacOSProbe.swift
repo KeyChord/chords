@@ -343,6 +343,15 @@ func inspect(_ args: [String]) throws {
         let root = try application(args[1])
         let target: AXUIElement? = attribute(root, kAXFocusedUIElementAttribute)
         try writeJSON(target.map { node($0, depth: 0) } ?? [:])
+    case "type-text":
+        let characters = Array(args[1].utf16)
+        for down in [true, false] {
+            guard let event = CGEvent(keyboardEventSource: nil, virtualKey: 0, keyDown: down) else {
+                throw ProbeError("Could not create a text event")
+            }
+            event.keyboardSetUnicodeString(stringLength: characters.count, unicodeString: characters)
+            event.post(tap: .cghidEventTap)
+        }
     case "move":
         let root = try application(args[1])
         guard let window: AXUIElement = attribute(root, kAXFocusedWindowAttribute),

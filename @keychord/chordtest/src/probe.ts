@@ -197,6 +197,10 @@ export class MacOSProbe {
     await runCommand([this.executable, "key", String(code), String(flags)]);
   }
 
+  async typeText(value: string) {
+    await runCommand([this.executable, "type-text", value]);
+  }
+
   async moveIcon(bundleId: string, title: string, x: number, y: number) {
     await runCommand([this.executable, "move", bundleId, title, String(x), String(y)]);
   }

@@ -10,7 +10,7 @@ file = '@keychord/chords-menu/js/menu.js'
 
 '?e' = { name = 'Edit' }
 'ed' = { name = 'Edit: Duplicate Note', '@input:menu' = ['BY_PATH', ['File', 'Duplicate Note']] }
-'ex' = { name = 'Edit: Delete Note', '@input:menu' = ['BY_PATH', ['Edit', 'Delete']] }
+'ex' = { name = 'Edit: Delete Note', '@input:menu' = ['BY_PATH', ['Edit', 'Delete Note']] }
 
 '?j' = { name = 'Jump' }
 'jn' = { name = 'Jump: Search All Notes', '@input:menu' = [
