@@ -1,7 +1,7 @@
 {
   "name": "@keychord/chords-com.apple.mail",
   "displayName": "Mail Chords",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Chords for Mail (com.apple.mail).",
   "categories": [
     "macOS"

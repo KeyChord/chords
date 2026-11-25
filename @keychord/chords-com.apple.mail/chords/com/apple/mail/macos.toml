@@ -16,13 +16,6 @@ file = '@keychord/chords-menu/js/menu.js'
 
 '?g' = { name = 'Goto' }
 'g,' = { name = 'Goto: Settings', '@input:menu' = ['BY_PATH', ['Mail', 'Settings…']] }
-'go' = { name = 'Goto: Open Mailbox Quickly', '@input:menu' = [
-  'BY_PATH',
-  [
-    'Mailbox',
-    'Open Quickly…',
-  ],
-] }
 
 '?n' = { name = 'New' }
 'nm' = { name = 'New: Message', '@input:menu' = ['BY_PATH', ['File', 'New Message']] }
