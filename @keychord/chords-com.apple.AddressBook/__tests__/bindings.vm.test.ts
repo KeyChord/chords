@@ -30,6 +30,30 @@ const first = "Pim";
 const second = "Pimx";
 const menu = (probe: MacOSProbe, ...path: string[]) => probe.menu(bundleId, ...path);
 const press = (probe: MacOSProbe, ...path: string[]) => probe.press(bundleId, ...path);
+const cancel = (probe: MacOSProbe) => probe.pressControl(bundleId, "AXButton", "Cancel");
+
+const searchFocused = async (probe: MacOSProbe) =>
+  (await probe.focus(bundleId)).subrole === "AXSearchField";
+
+async function leaveSearch(probe: MacOSProbe) {
+  if (!(await searchFocused(probe))) return;
+  await probe.key(53);
+  if (!(await searchFocused(probe))) return;
+  const panel = await waitFor(async () =>
+    (await nodes(probe)).find(
+      (node) =>
+        node.role === "AXOutline" &&
+        node.title === "Contact List" &&
+        node.position &&
+        node.size?.every((dimension) => dimension > 0),
+    ),
+  );
+  const [x, y] = panel.position!;
+  const [width, height] = panel.size!;
+  await probe.clickPoint(x + width / 2, y + height / 2);
+  if (await searchFocused(probe)) await probe.key(48);
+  await until(async () => !(await searchFocused(probe)), "focus to leave the contact search field");
+}
 
 async function listsTitle(probe: MacOSProbe) {
   return flattenAX([await menu(probe, "View")]).find((node) =>
@@ -72,18 +96,17 @@ const scenarios: Record<string, Scenario> = {
             ),
         );
       const edit = async () =>
-        (await nodes(probe)).some((node) => node.role === "AXButton" && node.title === "Done");
+        (await nodes(probe)).some(
+          (node) => node.role === "AXTextField" && node.description === "First",
+        );
       const selected = async (name: string) => (await row(name)())?.selected === true;
       const nameCard = async (name: string) => {
         await until(edit, "the contact editor");
         await until(
-          async () => (await probe.focus(bundleId)).role === "AXTextField",
+          async () => (await probe.focus(bundleId)).description === "First",
           "the new card name field",
         );
-        await probe.key(35, 1 << 17);
-        await probe.key(34);
-        await probe.key(46);
-        if (name === second) await probe.key(7);
+        await probe.typeText(name);
         await probe.pressControl(bundleId, "AXButton", "Done");
         await waitFor(row(name), 10_000);
       };
@@ -119,7 +142,9 @@ const scenarios: Record<string, Scenario> = {
           async () => (await probe.windows(bundleId)).length === windows + 1,
           "a separate contact window",
         );
-        await probe.key(13, 1 << 20);
+        const title = (await probe.window(bundleId)).title;
+        expect(title).toBeTruthy();
+        await probe.closeWindow(bundleId, title!);
         await until(
           async () => (await probe.windows(bundleId)).length === windows,
           "the separate contact window to close",
@@ -131,7 +156,7 @@ const scenarios: Record<string, Scenario> = {
           );
         await app.runChecked("xc");
         await until(save, "the vCard save panel");
-        await probe.key(53);
+        await cancel(probe);
         await until(async () => !(await save()), "the vCard save panel to close");
 
         await app.runChecked("ex");
@@ -142,7 +167,7 @@ const scenarios: Record<string, Scenario> = {
         for (const name of [first, second]) {
           if (!(await row(name)())) continue;
           await probe.selectRow(bundleId, name);
-          await press(probe, "Edit", "Delete");
+          await press(probe, "Edit", "Delete Card");
           await confirmDelete();
           await until(async () => !(await row(name)()), "fixture contact cleanup");
         }
@@ -162,19 +187,28 @@ const scenarios: Record<string, Scenario> = {
         );
       };
       try {
+        const sidebarRows = async () =>
+          (await nodes(probe))
+            .find((node) => node.role === "AXOutline" && node.id === "groupList")
+            ?.children?.filter((node) => node.role === "AXRow");
+        const originalRows = await waitFor(sidebarRows);
         expect(await isNewList()).toBe(false);
         await app.runChecked("nl");
         await until(isNewList, "the new list name editor");
-        await probe.key(53);
-        await press(probe, "Edit", "Undo");
+        await probe.clickControl(bundleId, "AXStaticText", "Managed via Tart");
         await until(async () => !(await isNewList()), "the new list editor to close");
+        // The sidebar can omit cell labels for an empty list.
+        await until(async () => {
+          const rows = await sidebarRows();
+          return rows?.length === originalRows.length + 1 && rows.some((row) => row.selected);
+        }, "the sidebar to contain the additional list");
 
         const composer = async () =>
           (await nodes(probe)).some((node) => node.role === "AXButton" && node.title === "Cancel");
         expect(await composer()).toBe(false);
         await app.runChecked("ns");
         await until(composer, "the smart list composer");
-        await probe.key(53);
+        await cancel(probe);
         await until(async () => !(await composer()), "the smart list composer to close");
       } finally {
         await probe.key(53);
@@ -197,13 +231,13 @@ const scenarios: Record<string, Scenario> = {
       }
       await until(async () => (await title()) === original, original);
 
-      const focused = async () => (await probe.focus(bundleId)).subrole === "AXSearchField";
-      expect(await focused()).toBe(false);
+      await leaveSearch(probe);
+      expect(await searchFocused(probe)).toBe(false);
       await app.runChecked("jc");
       try {
-        await until(focused, "the contact search field");
+        await until(() => searchFocused(probe), "the contact search field");
       } finally {
-        await probe.key(53);
+        await leaveSearch(probe);
       }
     },
   },
@@ -215,12 +249,15 @@ const scenarios: Record<string, Scenario> = {
           (await nodes(probe)).some(
             (node) => node.role === "AXButton" && button.test(node.title ?? ""),
           );
+        const path = key === "fi" ? ["File", "Import…"] : ["File", "Export", "Contacts Archive…"];
+        await leaveSearch(probe);
+        await until(async () => (await menu(probe, ...path)).enabled === true, path.join(" > "));
         expect(await panel()).toBe(false);
         await app.runChecked(key);
         try {
           await until(panel, "the file panel for " + key);
         } finally {
-          await probe.key(53);
+          if (await panel()) await cancel(probe);
         }
         await until(async () => !(await panel()), "the file panel to close");
       }

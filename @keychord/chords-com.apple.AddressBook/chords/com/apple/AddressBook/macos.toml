@@ -11,7 +11,7 @@ file = '@keychord/chords-menu/js/menu.js'
 
 '?e' = { name = 'Edit' }
 'ee' = { name = 'Edit: Contact', '@input:menu' = ['BY_PATH', ['Edit', 'Edit Card']] }
-'ex' = { name = 'Edit: Delete Contact', '@input:menu' = ['BY_PATH', ['Edit', 'Delete']] }
+'ex' = { name = 'Edit: Delete Contact', '@input:menu' = ['BY_PATH', ['Edit', 'Delete Card']] }
 
 '?g' = { name = 'Goto' }
 'g[' = { name = 'Goto: Previous Contact', '@input:menu' = [

@@ -1,7 +1,7 @@
 {
   "name": "@keychord/chords-com.apple.AddressBook",
   "displayName": "Contacts Chords",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Chords for Contacts (com.apple.AddressBook).",
   "categories": [
     "macOS"
