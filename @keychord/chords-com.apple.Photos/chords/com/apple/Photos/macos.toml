@@ -5,12 +5,24 @@ file = '@keychord/chords-menu/js/menu.js'
 
 [chords]
 '?g' = { name = 'Goto' }
-'gy' = { name = 'Goto: Years', shortcut = 'cmd+1' }
-'gm' = { name = 'Goto: Months', shortcut = 'cmd+2' }
-'ga' = { name = 'Goto: All Photos', shortcut = 'cmd+3' }
+'gy' = { name = 'Goto: Years', '@input:menu' = ['CLICK_RADIO_BUTTON', ['Years', 'AXPopUpButton']] }
+'gm' = { name = 'Goto: Months', '@input:menu' = [
+  'CLICK_RADIO_BUTTON',
+  [
+    'Months',
+    'AXPopUpButton',
+  ],
+] }
+'ga' = { name = 'Goto: All Photos', '@input:menu' = [
+  'CLICK_RADIO_BUTTON',
+  [
+    'All Photos',
+    'AXPopUpButton',
+  ],
+] }
 
 '?n' = { name = 'New' }
-'na' = { name = 'New: Album', '@input:menu' = ['BY_PATH', ['File', 'New Album']] }
+'na' = { name = 'New: Album', '@input:menu' = ['SEARCH', 'File > New Album'] }
 'nf' = { name = 'New: Folder', '@input:menu' = ['BY_PATH', ['File', 'New Folder']] }
 'ns' = { name = 'New: Smart Album', '@input:menu' = ['BY_PATH', ['File', 'New Smart Album…']] }
 
@@ -38,4 +50,4 @@ file = '@keychord/chords-menu/js/menu.js'
 'vt' = { name = 'View: Titles', '@input:menu' = ['BY_PATH', ['View', 'Metadata', 'Titles']] }
 
 '?p' = { name = 'Photo' }
-'pd' = { name = 'Photo: Delete', '@input:menu' = ['BY_PATH', ['Image', 'Delete Photo']] }
+'pd' = { name = 'Photo: Delete', '@input:menu' = ['SEARCH', 'Image > Delete'] }

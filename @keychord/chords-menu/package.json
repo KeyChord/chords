@@ -1,7 +1,7 @@
 {
   "name": "@keychord/chords-menu",
   "displayName": "Menu Chords",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "System shortcuts for Linux and Windows, plus application menus and the menu bar on macOS.",
   "categories": [
     "macOS"

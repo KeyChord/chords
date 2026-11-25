@@ -100,6 +100,68 @@ export class MacOSProbe {
     return JSON.parse(stdout);
   }
 
+  async runAppleScript(
+    appTitle: string,
+    source: readonly string[],
+    args: readonly string[] = [],
+    { timeout = 25_000 }: { timeout?: number } = {},
+  ): Promise<string> {
+    requireMacOSVM();
+    const script = Bun.spawn(
+      ["/usr/bin/osascript", ...source.flatMap((line) => ["-e", line]), ...args],
+      { stdout: "pipe", stderr: "pipe", timeout },
+    );
+    let completed = false;
+    const result = Promise.all([
+      new Response(script.stdout).text(),
+      new Response(script.stderr).text(),
+      script.exited,
+    ]).then((status) => {
+      completed = true;
+      return status;
+    });
+
+    const notification = "com.apple.UserNotificationCenter";
+    const target = appTitle.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const permission = new RegExp(
+      'tart-guest-agent.*wants access to control\\s*["“]?' + target + '(?=["”\\s.]|$)',
+    );
+    try {
+      await waitFor(async () => {
+        if (completed) return true;
+        const windows = await this.windows(notification, 7).catch(() => []);
+        for (const window of windows) {
+          const controls = flattenAX([window]);
+          const message = controls
+            .flatMap(({ title, description, value }) => [title, description, value])
+            .join(" ");
+          if (!permission.test(message)) continue;
+          const allow = controls.find(
+            (node) =>
+              node.role === "AXButton" &&
+              [node.title, node.description].includes("Allow") &&
+              node.enabled &&
+              node.position &&
+              node.size,
+          );
+          if (allow?.position && allow.size) {
+            const [x, y] = allow.position;
+            const [width, height] = allow.size;
+            await this.clickPoint(x + width / 2, y + height / 2);
+            return true;
+          }
+        }
+      }, 12_000);
+    } catch (error) {
+      script.kill();
+      await result;
+      throw error;
+    }
+    const [stdout, stderr, code] = await result;
+    if (code !== 0) throw new Error(appTitle + " AppleScript failed: " + stderr.trim());
+    return stdout.trim();
+  }
+
   front(): Promise<string> {
     return this.read("front");
   }

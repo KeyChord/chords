@@ -85,11 +85,13 @@ await menu("BY_PATH", ["File", "New Window"]);
 
 `BY_INDEX` uses zero-based menu indexes. `BY_PATH` accepts one or more exact titles.
 `BY_FIRST_PATH` accepts a list of exact paths and invokes the first enabled match.
-`BY_POPUP` accepts a menu button’s exact label or accessibility role and the exact title of its
-menu item. It can also accept an exact menu bar path to try first.
+`BY_POPUP` accepts a menu button's exact label or accessibility role and the exact title of a menu item.
+Pass a menu-bar path after those two values to use it when the native item is enabled.
+When several buttons match, the action requires a unique match in the focused control or one of its ancestors.
 `BY_PATH_WITH_AUDIO_INPUT` invokes an exact path when an audio input device is available.
-`CLICK_TOOLBAR_BUTTON` activates a toolbar button with an exact title or
+`CLICK_TOOLBAR_BUTTON` and `CLICK_RADIO_BUTTON` activate controls with an exact title or
 accessibility description in the current window.
+`CLICK_RADIO_BUTTON` also accepts a radio button label and an exact popup selector for a compact layout. It opens that popup when the radio button has no clickable target.
 `SELECT_ROW` selects a row by exact label in a table or outline in the focused window.
 `REQUIRE_CONTROL_ABSENT` reports the supplied error when a visible control in the focused
 window has the specified accessibility identifier.

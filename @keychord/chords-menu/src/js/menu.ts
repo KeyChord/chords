@@ -20,6 +20,7 @@ export type MenuAction =
   | "SEARCH"
   | "FOCUS"
   | "CLICK_TOOLBAR_BUTTON"
+  | "CLICK_RADIO_BUTTON"
   | "SELECT_ROW"
   | "REQUIRE_CONTROL_ABSENT"
   | "FOLDER_ACTIONS";
@@ -27,6 +28,7 @@ export type MenuAction =
 /** An exact menu path, starting at a top-level menu and ending at the item to invoke. */
 export type MenuPath = readonly [menu: string, ...subitems: string[]];
 type MenuPaths = readonly [MenuPath, ...MenuPath[]];
+type RadioTarget = readonly [buttonLabel: string, compactPopup: string];
 type PopupPath = readonly [buttonLabel: string, itemTitle: string, ...preferredMenuPath: string[]];
 export type RowPath = readonly [listName: string, rowLabel: string];
 
@@ -40,6 +42,7 @@ export type MenuHandlerContext = {
 export type MenuArguments =
   | [action: "BY_INDEX", menuIndex: number | string]
   | [action: "BY_LETTERS" | "SEARCH" | "FOCUS" | "CLICK_TOOLBAR_BUTTON", query: string]
+  | [action: "CLICK_RADIO_BUTTON", target: string | RadioTarget]
   | [action: "BY_PATH" | "BY_KEY" | "BY_PATH_WITH_AUDIO_INPUT", path: MenuPath]
   | [action: "BY_FIRST_PATH", paths: MenuPaths]
   | [action: "BY_POPUP", path: PopupPath]
@@ -75,6 +78,11 @@ export type MenuHandler = {
   (this: MenuHandlerContext | void, action: "SEARCH", query: string): Promise<void>;
   (this: MenuHandlerContext | void, action: "FOCUS", subrole: string): Promise<void>;
   (this: MenuHandlerContext | void, action: "CLICK_TOOLBAR_BUTTON", label: string): Promise<void>;
+  (
+    this: MenuHandlerContext | void,
+    action: "CLICK_RADIO_BUTTON",
+    target: string | RadioTarget,
+  ): Promise<void>;
 
   /**
    * Exact menu titles from the menu bar down to the item to invoke. For example:
@@ -147,6 +155,13 @@ export async function runMenuAction(
   }
   if (action === "FOCUS" && (typeof value !== "string" || !value.trim())) {
     throw new TypeError('"FOCUS" expects an accessibility subrole');
+  }
+  if (action === "CLICK_RADIO_BUTTON") {
+    const target = typeof value === "string" ? [value] : value;
+    if (!isMenuPath(target) || target.length > 2) {
+      throw new TypeError('"CLICK_RADIO_BUTTON" expects a label and an optional popup selector');
+    }
+    return addon.runMenuAction(processName, action, JSON.stringify(target));
   }
   if (action === "CLICK_TOOLBAR_BUTTON" && (typeof value !== "string" || !value.trim())) {
     throw new TypeError(`"${action}" expects an exact accessibility label`);

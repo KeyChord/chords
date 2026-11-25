@@ -66,7 +66,7 @@ public enum MenuError: Error, CustomStringConvertible {
         case .ambiguousSearch(let query, let paths):
             return "Menu search \"\(query)\" is ambiguous: \(paths.joined(separator: ", ")). Include a menu path such as Window > Center."
         case .invalidAction(let action):
-            return "unknown menu action \"\(action)\" (expected \"BY_INDEX\", \"BY_LETTERS\", \"BY_PATH\", \"BY_POPUP\", \"BY_FIRST_PATH\", \"BY_PATH_WITH_AUDIO_INPUT\", \"BY_KEY\", \"SEARCH\", \"FOCUS\", \"CLICK_TOOLBAR_BUTTON\", \"SELECT_ROW\", \"REQUIRE_CONTROL_ABSENT\", or \"FOLDER_ACTIONS\")"
+            return "unknown menu action \"\(action)\" (expected \"BY_INDEX\", \"BY_LETTERS\", \"BY_PATH\", \"BY_POPUP\", \"BY_FIRST_PATH\", \"BY_PATH_WITH_AUDIO_INPUT\", \"BY_KEY\", \"SEARCH\", \"FOCUS\", \"CLICK_TOOLBAR_BUTTON\", \"CLICK_RADIO_BUTTON\", \"SELECT_ROW\", \"REQUIRE_CONTROL_ABSENT\", or \"FOLDER_ACTIONS\")"
         case .applicationNotFound(let name):
             return "application \"\(name)\" is not running and could not be launched"
         case .noFrontmostApplication:
@@ -434,8 +434,11 @@ private func focusedWindowOwnsPoint(_ frame: CGRect, pid: pid_t, point: CGPoint)
 }
 
 @MainActor
-private func clickWindowButton(in application: Element, target: NSRunningApplication, label: String) async throws {
-    let role = kAXButtonRole
+private func clickWindowButton(
+    in application: Element, target: NSRunningApplication, label: String, toolbarOnly: Bool,
+    compactPopup: String? = nil
+) async throws {
+    let role = toolbarOnly ? kAXButtonRole : kAXRadioButtonRole
     func matches(_ element: Element) -> Bool {
         element.role() == role &&
             (element.title() == label || element.attribute(Attribute<String>(kAXDescriptionAttribute)) == label)
@@ -443,11 +446,54 @@ private func clickWindowButton(in application: Element, target: NSRunningApplica
     guard target.isActive, let window = application.focusedWindow() ?? application.mainWindow() else {
         throw MenuError.accessibility("the application has no focused window")
     }
-    let toolbars = descendants(window, depth: 8) { $0.role() == kAXToolbarRole }
-    let candidates = toolbars.flatMap { descendants($0, depth: 6, matching: matches) }
+    let candidates: [Element]
+    if toolbarOnly {
+        let toolbars = descendants(window, depth: 8) { $0.role() == kAXToolbarRole }
+        candidates = toolbars.flatMap { descendants($0, depth: 6, matching: matches) }
+    } else {
+        let focused = descendants(window, depth: 12, matching: matches)
+        if focused.isEmpty, window.role() == kAXWindowRole, let main = application.mainWindow() {
+            candidates = descendants(main, depth: 12, matching: matches)
+        } else {
+            candidates = focused
+        }
+    }
     let buttons = candidates.filter { $0.isEnabled() != false }
     if !candidates.isEmpty && buttons.isEmpty {
         throw MenuError.accessibility("the \(role) named \"\(label)\" is disabled")
+    }
+    func radioSelected() -> Bool {
+        guard !toolbarOnly, buttons.count == 1,
+              let activeWindow = application.focusedWindow() ?? application.mainWindow() else {
+            return false
+        }
+        let current = descendants(activeWindow, depth: 12, matching: matches)
+            .filter { $0.isEnabled() != false }
+        guard current.count == 1, let button = current.first else { return false }
+        return button.attribute(Attribute<Bool>(kAXSelectedAttribute)) == true ||
+            button.attribute(Attribute<Bool>(kAXValueAttribute)) == true ||
+            button.attribute(Attribute<Int>(kAXValueAttribute)) == 1 ||
+            button.attribute(Attribute<NSNumber>(kAXValueAttribute))?.intValue == 1
+    }
+    func waitForRadioSelection() async throws -> Bool {
+        let deadline = ContinuousClock.now + .milliseconds(600)
+        repeat {
+            if radioSelected() { return true }
+            try await Task.sleep(for: .milliseconds(30))
+        } while ContinuousClock.now < deadline
+        return radioSelected()
+    }
+    if !toolbarOnly, buttons.count == 1, let button = buttons.first {
+        if radioSelected() { return }
+        if button.isActionSupported(kAXPressAction) {
+            do {
+                try axPress(button, label: "\(role) \"\(label)\"")
+            } catch {
+                // An accessibility press can complete asynchronously.
+                log("Accessibility press for \(role) \(label) failed: \(error)")
+            }
+            if try await waitForRadioSelection() { return }
+        }
     }
     func identifiesAncestor(_ ancestor: Element, of element: Element) -> Bool {
         var current: Element? = element
@@ -472,7 +518,7 @@ private func clickWindowButton(in application: Element, target: NSRunningApplica
             guard pid == target.processIdentifier else { continue }
             let hit = Element(element)
             let containerHit =
-                [kAXToolbarRole, kAXGroupRole].contains(hit.role() ?? "") &&
+                [kAXToolbarRole, kAXGroupRole, kAXRadioGroupRole].contains(hit.role() ?? "") &&
                 identifiesAncestor(hit, of: button)
             hitsButton = identifiesAncestor(button, of: hit) || containerHit
         }
@@ -485,13 +531,25 @@ private func clickWindowButton(in application: Element, target: NSRunningApplica
         if !points.contains(point) { points.append(point) }
     }
     guard points.count == 1, let point = points.first, target.isActive else {
+        if !toolbarOnly, buttons.count == 1, try await waitForRadioSelection() { return }
+        if let compactPopup, target.isActive {
+            try await clickPopupItem(
+                in: application, target: target, path: [compactPopup, label], preferAccessibilityPress: true
+            )
+            return
+        }
         throw MenuError.accessibility("expected one visible \(role) named \"\(label)\" (\(buttons.count) accessibility matches, \(points.count) clickable)")
     }
     try await click(at: point, type: .left)
+    if !toolbarOnly, try await !waitForRadioSelection() {
+        throw MenuError.accessibility("the \(role) named \"\(label)\" did not become selected")
+    }
 }
 
 @MainActor
-private func clickPopupItem(in application: Element, target: NSRunningApplication, path: [String]) async throws {
+private func clickPopupItem(
+    in application: Element, target: NSRunningApplication, path: [String], preferAccessibilityPress: Bool = false
+) async throws {
     guard path.count >= 2, path.count != 3 else {
         throw MenuError.invalidPath("expected a button selector and item title, with an optional menu path")
     }
@@ -558,6 +616,10 @@ private func clickPopupItem(in application: Element, target: NSRunningApplicatio
             }
             guard item.isEnabled() != false else {
                 throw MenuError.pathItemDisabled(component: itemTitle, path: path)
+            }
+            if preferAccessibilityPress, item.isActionSupported(kAXPressAction) {
+                try axPress(item, label: [label, itemTitle].joined(separator: " > "))
+                return
             }
             if let frame = item.frame(), !frame.isEmpty {
                 let point = CGPoint(x: frame.midX, y: frame.midY)
@@ -793,7 +855,18 @@ public func runMenuAction(processName: String?, action: String, value: String) a
         return
     }
     if action == "CLICK_TOOLBAR_BUTTON" {
-        try await clickWindowButton(in: application, target: target, label: value)
+        try await clickWindowButton(in: application, target: target, label: value, toolbarOnly: true)
+        return
+    }
+    if action == "CLICK_RADIO_BUTTON" {
+        let arguments = try parseMenuPath(value)
+        guard (1...2).contains(arguments.count) else {
+            throw MenuError.invalidPath("expected a radio button label and an optional popup selector")
+        }
+        try await clickWindowButton(
+            in: application, target: target, label: arguments[0], toolbarOnly: false,
+            compactPopup: arguments.dropFirst().first
+        )
         return
     }
     if action == "BY_POPUP" {
