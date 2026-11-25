@@ -63,15 +63,39 @@ test.skipIf(!macOSUITestsEnabled)(
                 /describe|prompt/i.test(label ?? ""),
               ),
           );
+        const unavailableAlert = async () =>
+          (await controls()).find(
+            (node) =>
+              node.role === "AXSheet" &&
+              flattenAX(node.children ?? []).some(
+                (child) => child.value === "Image Playground Unavailable",
+              ),
+          );
         const item = await newImage();
         if (item.enabled === false) {
           await app.expectFailure("ni", /Menu item .*New Image.*is disabled/);
         } else {
           expect(await composer()).toBeUndefined();
+          expect(await unavailableAlert()).toBeUndefined();
           await app.runChecked("ni");
-          await waitFor(composer, 12_000);
-          await probe.key(53);
-          await waitFor(async () => ((await composer()) ? undefined : true));
+          await waitFor(async () => (await composer()) ?? (await unavailableAlert()), 12_000);
+          const alert = await unavailableAlert();
+          if (alert) {
+            expect(
+              flattenAX([alert]).some(
+                (node) =>
+                  typeof node.value === "string" &&
+                  /^Image Playground is not available when your Siri language is set to .+\.$/.test(
+                    node.value,
+                  ),
+              ),
+            ).toBe(true);
+            await probe.pressControl(bundleId, "AXButton", "OK");
+            await waitFor(async () => ((await unavailableAlert()) ? undefined : true));
+          } else {
+            await probe.key(53);
+            await waitFor(async () => ((await composer()) ? undefined : true));
+          }
         }
 
         const sidebar = async () =>

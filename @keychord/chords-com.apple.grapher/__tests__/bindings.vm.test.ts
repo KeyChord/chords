@@ -5,6 +5,7 @@ import {
   waitFor,
   withChordPackage,
   withMacOSProbe,
+  type AXNode,
 } from "@keychord/chordtest";
 
 const bundle = "com.apple.grapher";
@@ -56,7 +57,7 @@ test.skipIf(!macOSUITestsEnabled)(
           (await nodes()).find((node) => node.role === "AXButton" && label.test(node.title ?? ""));
         const dismiss = async () => {
           if (await button(/^Cancel$/)) {
-            await probe.pressControl(bundle, "AXButton", "Cancel");
+            await probe.clickControl(bundle, "AXButton", "Cancel");
           } else {
             await probe.key(53);
           }
@@ -68,7 +69,7 @@ test.skipIf(!macOSUITestsEnabled)(
 
         await app.runChecked("fn");
         await waitFor(() => button(/^Choose$/));
-        await probe.pressControl(bundle, "AXButton", "Choose");
+        await probe.clickControl(bundle, "AXButton", "Choose");
         const hasView = async (item: string) =>
           Boolean((await probe.menu(bundle, "View", item).catch(() => undefined))?.enabled);
         await waitFor(async () => ((await hasView(switches.v2)) ? true : undefined), 15_000);
@@ -81,16 +82,31 @@ test.skipIf(!macOSUITestsEnabled)(
           (await equationRows()).length === initial + 1 ? true : undefined,
         );
         const rows = await equationRows();
-        const row = rows.find((node) => node.selected) ?? rows.at(-1);
+        const row = rows.find((node) => node.selected);
+        expect(row?.position).toBeDefined();
         if (!row?.position || !row.size) throw new Error("Grapher equation row has no AX bounds");
         await probe.clickPoint(
           row.position[0] + row.size[0] / 2,
           row.position[1] + row.size[1] / 2,
         );
+        await waitFor(async () => (await probe.focus(bundle)).role === "AXOutline" || undefined);
         await app.runChecked("ed");
-        await waitFor(async () => ((await equationRows()).length === initial ? true : undefined));
+        await waitFor(async () => (await equationRows()).length === initial || undefined).catch(
+          async (cause) => {
+            throw new Error(
+              "The selected equation was not removed: " +
+                JSON.stringify({
+                  initial,
+                  focus: await probe.focus(bundle),
+                  rows: await equationRows(),
+                }),
+              { cause },
+            );
+          },
+        );
 
         for (const [key, label] of Object.entries(dialogs)) {
+          if ((await probe.front()) !== bundle) await probe.activate(bundle);
           expect(await button(label)).toBeUndefined();
           await app.runChecked(key);
           try {
@@ -115,10 +131,26 @@ test.skipIf(!macOSUITestsEnabled)(
         await app.runChecked("vp");
         await waitFor(async () => (Boolean(await palette()) === hasPalette ? true : undefined));
 
+        const numericFields = (controls: AXNode[]) =>
+          controls.flatMap((node) => {
+            if (node.role !== "AXTextField") return [];
+            if (typeof node.value === "number") return [node.value];
+            const text = typeof node.value === "string" ? node.value.replace("−", "-") : "";
+            return /^[-+]?\d+(?:\.\d+)?$/.test(text) ? [Number(text)] : [];
+          });
         const frameLimits = async () =>
-          flattenAX(await probe.windows(bundle, 7)).find(
-            (node) =>
-              ["AXWindow", "AXSheet"].includes(node.role ?? "") && node.title === "Frame Limits",
+          flattenAX([await probe.window(bundle, 8), ...(await probe.windows(bundle, 8))]).find(
+            (node) => {
+              if (!["AXWindow", "AXSheet", "AXDialog"].includes(node.role ?? "")) return false;
+              if ([node.title, node.description].includes("Frame Limits")) return true;
+              if (node.role !== "AXSheet") return false;
+              const contents = flattenAX([node]);
+              const buttons = contents.filter((element) => element.role === "AXButton");
+              return (
+                numericFields(contents).length === 8 &&
+                ["OK", "Cancel"].every((title) => buttons.some((button) => button.title === title))
+              );
+            },
           );
         const readLimits = async (open: () => Promise<void>) => {
           expect(await frameLimits()).toBeUndefined();
@@ -127,13 +159,24 @@ test.skipIf(!macOSUITestsEnabled)(
             return await waitFor(async () => {
               const limits = await frameLimits();
               if (!limits) return;
-              const values = flattenAX([limits]).flatMap((node) => {
-                if (node.role !== "AXTextField") return [];
-                if (typeof node.value === "number") return [node.value];
-                const text = typeof node.value === "string" ? node.value.replace("−", "-") : "";
-                return /^[-+]?\d+(?:\.\d+)?$/.test(text) ? [Number(text)] : [];
-              });
+              const values = numericFields(flattenAX([limits]));
               return values.length >= 2 ? values : undefined;
+            }, 10_000).catch(async (cause) => {
+              const controls = (await nodes())
+                .filter(({ role }) =>
+                  ["AXWindow", "AXSheet", "AXTextField", "AXButton"].includes(role ?? ""),
+                )
+                .map(({ role, title, description, value }) => ({
+                  role,
+                  title,
+                  description,
+                  value,
+                }));
+              throw new Error(
+                "Grapher did not expose numeric Frame Limits: " +
+                  JSON.stringify(controls.slice(0, 45)),
+                { cause },
+              );
             });
           } finally {
             await dismiss();

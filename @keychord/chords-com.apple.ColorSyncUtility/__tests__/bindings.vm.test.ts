@@ -49,16 +49,17 @@ test.skipIf(!macOSUITestsEnabled)(
         withMacOSProbe(async (probe) => {
           await probe.activate(bundleId);
           const utilityWindowCount = async () =>
-            (await probe.windows(bundleId)).filter((window) => window.title === "ColorSync Utility")
-              .length;
+            (await probe.windows(bundleId)).filter(
+              (window) => window.subrole === "AXStandardWindow",
+            ).length;
+          await waitFor(async () => (await utilityWindowCount()) || undefined);
           const before = await utilityWindowCount();
           await app.runChecked("fn");
           await waitFor(async () => ((await utilityWindowCount()) > before ? true : undefined));
-          await probe.key(13, 1 << 20);
 
           await app.runChecked("fo");
           await waitFor(async () => openPanel(await probe.windows(bundleId, 8)));
-          await probe.key(53);
+          await probe.pressControl(bundleId, "AXButton", "Cancel");
           await waitFor(async () =>
             openPanel(await probe.windows(bundleId, 8)) ? undefined : true,
           );
@@ -82,7 +83,7 @@ test.skipIf(!macOSUITestsEnabled)(
               expect(await dialogButton()).toBeUndefined();
               await app.runChecked(sequence);
               await waitFor(dialogButton, 12_000);
-              await probe.key(53);
+              await probe.pressControl(bundleId, "AXButton", "Cancel");
               await waitFor(async () => ((await dialogButton()) ? undefined : true));
             }
           } finally {

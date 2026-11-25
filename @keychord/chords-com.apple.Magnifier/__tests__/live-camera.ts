@@ -291,7 +291,17 @@ export async function startCamera(probe: MacOSProbe) {
     await pressOBS(probe, "OK");
   if ((await probe.front()) !== obs) throw new Error("OBS could not regain focus");
   await probe.key(12, 1 << 20);
-  await waitFor(async () => !(await probe.running(obs)) || undefined, 5_000);
+  const stopped = async () => !(await probe.running(obs)) || undefined;
+  if (!(await waitFor(stopped, 8_000).catch(() => undefined))) {
+    const result = Bun.spawnSync(
+      ["/usr/bin/pkill", "-TERM", "-f", "^/Applications/OBS[.]app/Contents/MacOS/OBS( |$)"],
+      { stdout: "ignore", stderr: "pipe", timeout: 5_000 },
+    );
+    if (result.exitCode !== 0 && (await probe.running(obs))) {
+      throw new Error("The disposable OBS fixture did not stop: " + result.stderr.toString());
+    }
+    await waitFor(stopped, 10_000);
+  }
 
   const logs = join(homedir(), "Library", "Application Support", "obs-studio", "logs");
   const earlierLogs = new Set(await readdir(logs).catch(() => []));

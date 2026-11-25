@@ -24,7 +24,7 @@ function behavior(app: ChordApp, probe: MacOSProbe) {
   const button = async (title: RegExp) =>
     (await nodes()).find((node) => node.role === "AXButton" && title.test(node.title ?? ""));
   const editor = async () =>
-    (await nodes()).find(
+    flattenAX([await probe.window(id, 7)]).find(
       (node) => node.role === "AXTextArea" && /script source/i.test(node.description ?? ""),
     );
   const newScript = async (open: () => Promise<void>) => {
@@ -39,23 +39,37 @@ function behavior(app: ChordApp, probe: MacOSProbe) {
     return before;
   };
   const closeScript = async (before: number) => {
-    await probe.key(13, command);
+    const title = (await probe.window(id)).title;
+    expect(title).toMatch(/^Untitled/);
+    await probe.closeWindow(id, title!);
     await waitFor(async () => {
-      const discard = await button(/^Don.t Save$/);
+      const document = (await probe.windows(id, 8)).find((node) => node.title === title);
+      const sheet = document && flattenAX([document]).find((node) => node.role === "AXSheet");
+      const discard =
+        sheet &&
+        flattenAX([sheet]).find(
+          (node) => node.role === "AXButton" && /^(Delete|Don.t Save)$/.test(node.title ?? ""),
+        );
       if (discard?.title) await probe.pressControl(id, "AXButton", discard.title);
       return (await probe.windows(id)).length === before ? true : undefined;
     });
   };
   const replaceSource = async (text: string) => {
-    const source = await waitFor(editor);
-    await probe.clickControl(id, "AXTextArea", source.description!);
-    await waitFor(async () =>
-      (await probe.focus(id)).description === source.description ? true : undefined,
+    const source = await waitFor(async () => {
+      const value = await editor();
+      if (value?.position && value.size) return { position: value.position, size: value.size };
+    });
+    await probe.clickPoint(
+      source.position[0] + source.size[0] / 2,
+      source.position[1] + source.size[1] / 2,
     );
-    const copy = Bun.spawn(["/usr/bin/pbcopy"], { stdin: Buffer.from(text) });
+    await waitFor(async () =>
+      /script source/i.test((await probe.focus(id)).description ?? "") ? true : undefined,
+    );
+    const copy = Bun.spawn(["/usr/bin/pbcopy"], { stdin: new Blob([text]) });
     expect(await copy.exited).toBe(0);
-    await probe.key(0, command);
-    await probe.key(9, command);
+    if ((await editor())?.value) await probe.press(id, "Edit", "Select All");
+    await probe.press(id, "Edit", "Paste");
     await waitFor(async () => ((await editor())?.value === text ? true : undefined));
   };
   const withScript = async (text: string, check: () => Promise<void>) => {
@@ -76,24 +90,38 @@ function behavior(app: ChordApp, probe: MacOSProbe) {
         if (await button(/^Cancel$/)) return button(confirm);
       });
     } finally {
-      await probe.key(escape);
+      if (await button(/^Cancel$/)) await probe.pressControl(id, "AXButton", "Cancel");
       await waitFor(async () => (!(await button(/^Cancel$/)) ? true : undefined));
     }
   };
   const findBar = (node: AXNode) =>
     node.subrole === "AXSearchField" ||
     (node.role === "AXTextField" && /find|search/i.test(node.description ?? node.title ?? ""));
+  const replaceControls = async () => {
+    if (await button(/^Replace All$/)) return true;
+    const segments = (await nodes()).filter(
+      (node) => node.role === "AXButton" && node.subrole === "AXSegment",
+    );
+    return ["Replace", "All"].every((label) =>
+      segments.some((node) => [node.title, node.description].includes(label)),
+    );
+  };
   const search = async (sequence: string, replace = false) => {
     expect(findBar(await probe.focus(id))).toBe(false);
+    expect(await replaceControls()).toBe(false);
     await app.runChecked(sequence);
     try {
-      await waitFor(async () => (findBar(await probe.focus(id)) ? true : undefined));
-      if (replace) await waitFor(() => button(/^Replace All$/));
+      await waitFor(async () =>
+        (replace ? await replaceControls() : findBar(await probe.focus(id))) ? true : undefined,
+      );
     } finally {
-      if ((await menu("Edit", "Find", "Hide Find Bar").catch(() => undefined))?.enabled)
+      if (await button(/^Done$/)) await probe.pressControl(id, "AXButton", "Done");
+      else if ((await menu("Edit", "Find", "Hide Find Bar").catch(() => undefined))?.enabled)
         await probe.press(id, "Edit", "Find", "Hide Find Bar");
       else await probe.key(escape);
-      await waitFor(async () => (!findBar(await probe.focus(id)) ? true : undefined));
+      await waitFor(async () =>
+        !findBar(await probe.focus(id)) && !(await replaceControls()) ? true : undefined,
+      );
     }
   };
   const hide = (label: string) => menu("View", `Hide ${label}`).catch(() => undefined);

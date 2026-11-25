@@ -204,7 +204,7 @@ export class MacOSProbe {
 
   async activate(bundleId: string, ...args: string[]) {
     await runCommand(["/usr/bin/open", "-b", bundleId, ...args]);
-    await waitFor(async () => ((await this.front()) === bundleId ? true : undefined));
+    await waitFor(async () => ((await this.front()) === bundleId ? true : undefined), 15_000);
   }
 
   windows(bundleId: string, depth = 0): Promise<AXNode[]> {

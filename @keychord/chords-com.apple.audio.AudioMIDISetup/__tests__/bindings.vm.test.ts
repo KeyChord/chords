@@ -1,7 +1,6 @@
 import { expect, test } from "bun:test";
 import {
   flattenAX,
-  type AXNode,
   macOSUITestsEnabled,
   waitFor,
   withChordPackage,
@@ -43,33 +42,44 @@ test.skipIf(!macOSUITestsEnabled)(
             const window = await probe.window(bundleId, depth);
             return window.title === title ? window : undefined;
           }, 12_000);
-        await focusedWindow("Audio Devices");
-
+        const menu = (title: string) =>
+          probe.menu(bundleId, "Window", title).catch(() => undefined);
+        const audio = await waitFor(async () => {
+          if (!(await menu("Hide Audio Devices"))?.enabled) return;
+          return (await probe.window(bundleId)).title;
+        }, 12_000);
         for (const [sequence, title] of Object.entries(windows)) {
-          const target = (await probe.windows(bundleId)).find((window) => window.title === title);
+          const targetTitle = sequence === "ga" ? audio : title;
+          const target = (await probe.windows(bundleId)).find(
+            (window) => window.title === targetTitle,
+          );
           if (target) {
-            await probe.raiseWindow(bundleId, title);
-            await focusedWindow(title);
-            await probe.key(13, 1 << 20);
-            await waitFor(async () =>
-              (await probe.windows(bundleId)).every((window) => window.title !== title)
-                ? true
-                : undefined,
-            );
+            await probe.closeWindow(bundleId, targetTitle);
+            await waitFor(async () => (await menu("Show " + title))?.enabled || undefined);
           }
           await app.runChecked(sequence);
-          await focusedWindow(title);
+          if (sequence === "ga") {
+            await waitFor(async () => (await menu("Hide Audio Devices"))?.enabled || undefined);
+            await focusedWindow(audio);
+          } else {
+            await focusedWindow(title);
+          }
         }
 
         await probe.raiseWindow(bundleId, "MIDI Studio");
-        const toolbar = (window: AXNode) =>
-          flattenAX([window]).find((element) => element.role === "AXToolbar");
+        const toolbar = async () => {
+          const view = await probe.menu(bundleId, "View");
+          return flattenAX([view]).find(
+            ({ title, enabled }) =>
+              enabled && (title === "Show Toolbar" || title === "Hide Toolbar"),
+          )?.title;
+        };
         const waitForToolbar = (visible: boolean) =>
           waitFor(async () =>
-            Boolean(toolbar(await probe.window(bundleId, 4))) === visible ? true : undefined,
+            (await toolbar()) === (visible ? "Hide Toolbar" : "Show Toolbar") ? true : undefined,
           );
         await focusedWindow("MIDI Studio");
-        const originallyVisible = Boolean(toolbar(await probe.window(bundleId, 4)));
+        const originallyVisible = (await waitFor(toolbar)) === "Hide Toolbar";
         try {
           if (!originallyVisible) await probe.press(bundleId, "View", "Show Toolbar");
           await waitForToolbar(true);
@@ -93,24 +103,23 @@ test.skipIf(!macOSUITestsEnabled)(
               : undefined,
           );
         } finally {
-          if (!originallyVisible && toolbar(await probe.window(bundleId, 4))) {
+          if (!originallyVisible && (await toolbar()) === "Hide Toolbar") {
             await probe.press(bundleId, "View", "Hide Toolbar");
           }
         }
 
+        const prior = new Set((await probe.windows(bundleId)).map(({ title }) => title));
+        const settings = async () =>
+          (await probe.windows(bundleId)).find(({ title }) => title && !prior.has(title));
         await app.runChecked("gs");
         try {
-          await waitFor(async () =>
-            (await probe.windows(bundleId, 5)).find(
-              (window) =>
-                /settings|preferences/i.test(window.title ?? "") ||
-                flattenAX([window]).some(
-                  (element) => element.title === "When application launches:",
-                ),
-            ),
-          );
+          await waitFor(settings);
         } finally {
-          await probe.key(13, 1 << 20);
+          const window = await settings();
+          if (window?.title) {
+            await probe.closeWindow(bundleId, window.title);
+            await waitFor(async () => ((await settings()) ? undefined : true));
+          }
         }
       }),
     );

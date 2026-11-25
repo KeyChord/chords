@@ -40,18 +40,16 @@ test.skipIf(!macOSUITestsEnabled)(
           return item?.enabled ? item : undefined;
         }, 20_000);
 
-        // Starting with closed report windows proves the command creates the report.
-        while ((await probe.window(bundle)).role === "AXWindow") {
-          const before = (await probe.windows(bundle)).length;
-          await probe.key(13, 1 << 20); // Command-W
-          await waitFor(async () =>
-            (await probe.windows(bundle)).length < before ? true : undefined,
-          );
-        }
         const report = async () =>
-          flattenAX([await probe.window(bundle, 8)]).find((node) =>
-            [node.title, node.value].some((label) => label === "Hardware"),
+          (await probe.windows(bundle, 8)).find(
+            (window) =>
+              !window.minimized &&
+              flattenAX([window]).some((node) => [node.title, node.value].includes("Hardware")),
           );
+        if (await report()) {
+          await probe.press(bundle, "Window", "Minimize");
+          await waitFor(async () => ((await report()) ? undefined : true));
+        }
         await app.runChecked("rn");
         await waitFor(report, 30_000);
 
@@ -72,7 +70,7 @@ test.skipIf(!macOSUITestsEnabled)(
           expect(await dialogButton(button)).toBeUndefined();
           await app.runChecked(key);
           await waitFor(() => dialogButton(button), 20_000);
-          await probe.key(53); // Escape
+          await probe.pressControl(bundle, "AXButton", "Cancel");
           await waitFor(async () => (!(await dialogButton(button)) ? true : undefined));
         }
 

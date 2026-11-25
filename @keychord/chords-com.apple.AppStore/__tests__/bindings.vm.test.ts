@@ -55,7 +55,34 @@ test.skipIf(!macOSUITestsEnabled)(
             ? true
             : undefined;
         };
+        const ready = (label: string) =>
+          waitFor(async () => {
+            const sheets = flattenAX(await probe.windows(bundle, 10)).filter(
+              (node) => node.role === "AXSheet",
+            );
+            for (const sheet of sheets) {
+              const content = flattenAX(sheet.children ?? []);
+              if (
+                content.some(
+                  ({ value }) =>
+                    typeof value === "string" && /^Welcome to the App\sStore$/.test(value),
+                )
+              ) {
+                await probe.clickControl(bundle, "AXButton", "Continue");
+                return;
+              }
+              if (content.some(({ value }) => value === "Stay Up to Date with Notifications")) {
+                await probe.clickControl(bundle, "AXStaticText", "Not Now");
+                return;
+              }
+            }
+            return (await probe.menu(bundle, "Store", label).catch(() => undefined))?.enabled
+              ? true
+              : undefined;
+          }, 15_000);
         const goto = async (label: string) => {
+          if (await selected(label)) return;
+          await ready(label);
           await probe.press(bundle, "Store", label);
           await waitFor(() => selected(label), 15_000);
         };
@@ -67,31 +94,50 @@ test.skipIf(!macOSUITestsEnabled)(
             ? true
             : undefined;
         };
-        const settingsOpen = async () =>
-          (await probe.windows(bundle)).some((window) => window.title === "App Store Settings")
-            ? true
-            : undefined;
-
-        await waitFor(() => probe.menu(bundle, "Store", "Search").catch(() => undefined), 15_000);
         await goto(sections.gd);
         for (const [sequence, target] of Object.entries(sections)) {
           if (await selected(target)) await goto(sections.ga);
           expect(await selected(target)).toBeUndefined();
+          await ready(target);
           await app.runChecked(sequence);
-          await waitFor(() => selected(target), 15_000);
+          try {
+            await waitFor(() => selected(target), 15_000);
+          } catch (cause) {
+            const controls = flattenAX(await probe.windows(bundle, 8)).filter(
+              (node) => node.selected || node.role === "AXSheet" || node.role === "AXWindow",
+            );
+            console.error(
+              "App Store navigation state",
+              JSON.stringify(
+                controls.map(({ role, title, description, value }) => ({
+                  role,
+                  title,
+                  description,
+                  value,
+                })),
+              ),
+            );
+            throw new Error(`Expected ${sequence} to show ${target}`, { cause });
+          }
           await goto(sections.gd);
         }
 
         expect(await searchFocused()).toBeUndefined();
+        await ready("Search");
         await app.runChecked("g/");
         await waitFor(searchFocused, 10_000);
         await probe.key(53);
         await goto(sections.gd);
 
-        expect(await settingsOpen()).toBeUndefined();
+        const previousWindows = await probe.windows(bundle);
+        const settingsOpen = async () =>
+          (await probe.windows(bundle)).find(
+            (window) =>
+              window.title && !previousWindows.some((previous) => previous.title === window.title),
+          );
         await app.runChecked("g,");
-        await waitFor(settingsOpen, 10_000);
-        await probe.key(13, 1 << 20);
+        const settings = await waitFor(settingsOpen, 10_000);
+        await probe.closeWindow(bundle, settings.title!);
         await waitFor(async () => (!(await settingsOpen()) ? true : undefined), 10_000);
       }),
     );

@@ -102,8 +102,12 @@ export async function withChordPackage<T>(
         "-e",
         "-c",
         `
-requirement=$(codesign -d -r- "$1" 2>&1 | sed -n 's/^designated => //p')
-test -n "$requirement"
+# codesign prefixes the synthesized requirement of an ad-hoc fixture with "# ".
+requirement=$(codesign -d -r- "$1" 2>&1 | sed -nE 's/^(# )?designated => //p')
+if [ -z "$requirement" ]; then
+  printf 'Could not read the designated code requirement for %s\\n' "$1" >&2
+  exit 1
+fi
 blob=$(mktemp)
 trap 'rm -f "$blob"' EXIT
 printf '%s' "$requirement" | csreq -r- -b "$blob"
@@ -163,20 +167,39 @@ sudo killall tccd
     // current defaults. The VM should load only its test packages and the built-in Chord UI.
     await Bun.write(join(appData, "repos.json"), "{}");
     await rm(join(appData, "builtin-packages.json"), { force: true });
-    const start = (await Bun.file(log).exists()) ? Bun.file(log).size : 0;
-    await Bun.write(workerStderr, "");
-    await runCommand(["/usr/bin/open", "-g", "--stderr", workerStderr, appPath]);
-    launched = true;
-    await waitFor(async () => {
-      if (!(await Bun.file(log).exists())) return;
-      const output = await Bun.file(log).slice(start).text();
-      if (
-        output.includes("Keyboard event tap started") &&
-        output.includes("Input ownership: active")
-      )
-        return true;
-      await Bun.sleep(250);
-    }, 30_000);
+    const startChord = async () => {
+      const start = (await Bun.file(log).exists()) ? Bun.file(log).size : 0;
+      await Bun.write(workerStderr, "");
+      await runCommand(["/usr/bin/open", "-g", "--stderr", workerStderr, appPath]);
+      launched = true;
+      await waitFor(async () => {
+        if (!(await Bun.file(log).exists())) return;
+        const output = await Bun.file(log).slice(start).text();
+        if (
+          output.includes("Keyboard event tap started") &&
+          output.includes("Input ownership: active")
+        )
+          return true;
+        await Bun.sleep(250);
+      }, 30_000);
+    };
+    try {
+      await startChord();
+    } catch (firstError) {
+      const firstStderr = await Bun.file(workerStderr)
+        .text()
+        .catch(() => "");
+      await stop();
+      console.warn("Chord did not acquire the keyboard event tap on startup. Retrying.");
+      try {
+        await startChord();
+      } catch (secondError) {
+        throw new AggregateError(
+          [firstError, secondError],
+          `Chord could not acquire the keyboard event tap after two starts. ${firstStderr.trim()}`,
+        );
+      }
+    }
     await waitFor(async () => {
       if (await Bun.file(marker).exists()) return true;
       await app.run(readySequence).catch((error: unknown) => {

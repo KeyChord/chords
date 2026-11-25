@@ -39,10 +39,10 @@ test.skipIf(!macOSUITestsEnabled)(
         const matchesWindow = async (pattern: RegExp) =>
           (await probe.windows(bundleId)).find((item) => pattern.test(item.title ?? ""));
         const window = (pattern: RegExp) => waitFor(() => matchesWindow(pattern), 12_000);
-        const connections = /^connections$/i;
-        if (await matchesWindow(connections)) {
-          await probe.raiseWindow(bundleId, (await window(connections)).title!);
-          await probe.key(13, 1 << 20);
+        const connections = /^(All )?Connections$/;
+        const connectionWindow = await matchesWindow(connections);
+        if (connectionWindow?.title) {
+          await probe.closeWindow(bundleId, connectionWindow.title);
           await waitFor(async () => ((await matchesWindow(connections)) ? undefined : true));
         }
         await app.runChecked("wc");
@@ -60,22 +60,26 @@ test.skipIf(!macOSUITestsEnabled)(
           const cancel = await waitFor(() => dialog("Cancel"));
           expect(cancel.role).toBe("AXButton");
           await waitFor(() => dialog(button));
-          await probe.key(53);
+          await probe.pressControl(bundleId, "AXButton", "Cancel");
           await waitFor(async () => ((await dialog("Cancel")) ? undefined : true));
         }
 
+        const previousWindows = await probe.windows(bundleId);
+        const settingsWindow = async () =>
+          (await probe.windows(bundleId)).find(
+            (item) =>
+              item.title && !previousWindows.some((previous) => previous.title === item.title),
+          );
         await app.runChecked("gs");
-        await window(/settings|preferences/i);
-        await probe.key(13, 1 << 20);
-        await waitFor(async () =>
-          (await matchesWindow(/settings|preferences/i)) ? undefined : true,
-        );
+        const settings = await waitFor(settingsWindow, 12_000);
+        await probe.closeWindow(bundleId, settings.title!);
+        await waitFor(async () => ((await settingsWindow()) ? undefined : true));
 
         const transferMenu = await probe.menu(bundleId, "Window", "File Transfers");
         if (transferMenu.enabled) {
           await app.runChecked("wf");
-          await window(/file transfers/i);
-          await probe.key(13, 1 << 20);
+          const transfers = await window(/file transfers/i);
+          await probe.closeWindow(bundleId, transfers.title!);
         } else {
           await app.expectFailure("wf", /Menu item .* is disabled/i);
         }

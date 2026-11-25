@@ -40,12 +40,17 @@ test.skipIf(!macOSUITestsEnabled)(
           const window = await probe.window(bundle);
           return window.subrole === "AXStandardWindow" ? window : undefined;
         }, 15_000);
-        const nodes = async () => flattenAX(await probe.windows(bundle, 8));
+        const nodes = async () => flattenAX(await probe.windows(bundle, 11));
         const openPanel = async () =>
-          (await nodes()).find((node) => node.role === "AXButton" && node.title === "Open");
+          (await nodes()).find(
+            (node) => node.role === "AXButton" && [node.title, node.description].includes("Cancel"),
+          );
         await app.runChecked("fo");
         await waitFor(openPanel);
-        await probe.key(53); // Escape the file picker.
+        expect(
+          (await nodes()).some((node) => node.role === "AXButton" && node.title === "Open"),
+        ).toBe(true);
+        await probe.clickControl(bundle, "AXButton", "Cancel");
         await waitFor(async () => (!(await openPanel()) ? true : undefined));
 
         const menuTitle = async (menu: string, text: string) => {
@@ -65,15 +70,22 @@ test.skipIf(!macOSUITestsEnabled)(
         }
         await app.runChecked("ls");
         await waitFor(async () => ((await streaming()) === true ? true : undefined));
-        try {
+        const searchField = await waitFor(async () => {
+          const fields = (await nodes()).filter(
+            ({ role, id, enabled, size }) =>
+              role === "AXTextField" && id && enabled && size && size[0] > 0,
+          );
+          return fields.length === 1 ? fields[0] : undefined;
+        });
+        const focusSearch = async () => {
           await app.runChecked("js");
-          await waitFor(async () => {
-            const focus = await probe.focus(bundle);
-            return focus.subrole === "AXSearchField" ||
-              (focus.role === "AXTextField" && /search/i.test(focus.description ?? ""))
-              ? true
-              : undefined;
-          });
+          await waitFor(async () =>
+            (await probe.focus(bundle)).id === searchField.id ? true : undefined,
+          );
+        };
+        try {
+          expect((await probe.focus(bundle)).id).not.toBe(searchField.id);
+          await focusSearch();
           await probe.key(53);
 
           for (const [key, title] of Object.entries(filters)) {
@@ -99,19 +111,13 @@ test.skipIf(!macOSUITestsEnabled)(
 
           // Search for a unique guest-generated message so a busy stream cannot bury it.
           const marker = "chordtestconsole" + Date.now();
-          await app.runChecked("js");
-          await runCommand([
-            "/bin/sh",
-            "-c",
-            'printf %s "$1" | /usr/bin/pbcopy',
-            "chordtest",
-            marker,
-          ]);
-          await probe.key(9, 1 << 20); // Command-V
+          await focusSearch();
+          await probe.typeText(marker);
+          await waitFor(async () => (await probe.focus(bundle)).value === marker || undefined);
           await probe.key(36);
           await runCommand(["/usr/bin/logger", "-p", "user.notice", marker]);
           const message = async () =>
-            (await nodes()).find(
+            flattenAX(await probe.visibleRows(bundle, 4)).find(
               (node) =>
                 node.role === "AXStaticText" && (node.value === marker || node.title === marker),
             );

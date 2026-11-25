@@ -40,9 +40,17 @@ function behavior(
       (node) => node.role === role && label.test(node.title ?? node.description ?? ""),
     );
   const closeNewDocument = async (before: number) => {
-    await probe.key(13, command);
+    const title = (await window()).title;
+    expect(title).toMatch(/^Untitled/);
+    await probe.closeWindow(id, title!);
     await waitFor(async () => {
-      const discard = await control("AXButton", /^Don.t Save$/);
+      const document = (await probe.windows(id, 8)).find((node) => node.title === title);
+      const sheet = document && flattenAX([document]).find((node) => node.role === "AXSheet");
+      const discard =
+        sheet &&
+        flattenAX([sheet]).find(
+          (node) => node.role === "AXButton" && /^(Delete|Don.t Save)$/.test(node.title ?? ""),
+        );
       if (discard?.title) await probe.pressControl(id, "AXButton", discard.title);
       return (await documents()).length === before ? true : undefined;
     });
@@ -55,22 +63,24 @@ function behavior(
         if (await control("AXButton", /^Cancel$/)) return control("AXButton", button);
       });
     } finally {
-      await probe.key(escape);
+      if (await control("AXButton", /^Cancel$/)) await probe.pressControl(id, "AXButton", "Cancel");
       await waitFor(async () => (!(await control("AXButton", /^Cancel$/)) ? true : undefined));
     }
   };
-  const search = async (sequence: string, matches: (node: AXNode) => boolean) => {
-    expect(matches(await probe.focus(id))).toBe(false);
+  const replaceControls = async () => {
+    const buttons = flattenAX(await probe.windows(id, 8)).filter(
+      (node) => node.role === "AXButton" && node.subrole === "AXSegment",
+    );
+    return ["Replace", "All"].every((label) => buttons.some((node) => node.description === label));
+  };
+  const search = async (sequence: "sf" | "sr", ready: () => Promise<boolean>) => {
+    expect(await control("AXButton", /^Done$/)).toBeUndefined();
     await app.runChecked(sequence);
     try {
-      await waitFor(async () => {
-        const focus = await probe.focus(id);
-        if (matches(focus)) return focus;
-      });
-      if (sequence === "sr") await waitFor(() => control("AXButton", /^Replace All$/));
+      await waitFor(async () => ((await ready()) ? true : undefined));
     } finally {
-      await probe.key(escape);
-      await waitFor(async () => (!matches(await probe.focus(id)) ? true : undefined));
+      if (await control("AXButton", /^Done$/)) await probe.pressControl(id, "AXButton", "Done");
+      await waitFor(async () => (!(await control("AXButton", /^Done$/)) ? true : undefined));
     }
   };
   const searchFocused = (node: AXNode) =>
@@ -115,8 +125,8 @@ function behavior(
       }
     },
     fe: () => panel("fe", /^Save$/),
-    sf: () => search("sf", searchFocused),
-    sr: () => search("sr", searchFocused),
+    sf: () => search("sf", async () => searchFocused(await probe.focus(id))),
+    sr: () => search("sr", replaceControls),
     tp: () => textMode("tp", "Make Plain Text", "Make Rich Text"),
     tr: () => textMode("tr", "Make Rich Text", "Make Plain Text"),
     tv: () => changeFormat("tv", "Prevent Editing", "Allow Editing"),

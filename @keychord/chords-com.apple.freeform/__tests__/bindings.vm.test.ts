@@ -8,7 +8,6 @@ import {
 } from "@keychord/chordtest";
 
 const bundleId = "com.apple.freeform";
-const command = 1 << 20;
 const browserView = { vl: "as List", vi: "as Icons" };
 const sortOrder = { sn: "Name", sd: "Date" };
 const insert = { in: "Sticky Note", it: "Text Box", ir: "Rectangle" };
@@ -58,7 +57,8 @@ test.skipIf(!macOSUITestsEnabled)(
           );
         const itemTitle = async (label: string) =>
           flattenAX([await menu("View")]).find(
-            (node) => node.title === "Show " + label || node.title === "Hide " + label,
+            (node) =>
+              node.enabled && (node.title === "Show " + label || node.title === "Hide " + label),
           )?.title;
         const isBrowser = async () =>
           (await menu("View", "as List").catch(() => undefined))?.enabled;
@@ -69,8 +69,32 @@ test.skipIf(!macOSUITestsEnabled)(
         };
         const boardNames = async () =>
           (await controls()).flatMap((node) =>
-            node.role === "AXStaticText" && typeof node.value === "string" ? [node.value] : [],
+            ["AXStaticText", "AXCell", "AXRow"].includes(node.role ?? "")
+              ? [node.title, node.value, node.description].filter(
+                  (value): value is string => typeof value === "string",
+                )
+              : [],
           );
+        const selectBoard = async (name: string, action: string) => {
+          const item = await waitFor(async () =>
+            (await controls()).find(
+              (node) =>
+                ["AXStaticText", "AXCell", "AXRow", "AXButton"].includes(node.role ?? "") &&
+                node.position &&
+                node.size?.every((amount) => amount > 0) &&
+                [node.title, node.value, node.description].includes(name),
+            ),
+          ).catch(async (cause) => {
+            throw new Error(
+              `Freeform did not list ${name}: ${JSON.stringify(await boardNames())}`,
+              { cause },
+            );
+          });
+          const [x, y] = item.position!;
+          const [width, height] = item.size!;
+          await probe.clickPoint(x + width / 2, y + height / 2);
+          await waitFor(async () => (await menu("File", action)).enabled || undefined);
+        };
         const zoom = async () => {
           for (const node of await controls()) {
             for (const label of [node.title, node.description, node.value]) {
@@ -81,24 +105,72 @@ test.skipIf(!macOSUITestsEnabled)(
           }
         };
         const back = async () => {
-          await waitFor(() => button("Back"));
-          await probe.pressControl(bundleId, "AXButton", "Back");
+          await waitFor(() => button("Go Back"));
+          await probe.clickControl(bundleId, "AXButton", "Go Back");
           await waitFor(async () => ((await isBrowser()) ? true : undefined), 12_000);
         };
 
         await probe.activate(bundleId);
         await waitFor(async () => {
-          const onboarding = (await button("Continue")) ?? (await button("Get Started"));
-          if (onboarding) {
-            await probe.pressControl(
-              bundleId,
-              "AXButton",
-              onboarding.title ?? onboarding.description!,
+          const windows = await probe.windows(bundleId, 12);
+          const controls = flattenAX(windows);
+          const welcome = controls.find(({ id }) => id === "WelcomeWindow");
+          const onboarding = flattenAX(welcome ? [welcome] : windows).find(
+            ({ role, id, title, enabled }) =>
+              role === "AXButton" &&
+              enabled &&
+              (id === "Primary Button" ||
+                id === "onboarding.primary.button" ||
+                (welcome && title === "Continue")),
+          );
+          if (onboarding?.position && onboarding.size) {
+            const [x, y] = onboarding.position;
+            const [width, height] = onboarding.size;
+            await probe.clickPoint(x + width / 2, y + height / 2);
+            return;
+          }
+          const iCloud = controls.some(
+            ({ role, title }) => role === "AXButton" && title === "Go to System Settings",
+          );
+          const dismiss = iCloud
+            ? controls.find(
+                ({ role, title, enabled }) => role === "AXButton" && title === "Not Now" && enabled,
+              )
+            : undefined;
+          if (dismiss?.position && dismiss.size) {
+            await probe.clickPoint(
+              dismiss.position[0] + dismiss.size[0] / 2,
+              dismiss.position[1] + dismiss.size[1] / 2,
             );
             return;
           }
           if (await isBrowser()) return true;
-        }, 20_000);
+          const returnToBrowser = await button("Go Back");
+          if (returnToBrowser?.enabled && returnToBrowser.position && returnToBrowser.size) {
+            await probe.clickPoint(
+              returnToBrowser.position[0] + returnToBrowser.size[0] / 2,
+              returnToBrowser.position[1] + returnToBrowser.size[1] / 2,
+            );
+          }
+        }, 20_000).catch(async (cause) => {
+          const context = (await controls())
+            .filter(
+              ({ role, title, description, id }) =>
+                role === "AXSheet" || (role === "AXButton" && (title || description || id)),
+            )
+            .map(({ role, title, description, id, enabled }) => ({
+              role,
+              title,
+              description,
+              id,
+              enabled,
+            }));
+          throw new Error(
+            "Freeform board browser did not become available: " +
+              JSON.stringify({ front: await probe.front(), context }),
+            { cause },
+          );
+        });
 
         // Start each pair in the alternate mode so both chords must perform a transition.
         await probe.press(bundleId, "View", "as Icons");
@@ -130,25 +202,18 @@ test.skipIf(!macOSUITestsEnabled)(
         await waitFor(async () =>
           (await menu("Insert", "Sticky Note")).enabled ? true : undefined,
         );
-        await app.runChecked("jf");
-        await waitFor(async () => {
-          const focus = await probe.focus(bundleId);
-          return focus.subrole === "AXSearchField" ||
-            (focus.role === "AXTextField" &&
-              /find|search/i.test(focus.description ?? focus.id ?? ""))
-            ? true
-            : undefined;
-        });
-        await probe.key(53);
 
-        if ((await itemTitle("Grid")) === "Hide Grid") {
-          await probe.press(bundleId, "View", "Hide Grid");
+        const gridWasVisible = (await waitFor(() => itemTitle("Grid"))) === "Hide Grid";
+        if (gridWasVisible) {
+          await app.runChecked("vgh");
           await waitFor(async () => ((await itemTitle("Grid")) === "Show Grid" ? true : undefined));
         }
         await app.runChecked("vgs");
         await waitFor(async () => ((await itemTitle("Grid")) === "Hide Grid" ? true : undefined));
-        await app.runChecked("vgh");
-        await waitFor(async () => ((await itemTitle("Grid")) === "Show Grid" ? true : undefined));
+        if (!gridWasVisible) {
+          await app.runChecked("vgh");
+          await waitFor(async () => ((await itemTitle("Grid")) === "Show Grid" ? true : undefined));
+        }
 
         const originalZoom = await waitFor(zoom);
         await app.runChecked("z=");
@@ -171,24 +236,70 @@ test.skipIf(!macOSUITestsEnabled)(
         await app.runChecked("za");
         await waitFor(async () => ((await zoom()) === 100 ? true : undefined));
 
+        const undo = async () =>
+          flattenAX([await menu("Edit")]).find((node) => /^Undo\b/.test(node.title ?? ""));
         for (const [sequence, object] of Object.entries(insert)) {
-          const undo = async () =>
-            flattenAX([await menu("Edit")]).find((node) => /^Undo\b/.test(node.title ?? ""));
           const before = (await undo())?.title;
           await app.runChecked(sequence);
-          await waitFor(async () => {
-            const title = (await undo())?.title;
-            return title !== before && /^Undo (Insert|Add|Create)/i.test(title ?? "")
-              ? true
+          const inserted = await waitFor(async () => {
+            const item = await undo();
+            const action = item?.title ?? "";
+            return item?.enabled &&
+              action !== before &&
+              (/^Undo (Insert|Add|Create)/i.test(action) || action.includes(object))
+              ? action
               : undefined;
+          }).catch(async (cause) => {
+            const item = await undo();
+            throw new Error(`Freeform ${object} left Undo at ${item?.title} (before ${before})`, {
+              cause,
+            });
           });
-          console.log("Freeform inserted " + object);
-          if (sequence !== "in") {
-            await probe.key(53);
-            await probe.key(6, command);
-            await waitFor(async () => ((await undo())?.title === before ? true : undefined));
-          }
+          console.log("Freeform inserted " + object, inserted);
+          await probe.key(53);
+          await probe.press(bundleId, "Edit", inserted);
+          await waitFor(async () => ((await undo())?.title === before ? true : undefined));
         }
+
+        await probe.press(bundleId, "Insert", "Sticky Note");
+        await waitFor(async () => {
+          const item = await undo();
+          return item?.enabled && /^Undo (Insert|Add|Create)/i.test(item.title ?? "")
+            ? item
+            : undefined;
+        });
+        await probe.key(53);
+        const beforeFind = await probe.focus(bundleId);
+        await app.runChecked("jf");
+        await waitFor(async () => {
+          const focus = await probe.focus(bundleId);
+          if (focus.subrole === "AXSearchField") return focus;
+          if (focus.role !== "AXTextField") return;
+          const searchLabel = [focus.title, focus.description, focus.id].some((value) =>
+            /find|search/i.test(value ?? ""),
+          );
+          const changed =
+            focus.id !== beforeFind.id ||
+            (focus.position &&
+              beforeFind.position &&
+              focus.position.some((value, index) => value !== beforeFind.position![index]));
+          if (searchLabel || (changed && focus.value === "")) return focus;
+        }).catch(async (cause) => {
+          const fields = (await controls()).filter(
+            ({ role, subrole }) =>
+              ["AXTextField", "AXComboBox"].includes(role ?? "") || subrole === "AXSearchField",
+          );
+          throw new Error(
+            "Freeform did not focus board search: " +
+              JSON.stringify({
+                beforeFind,
+                focus: await probe.focus(bundleId),
+                fields,
+              }),
+            { cause },
+          );
+        });
+        await probe.key(53);
 
         await app.runChecked("be");
         await waitFor(() => button("Export"));
@@ -198,7 +309,7 @@ test.skipIf(!macOSUITestsEnabled)(
 
         await probe.press(bundleId, "View", "as List");
         await waitFor(async () => (await menu("View", "as List")).mark || undefined);
-        await probe.selectRow(bundleId, board);
+        await selectBoard(board, "Duplicate");
         const originals = await boardNames();
         await app.runChecked("bu");
         const duplicate = await waitFor(async () => {
@@ -214,7 +325,7 @@ test.skipIf(!macOSUITestsEnabled)(
           [duplicate, true],
           [board, false],
         ] as const) {
-          await probe.selectRow(bundleId, name);
+          await selectBoard(name, "Delete");
           if (chord) await app.runChecked("bd");
           else await probe.press(bundleId, "File", "Delete");
           await waitFor(async () => {

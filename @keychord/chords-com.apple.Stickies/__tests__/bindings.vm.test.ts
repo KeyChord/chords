@@ -27,20 +27,34 @@ function behavior(app: ChordApp, probe: MacOSProbe) {
   const window = () => probe.window(id);
   const defaultDocuments = () => probe.windows(id);
   const button = async (title: RegExp) =>
-    flattenAX(await probe.windows(id, 6)).find(
-      (node) => node.role === "AXButton" && title.test(node.title ?? ""),
+    flattenAX([await probe.window(id, 12), ...(await probe.windows(id, 12))]).find(
+      (node) =>
+        node.role === "AXButton" &&
+        [node.title, node.description].some((label) => title.test(label ?? "")),
     );
   const waitForNote = () =>
     waitFor(async () => ((await window()).title === noteText ? true : undefined));
   const makeNote = async (open: () => Promise<void>) => {
     const count = (await defaultDocuments()).length;
     await open();
-    await waitFor(async () =>
-      (await defaultDocuments()).length === count + 1 &&
-      (await window()).title?.startsWith("Untitled")
-        ? true
-        : undefined,
-    );
+    await waitFor(async () => {
+      const current = await defaultDocuments();
+      if (current.length !== count + 1) return;
+      const [note, focus] = await Promise.all([window(), probe.focus(id)]);
+      if (note.subrole === "AXStandardWindow" && focus.role === "AXTextArea" && !focus.value) {
+        return note;
+      }
+    }).catch(async (cause) => {
+      throw new Error(
+        "Stickies did not focus a new empty note: " +
+          JSON.stringify({
+            count,
+            windows: await defaultDocuments(),
+            focus: await probe.focus(id),
+          }),
+        { cause },
+      );
+    });
     return count;
   };
   const countNotes = (count: number) =>
@@ -48,7 +62,10 @@ function behavior(app: ChordApp, probe: MacOSProbe) {
   const pasteNote = async () => {
     const copy = Bun.spawn(["/usr/bin/pbcopy"], { stdin: Buffer.from(noteText) });
     expect(await copy.exited).toBe(0);
-    await probe.key(9, command);
+    await probe.press(id, "Edit", "Paste");
+    await waitFor(async () => (await probe.focus(id)).value === noteText || undefined).catch(() =>
+      probe.setFocusedText(id, noteText),
+    );
     await waitForNote();
   };
   const deleteNote = async () => {
@@ -59,12 +76,14 @@ function behavior(app: ChordApp, probe: MacOSProbe) {
     );
   };
   const panel = async (sequence: string, confirm: RegExp) => {
+    if ((await probe.front()) !== id) await probe.activate(id);
+    await waitForNote();
     expect(await button(/^Cancel$/)).toBeUndefined();
     await app.runChecked(sequence);
     try {
       await waitFor(async () => {
         if (await button(/^Cancel$/)) return button(confirm);
-      });
+      }, 15_000);
     } finally {
       await probe.key(escape);
       await waitFor(async () => (!(await button(/^Cancel$/)) ? true : undefined));
@@ -98,23 +117,69 @@ function behavior(app: ChordApp, probe: MacOSProbe) {
   const setCollapse = async (collapsed: boolean) => {
     const action = collapsed ? "Collapse" : "Expand";
     const other = collapsed ? "Expand" : "Collapse";
-    if (await menu("Window", action).catch(() => undefined))
-      await probe.press(id, "Window", action);
-    await waitFor(() => menu("Window", other).catch(() => undefined));
+    const state = await waitFor(async () => {
+      const current = await menu("Window", action).catch(() => undefined);
+      if (current?.enabled) return "transition";
+      const opposite = await menu("Window", other).catch(() => undefined);
+      if (opposite?.enabled) return "already";
+    }, 10_000);
+    if (state === "transition") await probe.press(id, "Window", action);
+    await waitFor(
+      async () => (await menu("Window", other).catch(() => undefined))?.enabled || undefined,
+    );
   };
   const changeCollapse = async (sequence: string, collapsed: boolean) => {
-    await setCollapse(!collapsed);
-    const height = (await window()).size?.[1];
-    expect(height).toBeGreaterThan(0);
-    try {
-      await app.runChecked(sequence);
-      await waitFor(async () => {
-        const after = (await window()).size?.[1];
-        if (after !== undefined && (collapsed ? after < height! : after > height!)) return after;
-      });
-    } finally {
+    if ((await probe.front()) !== id) await probe.activate(id);
+    const note = async () => (await defaultDocuments()).find(({ title }) => title === noteText);
+    const focusNote = async () => {
+      if ((await window()).title !== noteText) await probe.raiseWindow(id, noteText);
+      await waitFor(async () => (await window()).title === noteText || undefined);
+    };
+    const height = async () => (await note())?.size?.[1];
+    if (collapsed) {
+      await focusNote();
       await setCollapse(false);
+    } else {
+      const expand = () => menu("Window", "Expand").catch(() => undefined);
+      if (!(await expand())?.enabled) {
+        const current = await waitFor(note);
+        if (current.position && current.size) {
+          const [x, y] = current.position;
+          const [width, height] = current.size;
+          await probe.clickPoint(x + width / 2, y + height / 2);
+        }
+      }
+      await waitFor(async () => (await expand())?.enabled || undefined, 12_000).catch(
+        async (cause) => {
+          const commands = flattenAX([await menu("Window")])
+            .filter((entry) => /^(Collapse|Expand)(?: All)?$/.test(entry.title ?? ""))
+            .map(({ title, enabled, id, key, keyModifiers }) => ({
+              title,
+              enabled,
+              id,
+              key,
+              keyModifiers,
+            }));
+          throw new Error(
+            "Stickies did not enable Expand on the collapsed note: " +
+              JSON.stringify({
+                note: await note(),
+                window: await window(),
+                focus: await probe.focus(id),
+                commands,
+              }),
+            { cause },
+          );
+        },
+      );
     }
+    const before = await waitFor(height);
+    expect(before).toBeGreaterThan(0);
+    await app.runChecked(sequence);
+    await waitFor(async () => {
+      const after = await height();
+      if (after !== undefined && (collapsed ? after < before : after > before)) return after;
+    });
   };
 
   return {
@@ -199,7 +264,17 @@ test.skipIf(!macOSUITestsEnabled)(
     await withChordPackage(import.meta.url, (app) =>
       withMacOSProbe(async (probe) => {
         await probe.activate(id);
-        await waitFor(() => probe.menu(id, "File", "New Note").catch(() => undefined), 12_000);
+        await waitFor(async () => {
+          const item = await probe.menu(id, "File", "New Note").catch(() => undefined);
+          if (!item?.enabled || (await probe.front()) !== id) return;
+          const windows = await probe.windows(id);
+          const focus = await probe.focus(id);
+          if (
+            windows.some((window) => window.subrole === "AXStandardWindow") &&
+            focus.role === "AXTextArea"
+          )
+            return item;
+        }, 12_000);
         const { cases, prepare, cleanup } = behavior(app, probe);
         expect(Object.keys(cases).sort()).toEqual([...caseKeys].sort());
         try {

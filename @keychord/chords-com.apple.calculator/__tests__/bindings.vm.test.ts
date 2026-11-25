@@ -34,7 +34,7 @@ test.skipIf(!macOSUITestsEnabled)(
         const view = (title: string) => probe.menu(bundle, "View", title);
         await waitFor(() => view("Basic").catch(() => undefined), 15_000);
 
-        const nodes = async () => flattenAX(await probe.windows(bundle, 9));
+        const nodes = async () => flattenAX(await probe.windows(bundle, 12));
         const control = async (label: RegExp) =>
           (await nodes()).find(
             (node) =>
@@ -55,9 +55,25 @@ test.skipIf(!macOSUITestsEnabled)(
         const originalMode = await waitFor(mode);
         await probe.press(bundle, "View", "Basic");
         await waitFor(async () => ((await mode()) === "Basic" ? true : undefined));
+        const display = async () =>
+          (await nodes()).find(
+            ({ role, description }) => role === "AXStaticText" && description === "Edit field",
+          )?.value;
+        const clickButton = async (name: string) => {
+          const button = await waitFor(async () =>
+            (await nodes()).find(
+              ({ role, id, position, size }) =>
+                role === "AXButton" && id === name && position && size,
+            ),
+          );
+          await probe.clickPoint(
+            button.position![0] + button.size![0] / 2,
+            button.position![1] + button.size![1] / 2,
+          );
+        };
         const copied = async () => (await runCommand(["/usr/bin/pbpaste"])).stdout.trim();
         const copy = async (expected: string) => {
-          await probe.key(8, 1 << 20); // Command-C observes Calculator's actual display.
+          await probe.press(bundle, "Edit", "Copy");
           await waitFor(async () => ((await copied()) === expected ? true : undefined));
         };
         for (const [key, title] of Object.entries(modes)) {
@@ -65,27 +81,28 @@ test.skipIf(!macOSUITestsEnabled)(
           await app.runChecked(key);
           await waitFor(async () => ((await mode()) === title ? true : undefined));
           if (key === "vs") {
-            await probe.key(53, 1 << 19); // Option-Escape clears any previous expression.
-            await probe.key(25); // 9
+            if ((await display()) !== "0") await clickButton("Clear");
+            await clickButton("Nine");
+            await waitFor(async () => (await display()) === "9" || undefined);
             await app.runChecked("cr");
-            await probe.key(36); // Return evaluates the expression.
-            await copy("3");
+            await waitFor(async () => String(await display()).startsWith("√") || undefined);
+            await clickButton("Equals");
+            await waitFor(async () => (await display()) === "3" || undefined);
           } else if (key === "vp") {
-            await probe.key(53, 1 << 19);
-            await probe.key(18); // 1
-            await probe.key(29); // 0
             const base = async () => {
-              // Drive the same number through the native copy command to see its new representation.
-              await probe.key(8, 1 << 20);
-              return copied();
+              const group = (await nodes()).find(({ id }) => id === "CurrentBase");
+              return flattenAX(group ? [group] : []).find(
+                ({ role, value }) => role === "AXRadioButton" && value === 1,
+              )?.id;
             };
-            const initial = await base();
+            const order = ["base8", "base10", "base16"];
+            const initial = await waitFor(base);
+            expect(order).toContain(initial);
             for (let step = 0; step < 3; step++) {
-              const before = await base();
+              const expected = order[(order.indexOf(initial) + step + 1) % order.length];
               await app.runChecked("cb");
-              await waitFor(async () => ((await base()) !== before ? true : undefined));
+              await waitFor(async () => ((await base()) === expected ? true : undefined));
             }
-            expect(await base()).toBe(initial);
           }
         }
 
@@ -122,12 +139,16 @@ test.skipIf(!macOSUITestsEnabled)(
           await waitFor(async () => (Boolean(await toggle()) === before ? true : undefined));
         }
 
-        await probe.key(53, 1 << 19);
-        await probe.key(19); // 2
-        await probe.key(24, 1 << 17); // +
-        await probe.key(20); // 3
-        await probe.key(36); // =
-        await runCommand(["/bin/sh", "-c", "printf %s placeholder | /usr/bin/pbcopy"]);
+        await probe.press(bundle, "View", "Basic");
+        await waitFor(async () => (await mode()) === "Basic" || undefined);
+        if ((await display()) !== "0") await clickButton("AllClear");
+        for (const name of ["Two", "Add", "Three", "Equals"]) await clickButton(name);
+        await waitFor(async () => (await display()) === "5" || undefined);
+        const clipboard = Bun.spawn(["/usr/bin/pbcopy"], {
+          stdin: new Blob(["placeholder"]),
+          timeout: 5_000,
+        });
+        expect(await clipboard.exited).toBe(0);
         await app.runChecked("cc");
         await waitFor(async () => ((await copied()) === "5" ? true : undefined));
         await app.runChecked("cx");

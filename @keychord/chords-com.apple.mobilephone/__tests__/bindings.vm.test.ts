@@ -31,24 +31,27 @@ test.skipIf(!macOSUITestsEnabled)(
         );
         await probe.activate(bundleId);
         const windows = async () => await probe.windows(bundleId, 7);
-        const firstWindows = await waitFor(async () => {
-          const current = await windows().catch(() => []);
-          if (current.length) return current;
-        }, 15_000);
-        if (
-          flattenAX(firstWindows).some((node) =>
+        // A signed-out guest can expose the native menu bar without a main window.
+        await waitFor(async () => {
+          const nodes = flattenAX(await windows().catch(() => []));
+          const welcome = nodes.some((node) =>
             [node.title, node.description, node.value].includes("Welcome to Phone"),
-          )
-        ) {
-          await probe.pressControl(bundleId, "AXButton", "Continue");
-          await waitFor(async () =>
-            flattenAX(await windows()).some((node) =>
-              [node.title, node.description, node.value].includes("Welcome to Phone"),
-            )
-              ? undefined
-              : true,
           );
-        }
+          if (welcome) {
+            const next = nodes.find(
+              ({ role, title, description, enabled }) =>
+                role === "AXButton" && enabled && [title, description].includes("Continue"),
+            );
+            if (next?.position && next.size) {
+              await probe.clickPoint(
+                next.position[0] + next.size[0] / 2,
+                next.position[1] + next.size[1] / 2,
+              );
+            }
+            return;
+          }
+          return probe.menu(bundleId, "Phone", "Settings…").catch(() => undefined);
+        }, 15_000);
 
         const menu = (...path: string[]) =>
           waitFor(() => probe.menu(bundleId, ...path).catch(() => undefined), 10_000);

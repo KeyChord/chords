@@ -48,14 +48,14 @@ test.skipIf(!macOSUITestsEnabled)(
         );
         await probe.activate(bundleId);
         const controls = async () => flattenAX(await probe.windows(bundleId, 8));
-        const noCamera = await waitFor(
+        const capture = await waitFor(
           async () =>
-            (await controls()).find((node) =>
-              [node.title, node.description, node.value].includes("No Camera Available"),
+            (await controls()).find(
+              (node) => node.role === "AXButton" && node.description === "take photo",
             ),
           15_000,
         );
-        expect(noCamera).toBeDefined();
+        expect(capture.enabled).toBe(false);
 
         const autoFlip = () => probe.menu(bundleId, "Edit", "Auto Flip New Items");
         const originalMark = (await autoFlip()).mark;

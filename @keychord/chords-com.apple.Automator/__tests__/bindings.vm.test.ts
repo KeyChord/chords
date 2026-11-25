@@ -73,7 +73,7 @@ function behavior(app: ChordApp, probe: MacOSProbe) {
         if (await button(/^Cancel$/)) return (await target()) || undefined;
       });
     } finally {
-      await probe.key(escape);
+      if (await button(/^Cancel$/)) await probe.pressControl(id, "AXButton", "Cancel");
       await waitFor(async () => (!(await button(/^Cancel$/)) ? true : undefined));
     }
   };
@@ -140,8 +140,9 @@ function behavior(app: ChordApp, probe: MacOSProbe) {
             : undefined,
         );
       } finally {
-        if (await templateChooser()) await probe.key(escape);
-        if ((await probe.window(id)).title?.startsWith("Untitled")) await probe.key(13, command);
+        if (await templateChooser()) await probe.pressControl(id, "AXButton", "Cancel");
+        const title = (await probe.window(id)).title;
+        if (title?.startsWith("Untitled")) await probe.closeWindow(id, title);
         await waitFor(async () => ((await probe.windows(id)).length === before ? true : undefined));
       }
     },
@@ -176,7 +177,7 @@ function behavior(app: ChordApp, probe: MacOSProbe) {
       try {
         await app.runChecked("wr");
         await waitForRunning(true);
-        expect((await menu("Workflow", "Run")).enabled).toBe(false);
+        expect((await menu("Workflow", "Pause")).enabled).toBe(true);
       } finally {
         await stop();
       }
