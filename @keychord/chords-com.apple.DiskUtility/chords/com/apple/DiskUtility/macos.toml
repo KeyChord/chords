@@ -32,8 +32,8 @@ file = '@keychord/chords-menu/js/menu.js'
 '?d' = { name = 'Disk' }
 'di' = { name = 'Disk: Get Info', '@input:menu' = ['BY_PATH', ['File', 'Get Info']] }
 'df' = { name = 'Disk: First Aid', '@input:menu' = ['BY_PATH', ['File', 'Run First Aid...']] }
-'dm' = { name = 'Disk: Mount', '@input:menu' = ['BY_PATH', ['File', 'Mount']] }
-'du' = { name = 'Disk: Unmount', '@input:menu' = ['BY_PATH', ['File', 'Unmount']] }
+'dm' = { name = 'Disk: Mount', '@input:menu' = ['CLICK_TOOLBAR_BUTTON', 'Mount'] }
+'du' = { name = 'Disk: Unmount', '@input:menu' = ['CLICK_TOOLBAR_BUTTON', 'Unmount'] }
 'de' = { name = 'Disk: Erase', '@input:menu' = ['BY_PATH', ['Edit', 'Erase...']] }
 'dr' = { name = 'Disk: Restore', '@input:menu' = ['BY_PATH', ['Edit', 'Restore...']] }
 'dp' = { name = 'Disk: Partition', '@input:menu' = ['BY_PATH', ['Edit', 'Partition...']] }

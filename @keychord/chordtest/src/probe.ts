@@ -261,6 +261,10 @@ export class MacOSProbe {
     await runCommand([this.executable, "click-control", bundleId, role, label]);
   }
 
+  async dragPoints(from: readonly [number, number], to: readonly [number, number]) {
+    await runCommand([this.executable, "drag-points", ...[...from, ...to].map(String)]);
+  }
+
   async doubleClickPoint(x: number, y: number) {
     await runCommand([this.executable, "double-click-point", String(x), String(y)]);
   }

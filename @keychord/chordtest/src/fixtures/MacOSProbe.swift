@@ -56,6 +56,19 @@ func click(_ point: CGPoint, count: Int = 1) throws {
     }
 }
 
+func drag(from: CGPoint, to: CGPoint) {
+    let middle = CGPoint(x: (from.x + to.x) / 2, y: (from.y + to.y) / 2)
+    for (type, position) in [(CGEventType.mouseMoved, from), (.leftMouseDown, from),
+                             (.leftMouseDragged, middle), (.leftMouseDragged, to), (.leftMouseUp, to)] {
+        _ = CGWarpMouseCursorPosition(position)
+        let event = CGEvent(mouseEventSource: nil, mouseType: type, mouseCursorPosition: position,
+                            mouseButton: .left)
+        event?.setIntegerValueField(.mouseEventClickState, value: 1)
+        event?.post(tap: .cghidEventTap)
+        Thread.sleep(forTimeInterval: 0.07)
+    }
+}
+
 func application(_ bundleId: String) throws -> AXUIElement {
     guard let app = NSRunningApplication.runningApplications(withBundleIdentifier: bundleId).first else {
         throw ProbeError("\(bundleId) is not running")
@@ -238,6 +251,13 @@ func inspect(_ args: [String]) throws {
     case "click-point", "double-click-point":
         try click(CGPoint(x: Double(args[1])!, y: Double(args[2])!),
                   count: args[0] == "double-click-point" ? 2 : 1)
+    case "drag-points":
+        let coordinates = args.dropFirst().compactMap(Double.init)
+        guard coordinates.count == 4, coordinates.allSatisfy({ $0.isFinite }) else {
+            throw ProbeError("Invalid drag coordinates")
+        }
+        drag(from: CGPoint(x: coordinates[0], y: coordinates[1]),
+             to: CGPoint(x: coordinates[2], y: coordinates[3]))
     case "window-order":
         let apps = Dictionary(uniqueKeysWithValues: NSWorkspace.shared.runningApplications.compactMap { app in
             app.bundleIdentifier.map { (app.processIdentifier, $0) }
