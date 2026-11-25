@@ -10,7 +10,7 @@ file = '@keychord/chords-menu/js/menu.js'
 'gs' = { name = 'Goto: Speech', '@input:menu' = ['BY_PATH', ['View', 'Speech']] }
 'gn' = { name = 'Goto: Navigation', '@input:menu' = ['BY_PATH', ['View', 'Navigation']] }
 'gw' = { name = 'Goto: Web', '@input:menu' = ['BY_PATH', ['View', 'Web']] }
-'gu' = { name = 'Goto: Sound', '@input:menu' = ['BY_PATH', ['View', 'Sound']] }
+'gu' = { name = 'Goto: Sound', '@input:menu' = ['SELECT_ROW', ['Utility Categories', 'Sound']] }
 'gi' = { name = 'Goto: Visuals', '@input:menu' = ['BY_PATH', ['View', 'Visuals']] }
 'gc' = { name = 'Goto: Commands', '@input:menu' = ['BY_PATH', ['View', 'Commands']] }
 'gb' = { name = 'Goto: Braille', '@input:menu' = ['BY_PATH', ['View', 'Braille']] }

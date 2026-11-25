@@ -1,7 +1,7 @@
 {
   "name": "@keychord/chords-com.apple.games",
   "displayName": "Games Chords",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Chords for Games (com.apple.games).",
   "categories": [
     "macOS"

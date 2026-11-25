@@ -13,15 +13,24 @@ export type MenuAction =
   | "BY_INDEX"
   | "BY_LETTERS"
   | "BY_PATH"
+  | "BY_POPUP"
   | "BY_FIRST_PATH"
+  | "BY_PATH_WITH_AUDIO_INPUT"
   | "BY_KEY"
   | "SEARCH"
-  | "FOCUS";
+  | "FOCUS"
+  | "CLICK_TOOLBAR_BUTTON"
+  | "SELECT_ROW"
+  | "REQUIRE_CONTROL_ABSENT"
+  | "FOLDER_ACTIONS";
 
 /** An exact menu path, starting at a top-level menu and ending at the item to invoke. */
 export type MenuPath = readonly [menu: string, ...subitems: string[]];
-
 type MenuPaths = readonly [MenuPath, ...MenuPath[]];
+type PopupPath = readonly [buttonLabel: string, itemTitle: string, ...preferredMenuPath: string[]];
+export type RowPath = readonly [listName: string, rowLabel: string];
+
+type ControlGuard = readonly [identifier: string, error: string];
 
 export type MenuHandlerContext = {
   /** Bundle identifier captured by Chord when it resolved the chord. */
@@ -30,9 +39,13 @@ export type MenuHandlerContext = {
 
 export type MenuArguments =
   | [action: "BY_INDEX", menuIndex: number | string]
-  | [action: "BY_LETTERS" | "SEARCH" | "FOCUS", query: string]
-  | [action: "BY_PATH" | "BY_KEY", path: MenuPath]
-  | [action: "BY_FIRST_PATH", paths: MenuPaths];
+  | [action: "BY_LETTERS" | "SEARCH" | "FOCUS" | "CLICK_TOOLBAR_BUTTON", query: string]
+  | [action: "BY_PATH" | "BY_KEY" | "BY_PATH_WITH_AUDIO_INPUT", path: MenuPath]
+  | [action: "BY_FIRST_PATH", paths: MenuPaths]
+  | [action: "BY_POPUP", path: PopupPath]
+  | [action: "SELECT_ROW", path: RowPath]
+  | [action: "REQUIRE_CONTROL_ABSENT", guard: ControlGuard]
+  | [action: "FOLDER_ACTIONS", folder: string];
 
 /** Resolves when the native action completes; rejects on validation or accessibility errors. */
 export type MenuHandler = {
@@ -61,13 +74,26 @@ export type MenuHandler = {
   (this: MenuHandlerContext | void, action: "BY_LETTERS", query: string): Promise<void>;
   (this: MenuHandlerContext | void, action: "SEARCH", query: string): Promise<void>;
   (this: MenuHandlerContext | void, action: "FOCUS", subrole: string): Promise<void>;
+  (this: MenuHandlerContext | void, action: "CLICK_TOOLBAR_BUTTON", label: string): Promise<void>;
 
   /**
    * Exact menu titles from the menu bar down to the item to invoke. For example:
    * `["Window", "Move Tab to New Window"]`.
    */
-  (this: MenuHandlerContext | void, action: "BY_PATH" | "BY_KEY", path: MenuPath): Promise<void>;
+  (
+    this: MenuHandlerContext | void,
+    action: "BY_PATH" | "BY_KEY" | "BY_PATH_WITH_AUDIO_INPUT",
+    path: MenuPath,
+  ): Promise<void>;
   (this: MenuHandlerContext | void, action: "BY_FIRST_PATH", paths: MenuPaths): Promise<void>;
+  (this: MenuHandlerContext | void, action: "BY_POPUP", path: PopupPath): Promise<void>;
+  (this: MenuHandlerContext | void, action: "SELECT_ROW", path: RowPath): Promise<void>;
+  (
+    this: MenuHandlerContext | void,
+    action: "REQUIRE_CONTROL_ABSENT",
+    guard: ControlGuard,
+  ): Promise<void>;
+  (this: MenuHandlerContext | void, action: "FOLDER_ACTIONS", folder: string): Promise<void>;
   (this: MenuHandlerContext | void, ...args: MenuArguments): Promise<void>;
 };
 
@@ -90,13 +116,29 @@ export async function runMenuAction(
     }
     return addon.runMenuAction(processName, action, JSON.stringify(value));
   }
-  if (action === "BY_PATH" || action === "BY_KEY") {
-    if (
-      !Array.isArray(value) ||
-      value.length < 1 ||
-      value.some((component) => typeof component !== "string" || component.trim().length === 0)
-    ) {
+  if (
+    action === "BY_PATH" ||
+    action === "BY_POPUP" ||
+    action === "BY_KEY" ||
+    action === "BY_PATH_WITH_AUDIO_INPUT" ||
+    action === "SELECT_ROW" ||
+    action === "REQUIRE_CONTROL_ABSENT"
+  ) {
+    if (!isMenuPath(value)) {
       throw new TypeError(`"${action}" expects at least one non-empty string component`);
+    }
+    if (action === "BY_POPUP" && (value.length < 2 || value.length === 3)) {
+      throw new TypeError(
+        '"BY_POPUP" expects a button selector and item title, with an optional menu path',
+      );
+    }
+    if (action === "SELECT_ROW" && value.length !== 2) {
+      throw new TypeError('"SELECT_ROW" expects a table or outline name and a row label');
+    }
+    if (action === "REQUIRE_CONTROL_ABSENT" && value.length !== 2) {
+      throw new TypeError(
+        '"REQUIRE_CONTROL_ABSENT" expects a control identifier and an error message',
+      );
     }
     return addon.runMenuAction(processName, action, JSON.stringify(value));
   }
@@ -105,6 +147,12 @@ export async function runMenuAction(
   }
   if (action === "FOCUS" && (typeof value !== "string" || !value.trim())) {
     throw new TypeError('"FOCUS" expects an accessibility subrole');
+  }
+  if (action === "CLICK_TOOLBAR_BUTTON" && (typeof value !== "string" || !value.trim())) {
+    throw new TypeError(`"${action}" expects an exact accessibility label`);
+  }
+  if (action === "FOLDER_ACTIONS" && (typeof value !== "string" || !value.trim())) {
+    throw new TypeError('"FOLDER_ACTIONS" expects a folder path');
   }
   return addon.runMenuAction(processName, action, String(value));
 }

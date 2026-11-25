@@ -1,7 +1,7 @@
 {
   "name": "@keychord/chords-com.apple.VoiceOverUtility",
   "displayName": "VoiceOver Utility Chords",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Chords for VoiceOver Utility (com.apple.VoiceOverUtility).",
   "categories": [
     "macOS"

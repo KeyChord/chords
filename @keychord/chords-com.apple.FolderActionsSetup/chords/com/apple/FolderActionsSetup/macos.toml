@@ -1,8 +1,8 @@
 name = 'Folder Actions Setup'
 
-[on.attach]
-file = 'attach.js'
+[on.menu]
+file = '@keychord/chords-menu/js/menu.js'
 
 [chords]
 '?f' = { name = 'Folder' }
-'fa(.+)' = { name = 'Folder: Attach Script to $1', '@input:attach' = ['$1'] }
+'fa(.+)' = { name = 'Folder: Attach Script to $1', '@input:menu' = ['FOLDER_ACTIONS', '$1'] }

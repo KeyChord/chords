@@ -54,27 +54,55 @@ test.skipIf(!macOSUITestsEnabled)(
             ? true
             : undefined;
 
-        const startup = await waitFor(async () => {
-          if (await selected(destinations.gh)) return "home";
+        const signInRequired = async () =>
+          (await elements()).some(
+            ({ id, value }) =>
+              id === "games.onboarding.title" && value === "Sign In to Game Center",
+          );
+        await waitFor(async () => {
           const nodes = await elements();
-          if (
-            nodes.some((node) => matches(node, /^Welcome to Apple Games$/)) &&
-            nodes.some((node) => node.role === "AXButton" && matches(node, /^Continue$/))
-          )
-            return "welcome";
-        }, 30_000);
-        if (startup === "welcome") {
-          await probe.pressControl(bundle, "AXButton", "Continue");
-          await waitFor(() => selected(destinations.gh), 30_000);
+          if (await signInRequired()) return true;
+          const welcome = nodes.find(
+            ({ id, role, enabled }) =>
+              role === "AXButton" && enabled && id === "games.onboarding.primaryButton",
+          );
+          if (welcome?.position && welcome.size) {
+            const [x, y] = welcome.position;
+            const [width, height] = welcome.size;
+            await probe.clickPoint(x + width / 2, y + height / 2);
+            return;
+          }
+          return selected(destinations.gh);
+        }, 30_000).catch(async (cause) => {
+          const nodes = (await elements()).filter(
+            ({ id, role }) =>
+              id?.startsWith("games.onboarding.") || role === "AXHeading" || role === "AXSheet",
+          );
+          throw new Error("Games did not open its Home view: " + JSON.stringify(nodes), { cause });
+        });
+
+        if (await signInRequired()) {
+          for (const sequence of Object.keys(destinations)) {
+            await app.expectFailure(
+              sequence,
+              /Sign in to Game Center in Games before switching sections/,
+            );
+            expect(await signInRequired()).toBe(true);
+          }
+        } else {
+          for (const [sequence, destination] of Object.entries(destinations)) {
+            expect(await selected(destination)).toBeUndefined();
+            await app.runChecked(sequence);
+            await waitFor(() => selected(destination), 25_000);
+            expect(await probe.front()).toBe(bundle);
+          }
         }
 
-        for (const [sequence, destination] of Object.entries(destinations)) {
-          expect(await selected(destination)).toBeUndefined();
-          await app.runChecked(sequence);
-          await waitFor(() => selected(destination), 25_000);
-          expect(await probe.front()).toBe(bundle);
+        const settingsItem = await probe.menu(bundle, "Games", "Settings…");
+        if (settingsItem.enabled === false) {
+          await app.expectFailure("g,", /Menu item "Settings…".*is disabled/);
+          return;
         }
-
         const settingsOpen = async () =>
           (await elements()).some(
             (node) =>
@@ -88,7 +116,10 @@ test.skipIf(!macOSUITestsEnabled)(
         await waitFor(settingsOpen, 10_000);
         await probe.key(13, 1 << 20);
         await waitFor(async () => (!(await settingsOpen()) ? true : undefined), 10_000);
-        await waitFor(() => selected(destinations.gh), 15_000);
+        await waitFor(
+          async () => (await signInRequired()) || (await selected(destinations.gh)),
+          15_000,
+        );
       }),
     );
   },

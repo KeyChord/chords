@@ -1,7 +1,7 @@
 {
   "name": "@keychord/chords-com.apple.VoiceMemos",
   "displayName": "Voice Memos Chords",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Chords for Voice Memos (com.apple.VoiceMemos).",
   "categories": [
     "macOS"

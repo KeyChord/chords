@@ -84,6 +84,20 @@ await menu("BY_PATH", ["File", "New Window"]);
 ```
 
 `BY_INDEX` uses zero-based menu indexes. `BY_PATH` accepts one or more exact titles.
+`BY_FIRST_PATH` accepts a list of exact paths and invokes the first enabled match.
+`BY_POPUP` accepts a menu button’s exact label or accessibility role and the exact title of its
+menu item. It can also accept an exact menu bar path to try first.
+`BY_PATH_WITH_AUDIO_INPUT` invokes an exact path when an audio input device is available.
+`CLICK_TOOLBAR_BUTTON` activates a toolbar button with an exact title or
+accessibility description in the current window.
+`SELECT_ROW` selects a row by exact label in a table or outline in the focused window.
+`REQUIRE_CONTROL_ABSENT` reports the supplied error when a visible control in the focused
+window has the specified accessibility identifier.
+Pass the list’s accessibility identifier or description and the row label, such as
+`["outline", "Recently Added"]` in Music.
+
+`FOLDER_ACTIONS` reveals a folder in Finder and invokes Folder Actions Setup after verifying
+the selection.
 Handlers capture the resolved application's bundle identifier from Chord's context
 and return promises that callers should await. Native operations run on Swift's
 main actor and complete on the originating JavaScript queue.
@@ -131,5 +145,3 @@ including when vendored into other chord packages. Requires macOS 14+ and Access
 Build with `vp pack` (Swift 6.2+). Run unit tests with `vp run test` (`bun test --isolate`)
 in this directory, and real menu/tray checks in the disposable macOS VM with
 `vp run test:macos -- @keychord/chords-menu` from the monorepo root.
-
-`BY_FIRST_PATH` accepts a list of exact menu paths and invokes the first enabled match.

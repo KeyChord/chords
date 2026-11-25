@@ -1,3 +1,4 @@
+import AVFoundation
 // Native (Swift) implementation of the macOS menu bar handler.
 //
 // Behaviour mirrors the query language documented in `readme.md`, talking to the Accessibility
@@ -44,8 +45,12 @@ public enum MenuError: Error, CustomStringConvertible {
     case indexOutOfRange(index: Int, count: Int)
     case invalidIndex(String)
     case invalidPath(String)
+    case invalidFolderPath(String)
+    case folderNotFound(String)
     case pathComponentNotFound(component: String, path: [String], available: [String])
     case pathItemDisabled(component: String, path: [String])
+    case audioInputRequired(path: [String])
+    case visibleControl(String)
     case emptyQuery
     case invalidQuery(String)
     case noTopLevelMatch(prefix: String, occurrence: Int, found: Int)
@@ -61,7 +66,7 @@ public enum MenuError: Error, CustomStringConvertible {
         case .ambiguousSearch(let query, let paths):
             return "Menu search \"\(query)\" is ambiguous: \(paths.joined(separator: ", ")). Include a menu path such as Window > Center."
         case .invalidAction(let action):
-            return "unknown menu action \"\(action)\" (expected \"BY_INDEX\", \"BY_LETTERS\", \"BY_PATH\", \"BY_FIRST_PATH\", \"BY_KEY\", \"SEARCH\", or \"FOCUS\")"
+            return "unknown menu action \"\(action)\" (expected \"BY_INDEX\", \"BY_LETTERS\", \"BY_PATH\", \"BY_POPUP\", \"BY_FIRST_PATH\", \"BY_PATH_WITH_AUDIO_INPUT\", \"BY_KEY\", \"SEARCH\", \"FOCUS\", \"CLICK_TOOLBAR_BUTTON\", \"SELECT_ROW\", \"REQUIRE_CONTROL_ABSENT\", or \"FOLDER_ACTIONS\")"
         case .applicationNotFound(let name):
             return "application \"\(name)\" is not running and could not be launched"
         case .noFrontmostApplication:
@@ -74,11 +79,19 @@ public enum MenuError: Error, CustomStringConvertible {
             return "invalid menu index \"\(value)\""
         case .invalidPath(let reason):
             return "Invalid menu path: \(reason)"
+        case .invalidFolderPath(let path):
+            return "Enter an absolute folder path or a path starting with ~/. Got: \(path)"
+        case .folderNotFound(let path):
+            return "Folder not found: \(path)"
         case .pathComponentNotFound(let component, let path, let available):
             let renderedPath = path.joined(separator: " > ")
             return "Menu path \"\(renderedPath)\" has no component \"\(component)\". Available items: \(available)."
         case .pathItemDisabled(let component, let path):
             return "Menu item \"\(component)\" in path \"\(path.joined(separator: " > "))\" is disabled."
+        case .audioInputRequired(let path):
+            return "Cannot invoke \"\(path.joined(separator: " > "))\" without an audio input device."
+        case .visibleControl(let message):
+            return message
         case .emptyQuery:
             return "Expected a non-empty lowercase query"
         case .invalidQuery(let query):
@@ -396,6 +409,249 @@ private func focusToolbarControl(in application: Element, target: NSRunningAppli
     throw MenuError.accessibility("the \(subrole) toolbar control did not receive focus")
 }
 
+@MainActor
+private func descendants(_ element: Element, depth: Int, matching predicate: (Element) -> Bool) -> [Element] {
+    if predicate(element) { return [element] }
+    guard depth > 0 else { return [] }
+    return axChildren(element).flatMap { descendants($0, depth: depth - 1, matching: predicate) }
+}
+
+@MainActor
+private func focusedWindowOwnsPoint(_ frame: CGRect, pid: pid_t, point: CGPoint) -> Bool {
+    guard frame.contains(point),
+          let windows = CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID)
+              as? [[String: Any]] else { return false }
+    for window in windows {
+        guard (window[kCGWindowAlpha as String] as? Double ?? 1) > 0,
+              let rawBounds = window[kCGWindowBounds as String] as? [String: Any],
+              let bounds = CGRect(dictionaryRepresentation: rawBounds as CFDictionary),
+              bounds.contains(point) else { continue }
+        return window[kCGWindowOwnerPID as String] as? pid_t == pid &&
+            abs(bounds.minX - frame.minX) <= 2 && abs(bounds.minY - frame.minY) <= 2 &&
+            abs(bounds.width - frame.width) <= 2 && abs(bounds.height - frame.height) <= 2
+    }
+    return false
+}
+
+@MainActor
+private func clickWindowButton(in application: Element, target: NSRunningApplication, label: String) async throws {
+    let role = kAXButtonRole
+    func matches(_ element: Element) -> Bool {
+        element.role() == role &&
+            (element.title() == label || element.attribute(Attribute<String>(kAXDescriptionAttribute)) == label)
+    }
+    guard target.isActive, let window = application.focusedWindow() ?? application.mainWindow() else {
+        throw MenuError.accessibility("the application has no focused window")
+    }
+    let toolbars = descendants(window, depth: 8) { $0.role() == kAXToolbarRole }
+    let candidates = toolbars.flatMap { descendants($0, depth: 6, matching: matches) }
+    let buttons = candidates.filter { $0.isEnabled() != false }
+    if !candidates.isEmpty && buttons.isEmpty {
+        throw MenuError.accessibility("the \(role) named \"\(label)\" is disabled")
+    }
+    func identifiesAncestor(_ ancestor: Element, of element: Element) -> Bool {
+        var current: Element? = element
+        for _ in 0...4 {
+            guard let item = current else { return false }
+            if item == ancestor { return true }
+            current = item.parent()
+        }
+        return false
+    }
+    var points: [CGPoint] = []
+    for button in buttons {
+        guard let frame = button.frame(), !frame.isEmpty else { continue }
+        let point = CGPoint(x: frame.midX, y: frame.midY)
+        var element: AXUIElement?
+        var pid: pid_t = 0
+        let status = AXUIElementCopyElementAtPosition(
+            AXUIElementCreateSystemWide(), Float(point.x), Float(point.y), &element
+        )
+        var hitsButton = false
+        if status == .success, let element, AXUIElementGetPid(element, &pid) == .success {
+            guard pid == target.processIdentifier else { continue }
+            let hit = Element(element)
+            let containerHit =
+                [kAXToolbarRole, kAXGroupRole].contains(hit.role() ?? "") &&
+                identifiesAncestor(hit, of: button)
+            hitsButton = identifiesAncestor(button, of: hit) || containerHit
+        }
+        // Some controls return an opaque accessibility hit even though the exact focused
+        // window owns the point and the unique requested control has a visible frame there.
+        if !hitsButton, buttons.count == 1, let windowFrame = window.frame() {
+            hitsButton = focusedWindowOwnsPoint(windowFrame, pid: target.processIdentifier, point: point)
+        }
+        guard hitsButton else { continue }
+        if !points.contains(point) { points.append(point) }
+    }
+    guard points.count == 1, let point = points.first, target.isActive else {
+        throw MenuError.accessibility("expected one visible \(role) named \"\(label)\" (\(buttons.count) accessibility matches, \(points.count) clickable)")
+    }
+    try await click(at: point, type: .left)
+}
+
+@MainActor
+private func clickPopupItem(in application: Element, target: NSRunningApplication, path: [String]) async throws {
+    guard path.count >= 2, path.count != 3 else {
+        throw MenuError.invalidPath("expected a button selector and item title, with an optional menu path")
+    }
+    if path.count > 2, let menuBar = application.menuBar() {
+        let preferred = Array(path.dropFirst(2))
+        if let item = try? menuItem(axChildren(menuBar), path: preferred) {
+            try axPress(item, label: preferred.joined(separator: " > "))
+            return
+        }
+    }
+    let label = path[0]
+    let itemTitle = path[1]
+    guard target.isActive, let window = application.focusedWindow() ?? application.mainWindow() else {
+        throw MenuError.accessibility("the application has no focused window")
+    }
+    func matchesButton(_ element: Element) -> Bool {
+        guard let role = element.role(), role == kAXMenuButtonRole || role == kAXPopUpButtonRole,
+              element.isEnabled() != false, let frame = element.frame(), !frame.isEmpty else { return false }
+        return role == label || element.title() == label ||
+            element.attribute(Attribute<String>(kAXDescriptionAttribute)) == label
+    }
+    var buttons = descendants(window, depth: 12, matching: matchesButton)
+    if buttons.count > 1, let focused = application.attribute(Attribute<AXUIElement>(kAXFocusedUIElementAttribute)) {
+        var parent: Element? = Element(focused)
+        for _ in 0..<8 {
+            guard let current = parent, current != window else { break }
+            let scoped = descendants(current, depth: 7, matching: matchesButton)
+            if scoped.count == 1 && buttons.contains(scoped[0]) {
+                buttons = scoped
+                break
+            }
+            parent = current.parent()
+        }
+    }
+    guard buttons.count == 1, let button = buttons.first else {
+        throw MenuError.accessibility("expected one enabled menu button named \"\(label)\"")
+    }
+    func windowMenus() -> [Element] {
+        let appWindows = application.windows() ?? []
+        return ([window] + appWindows).flatMap { container in
+            descendants(container, depth: 12) { $0.role() == kAXMenuRole }
+        }
+    }
+    let previousMenus = windowMenus()
+    try axPress(button, label: "menu button \"\(label)\"")
+    let deadline = Date().addingTimeInterval(2.5)
+    repeat {
+        guard target.isActive else {
+            throw MenuError.accessibility("the application lost focus while opening \"\(label)\"")
+        }
+        var menus = axChildren(button).filter { $0.role() == kAXMenuRole }
+        if let shown = button.attribute(Attribute<AXUIElement>(kAXShownMenuUIElementAttribute)) {
+            menus.append(Element(shown))
+        }
+        menus += windowMenus().filter { !previousMenus.contains($0) }
+        var matches: [Element] = []
+        for item in menus.flatMap(axChildren)
+        where item.role() == kAXMenuItemRole && title(of: item) == itemTitle && !matches.contains(item) {
+            matches.append(item)
+        }
+        if let item = matches.first {
+            guard matches.count == 1 else {
+                throw MenuError.accessibility("popup item \"\(itemTitle)\" is ambiguous in \"\(label)\"")
+            }
+            guard item.isEnabled() != false else {
+                throw MenuError.pathItemDisabled(component: itemTitle, path: path)
+            }
+            if let frame = item.frame(), !frame.isEmpty {
+                let point = CGPoint(x: frame.midX, y: frame.midY)
+                var hitElement: AXUIElement?
+                var pid: pid_t = 0
+                let hit = AXUIElementCopyElementAtPosition(
+                    AXUIElementCreateSystemWide(), Float(point.x), Float(point.y), &hitElement
+                )
+                if hit == .success, let hitElement,
+                   AXUIElementGetPid(hitElement, &pid) == .success, pid == target.processIdentifier {
+                    var ancestor: Element? = Element(hitElement)
+                    for _ in 0...4 {
+                        guard let current = ancestor else { break }
+                        if current == item || (current.role() == kAXMenuRole && axChildren(current).contains(item)) {
+                            try await click(at: point, type: .left)
+                            return
+                        }
+                        ancestor = current.parent()
+                    }
+                }
+            }
+            try axPress(item, label: [label, itemTitle].joined(separator: " > "))
+            return
+        }
+        try await Task.sleep(for: .milliseconds(25))
+    } while Date() < deadline
+    throw MenuError.accessibility("menu button \"\(label)\" did not expose \"\(itemTitle)\"")
+}
+
+@MainActor
+private func selectListRow(in application: Element, listName: String, label: String) throws {
+    guard let window = application.focusedWindow() ?? application.mainWindow() else {
+        throw MenuError.accessibility("the application has no focused window")
+    }
+    let lists = descendants(window, depth: 7) { element in
+        element.role() == kAXOutlineRole || element.role() == kAXTableRole
+    }
+    let byIdentifier = lists.filter {
+        $0.attribute(Attribute<String>(kAXIdentifierAttribute)) == listName
+    }
+    let matchingLists = byIdentifier.isEmpty ? lists.filter {
+        $0.attribute(Attribute<String>(kAXDescriptionAttribute)) == listName
+    } : byIdentifier
+    guard matchingLists.count == 1, let list = matchingLists.first else {
+        throw MenuError.accessibility("expected one table or outline named \"\(listName)\"")
+    }
+    let rows = descendants(list, depth: 4) { $0.role() == kAXRowRole }
+    let matches = rows.filter { row in
+        !descendants(row, depth: 3) { element in
+            title(of: element) == label ||
+                element.attribute(Attribute<String>(kAXValueAttribute)) == label
+        }.isEmpty
+    }
+    guard matches.count == 1, let row = matches.first else {
+        throw MenuError.accessibility("expected one row named \"\(label)\" in \"\(listName)\"")
+    }
+    try row.setAttributeValue(true, forAttribute: kAXSelectedAttribute)
+}
+
+@MainActor
+private func openFolderActions(path: String) async throws {
+    let expanded = path.hasPrefix("~/") ? (path as NSString).expandingTildeInPath : path
+    guard expanded.hasPrefix("/") else { throw MenuError.invalidFolderPath(path) }
+
+    let folder = URL(fileURLWithPath: expanded, isDirectory: true).resolvingSymlinksInPath()
+    var isDirectory: ObjCBool = false
+    guard FileManager.default.fileExists(atPath: folder.path, isDirectory: &isDirectory),
+          isDirectory.boolValue else { throw MenuError.folderNotFound(expanded) }
+
+    NSWorkspace.shared.activateFileViewerSelecting([folder])
+    let finder = try await activate(processName: "com.apple.finder")
+    let application = AXApp(finder).element
+    let menuPath = ["Finder", "Services", "Folder Actions Setup…"]
+    let deadline = ContinuousClock.now + .seconds(8)
+    repeat {
+        if finder.isActive, let window = application.focusedWindow() ?? application.mainWindow() {
+            let selected = descendants(window, depth: 9) {
+                $0.attribute(Attribute<Bool>(kAXSelectedAttribute)) == true &&
+                    $0.attribute(Attribute<URL>(kAXURLAttribute))?.isFileURL == true
+            }
+            let selectedPaths = Set(selected.compactMap {
+                $0.attribute(Attribute<URL>(kAXURLAttribute))?.resolvingSymlinksInPath().path
+            })
+            if selectedPaths == [folder.path], let menuBar = application.menuBar() {
+                try clickMenuItem(axChildren(menuBar), path: menuPath)
+                return
+            }
+        }
+        try await Task.sleep(for: .milliseconds(75))
+    } while ContinuousClock.now < deadline
+
+    throw MenuError.accessibility("Finder did not select the requested folder \"\(folder.path)\"")
+}
+
 /// Alternate items and first-responder commands can depend on the actual key event.
 @MainActor
 private func pressKeyEquivalent(_ item: Element, target: NSRunningApplication) throws {
@@ -516,6 +772,10 @@ private extension NSWorkspace {
 /// Drives the menu bar on MainActor; the JS entrypoint returns a Promise.
 @MainActor
 public func runMenuAction(processName: String?, action: String, value: String) async throws {
+    if action == "FOLDER_ACTIONS" {
+        try await openFolderActions(path: value)
+        return
+    }
     let target: NSRunningApplication
     if let processName {
         target = try await activate(processName: processName)
@@ -530,6 +790,38 @@ public func runMenuAction(processName: String?, action: String, value: String) a
     let application = AXApp(target).element
     if action == "FOCUS" {
         try await focusToolbarControl(in: application, target: target, subrole: value)
+        return
+    }
+    if action == "CLICK_TOOLBAR_BUTTON" {
+        try await clickWindowButton(in: application, target: target, label: value)
+        return
+    }
+    if action == "BY_POPUP" {
+        try await clickPopupItem(in: application, target: target, path: parseMenuPath(value))
+        return
+    }
+    if action == "SELECT_ROW" {
+        let path = try parseMenuPath(value)
+        guard path.count == 2 else {
+            throw MenuError.invalidPath("expected a table or outline name and a row label")
+        }
+        try selectListRow(in: application, listName: path[0], label: path[1])
+        return
+    }
+    if action == "REQUIRE_CONTROL_ABSENT" {
+        let arguments = try parseMenuPath(value)
+        guard arguments.count == 2 else {
+            throw MenuError.invalidPath("expected a control identifier and an error message")
+        }
+        guard let window = application.focusedWindow() ?? application.mainWindow() else {
+            throw MenuError.accessibility("the application has no focused window")
+        }
+        let matches = descendants(window, depth: 12) {
+            $0.attribute(Attribute<String>(kAXIdentifierAttribute)) == arguments[0]
+        }
+        if matches.contains(where: { $0.frame()?.isEmpty == false }) {
+            throw MenuError.visibleControl(arguments[1])
+        }
         return
     }
     guard let menuBar = application.menuBar() else {
@@ -561,6 +853,13 @@ public func runMenuAction(processName: String?, action: String, value: String) a
         try clickMenuItem(items, path: try parseMenuPath(value))
     case "BY_FIRST_PATH":
         try clickFirstMenuPath(items, value: value)
+    case "BY_PATH_WITH_AUDIO_INPUT":
+        let path = try parseMenuPath(value)
+        let item = try menuItem(items, path: path)
+        guard AVCaptureDevice.default(for: .audio) != nil else {
+            throw MenuError.audioInputRequired(path: path)
+        }
+        try axPress(item, label: "menu path \"\(path.joined(separator: " > "))\"")
     case "BY_KEY":
         try pressKeyEquivalent(menuItem(items, path: parseMenuPath(value)), target: target)
     default:

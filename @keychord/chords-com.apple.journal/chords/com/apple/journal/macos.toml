@@ -12,7 +12,15 @@ file = '@keychord/chords-menu/js/menu.js'
 '?e' = { name = 'Entry' }
 'ee' = { name = 'Entry: Edit', '@input:menu' = ['BY_PATH', ['Entry', 'Edit Entry']] }
 'eb' = { name = 'Entry: Toggle Bookmark', '@input:menu' = ['SEARCH', 'Bookmark'] }
-'ex' = { name = 'Entry: Delete', '@input:menu' = ['BY_PATH', ['Entry', 'Delete Entry']] }
+'ex' = { name = 'Entry: Delete', '@input:menu' = [
+  'BY_POPUP',
+  [
+    'AXPopUpButton',
+    'Delete',
+    'Entry',
+    'Delete Entry',
+  ],
+] }
 
 '?g' = { name = 'Goto' }
 'ga' = { name = 'Goto: All Entries', '@input:menu' = ['BY_PATH', ['View', 'All Entries']] }
@@ -29,7 +37,15 @@ file = '@keychord/chords-menu/js/menu.js'
 
 '?f' = { name = 'File' }
 'fe' = { name = 'File: Export', '@input:menu' = ['BY_PATH', ['File', 'Export…']] }
-'fp' = { name = 'File: Print', '@input:menu' = ['BY_PATH', ['File', 'Print…']] }
+'fp' = { name = 'File: Print', '@input:menu' = [
+  'BY_POPUP',
+  [
+    'AXPopUpButton',
+    'Print',
+    'File',
+    'Print…',
+  ],
+] }
 
 '?s' = { name = 'Settings' }
 's,' = { name = 'Settings: Open', '@input:menu' = ['BY_PATH', ['Journal', 'Settings…']] }

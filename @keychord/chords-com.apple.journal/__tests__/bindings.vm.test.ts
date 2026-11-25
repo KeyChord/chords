@@ -13,7 +13,6 @@ import {
 const bundleId = "com.apple.journal";
 const entryText = "chord";
 const escape = 53;
-const command = 1 << 20;
 const label = (node: AXNode, text: string) =>
   [node.title, node.description, node.value].includes(text);
 
@@ -31,61 +30,194 @@ class Journal {
     await this.probe.activate(bundleId);
     await waitFor(async () => {
       const nodes = await this.nodes();
-      if (
-        nodes.some((node) => label(node, "All Entries")) &&
-        (await this.probe.menu(bundleId, "File", "New Entry")).enabled
-      )
-        return true;
-      const button = ["Continue", "Get Started", "Not Now", "Not now", "Skip"].find((text) =>
-        nodes.some((node) => node.role === "AXButton" && node.enabled && label(node, text)),
+      const button = nodes.find(
+        (node) =>
+          node.role === "AXButton" &&
+          node.enabled &&
+          ["Continue", "Get Started", "Not Now", "Not now", "Skip"].some((text) =>
+            label(node, text),
+          ),
       );
-      if (button) await this.probe.pressControl(bundleId, "AXButton", button);
+      if (button?.position && button.size) {
+        await this.probe.clickPoint(
+          button.position[0] + button.size[0] / 2,
+          button.position[1] + button.size[1] / 2,
+        );
+        return;
+      }
+      const window = (await this.probe.windows(bundleId)).find(({ title }) =>
+        title?.startsWith("Journal"),
+      );
+      return window &&
+        (await this.probe.menu(bundleId, "File", "New Entry").catch(() => undefined))?.enabled
+        ? true
+        : undefined;
     }, 20_000);
   }
 
   async editor() {
+    const field = await waitFor(async () => {
+      const nodes = await this.nodes();
+      const onboarding = nodes.find(
+        (node) =>
+          node.role === "AXSheet" &&
+          flattenAX([node]).some(
+            ({ role, description }) => role === "AXHeading" && description === "Welcome to",
+          ),
+      );
+      if (onboarding) {
+        const next = flattenAX([onboarding]).find(
+          (node) => node.role === "AXButton" && label(node, "Continue") && node.enabled !== false,
+        );
+        if (next?.position && next.size) {
+          const [x, y] = next.position;
+          const [width, height] = next.size;
+          await this.probe.clickPoint(x + width / 2, y + height / 2);
+        }
+        return;
+      }
+      return nodes.find(
+        ({ role, description, position, size }) =>
+          role === "AXTextArea" && description === "Journal Text" && position && size,
+      );
+    }, 12_000);
+    const focused = await this.probe.focus(bundleId);
+    if (focused.role !== "AXTextArea" || focused.description !== "Journal Text") {
+      await this.probe.clickPoint(
+        field.position![0] + field.size![0] / 2,
+        field.position![1] + field.size![1] / 2,
+      );
+    }
     return waitFor(async () => {
       const node = await this.probe.focus(bundleId);
-      return node.role === "AXTextArea" ? node : undefined;
+      return node.role === "AXTextArea" && node.description === "Journal Text" ? node : undefined;
     });
   }
 
   async entry() {
-    return waitFor(async () =>
-      (await this.nodes()).find((node) => label(node, entryText) && node.role !== "AXTextArea"),
-    );
+    return waitFor(async () => {
+      const nodes = await this.nodes();
+      if (nodes.some((node) => node.role === "AXButton" && label(node, "Done"))) return;
+      return nodes.find((node) => label(node, entryText) && node.position && node.size);
+    }).catch(async (cause) => {
+      const visible = (await this.nodes()).filter(({ role }) =>
+        ["AXStaticText", "AXHeading", "AXTextField", "AXTextArea"].includes(role ?? ""),
+      );
+      throw new Error("Saved entry did not appear: " + JSON.stringify(visible), { cause });
+    });
   }
 
-  async selectEntry() {
+  async selectEntry(path = ["Entry", "Edit Entry"]) {
     const entry = await this.entry();
-    const name = entry.title ?? entry.description ?? String(entry.value);
-    await this.probe.clickControl(bundleId, entry.role!, name);
+    const actionEnabled = async () =>
+      (await this.probe.menu(bundleId, ...path)).enabled || undefined;
+    if (await actionEnabled()) return;
+    await this.probe.selectRow(bundleId, entryText).catch(() => {});
+    if (await actionEnabled()) return;
+    const cell =
+      (await this.nodes())
+        .filter(
+          (node) =>
+            ["AXRow", "AXCell", "AXButton", "AXGroup"].includes(node.role ?? "") &&
+            node.position &&
+            node.size?.every((dimension) => dimension > 0) &&
+            flattenAX([node]).some((child) => label(child, entryText)),
+        )
+        .sort((a, b) => a.size![0] * a.size![1] - b.size![0] * b.size![1])[0] ?? entry;
+    const [x, y] = cell.position!;
+    const [width, height] = cell.size!;
+    await this.probe.clickPoint(x + width / 2, y + height / 2);
+    await waitFor(actionEnabled, 8_000).catch(async (cause) => {
+      throw new Error(
+        "The saved Journal entry did not enable " +
+          path.join(" > ") +
+          ": " +
+          JSON.stringify({
+            row: { role: cell.role, id: cell.id, position: cell.position, size: cell.size },
+            focus: await this.probe.focus(bundleId),
+            controls: (await this.nodes())
+              .filter((node) => node.role === "AXButton" || label(node, entryText))
+              .map(({ role, title, description, id, position, size }) => ({
+                role,
+                title,
+                description,
+                id,
+                position,
+                size,
+              }))
+              .slice(0, 30),
+          }),
+        { cause },
+      );
+    });
   }
 
   async closeDialog() {
-    await this.probe.key(escape);
+    const cancel = (await this.nodes()).find(
+      (node) => node.role === "AXButton" && node.enabled && label(node, "Cancel"),
+    );
+    if (cancel?.position && cancel.size) {
+      const [x, y] = cancel.position;
+      const [width, height] = cancel.size;
+      await this.probe.clickPoint(x + width / 2, y + height / 2);
+    } else {
+      await this.probe.key(escape);
+    }
     await waitFor(async () =>
       (await this.nodes()).some((node) => node.role === "AXSheet") ? undefined : true,
     );
   }
 
+  async entryList() {
+    const back = await this.probe.windowElement(bundleId, "BackButton", "AXButton");
+    if (back?.enabled && back.position && back.size) {
+      const [x, y] = back.position;
+      const [width, height] = back.size;
+      await this.probe.clickPoint(x + width / 2, y + height / 2);
+      await waitFor(
+        async () =>
+          !(await this.probe.windowElement(bundleId, "BackButton", "AXButton")) || undefined,
+      );
+    }
+    return this.entry();
+  }
+
   async section(name: string) {
-    await waitFor(async () =>
+    const selected = (node: AXNode) =>
+      node.selected === true ||
+      (["AXRadioButton", "AXCheckBox"].includes(node.role ?? "") && node.value === 1);
+    await waitFor(async () => {
+      const menu = await this.probe.menu(bundleId, "View", name).catch(() => undefined);
+      if (menu?.mark) return true;
+      return (await this.nodes()).find((node) => label(node, name) && selected(node));
+    });
+  }
+
+  async selectSection(name: string) {
+    const target = await waitFor(async () =>
       (await this.nodes()).find(
         (node) =>
-          label(node, name) &&
-          (node.selected === true ||
-            (["AXRadioButton", "AXCheckBox"].includes(node.role ?? "") && node.value === 1)),
+          node.role === "AXStaticText" &&
+          node.description === name &&
+          node.enabled &&
+          node.position &&
+          node.size?.every((dimension) => dimension > 0),
       ),
     );
+    const [x, y] = target.position!;
+    const [width, height] = target.size!;
+    await this.probe.clickPoint(x + width / 2, y + height / 2);
+    await this.section(name);
   }
 
   async panel(sequence: string, expression: RegExp) {
     const shown = async () =>
-      (await this.nodes()).find((node) =>
-        [node.title, node.description, node.value].some(
-          (value) => typeof value === "string" && expression.test(value),
-        ),
+      (await this.nodes()).find(
+        (node) =>
+          node.role !== "AXButton" &&
+          [node.title, node.description, node.value].some(
+            (value) => typeof value === "string" && expression.test(value),
+          ),
       );
     expect(await shown()).toBeUndefined();
     try {
@@ -103,48 +235,56 @@ const cases: Record<string, (journal: Journal) => Promise<void>> = {
     const { app, probe } = journal;
     expect((await probe.focus(bundleId)).role).not.toBe("AXTextArea");
     await app.runChecked("ne");
-    await journal.editor();
-    for (const code of [8, 4, 31, 15, 2]) await probe.key(code); // chord
-    await waitFor(async () => (await probe.focus(bundleId)).value === entryText || undefined);
+    await journal.editor().catch((cause) => {
+      throw new Error("Journal text editor did not receive focus", { cause });
+    });
+    const typed = async () => (await probe.focus(bundleId)).value === entryText || undefined;
+    await probe.typeText(entryText);
+    if (!(await waitFor(typed, 1_500).catch(() => undefined))) {
+      const copy = Bun.spawn(["/usr/bin/pbcopy"], { stdin: new Blob([entryText]) });
+      expect(await copy.exited).toBe(0);
+      if ((await probe.focus(bundleId)).value) await probe.press(bundleId, "Edit", "Select All");
+      await probe.press(bundleId, "Edit", "Paste");
+    }
+    await waitFor(typed).catch(async (cause) => {
+      throw new Error(
+        "Entry text did not reach the editor: " + JSON.stringify(await probe.focus(bundleId)),
+        { cause },
+      );
+    });
     await probe.pressControl(bundleId, "AXButton", "Done");
     await journal.entry();
   },
-  nj: (journal) => journal.panel("nj", /^New Journal$/),
-  nw: async ({ app, probe }) => {
-    const count = (await probe.windows(bundleId)).length;
-    try {
-      await app.runChecked("nw");
-      await waitFor(async () => (await probe.windows(bundleId)).length === count + 1 || undefined);
-    } finally {
-      if ((await probe.windows(bundleId)).length > count) await probe.key(13, command);
-    }
-    await waitFor(async () => (await probe.windows(bundleId)).length === count || undefined);
-  },
-  jf: async ({ app, probe }) => {
-    const focused = async () => (await probe.focus(bundleId)).subrole === "AXSearchField";
-    expect(await focused()).toBe(false);
-    try {
-      await app.runChecked("jf");
-      await waitFor(async () => (await focused()) || undefined);
-    } finally {
-      await probe.key(escape);
-      await waitFor(async () => !(await focused()) || undefined);
-    }
-  },
-  "s,": async (journal) => {
-    const { app, probe } = journal;
-    const settings = async () =>
-      (await probe.windows(bundleId)).find((node) =>
-        /^(Journal )?Settings$/.test(node.title ?? ""),
+  "s,": async ({ app, probe }) => {
+    const identify = ({ title, id, position }: AXNode) => JSON.stringify([title, id, position]);
+    const openedBefore = await probe.windows(bundleId);
+    const known = openedBefore.map(identify);
+    const settings = async () => {
+      const current = await probe.windows(bundleId, 6);
+      return current.find((window) => {
+        if (known.includes(identify(window))) return false;
+        const items = flattenAX([window]);
+        return (
+          /^(Journal )?Settings$/.test(window.title ?? "") ||
+          ["General", "Notifications"].every((heading) =>
+            items.some((item) => item.role === "AXButton" && label(item, heading)),
+          )
+        );
+      });
+    };
+    await app.runChecked("s,");
+    const opened = await waitFor(settings, 10_000).catch(async (cause) => {
+      throw new Error(
+        "Journal did not show Settings: " + JSON.stringify(await probe.windows(bundleId)),
+        { cause },
       );
-    expect(await settings()).toBeUndefined();
-    try {
-      await app.runChecked("s,");
-      await waitFor(settings);
-    } finally {
-      if (await settings()) await probe.key(13, command);
-      await waitFor(async () => ((await settings()) ? undefined : true));
-    }
+    });
+    const identifier = opened.title ?? opened.id;
+    expect(identifier).toBeTruthy();
+    await probe.closeWindow(bundleId, identifier!);
+    await waitFor(async () => !(await settings()) || undefined);
+    const main = openedBefore.find((window) => window.title?.startsWith("Journal"));
+    if (main?.title) await probe.raiseWindow(bundleId, main.title);
   },
   ee: async (journal) => {
     await journal.selectEntry();
@@ -169,24 +309,36 @@ const cases: Record<string, (journal: Journal) => Promise<void>> = {
     }
   },
   fe: (journal) => journal.panel("fe", /^Export Journal Entries\?$/),
-  fp: (journal) => journal.panel("fp", /^Print Options$/),
-  gd: async (journal) => {
-    await journal.app.runChecked("gd");
+  jf: async ({ app, probe }) => {
+    const searchItem = await probe.menu(bundleId, "Edit", "Find", "Search");
+    if (searchItem.enabled === false) {
+      await app.expectFailure("jf", /Menu item "Search".*is disabled/);
+      return;
+    }
+    const focused = async () => {
+      const field = await probe.focus(bundleId);
+      return (
+        field.subrole === "AXSearchField" ||
+        (field.role === "AXTextField" &&
+          [field.title, field.description, field.id].some((name) => /search/i.test(name ?? "")))
+      );
+    };
+    expect(await focused()).toBe(false);
     try {
-      await journal.section("Recently Deleted");
+      await app.runChecked("jf");
+      await waitFor(async () => (await focused()) || undefined);
     } finally {
-      await journal.probe.press(bundleId, "View", "All Entries");
-      await journal.section("All Entries");
+      await probe.key(escape);
+      if (await focused()) await probe.key(48);
+      await waitFor(async () => !(await focused()) || undefined);
     }
   },
-  ga: async (journal) => {
-    await journal.probe.press(bundleId, "View", "Recently Deleted");
-    await journal.section("Recently Deleted");
-    await journal.app.runChecked("ga");
-    await journal.section("All Entries");
+  fp: async (journal) => {
+    await journal.entryList();
+    await journal.panel("fp", /^Print Options$/);
   },
   ex: async (journal) => {
-    await journal.selectEntry();
+    await journal.entryList();
     await journal.app.runChecked("ex");
     const confirm = await waitFor(async () => {
       const nodes = await journal.nodes();
@@ -198,13 +350,85 @@ const cases: Record<string, (journal: Journal) => Promise<void>> = {
         ? nodes.find((node) => node.role === "AXButton" && label(node, "Delete"))
         : undefined;
     });
-    await journal.probe.pressControl(bundleId, "AXButton", confirm.title ?? "Delete Entry");
+    await journal.probe.pressControl(
+      bundleId,
+      "AXButton",
+      confirm.title ?? confirm.description ?? "Delete Entry",
+    );
     await waitFor(async () =>
       (await journal.nodes()).some((node) => label(node, entryText)) ? undefined : true,
     );
-    await journal.probe.press(bundleId, "View", "Recently Deleted");
+    await waitFor(async () =>
+      (await journal.nodes()).find(
+        (node) =>
+          node.role === "AXStaticText" &&
+          node.description === "Recently Deleted" &&
+          node.value === "1 entry",
+      ),
+    );
+  },
+  gd: async (journal) => {
+    await journal.app.runChecked("gd");
+    try {
+      await journal.section("Recently Deleted");
+      await journal.entry();
+    } finally {
+      await journal.selectSection("Journal");
+    }
+  },
+  ga: async (journal) => {
+    await journal.app.runChecked("gd");
+    await journal.section("Recently Deleted");
     await journal.entry();
-    await journal.probe.press(bundleId, "View", "All Entries");
+    await journal.app.runChecked("ga");
+    // Retain the deleted record in the fixture and verify the regular empty list.
+    await waitFor(async () => {
+      const nodes = await journal.nodes();
+      return (
+        (!nodes.some((node) => label(node, entryText)) &&
+          ["No Entries", "To add an entry, click the plus button."].every((title) =>
+            nodes.some((node) => node.role === "AXStaticText" && label(node, title)),
+          )) ||
+        undefined
+      );
+    }, 10_000).catch(async (cause) => {
+      const labels = (await journal.nodes())
+        .filter(({ role }) => role === "AXHeading" || role === "AXStaticText")
+        .map(({ title, description, value }) => title ?? description ?? value);
+      throw new Error(
+        "Journal did not return to the regular entry list: " + JSON.stringify(labels),
+        {
+          cause,
+        },
+      );
+    });
+  },
+  nj: (journal) => journal.panel("nj", /^Journal Name$/),
+  nw: async ({ app, probe }) => {
+    const scenes = async () =>
+      (await probe.windows(bundleId)).filter(
+        ({ id, subrole }) => id === "SceneWindow" && subrole === "AXStandardWindow",
+      );
+    const identify = ({ title, position }: AXNode) => JSON.stringify([title, position]);
+    const original = (await scenes()).map(identify);
+    expect(original.length).toBeGreaterThan(0);
+    await app.runChecked("nw");
+    const opened = await waitFor(async () => {
+      const current = await scenes();
+      if (current.length !== original.length + 1) return;
+      return current.find((window) => !original.includes(identify(window)));
+    }, 12_000);
+    if (
+      opened.title &&
+      (await scenes()).filter(({ title }) => title === opened.title).length === 1
+    ) {
+      await probe.closeWindow(bundleId, opened.title);
+    } else {
+      const focused = await probe.window(bundleId);
+      expect(identify(focused)).toBe(identify(opened));
+      await probe.press(bundleId, "File", "Close");
+    }
+    await waitFor(async () => (await scenes()).length === original.length || undefined);
   },
 };
 
@@ -233,6 +457,7 @@ test.skipIf(!macOSUITestsEnabled)(
         const failures: string[] = [];
         for (const [sequence, run] of Object.entries(cases)) {
           try {
+            if ((await probe.front()) !== bundleId) await probe.activate(bundleId);
             await run(journal);
             console.log(`Journal ${sequence} passed`);
           } catch (error) {

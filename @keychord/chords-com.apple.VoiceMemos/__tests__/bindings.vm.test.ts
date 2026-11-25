@@ -86,23 +86,27 @@ const cases: Record<string, (memos: VoiceMemos) => Promise<void>> = {
       await app.expectFailure("rn", /Menu item "Start New Recording".*is disabled/);
       return;
     }
-    const noMicrophone = async () =>
-      (await memos.nodes()).find((node) => matches(node, "No Microphone Available"));
-    expect(await noMicrophone()).toBeUndefined();
-    try {
-      await app.runChecked("rn");
-      await waitFor(noMicrophone);
-    } finally {
-      if (await noMicrophone()) await probe.pressControl(bundleId, "AXButton", "OK");
-      await waitFor(async () => ((await noMicrophone()) ? undefined : true));
-    }
+    const { stdout } = await runCommand(["/usr/sbin/system_profiler", "SPAudioDataType", "-json"]);
+    const devices = JSON.parse(stdout) as {
+      SPAudioDataType: { _items?: { coreaudio_device_input?: number }[] }[];
+    };
+    expect(
+      devices.SPAudioDataType.some(({ _items }) =>
+        _items?.some(({ coreaudio_device_input }) => (coreaudio_device_input ?? 0) > 0),
+      ),
+    ).toBe(false);
+    await app.expectFailure(
+      "rn",
+      /Cannot invoke "File > Start New Recording" without an audio input device/,
+    );
   },
   vs: async ({ app, probe }) => {
     const sidebarItem = async () =>
-      flattenAX([await probe.menu(bundleId, "View")]).find((node) =>
+      flattenAX([await probe.menu(bundleId, "View").catch(() => ({}))]).find((node) =>
         /^(Show|Hide) Sidebar$/.test(node.title ?? ""),
       )?.title;
-    const before = await sidebarItem();
+    await probe.activate(bundleId);
+    const before = await waitFor(sidebarItem, 12_000);
     expect(before).toMatch(/^(Show|Hide) Sidebar$/);
     const after = before === "Show Sidebar" ? "Hide Sidebar" : "Show Sidebar";
     await app.runChecked("vs");
@@ -114,8 +118,21 @@ const cases: Record<string, (memos: VoiceMemos) => Promise<void>> = {
     }
   },
   jf: async ({ app, probe }) => {
+    await probe.activate(bundleId);
+    await waitFor(async () => {
+      const window = await probe.window(bundleId, 8);
+      return (
+        (window.role === "AXWindow" &&
+          flattenAX([window]).some(
+            ({ subrole, enabled, position, size }) =>
+              subrole === "AXSearchField" && enabled && position && size,
+          )) ||
+        undefined
+      );
+    }, 12_000);
     const focused = async () => (await probe.focus(bundleId)).subrole === "AXSearchField";
-    expect(await focused()).toBe(false);
+    if (await focused()) await probe.key(53);
+    await waitFor(async () => !(await focused()) || undefined);
     try {
       await app.runChecked("jf");
       await waitFor(async () => (await focused()) || undefined);
@@ -125,14 +142,16 @@ const cases: Record<string, (memos: VoiceMemos) => Promise<void>> = {
     }
   },
   "s,": async (memos) => {
+    const title = "Voice Memos Settings";
     const settings = async () =>
-      (await memos.nodes()).find((node) => matches(node, "Audio Quality"));
+      (await memos.probe.windows(bundleId, 6)).find((node) => node.title === title);
     expect(await settings()).toBeUndefined();
     try {
       await memos.app.runChecked("s,");
-      await waitFor(settings);
+      const window = await waitFor(settings);
+      expect(flattenAX([window]).some((node) => matches(node, "Audio Quality:"))).toBe(true);
     } finally {
-      if (await settings()) await memos.probe.key(13, 1 << 20);
+      if (await settings()) await memos.probe.closeWindow(bundleId, title);
       await waitFor(async () => ((await settings()) ? undefined : true));
     }
   },

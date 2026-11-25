@@ -1,7 +1,6 @@
 import { expect, test } from "bun:test";
-import { mkdtemp, rm } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { mkdir, rm } from "node:fs/promises";
+import { basename } from "node:path";
 import {
   flattenAX,
   macOSUITestsEnabled,
@@ -32,7 +31,9 @@ test.skipIf(!macOSUITestsEnabled)(
       "guest macOS",
       Bun.spawnSync(["sw_vers", "-productVersion"]).stdout.toString().trim(),
     );
-    const folder = await mkdtemp(join(tmpdir(), "chordtest-folder-action-"));
+    // The Chord CLI parses physical keys, so the fixture path uses lowercase ASCII.
+    const folder = `/tmp/chordtest-folder-action-${crypto.randomUUID()}`;
+    await mkdir(folder);
     try {
       await withChordPackage(import.meta.url, (app) =>
         withMacOSProbe(async (probe) => {
@@ -42,15 +43,32 @@ test.skipIf(!macOSUITestsEnabled)(
               (window) => window.title === "Folder Actions Setup",
             ),
           );
-          const attach = async () =>
-            flattenAX(await probe.windows(bundleId, 7)).find(
-              (node) => node.role === "AXButton" && node.title === "Attach",
-            );
-          expect(await attach()).toBeUndefined();
+          const nodes = async () => flattenAX(await probe.windows(bundleId, 11));
+          const button = async (title: string) =>
+            (await nodes()).find((node) => node.role === "AXButton" && node.title === title);
+          expect(await button("Attach")).toBeUndefined();
           await app.runChecked(`fa${folder}`);
-          await waitFor(attach, 12_000);
-          await probe.pressControl(bundleId, "AXButton", "Cancel");
-          await waitFor(async () => (!(await attach()) ? true : undefined));
+          const dialog = await waitFor(
+            async () => (await button("Run Service")) ?? (await button("Attach")),
+            12_000,
+          );
+          if (dialog.title === "Run Service") {
+            await probe.activate(bundleId);
+            await probe.clickControl(bundleId, "AXButton", "Run Service");
+          }
+          await waitFor(() => button("Attach"), 12_000);
+          try {
+            const controls = await nodes();
+            expect(
+              controls.some(
+                (node) => node.role === "AXTextField" && node.value === basename(folder),
+              ),
+            ).toBe(true);
+            expect(controls.some((node) => node.value === "Choose a Script to Attach:")).toBe(true);
+          } finally {
+            await probe.clickControl(bundleId, "AXButton", "Cancel");
+            await waitFor(async () => !(await button("Attach")) || undefined);
+          }
         }),
       );
     } finally {

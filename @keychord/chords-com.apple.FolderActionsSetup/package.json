@@ -1,7 +1,7 @@
 {
   "name": "@keychord/chords-com.apple.FolderActionsSetup",
   "displayName": "Folder Actions Setup Chords",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Chords for Folder Actions Setup (com.apple.FolderActionsSetup).",
   "categories": [
     "macOS"
@@ -13,6 +13,9 @@
   "type": "module",
   "scripts": {
     "test": "bun test --isolate"
+  },
+  "dependencies": {
+    "@keychord/chords-menu": "workspace:*"
   },
   "devDependencies": {
     "@keychord/chordtest": "workspace:*",

@@ -5,7 +5,13 @@ file = '@keychord/chords-menu/js/menu.js'
 
 [chords]
 '?r' = { name = 'Recording' }
-'rn' = { name = 'Recording: New', '@input:menu' = ['BY_PATH', ['File', 'Start New Recording']] }
+'rn' = { name = 'Recording: New', '@input:menu' = [
+  'BY_PATH_WITH_AUDIO_INPUT',
+  [
+    'File',
+    'Start New Recording',
+  ],
+] }
 'rd' = { name = 'Recording: Duplicate', '@input:menu' = ['BY_PATH', ['File', 'Duplicate']] }
 'rr' = { name = 'Recording: Rename', '@input:menu' = ['BY_PATH', ['File', 'Rename…']] }
 're' = { name = 'Recording: Edit', '@input:menu' = ['BY_PATH', ['Edit', 'Edit Recording']] }

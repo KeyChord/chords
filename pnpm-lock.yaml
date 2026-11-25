@@ -519,6 +519,10 @@ importers:
         version: 0.0.12(patch_hash=89b2877a29a2b736a8d488118fb480fa1e633a928f85962b30e55018395a66a8)
 
   '@keychord/chords-com.apple.FolderActionsSetup':
+    dependencies:
+      '@keychord/chords-menu':
+        specifier: workspace:*
+        version: link:../chords-menu
     devDependencies:
       '@keychord/chordtest':
         specifier: workspace:*
