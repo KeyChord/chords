@@ -339,6 +339,22 @@ func inspect(_ args: [String]) throws {
         let root = try application(args[1])
         let window: AXUIElement? = attribute(root, kAXFocusedWindowAttribute)
         try writeJSON(window.map { node($0, depth: Int(args[2])!) } ?? [:])
+    case "window-element":
+        let root = try application(args[1])
+        let window: AXUIElement? = attribute(root, kAXFocusedWindowAttribute)
+        let label = args[2]
+        let roles = Set(args.dropFirst(3))
+        let target = window.flatMap { window in
+            find(window, depth: 8) { element in
+                let role: String = attribute(element, kAXRoleAttribute) ?? ""
+                guard role != kAXWindowRole, roles.isEmpty || roles.contains(role) else { return false }
+                return [kAXIdentifierAttribute, kAXSubroleAttribute, kAXTitleAttribute,
+                        kAXDescriptionAttribute, kAXValueAttribute].contains {
+                    attribute(element, $0) == label
+                }
+            }
+        }
+        try writeJSON(target.map { node($0, depth: 0) } as Any? ?? NSNull())
     case "focus":
         let root = try application(args[1])
         let target: AXUIElement? = attribute(root, kAXFocusedUIElementAttribute)

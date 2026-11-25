@@ -165,6 +165,16 @@ export class MacOSProbe {
     return this.read("window", bundleId, String(depth));
   }
 
+  async windowElement(
+    bundleId: string,
+    label: string,
+    ...roles: string[]
+  ): Promise<AXNode | undefined> {
+    return (
+      (await this.read<AXNode | null>("window-element", bundleId, label, ...roles)) ?? undefined
+    );
+  }
+
   menu(bundleId: string, ...path: string[]): Promise<AXNode> {
     return this.read("menu", bundleId, ...path);
   }

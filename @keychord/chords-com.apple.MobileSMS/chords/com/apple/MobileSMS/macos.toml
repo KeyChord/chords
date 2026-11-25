@@ -5,17 +5,29 @@ file = '@keychord/chords-menu/js/menu.js'
 
 [chords]
 '?j' = { name = 'Jump' }
-'j/' = { name = 'Jump: Search Conversations', '@input:menu' = ['BY_PATH', ['Edit', 'Find…']] }
+'j/' = { name = 'Jump: Search Conversations', shortcut = 'cmd+f' }
 
 '?n' = { name = 'New' }
-'nm' = { name = 'New: Message', '@input:menu' = ['BY_PATH', ['File', 'New Message']] }
+'nm' = { name = 'New: Message', shortcut = 'cmd+n' }
 
 '?g' = { name = 'Goto' }
 'g,' = { name = 'Goto: Settings', '@input:menu' = ['BY_PATH', ['Messages', 'Settings…']] }
-'ga' = { name = 'Goto: All Messages', '@input:menu' = ['BY_PATH', ['View', 'All Messages']] }
+'ga' = { name = 'Goto: All Messages', '@input:menu' = ['BY_PATH', ['View', 'Messages']] }
 'gk' = { name = 'Goto: Known Senders', '@input:menu' = ['BY_PATH', ['View', 'Known Senders']] }
 'gu' = { name = 'Goto: Unknown Senders', '@input:menu' = ['BY_PATH', ['View', 'Unknown Senders']] }
-'gn' = { name = 'Goto: Unread Messages', '@input:menu' = ['BY_PATH', ['View', 'Unread Messages']] }
+'gn' = { name = 'Goto: Unread Messages', '@input:menu' = [
+  'BY_FIRST_PATH',
+  [
+    [
+      'View',
+      'Unread',
+    ],
+    [
+      'View',
+      'Unread Messages',
+    ],
+  ],
+] }
 'gd' = { name = 'Goto: Recently Deleted', '@input:menu' = [
   'BY_PATH',
   [
