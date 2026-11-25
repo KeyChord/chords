@@ -1,7 +1,7 @@
 {
   "name": "@keychord/chords-com.apple.Magnifier",
   "displayName": "Magnifier Chords",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Chords for Magnifier (com.apple.Magnifier).",
   "categories": [
     "macOS"

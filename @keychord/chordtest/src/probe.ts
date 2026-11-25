@@ -241,6 +241,10 @@ export class MacOSProbe {
     return this.read("menu", bundleId, ...path);
   }
 
+  menuElement(bundleId: string, ...path: string[]): Promise<AXNode> {
+    return this.read("menu-element", bundleId, ...path);
+  }
+
   focus(bundleId: string): Promise<AXNode> {
     return this.read("focus", bundleId);
   }
@@ -275,6 +279,14 @@ export class MacOSProbe {
 
   async key(code: number, flags = 0) {
     await runCommand([this.executable, "key", String(code), String(flags)]);
+  }
+
+  async keySequence(codes: readonly number[]) {
+    await runCommand([this.executable, "key-sequence", ...codes.map(String)]);
+  }
+
+  async scrollAt(x: number, y: number, lines: number) {
+    await runCommand([this.executable, "scroll-at", String(x), String(y), String(lines)]);
   }
 
   async typeText(value: string) {

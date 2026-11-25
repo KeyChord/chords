@@ -236,6 +236,19 @@ func inspect(_ args: [String]) throws {
         try writeJSON(["desktops": state.desktops, "activeSpace": state.active])
     case "prepare-desktops":
         try prepareDesktops(Int(args[1])!)
+    case "scroll-at":
+        guard args.count == 4, let x = Double(args[1]), let y = Double(args[2]), let amount = Int32(args[3]),
+              x.isFinite, y.isFinite, (-25...25).contains(amount),
+              let event = CGEvent(scrollWheelEvent2Source: nil, units: .line, wheelCount: 1,
+                                  wheel1: amount, wheel2: 0, wheel3: 0) else {
+            throw ProbeError("Invalid guest scroll event")
+        }
+        let point = CGPoint(x: x, y: y)
+        guard CGWarpMouseCursorPosition(point) == .success else {
+            throw ProbeError("Cannot move the pointer to the guest scroll view")
+        }
+        event.location = point
+        event.post(tap: .cghidEventTap)
     case "front":
         try writeJSON(NSWorkspace.shared.frontmostApplication?.bundleIdentifier ?? "")
     case "screen-locked":
@@ -283,10 +296,11 @@ func inspect(_ args: [String]) throws {
         })
     case "tree":
         try writeJSON(node(application(args[1]), depth: Int(args[2])!))
-    case "menu":
+    case "menu", "menu-element":
         let root = try application(args[1])
         let target = try menuItem(root, path: Array(args.dropFirst(2)))
-        try writeJSON(node(target, depth: 4, menu: true))
+        let fullMenu = args[0] == "menu"
+        try writeJSON(node(target, depth: fullMenu ? 4 : 0, menu: fullMenu))
     case "press":
         let target = try menuItem(application(args[1]), path: Array(args.dropFirst(2)))
         let status = AXUIElementPerformAction(target, kAXPressAction as CFString)
@@ -442,6 +456,20 @@ func inspect(_ args: [String]) throws {
             let event = CGEvent(keyboardEventSource: nil, virtualKey: key, keyDown: down)!
             event.flags = flags
             event.post(tap: .cghidEventTap)
+        }
+    case "key-sequence":
+        let codes = args.dropFirst()
+        let keys = codes.compactMap { CGKeyCode($0) }
+        guard !keys.isEmpty, keys.count == codes.count, keys.count <= 32 else {
+            throw ProbeError("Invalid guest key sequence")
+        }
+        for key in keys {
+            for down in [true, false] {
+                let event = CGEvent(keyboardEventSource: nil, virtualKey: key, keyDown: down)!
+                event.flags = []
+                event.post(tap: .cghidEventTap)
+                Thread.sleep(forTimeInterval: down ? 0.08 : 0.15)
+            }
         }
     default:
         throw ProbeError("Unknown probe command: \(args[0])")
