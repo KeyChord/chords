@@ -40,17 +40,19 @@ func click(_ element: AXUIElement) throws {
     try click(CGPoint(x: origin.x + size.width / 2, y: origin.y + size.height / 2))
 }
 
-func click(_ point: CGPoint) throws {
+func click(_ point: CGPoint, count: Int = 1) throws {
     guard point.x.isFinite, point.y.isFinite else { throw ProbeError("Invalid control position") }
     guard CGWarpMouseCursorPosition(point) == .success else {
         throw ProbeError("Cannot move the pointer to the control")
     }
-    for type in [CGEventType.mouseMoved, .leftMouseDown, .leftMouseUp] {
-        guard let event = CGEvent(mouseEventSource: nil, mouseType: type, mouseCursorPosition: point,
-                                  mouseButton: .left) else { throw ProbeError("Cannot create a mouse event") }
-        event.setIntegerValueField(.mouseEventClickState, value: 1)
-        event.post(tap: .cghidEventTap)
-        if type != .leftMouseUp { Thread.sleep(forTimeInterval: 0.04) }
+    for clickNumber in 1...count {
+        for type in [CGEventType.mouseMoved, .leftMouseDown, .leftMouseUp] {
+            guard let event = CGEvent(mouseEventSource: nil, mouseType: type, mouseCursorPosition: point,
+                                      mouseButton: .left) else { throw ProbeError("Cannot create a mouse event") }
+            event.setIntegerValueField(.mouseEventClickState, value: Int64(clickNumber))
+            event.post(tap: .cghidEventTap)
+            if type != .leftMouseUp { Thread.sleep(forTimeInterval: 0.04) }
+        }
     }
 }
 
@@ -233,8 +235,9 @@ func inspect(_ args: [String]) throws {
     case "cursor":
         let location = CGEvent(source: nil)!.location
         try writeJSON([location.x, location.y])
-    case "click-point":
-        try click(CGPoint(x: Double(args[1])!, y: Double(args[2])!))
+    case "click-point", "double-click-point":
+        try click(CGPoint(x: Double(args[1])!, y: Double(args[2])!),
+                  count: args[0] == "double-click-point" ? 2 : 1)
     case "window-order":
         let apps = Dictionary(uniqueKeysWithValues: NSWorkspace.shared.runningApplications.compactMap { app in
             app.bundleIdentifier.map { (app.processIdentifier, $0) }

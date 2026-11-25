@@ -23,8 +23,14 @@ file = '@keychord/chords-menu/js/menu.js'
 'vl' = { name = 'View: List', '@input:menu' = ['BY_PATH', ['View', 'View as List']] }
 'vs' = { name = 'View: Samples', '@input:menu' = ['BY_PATH', ['View', 'View as Samples']] }
 'vv' = { name = 'View: Specimen', '@input:menu' = ['BY_PATH', ['View', 'View as Specimen']] }
-'vb' = { name = 'View: Toggle Sidebar', '@input:menu' = ['SEARCH', 'Sidebar'] }
-'vi' = { name = 'View: Toggle Info Pane', '@input:menu' = ['SEARCH', 'Info Pane'] }
+'vb' = { name = 'View: Toggle Sidebar', shortcut = 'ctrl+cmd+s' }
+'vi' = { name = 'View: Toggle Info Pane', '@input:menu' = [
+  'BY_FIRST_PATH',
+  [
+    ['View', 'Show Info Pane'],
+    ['View', 'Hide Info Pane'],
+  ],
+] }
 
 '?j' = { name = 'Jump' }
 'jf' = { name = 'Jump: Font Search', '@input:menu' = ['FOCUS', 'AXSearchField'] }
