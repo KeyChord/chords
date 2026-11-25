@@ -1,7 +1,7 @@
 {
   "name": "@keychord/chords-com.apple.Home",
   "displayName": "Home Chords",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Chords for Home (com.apple.Home).",
   "categories": [
     "macOS"

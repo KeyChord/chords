@@ -5,7 +5,7 @@ file = '@keychord/chords-menu/js/menu.js'
 
 [chords]
 '?j' = { name = 'Jump' }
-'js' = { name = 'Jump: Search', '@input:menu' = ['FOCUS', 'AXSearchField'] }
+'js' = { name = 'Jump: Search', '@input:menu' = ['BY_PATH', ['Edit', 'Search']] }
 
 '?v' = { name = 'Vary' }
 'vs' = { name = 'Vary: Sidebar', '@input:menu' = ['SEARCH', 'Sidebar'] }
@@ -24,7 +24,7 @@ file = '@keychord/chords-menu/js/menu.js'
 ] }
 
 '?m' = { name = 'Map' }
-'mo' = { name = 'Map: Open', '@input:menu' = ['BY_PATH', ['View', 'Show Map']] }
+'mo' = { name = 'Map: Open', '@input:menu' = ['BY_PATH', ['View', 'Expand Map']] }
 
 '?s' = { name = 'Settings' }
 'sa' = { name = 'Settings: Open', '@input:menu' = ['BY_PATH', ['Weather', 'Settings…']] }

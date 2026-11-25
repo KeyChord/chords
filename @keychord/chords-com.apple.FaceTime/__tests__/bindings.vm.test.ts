@@ -74,8 +74,18 @@ test.skipIf(!macOSUITestsEnabled)(
           }
         }
 
-        const newCall = await menu("File", "New FaceTime");
-        if (newCall.enabled === false) {
+        const signedOut = flattenAX(await windows()).some(
+          (node) => node.value === "Activate FaceTime to make or receive calls from this Mac",
+        );
+        const newCall = await probe
+          .menu(bundleId, "File", "New FaceTime")
+          .catch((error: unknown) => {
+            if (signedOut && String(error).includes("Menu item File unavailable")) return;
+            throw error;
+          });
+        if (!newCall) {
+          await app.expectFailure("nc", /Menu path "File > New FaceTime" has no component "File"/);
+        } else if (newCall.enabled === false) {
           await app.expectFailure("nc", /Menu item "New FaceTime".*is disabled/);
         } else {
           const composeVisible = async () =>
@@ -100,10 +110,27 @@ test.skipIf(!macOSUITestsEnabled)(
           }
         }
 
-        expect((await menu("Audio", "Mute")).enabled).toBe(false);
+        const mute =
+          (await probe.menu(bundleId, "Audio", "Mute").catch(() => undefined)) ??
+          (await menu("Video", "Mute"));
+        expect(mute.enabled).toBe(false);
         await app.expectFailure("vm", /Menu item "Mute".*is disabled/);
-        expect((await menu("Video", "Always on Top")).enabled).toBe(false);
-        await app.expectFailure("vt", /Menu item "Always on Top".*is disabled/);
+        const alwaysOnTop = () => menu("Video", "Always on Top");
+        const before = await alwaysOnTop();
+        if (before.enabled === false) {
+          await app.expectFailure("vt", /Menu item "Always on Top".*is disabled/);
+        } else {
+          await app.runChecked("vt");
+          try {
+            await waitFor(async () =>
+              (await alwaysOnTop()).mark !== before.mark ? true : undefined,
+            );
+          } finally {
+            if ((await alwaysOnTop()).mark !== before.mark) {
+              await probe.press(bundleId, "Video", "Always on Top");
+            }
+          }
+        }
       }),
     );
   },

@@ -13,12 +13,6 @@ const dialogs = {
   fi: { path: ["File", "Import Configuration File..."], label: /^(Open|Import|Choose)$/ },
   fe: { path: ["File", "Export Configuration File..."], label: /^Save$/ },
 };
-const zoom = {
-  zi: "Zoom In",
-  zo: "Zoom Out",
-  za: "Actual Size",
-};
-
 test("every AirPort Utility binding has a behavior case", async () => {
   const definition = Bun.TOML.parse(
     await Bun.file(
@@ -29,7 +23,7 @@ test("every AirPort Utility binding has a behavior case", async () => {
     Object.keys(definition.chords)
       .filter((key) => !key.startsWith("?"))
       .sort(),
-  ).toEqual([...Object.keys(dialogs), ...Object.keys(zoom), "gs"].sort());
+  ).toEqual([...Object.keys(dialogs), "gs"].sort());
 });
 
 test.skipIf(!macOSUITestsEnabled)(
@@ -42,7 +36,10 @@ test.skipIf(!macOSUITestsEnabled)(
     await withChordPackage(import.meta.url, (app) =>
       withMacOSProbe(async (probe) => {
         await probe.activate(bundle);
-        await waitFor(() => probe.window(bundle).catch(() => undefined), 15_000);
+        await waitFor(
+          () => probe.menu(bundle, "File", "Configure Other...").catch(() => undefined),
+          15_000,
+        );
         for (const [sequence, { path, label }] of Object.entries(dialogs)) {
           const item = await probe.menu(bundle, ...path);
           if (sequence !== "fc" && item.enabled === false) {
@@ -61,7 +58,7 @@ test.skipIf(!macOSUITestsEnabled)(
             await app.runChecked(sequence);
             await waitFor(dialog, 12_000);
           } finally {
-            await probe.key(53);
+            if (await dialog()) await probe.pressControl(bundle, "AXButton", "Cancel");
             await waitFor(async () => ((await dialog()) ? undefined : true), 12_000);
           }
         }
@@ -75,49 +72,9 @@ test.skipIf(!macOSUITestsEnabled)(
           await app.runChecked("gs");
           await waitFor(settings, 12_000);
         } finally {
-          if (await settings()) await probe.key(13, 1 << 20);
+          const window = await settings();
+          if (window?.title) await probe.closeWindow(bundle, window.title);
           await waitFor(async () => ((await settings()) ? undefined : true));
-        }
-      }),
-    );
-  },
-  120_000,
-);
-
-test.skipIf(!macOSUITestsEnabled)(
-  "AirPort Utility zoom chords change the topology scale",
-  async () => {
-    await withChordPackage(import.meta.url, (app) =>
-      withMacOSProbe(async (probe) => {
-        await probe.activate(bundle);
-        await waitFor(() => probe.window(bundle).catch(() => undefined), 15_000);
-        const actualSize = () => probe.menu(bundle, "View", zoom.za);
-        const resetZoom = async () => {
-          if ((await actualSize()).enabled) await probe.press(bundle, "View", zoom.za);
-          await waitFor(async () => ((await actualSize()).enabled === false ? true : undefined));
-        };
-        await resetZoom();
-        try {
-          for (const sequence of ["zi", "zo"] as const) {
-            const item = await probe.menu(bundle, "View", zoom[sequence]);
-            if (item.enabled === false) {
-              await app.expectFailure(sequence, /Menu item .* is disabled/);
-              continue;
-            }
-
-            await app.runChecked(sequence);
-            await waitFor(async () => ((await actualSize()).enabled ? true : undefined));
-            await app.runChecked("za");
-            await waitFor(async () => ((await actualSize()).enabled === false ? true : undefined));
-          }
-          if (
-            (await probe.menu(bundle, "View", zoom.zi)).enabled === false &&
-            (await probe.menu(bundle, "View", zoom.zo)).enabled === false
-          ) {
-            await app.expectFailure("za", /Menu item .* is disabled/);
-          }
-        } finally {
-          await resetZoom();
         }
       }),
     );

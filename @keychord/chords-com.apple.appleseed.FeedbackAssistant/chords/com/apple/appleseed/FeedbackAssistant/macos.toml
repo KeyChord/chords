@@ -12,13 +12,7 @@ file = '@keychord/chords-menu/js/menu.js'
 
 '?g' = { name = 'Goto' }
 'gm' = { name = 'Goto: Main Window', '@input:menu' = ['BY_PATH', ['Window', 'Feedback Assistant']] }
-'gc' = { name = 'Goto: Settings', '@input:menu' = [
-  'BY_PATH',
-  [
-    'Feedback Assistant',
-    'Preferences…',
-  ],
-] }
+'gc' = { name = 'Goto: Settings', '@input:menu' = ['BY_PATH', ['Feedback Assistant', 'Settings…']] }
 
 '?v' = { name = 'Vary' }
 'vs' = { name = 'Vary: Sidebar', '@input:menu' = ['SEARCH', 'Sidebar'] }

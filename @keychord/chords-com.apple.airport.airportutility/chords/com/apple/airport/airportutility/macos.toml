@@ -27,10 +27,5 @@ file = '@keychord/chords-menu/js/menu.js'
   ],
 ] }
 
-'?z' = { name = 'Zoom' }
-'zi' = { name = 'Zoom: In', '@input:menu' = ['BY_PATH', ['View', 'Zoom In']] }
-'zo' = { name = 'Zoom: Out', '@input:menu' = ['BY_PATH', ['View', 'Zoom Out']] }
-'za' = { name = 'Zoom: Actual Size', '@input:menu' = ['BY_PATH', ['View', 'Actual Size']] }
-
 '?g' = { name = 'Goto' }
 'gs' = { name = 'Goto: Settings', '@input:menu' = ['BY_PATH', ['AirPort Utility', 'Settings…']] }

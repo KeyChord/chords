@@ -57,7 +57,7 @@ test.skipIf(!macOSUITestsEnabled)(
           await app.expectFailure(sequence, /Menu item .*is disabled/);
         }
 
-        const settings = ["Feedback Assistant", "Preferences…"];
+        const settings = ["Feedback Assistant", "Settings…"];
         if ((await probe.menu(bundleId, ...settings)).enabled === false) {
           await app.expectFailure("gc", /Menu item .*is disabled/);
         } else {

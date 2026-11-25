@@ -18,4 +18,4 @@ file = '@keychord/chords-menu/js/menu.js'
     'Always on Top',
   ],
 ] }
-'vm' = { name = 'Vary Call: Mute', '@input:menu' = ['BY_PATH', ['Audio', 'Mute']] }
+'vm' = { name = 'Vary Call: Mute', '@input:menu' = ['SEARCH', '> Mute'] }

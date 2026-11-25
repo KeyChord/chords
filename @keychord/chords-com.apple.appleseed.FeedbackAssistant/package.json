@@ -1,7 +1,7 @@
 {
   "name": "@keychord/chords-com.apple.appleseed.FeedbackAssistant",
   "displayName": "Feedback Assistant Chords",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Chords for Feedback Assistant (com.apple.appleseed.FeedbackAssistant).",
   "categories": [
     "macOS"

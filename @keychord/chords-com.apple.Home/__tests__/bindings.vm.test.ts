@@ -17,10 +17,10 @@ const destinations = [
 const editors = [
   {
     sequence: "na",
-    path: ["File", "Add Automation…"],
+    path: ["File", "Add Automation"],
     label: /^(New Automation|A Time of Day Occurs)$/i,
   },
-  { sequence: "ns", path: ["File", "Add Scene…"], label: /^New Scene$/ },
+  { sequence: "ns", path: ["File", "Add Scene"], label: /^New Scene$/ },
   { sequence: "eh", path: ["Edit", "Edit Home…"], label: /^(Home Settings|Remove Home)$/ },
   { sequence: "er", path: ["Edit", "Edit Room…"], label: /^(Room Settings|Remove Room)$/ },
 ];

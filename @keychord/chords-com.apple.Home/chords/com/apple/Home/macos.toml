@@ -10,8 +10,8 @@ file = '@keychord/chords-menu/js/menu.js'
 'gd' = { name = 'Goto: Discover', '@input:menu' = ['BY_PATH', ['View', 'Discover']] }
 
 '?n' = { name = 'New' }
-'na' = { name = 'New: Automation', '@input:menu' = ['BY_PATH', ['File', 'Add Automation…']] }
-'ns' = { name = 'New: Scene', '@input:menu' = ['BY_PATH', ['File', 'Add Scene…']] }
+'na' = { name = 'New: Automation', '@input:menu' = ['BY_PATH', ['File', 'Add Automation']] }
+'ns' = { name = 'New: Scene', '@input:menu' = ['BY_PATH', ['File', 'Add Scene']] }
 
 '?e' = { name = 'Edit' }
 'eh' = { name = 'Edit: Home', '@input:menu' = ['BY_PATH', ['Edit', 'Edit Home…']] }

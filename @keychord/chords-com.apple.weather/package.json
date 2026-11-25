@@ -1,7 +1,7 @@
 {
   "name": "@keychord/chords-com.apple.weather",
   "displayName": "Weather Chords",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Chords for Weather (com.apple.weather).",
   "categories": [
     "macOS"

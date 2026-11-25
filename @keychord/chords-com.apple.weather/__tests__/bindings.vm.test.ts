@@ -72,21 +72,15 @@ function toggleView(label: string): Behavior {
 }
 
 async function openSettings(app: ChordApp, probe: MacOSProbe, key: string) {
-  const before = (await probe.windows(bundle)).length;
-  const settings = async () => {
-    const windows = await probe.windows(bundle, 3);
-    return (
-      windows.length > before &&
-      windows.some((node) => /Settings|Preferences|General|Sources/.test(node.title ?? ""))
-    );
-  };
-  expect(await settings()).toBe(false);
+  const title = "Weather Settings";
+  const settings = async () => (await probe.windows(bundle)).find((node) => node.title === title);
+  expect(await settings()).toBeUndefined();
   try {
     await app.runChecked(key);
-    await waitFor(async () => ((await settings()) ? true : undefined), 10_000);
+    await waitFor(settings, 10_000);
   } finally {
     if (await settings()) {
-      await probe.key(13, 1 << 20);
+      await probe.closeWindow(bundle, title);
       await waitFor(async () => ((await settings()) ? undefined : true));
     }
   }
@@ -128,18 +122,22 @@ async function addLocation(app: ChordApp, probe: MacOSProbe, key: string) {
 }
 
 async function openMap(app: ChordApp, probe: MacOSProbe, key: string) {
-  const map = async () =>
-    (await controls(probe, 10)).find(
-      (node) => node.role === "AXButton" && [node.title, node.description].includes("Collapse Map"),
-    );
-  expect(await map()).toBeUndefined();
+  const expanded = () => menu(probe, "View", "Collapse Map");
+  const collapsed = () => menu(probe, "View", "Expand Map");
+  if (await expanded()) await probe.press(bundle, "View", "Collapse Map");
+  await waitFor(collapsed);
   try {
     await app.runChecked(key);
-    await waitFor(map, 15_000);
+    await waitFor(expanded, 15_000);
+    await waitFor(async () =>
+      (await controls(probe, 10)).find(
+        (node) => node.role === "AXGroup" && /^Weather map[: ]/.test(node.description ?? ""),
+      ),
+    );
   } finally {
-    if (await map()) {
-      await probe.pressControl(bundle, "AXButton", "Collapse Map");
-      await waitFor(async () => ((await map()) ? undefined : true));
+    if (await expanded()) {
+      await probe.press(bundle, "View", "Collapse Map");
+      await waitFor(collapsed);
     }
   }
 }
