@@ -9,7 +9,7 @@ file = '@keychord/chords-menu/js/menu.js'
 'go' = { name = 'Game: Open', '@input:menu' = ['BY_PATH', ['Game', 'Open…']] }
 'gs' = { name = 'Game: Save', '@input:menu' = ['BY_PATH', ['Game', 'Save']] }
 'ge' = { name = 'Game: Save As', '@input:menu' = ['BY_PATH', ['Game', 'Save As…']] }
-'g,' = { name = 'Game: Settings', '@input:menu' = ['BY_PATH', ['Chess', 'Preferences…']] }
+'g,' = { name = 'Game: Settings', '@input:menu' = ['BY_PATH', ['Chess', 'Settings…']] }
 
 '?m' = { name = 'Moves' }
 'mk' = { name = 'Moves: Take Back', '@input:menu' = ['BY_PATH', ['Moves', 'Take Back Move']] }

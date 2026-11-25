@@ -1,0 +1,27 @@
+name = 'Windows System Shortcuts'
+
+[meta]
+chord = '>=0.3.4'
+
+[placeholders]
+"<>" = { name = 'System shortcuts prefix', default = 's' }
+
+[chords]
+'?<>' = { name = 'System Shortcuts' }
+'<>0' = { name = 'Start Menu', shortcut = 'super' }
+'<>i' = { name = 'Focus Notification Area', shortcut = 'super+b' }
+'<>c' = { name = 'Quick Settings or Action Center', shortcut = 'super+a' }
+'<>t' = { name = 'Notifications and Calendar (Windows 11)', shortcut = 'super+n' }
+'<>r' = { name = 'Run Dialog', shortcut = 'super+r' }
+'<>q' = { name = 'Task Manager', shortcut = 'ctrl+shift+esc' }
+'<>ls' = { name = 'Lock Screen', shortcut = 'super+l' }
+
+'?<>v' = { name = 'Volume' }
+'<>vu' = { name = 'Volume Up', shortcut = 'AudioVolumeUp' }
+'<>vd' = { name = 'Volume Down', shortcut = 'AudioVolumeDown' }
+'<>vm' = { name = 'Volume Mute', shortcut = 'AudioVolumeMute' }
+
+'?<>w' = { name = 'Window' }
+'<>w' = { name = 'Window Menu', shortcut = 'alt+space' }
+'<>wm' = { name = 'Application Menu Bar', shortcut = 'f10' }
+'<>wq' = { name = 'Close Window', shortcut = 'alt+f4' }
