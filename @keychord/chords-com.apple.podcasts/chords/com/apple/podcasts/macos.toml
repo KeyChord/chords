@@ -5,11 +5,11 @@ file = '@keychord/chords-menu/js/menu.js'
 
 [chords]
 '?a' = { name = 'App' }
-'a,' = { name = 'App: Settings', '@input:menu' = ['BY_PATH', ['Podcasts', 'Settings…']] }
+'a,' = { name = 'App: Settings', '@input:menu' = ['BY_PATH', ['Podcasts', 'Settings']] }
 '?g' = { name = 'Goto' }
-'g/' = { name = 'Goto: Search', shortcut = 'cmd+f' }
+'g/' = { name = 'Goto: Search', '@input:menu' = ['BY_PATH', ['Edit', 'Search']] }
 '?n' = { name = 'New' }
-'ns' = { name = 'New: Station', '@input:menu' = ['SEARCH', 'File > New Station'] }
+'ns' = { name = 'New: Station', '@input:menu' = ['BY_PATH', ['File', 'Create Station']] }
 'nf' = { name = 'New: Follow a Show by URL', '@input:menu' = [
   'SEARCH',
   'File > Follow a Show by URL',
@@ -21,7 +21,7 @@ file = '@keychord/chords-menu/js/menu.js'
   'BY_PATH',
   [
     'Controls',
-    'Go to Current Show',
+    'Go to Show',
   ],
 ] }
 'pf' = { name = 'Playback: Skip Forward', shortcut = 'cmd+shift+right' }
