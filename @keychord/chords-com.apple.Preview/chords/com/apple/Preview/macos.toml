@@ -12,8 +12,8 @@ file = '@keychord/chords-menu/js/menu.js'
 'sf' = { name = 'Search: Find', '@input:menu' = ['BY_PATH', ['Edit', 'Find', 'Find…']] }
 
 '?g' = { name = 'Goto' }
-'g[' = { name = 'Goto: Previous Page', '@input:menu' = ['BY_PATH', ['Go', 'Previous Page']] }
-'g]' = { name = 'Goto: Next Page', '@input:menu' = ['BY_PATH', ['Go', 'Next Page']] }
+'g[' = { name = 'Goto: Previous Page', '@input:menu' = ['BY_PATH', ['Go', 'Previous Item']] }
+'g]' = { name = 'Goto: Next Page', '@input:menu' = ['BY_PATH', ['Go', 'Next Item']] }
 'gp' = { name = 'Goto: Page Number', '@input:menu' = ['BY_PATH', ['Go', 'Go to Page…']] }
 
 '?v' = { name = 'View' }

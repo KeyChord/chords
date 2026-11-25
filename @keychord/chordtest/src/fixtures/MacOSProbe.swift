@@ -386,6 +386,16 @@ func inspect(_ args: [String]) throws {
             event?.post(tap: .cghidEventTap)
             Thread.sleep(forTimeInterval: 0.07)
         }
+    case "set-focused-text":
+        let app = try application(args[1])
+        guard let field: AXUIElement = attribute(app, kAXFocusedUIElementAttribute),
+              let role: String = attribute(field, kAXRoleAttribute),
+              [kAXTextFieldRole, kAXTextAreaRole].contains(role),
+              attribute(field, kAXSubroleAttribute) != kAXSecureTextFieldSubrole else {
+            throw ProbeError("The focused control is not a plain text editor")
+        }
+        let status = AXUIElementSetAttributeValue(field, kAXValueAttribute as CFString, args[2] as CFString)
+        guard status == .success else { throw ProbeError("Cannot set focused text (AX error \(status.rawValue))") }
     case "key":
         let key = CGKeyCode(args[1])!
         let flags = CGEventFlags(rawValue: UInt64(args[2])!)

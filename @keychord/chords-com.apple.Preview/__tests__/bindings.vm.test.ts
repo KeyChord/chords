@@ -64,6 +64,8 @@ const caseKeys = [
 function behavior(
   app: ChordApp,
   probe: MacOSProbe,
+  pdf: string,
+  image: string,
 ): Record<(typeof caseKeys)[number], () => Promise<void>> {
   const menu = (...path: string[]) => probe.menu(id, ...path);
   const nodes = async () => flattenAX(await probe.windows(id, 7));
@@ -76,7 +78,7 @@ function behavior(
         if (await button(/^Cancel$/)) return button(title);
       });
     } finally {
-      await probe.key(escape);
+      if (await button(/^Cancel$/)) await probe.pressControl(id, "AXButton", "Cancel");
       await waitFor(async () => (!(await button(/^Cancel$/)) ? true : undefined));
     }
   };
@@ -108,20 +110,33 @@ function behavior(
   };
   const pageSize = async () =>
     (await nodes()).find(({ role, size }) => role === "AXPage" && size && size[0] > 0)?.size?.[0];
-  const zoom = async (sequence: string, changed: (before: number, after: number) => boolean) => {
-    await setView("Single Page");
+  const isActualSize = (size: number | undefined) =>
+    size !== undefined && Math.abs(size - pageWidth) < 0.01;
+  const waitForActualSize = () =>
+    waitFor(async () => {
+      const size = await pageSize();
+      if (isActualSize(size)) return size;
+    });
+  const setActualSize = async () => {
+    const size = await pageSize();
+    if (size !== undefined && isActualSize(size)) return size;
     await probe.press(id, "View", "Actual Size");
-    const before = await waitFor(pageSize);
-    try {
-      await app.runChecked(sequence);
-      await waitFor(async () => {
-        const size = await pageSize();
-        if (size !== undefined && changed(before, size)) return size;
-      });
-    } finally {
-      await probe.press(id, "View", "Actual Size");
-      await waitFor(async () => (Math.abs((await pageSize())! - before) < 1 ? true : undefined));
-    }
+    return waitForActualSize();
+  };
+  const zoom = async (sequence: "z=" | "z-") => {
+    await setView("Single Page");
+    const before = await waitFor(pageSize, 10_000);
+    await app.runChecked(sequence);
+    await waitFor(async () => {
+      const size = await pageSize();
+      const direction = sequence === "z=" ? 1 : -1;
+      return size !== undefined && (size - before) * direction > 1 ? size : undefined;
+    }, 10_000).catch(async (cause) => {
+      throw new Error(
+        `Preview page width was ${before} before ${sequence} and ${await pageSize()} afterward`,
+        { cause },
+      );
+    });
   };
   const toggle = async (sequence: string, section: string, label: string) => {
     const shown = () => menu(section, `Hide ${label}`).catch(() => undefined);
@@ -138,7 +153,22 @@ function behavior(
 
   return {
     fo: () => panel("fo", /^Open$/),
-    fe: () => panel("fe", /^(Save|Export)$/),
+    fe: async () => {
+      await probe.activate(id, image);
+      const source = await waitFor(async () => {
+        const window = await probe.window(id);
+        return window.title?.startsWith("Chordtest Export") ? window : undefined;
+      });
+      try {
+        await panel("fe", /^(Save|Export)$/);
+      } finally {
+        await probe.closeWindow(id, source.title!);
+        await probe.activate(id, pdf);
+        await waitFor(
+          async () => (await probe.window(id)).title?.startsWith("Chordtest Preview") || undefined,
+        );
+      }
+    },
     sf: async () => {
       expect((await probe.focus(id)).subrole).not.toBe("AXSearchField");
       await app.runChecked("sf");
@@ -147,7 +177,12 @@ function behavior(
           (await probe.focus(id)).subrole === "AXSearchField" ? true : undefined,
         );
       } finally {
-        await probe.key(escape);
+        const firstPage = await waitFor(async () =>
+          (await nodes()).find((node) => node.role === "AXPage" && node.position && node.size),
+        );
+        const [x, y] = firstPage.position!;
+        const [width, height] = firstPage.size!;
+        await probe.clickPoint(x + width / 2, y + height / 2);
         await waitFor(async () =>
           (await probe.focus(id)).subrole !== "AXSearchField" ? true : undefined,
         );
@@ -155,19 +190,19 @@ function behavior(
     },
     "g[": async () => {
       await setView("Single Page");
-      await probe.press(id, "Go", "Next Page");
-      await probe.press(id, "Go", "Next Page");
+      await probe.press(id, "Go", "Next Item");
+      await probe.press(id, "Go", "Next Item");
       await waitFor(async () =>
-        (await menu("Go", "Next Page")).enabled === false ? true : undefined,
+        (await menu("Go", "Next Item")).enabled === false ? true : undefined,
       );
-      await navigation("g[", "Previous Page", "Next Page");
-      await probe.press(id, "Go", "Previous Page");
-      await probe.press(id, "Go", "Previous Page");
+      await navigation("g[", "Previous Item", "Next Item");
+      await probe.press(id, "Go", "Previous Item");
+      await probe.press(id, "Go", "Previous Item");
       await waitFor(async () =>
-        (await menu("Go", "Previous Page")).enabled === false ? true : undefined,
+        (await menu("Go", "Previous Item")).enabled === false ? true : undefined,
       );
     },
-    "g]": () => navigation("g]", "Next Page", "Previous Page"),
+    "g]": () => navigation("g]", "Next Item", "Previous Item"),
     gp: () => panel("gp", /^(OK|Go)$/),
     ...Object.fromEntries(
       Object.entries(sidebarModes).map(([key, title]) => [
@@ -194,19 +229,21 @@ function behavior(
     vi: () => toggle("vi", "Tools", "Inspector"),
     za: async () => {
       await setView("Single Page");
-      await probe.press(id, "View", "Actual Size");
-      const actual = await waitFor(pageSize);
+      const actual = await setActualSize();
       await probe.press(id, "View", "Zoom In");
       try {
-        await waitFor(async () => ((await pageSize())! > actual ? true : undefined));
+        await waitFor(async () => {
+          const size = await pageSize();
+          if (size !== undefined && size > actual) return size;
+        });
         await app.runChecked("za");
-        await waitFor(async () => (Math.abs((await pageSize())! - actual) < 1 ? true : undefined));
+        await waitForActualSize();
       } finally {
-        await probe.press(id, "View", "Actual Size");
+        await setActualSize();
       }
     },
-    "z=": () => zoom("z=", (before, after) => after > before),
-    "z-": () => zoom("z-", (before, after) => after < before),
+    "z=": () => zoom("z="),
+    "z-": () => zoom("z-"),
   };
 }
 
@@ -222,15 +259,23 @@ test("every Preview binding has a behavior case", async () => {
 });
 
 test.skipIf(!macOSUITestsEnabled)(
-  "Preview chords navigate and display a three-page PDF",
+  "Preview chords navigate a three-page PDF and export an image",
   async () => {
     const guestVersion = Bun.spawnSync(["sw_vers", "-productVersion"]).stdout.toString().trim();
     console.log("guest macOS", guestVersion);
     expect(guestVersion).toMatch(/^27\./);
     const directory = await mkdtemp(join(tmpdir(), "chordtest-preview-"));
     const fixture = join(directory, "Chordtest Preview.pdf");
+    const image = join(directory, "Chordtest Export.png");
     try {
       await Bun.write(fixture, testPDF());
+      await Bun.write(
+        image,
+        Buffer.from(
+          "iVBORw0KGgoAAAANSUhEUgAAAEAAAAAwCAIAAAAuKetIAAAAZElEQVR4nO3PUQkAIBTAwFfNSuY0lCH8OITBAtzmrP11wwUNaEEDWtCAFjSgBQ1oQQNa0IAWNKAFDWhBA1rQgBY0oAUNaEEDWtCAFjSgBQ1oQQNa0IAWNKAFDWhBA1rQgBY8dgFGIvUA4YIaoAAAAABJRU5ErkJggg==",
+          "base64",
+        ),
+      );
       await withChordPackage(import.meta.url, (app) =>
         withMacOSProbe(async (probe) => {
           await probe.activate(id, fixture);
@@ -240,7 +285,7 @@ test.skipIf(!macOSUITestsEnabled)(
             12_000,
           );
           try {
-            const cases = behavior(app, probe);
+            const cases = behavior(app, probe, fixture, image);
             expect(Object.keys(cases).sort()).toEqual([...caseKeys].sort());
             for (const [sequence, run] of Object.entries(cases)) {
               try {

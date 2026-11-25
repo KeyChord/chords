@@ -201,6 +201,10 @@ export class MacOSProbe {
     await runCommand([this.executable, "type-text", value]);
   }
 
+  async setFocusedText(bundleId: string, value: string) {
+    await runCommand([this.executable, "set-focused-text", bundleId, value]);
+  }
+
   async moveIcon(bundleId: string, title: string, x: number, y: number) {
     await runCommand([this.executable, "move", bundleId, title, String(x), String(y)]);
   }

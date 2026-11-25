@@ -59,10 +59,16 @@ const scenarios: Record<string, Scenario> = {
     keys: Object.keys(views),
     async run(app, probe) {
       const choices = Object.values(views);
-      const current = async () =>
-        flattenAX([await menu(probe, "View")]).find(
-          (node) => node.mark && choices.includes(node.title ?? ""),
-        )?.title;
+      const current = async () => {
+        const view = await menu(probe, "View").catch((error: unknown) => {
+          if (error instanceof Error && error.message.includes("The app has no menu bar")) return;
+          throw error;
+        });
+        if (view) {
+          return flattenAX([view]).find((node) => node.mark && choices.includes(node.title ?? ""))
+            ?.title;
+        }
+      };
       const original = await waitFor(current);
       try {
         for (const [key, label] of Object.entries(views)) {
@@ -104,6 +110,12 @@ const scenarios: Record<string, Scenario> = {
       await press(probe, "View", "By Month");
       await press(probe, "View", "Go to Today");
       await until(() => showsMonth(0), "the current month in the month view");
+      const datePicker = async () =>
+        (await probe.focus(bundleId)).role === "AXDateTimeArea" ||
+        (await nodes(probe)).some((node) => node.role === "AXDateField");
+      const closeDatePicker = async () => {
+        if (await datePicker()) await probe.pressControl(bundleId, "AXButton", "Cancel");
+      };
       try {
         for (const [key, offset] of [
           ["g[", -1],
@@ -115,17 +127,11 @@ const scenarios: Record<string, Scenario> = {
           await until(() => showsMonth(offset), "month offset " + offset + " after " + key);
         }
         await app.runChecked("gd");
-        const datePicker = async () =>
-          (await nodes(probe)).some(
-            (node) =>
-              node.role === "AXDateField" ||
-              (node.role === "AXButton" && ["Go", "Go to Date"].includes(node.title ?? "")),
-          );
         await until(datePicker, "the Go to Date picker");
-        await probe.key(53);
+        await closeDatePicker();
         await until(async () => !(await datePicker()), "the date picker to close");
       } finally {
-        await probe.key(53);
+        await closeDatePicker();
         await press(probe, "View", "Go to Today");
         await press(probe, "View", original);
       }
@@ -134,19 +140,46 @@ const scenarios: Record<string, Scenario> = {
   "creates, inspects and deletes a local event": {
     keys: ["ne", "ei", "ex"],
     async run(app, probe) {
-      const present = async () =>
-        (await nodes(probe)).some((node) =>
-          [node.title, node.value, node.description].some(
-            (text) => typeof text === "string" && /\bPim\b/.test(text),
-          ),
+      const event = async () =>
+        (await nodes(probe)).find(
+          (node) => node.role === "AXStaticText" && node.description?.startsWith(fixture + ". "),
         );
-      const eventInfo = async () =>
-        (await nodes(probe)).some((node) =>
-          [node.title, node.description].some(
-            (text) =>
-              typeof text === "string" && /^(Add Location|Add Invitees|Add Notes)/i.test(text),
-          ),
+      const floatingInfo = async () =>
+        (await probe.windows(bundleId, 8)).find(
+          (window) =>
+            window.subrole === "AXUnknown" &&
+            flattenAX([window]).some(({ id, value }) => id === "title-field" && value === fixture),
         );
+      const closeEventInfo = async () => {
+        const window = await floatingInfo();
+        if (window) {
+          const close = window.children?.find(
+            ({ role, description }) => role === "AXButton" && description === "Close Window",
+          );
+          if (!close?.position || !close.size)
+            throw new Error("The event info window has no close button");
+          await probe.clickPoint(
+            close.position[0] + close.size[0] / 2,
+            close.position[1] + close.size[1] / 2,
+          );
+          await until(
+            async () => !(await floatingInfo()),
+            "the floating event info window to close",
+          );
+        }
+        if ((await probe.focus(bundleId)).id === "title-field") await probe.key(53);
+      };
+      const selectEvent = async (action: string) => {
+        const frame = await waitFor(async () => {
+          const item = await event();
+          if (item?.position && item.size) return { position: item.position, size: item.size };
+        });
+        await probe.clickPoint(
+          frame.position[0] + frame.size[0] / 2,
+          frame.position[1] + frame.size[1] / 2,
+        );
+        await until(async () => Boolean((await menu(probe, "Edit", action)).enabled), action);
+      };
       const original = await waitFor(
         async () =>
           flattenAX([await menu(probe, "View")]).find(
@@ -155,33 +188,39 @@ const scenarios: Record<string, Scenario> = {
       );
       await press(probe, "View", "By Day");
       await press(probe, "View", "Go to Today");
-      expect(await present()).toBe(false);
+      expect(await event()).toBeUndefined();
       try {
         await app.runChecked("ne");
         await until(
-          async () => (await probe.focus(bundleId)).role === "AXTextField",
+          async () => (await probe.focus(bundleId)).id === "QuickEventCell",
           "the quick event entry",
         );
-        await probe.key(35, 1 << 17);
-        await probe.key(34);
-        await probe.key(46);
+        const quickEntry = fixture + " today at 3pm";
+        const entered = async () => (await probe.focus(bundleId)).value === quickEntry || undefined;
+        await probe.typeText(quickEntry);
+        if (!(await waitFor(entered, 1_500).catch(() => undefined))) {
+          expect((await probe.focus(bundleId)).id).toBe("QuickEventCell");
+          await probe.setFocusedText(bundleId, quickEntry);
+        }
+        await until(async () => Boolean(await entered()), "the entered event description");
         await probe.key(36);
-        await until(present, "the event titled " + fixture);
-        await probe.key(53);
-        await until(async () => !(await eventInfo()), "the new event popover to close");
+        await until(async () => Boolean(await event()), "the event titled " + fixture);
+        await closeEventInfo();
 
+        await selectEvent("Get Info");
         await app.runChecked("ei");
-        await until(eventInfo, "the selected event's details");
-        await probe.key(53);
-        await until(async () => !(await eventInfo()), "the event info to close");
+        await until(async () => Boolean(await floatingInfo()), "the selected event's info window");
+        await closeEventInfo();
 
+        await selectEvent("Delete");
         await app.runChecked("ex");
-        await until(async () => !(await present()), "the selected event to be deleted");
+        await until(async () => !(await event()), "the selected event to be deleted");
       } finally {
-        await probe.key(53);
-        if (await present()) {
+        if (await event()) {
+          await closeEventInfo();
+          await selectEvent("Delete");
           await press(probe, "Edit", "Delete");
-          await until(async () => !(await present()), "fixture event cleanup");
+          await until(async () => !(await event()), "fixture event cleanup");
         }
         await press(probe, "View", original);
       }
@@ -229,7 +268,7 @@ const scenarios: Record<string, Scenario> = {
         try {
           await until(panel, "the file panel for " + key);
         } finally {
-          await probe.key(53);
+          if (await panel()) await probe.pressControl(bundleId, "AXButton", "Cancel");
         }
         await until(async () => !(await panel()), "the file panel to close");
       }
